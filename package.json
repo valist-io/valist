@@ -2,11 +2,13 @@
   "name": "valist",
   "version": "0.0.1",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
-  "main": "src/main.ts",
+  "main": "app/src/pages/index.ts",
   "directories": {
     "test": "test"
   },
   "scripts": {
+    "dev": "cd app && gatsby develop",
+    "build": "cd app && gatsby build",
     "test": "truffle test"
   },
   "repository": {
