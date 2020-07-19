@@ -1,0 +1,30 @@
+{
+  "name": "valistd",
+  "version": "0.0.1",
+  "description": "Valist HTTP Relay",
+  "author": "Akashic Technologies <contact@akashictech.io> (akashictech.io)",
+  "contributors": [
+    "Alec M. Wantoch <alec@akashictech.io> (akashictech.io)",
+    "Zachary J. Pelkey <zach@akashictech.io> (akashictech.io)"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akashictech/valist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akashictech/valist/issues"
+  },
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "develop": "tsc -w"
+  },
+  "dependencies": {
+    "valist": "file:../lib/"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}
