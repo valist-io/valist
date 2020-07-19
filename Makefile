@@ -1,9 +1,10 @@
 SHELL=/bin/bash
 
-# builds frontend to ui/public
+# builds frontend to ui/public (will build lib first)
 ui:
 	cd ui && npm run build
 
+# builds valist npm package
 lib:
 	cd lib && npm run build
 
