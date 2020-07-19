@@ -14,7 +14,7 @@ dev: lib
 
 # compile contracts
 contracts:
-	truffle build
+	truffle compile
 
 # migrates/deploys Solidity contracts via Truffle
 migrate:
@@ -27,5 +27,9 @@ frontend: lib ui
 
 # build all artifacts
 all: contracts lib ui
+
+install:
+	cd lib && npm i
+	cd ui && npm i
 
 .PHONY: ui lib contracts

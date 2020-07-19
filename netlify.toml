@@ -1,4 +1,4 @@
 [build]
   publish = "ui/public"
 
-  command = "make frontend"
+  command = "make install frontend"
