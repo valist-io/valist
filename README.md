@@ -90,9 +90,7 @@ The frontend is powered by Gatsby.js. To start the development server, run the f
 make dev
 ```
 
-This will build the `lib` and `ui` folders and start the local Gatsby development server at `localhost:8000`.
-
-> **Note:** Hot reloading of the `ui` is enabled, however changes to `lib` will need to be recompiled separately, as it is a separate package.
+This will build the `lib` and `ui` folders and start the local Gatsby development server at `localhost:8000`. Hot reloading works for both `lib` and `ui` using `tsc -w` in `lib`, and `gatsby develop` in `ui`. They are executed in parallel, piping output to the same shell, thanks to `make -j`.
 
 ### Migrating contracts
 

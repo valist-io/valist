@@ -9,8 +9,16 @@ lib:
 	cd lib && npm run build
 
 # runs local gatsby server
-dev: lib
+dev-ui:
 	cd ui && npm run develop
+
+# runs local gatsby server
+dev-lib:
+	cd lib && npm run develop
+
+# runs both dev servers in parallel, piping output to same shell
+dev:
+	@make -j 2 dev-lib dev-ui
 
 # compile contracts
 contracts:
