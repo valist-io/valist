@@ -2,7 +2,19 @@
   "name": "valist-ui",
   "description": "A web frontend for valist",
   "version": "0.0.1",
+  "author": "Akashic Technologies <contact@akashictech.io> (akashictech.io)",
+  "contributors": [
+    "Alec M. Wantoch <alec@akashictech.io> (akashictech.io)",
+    "Zachary J. Pelkey <zach@akashictech.io> (akashictech.io)"
+  ],
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akashictech/valist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akashictech/valist/issues"
+  },
   "scripts": {
     "build": "gatsby build",
     "develop": "gatsby develop",
@@ -25,12 +37,5 @@
     "gatsby-cli": "^2.12.62",
     "link-module-alias": "^1.2.0",
     "prettier": "2.0.5"
-  },
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/akashictech/valist.git"
-  },
-  "bugs": {
-    "url": "https://github.com/akashictech/valist/issues"
   }
 }
