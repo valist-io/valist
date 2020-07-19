@@ -1,0 +1,109 @@
+# Valist
+
+A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
+
+## The Problem
+
+Secure (and simplified) software updating is a common problem within IoT, traditional systems, and many cases now, dApps. Typically, it is necessary to roll your own upgrading solution, or be stuck with a centralized app store acceptance and delivery process. The former is ineffective, as constant re-implementation of a process that should be as secure as possible dramatically increases risk, while the latter is ineffective since you are tied to a central entity that manages your distribution on your behalf (i.e., requires permission).
+
+## A Potential Solution
+
+The idea is to leverage Ethereum, IPFS and/or Filecoin to create a public "base" layer for a simplified binary repository that both integrates with traditional systems and is built upon decentralized protocols. Smart contracts on Ethereum manage the latest source of truth for binary data stored in another layer such as IPFS and/or Filecoin. Clients can then query the software notary for the latest version of some software and be pointed to a verifiable, decentralized store.
+
+Imagine the following scenario:
+
+* A developer wants to upload a new firmware version for a hardware wallet (or some other arbitrary software) they have been building in a secure, verifiable way.
+
+* Using a simple frontend, the developer registers their credentials (one or more public keys, perhaps leveraging ERC-725) to the software notary dApp. This can also be organization-level credentials, with individual developer/team access control.
+
+* The developer then signs the firmware with a private key associated with the public identity.
+
+* The developer uploads the firmware to the binary store (IPFS/Filecoin) using the simple frontend, and can set any relevant metadata such as version number, update notes, etc.
+
+* The registry (on Ethereum, and potentially other blockchains in the future) is updated with the latest verified version.
+
+* Clients with the software installed automatically detect the change and proceed to notify and/or trigger an auto-update.
+
+The primary goal for this software is be to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from a single, but flexible notary systems just as much as future technologies. We personally have encountered more than a few situations where we wished a tool like this existed.
+
+As for the open source community, the ability to securely host code in a decentralized way is essential. While it is possible to spin up say, a Debian mirror, it might not be as approachable or commonplace, and places the onus of security and maintenance on the contributor. A system like this could make it easy as possible for a contributor to simply "check a box" next to their favorite app/dApp and help bear the load, without having to worry as much about security or configuration.
+
+This is also a major use-case that could help folks see the tangible value of blockchain/decentralized protocols outside of monetary applications, as it can increase security in many existing systems.
+
+One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data (perhaps via Infura or other public mirrors). This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems. However, users will have the freedom to self-host and contribute storage to the public network, or create their own internal networks that maintains its own notary data, where one can establish a PKI to handle certificate trust, or integrate into existing PKI.
+
+To start, we are providing a simple web frontend that can be deployed locally or on a server, and a shared library that will be used in a future CLI (and other clients). The intent is to be CI/CD friendly in the future, enabling automatic publishing of cryptographically verifiable software.
+
+## Building
+
+A `Makefile` is provided to simplify development workflow.
+
+### Prerequisites
+
+You must have `npm` installed on your system, as well as the `truffle-cli` package.
+
+To install Truffle, run the following:
+
+```bash
+npm install -g truffle
+```
+
+### Installing Dependencies
+
+To install all dependencies, simply run the following:
+
+```bash
+make install
+```
+
+This will `cd` into the `lib` folder and run an `npm install`, then repeats the same process for `ui`.
+
+You can also manually run `npm install` in each of the `lib` and `ui` folders.
+
+### Building the frontend
+
+You can build the `lib` and `ui` separately as Make targets.
+
+However, you also can build the whole frontend using:
+
+```bash
+make frontend
+```
+
+This works great inside of CI/CD tools as well. For example, `make install frontend` will work in most runners as the build command. Check out our `netlify.toml` for an example!
+
+### Building all artifacts
+
+To build the `contracts`, `lib`, and the `ui`, simply run:
+
+```bash
+make all
+```
+
+## Development
+
+### Running the dev server
+
+The frontend is powered by Gatsby.js. To start the development server, run the following command:
+
+```bash
+make dev
+```
+
+This will build the `lib` and `ui` folders and start the local Gatsby development server at `localhost:8000`.
+
+> **Note:** Hot reloading of the `ui` is enabled, however changes to `lib` will need to be recompiled separately, as it is a separate package.
+
+### Migrating contracts
+
+Truffle is managing the contract migrations and deployments. Make sure you have a development chain setup, and modify the `truffle-config.js` accordingly.
+
+Once your Truffle environment is established, simply run:
+
+```bash
+make migrate
+```
+
+You can also run the `make deploy` alias.
+
+This will deploy the Solidity contracts to your chain of choice. Make sure to update your contract addresses if/when necessary!
