@@ -1,6 +1,5 @@
 {
   "name": "valist-ui",
-  "private": true,
   "description": "A web frontend for valist",
   "version": "0.0.1",
   "license": "MIT",

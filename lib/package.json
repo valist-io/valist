@@ -1,0 +1,25 @@
+{
+  "name": "valist",
+  "version": "0.0.1",
+  "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
+  "main": "dist/main.js",
+  "types": "dist/main.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "author": "Alec M. Wantoch <alec@akashictech.io> (akashictech.io)",
+  "contributors": [
+    "Zachary J. Pelkey <zach@akashictech.io> (akashictech.io)"
+  ],
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akashictech/valist.git"
+  },
+  "bugs": {
+    "url": "https://github.com/akashictech/valist/issues"
+  },
+  "devDependencies": {
+    "typescript": "^3.9.7"
+  }
+}

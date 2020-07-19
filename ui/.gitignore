@@ -1,3 +1,9 @@
+# Truffle
+build
+
+# valist lib
+dist
+
 # Logs
 logs
 *.log
