@@ -1,5 +1,7 @@
 # Valist
 
+[![Netlify Status](https://api.netlify.com/api/v1/badges/c13b8854-5901-4c94-94e5-4050cb50d51b/deploy-status)](https://app.netlify.com/sites/valist/deploys)
+
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
 
 ## Motivation
@@ -10,7 +12,7 @@ The idea is to leverage Ethereum, IPFS and/or Filecoin to create a public "base"
 
 Imagine the following scenario:
 
-* A developer wants to upload a new firmware version for a hardware wallet (or some other arbitrary software) they have been building in a secure, verifiable way.
+* A developer wants to distribute a new firmware version for a hardware wallet (or some other arbitrary software) they have been building in a secure, verifiable way.
 
 * Using a simple frontend, the developer registers their credentials (one or more public keys, perhaps leveraging ERC-725) to the software notary dApp. This can also be organization-level credentials, with individual developer/team access control.
 
@@ -22,13 +24,13 @@ Imagine the following scenario:
 
 * Clients with the software installed automatically detect the change and proceed to notify and/or trigger an auto-update.
 
-The primary goal for this software is be to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from a single, but flexible notary systems just as much as future technologies. We personally have encountered more than a few situations where we wished a tool like this existed.
+The primary goal for this software is to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from flexible notary systems just as much as future technologies.
 
 As for the open source community, the ability to securely host code in a decentralized way is essential. While it is possible to spin up say, a Debian mirror, it might not be as approachable or commonplace, and places the onus of security and maintenance on the contributor. A system like this could make it easy as possible for a contributor to simply "check a box" next to their favorite app/dApp and help bear the load, without having to worry as much about security or configuration.
 
 This is also a major use-case that could help folks see the tangible value of blockchain/decentralized protocols outside of monetary applications, as it can increase security in many existing systems.
 
-One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data (perhaps via Infura or other public mirrors, like `valist.io`). This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems. However, users will have the freedom to self-host and contribute storage to the public network, or create their own internal networks that maintains its own notary data, where one can establish a PKI to handle certificate trust, or integrate into existing PKI.
+One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data. This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems, and users and enterprises will have the freedom to self-host and contribute storage to the public network, or create their own internal or private notaries.
 
 ### Architecture Overview
 
