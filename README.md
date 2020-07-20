@@ -2,11 +2,9 @@
 
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
 
-## The Problem
+## Motivation
 
 Secure (and simplified) software updating is a common problem within IoT, traditional systems, and many cases now, dApps. Typically, it is necessary to roll your own upgrading solution, or be stuck with a centralized app store acceptance and delivery process. The former is ineffective, as constant re-implementation of a process that should be as secure as possible dramatically increases risk, while the latter is ineffective since you are tied to a central entity that manages your distribution on your behalf (i.e., requires permission).
-
-## A Potential Solution
 
 The idea is to leverage Ethereum, IPFS and/or Filecoin to create a public "base" layer for a simplified binary repository that both integrates with traditional systems and is built upon decentralized protocols. Smart contracts on Ethereum manage the latest source of truth for binary data stored in another layer such as IPFS and/or Filecoin. Clients can then query the software notary for the latest version of some software and be pointed to a verifiable, decentralized store.
 
@@ -30,9 +28,13 @@ As for the open source community, the ability to securely host code in a decentr
 
 This is also a major use-case that could help folks see the tangible value of blockchain/decentralized protocols outside of monetary applications, as it can increase security in many existing systems.
 
-One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data (perhaps via Infura or other public mirrors). This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems. However, users will have the freedom to self-host and contribute storage to the public network, or create their own internal networks that maintains its own notary data, where one can establish a PKI to handle certificate trust, or integrate into existing PKI.
+One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data (perhaps via Infura or other public mirrors, like `valist.io`). This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems. However, users will have the freedom to self-host and contribute storage to the public network, or create their own internal networks that maintains its own notary data, where one can establish a PKI to handle certificate trust, or integrate into existing PKI.
 
-To start, we are providing a simple web frontend that can be deployed locally or on a server, and a shared library that will be used in a future CLI (and other clients). The intent is to be CI/CD friendly in the future, enabling automatic publishing of cryptographically verifiable software.
+### Architecture Overview
+
+To start, we are providing a simple web frontend and HTTP relay that can be deployed locally or on a server, and a shared library that will be used in a future CLI (and other clients). The intent is to be CI/CD friendly in the future, enabling automatic publishing of cryptographically verifiable software.
+
+![Architecture](docs/img/architecture.svg)
 
 ## Building
 
@@ -70,8 +72,7 @@ However, you also can build the whole frontend using:
 make frontend
 ```
 
-This works great inside of CI/CD tools as well. For example, `make install frontend` will work in most runners as the build command. Check out our `netlify.toml` for an example!
-
+This works great inside of CI/CD tools as well. For example, `make install frontend` will work in most runners as the build command.
 ### Building all artifacts
 
 To build the `contracts`, `lib`, and the `ui`, simply run:
