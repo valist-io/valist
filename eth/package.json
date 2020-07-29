@@ -1,0 +1,30 @@
+{
+  "name": "valist-contracts",
+  "version": "0.1.0",
+  "description": "Valist Solidity smart contracts",
+  "main": "truffle-config.js",
+  "directories": {
+    "test": "test"
+  },
+  "dependencies": {
+    "@openzeppelin/contracts": "^3.1.0"
+  },
+  "devDependencies": {
+    "truffle": "^5.1.36"
+  },
+  "scripts": {
+    "compile": "truffle compile",
+    "migrate": "truffle migrate",
+    "test": "truffle test"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/akashictech/valist.git"
+  },
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/akashictech/valist/issues"
+  },
+  "homepage": "https://github.com/akashictech/valist#readme"
+}

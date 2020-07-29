@@ -22,11 +22,11 @@ dev:
 
 # compile contracts
 contracts:
-	truffle compile
+	cd eth && npm run compile
 
 # migrates/deploys Solidity contracts via Truffle
 migrate:
-	truffle migrate
+	cd eth && npm run migrate
 
 deploy: migrate
 
@@ -39,5 +39,10 @@ all: contracts lib ui
 install:
 	cd lib && npm i
 	cd ui && npm i
+
+install-all:
+	cd lib && npm i
+	cd ui && npm i
+	cd eth && npm i
 
 .PHONY: ui lib contracts
