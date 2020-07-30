@@ -7,22 +7,30 @@ contract Valist {
 
     // map an organization/username handle to an Organization contract
     // [valist.io]/[organization]/[repository]
-    mapping(string => ValistOrganization) public valist;
+    mapping(string => ValistOrganization) public orgs;
 
     event Update(string orgName, string repoName, string meta, string changelog, string release);
 
-    function getRepositoryMetaByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
-        return valist[orgName].getRepository(repoName).getMeta();
+    function getOrganizationMeta(string memory orgName) public view returns(string memory meta) {
+        return orgs[orgName].meta();
     }
 
-    function getRepositoryLatestReleaseByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
-        return valist[orgName].getRepository(repoName).getLatestRelease();
+    function getOrganizationAddress(string memory orgName) public view returns(address org) {
+        return address(orgs[orgName]);
+    }
+
+    function getRepoMetaByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
+        return orgs[orgName].repos(repoName).meta();
+    }
+
+    function getRepoLatestReleaseByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
+        return orgs[orgName].repos(repoName).latestRelease();
     }
 
     // register organization/username to the global valist namespace
     function createOrganization(string memory orgName, string memory meta) public {
-        require(valist[orgName].isActive() == false, "Organization already exists!");
-        valist[orgName] = new ValistOrganization(meta, msg.sender);
+        require(address(orgs[orgName]) == address(0), "Organization already exists!");
+        orgs[orgName] = new ValistOrganization(msg.sender, meta);
     }
 
 }

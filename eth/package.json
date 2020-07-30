@@ -15,6 +15,9 @@
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
+    "migrate:reset": "truffle migrate --reset",
+    "develop": "truffle develop",
+    "console": "truffle console",
     "test": "truffle test"
   },
   "repository": {

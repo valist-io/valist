@@ -28,6 +28,10 @@ contracts:
 migrate:
 	cd eth && npm run migrate
 
+# runs local ganache cli
+blockchain:
+	cd eth && npm run develop
+
 deploy: migrate
 
 # build frontend

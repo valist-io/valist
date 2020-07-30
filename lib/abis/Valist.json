@@ -124,7 +124,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -143,7 +144,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -167,7 +169,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -186,7 +189,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -228,7 +232,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -252,7 +257,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -312,7 +318,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -336,7 +343,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -391,14 +399,14 @@
     "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/ValistOld.sol",
     "exportedSymbols": {
       "Valist": [
-        322
+        351
       ]
     },
-    "id": 323,
+    "id": 352,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 126,
+        "id": 155,
         "literals": [
           "solidity",
           ">=",
@@ -414,10 +422,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
         "file": "@openzeppelin/contracts/access/AccessControl.sol",
-        "id": 127,
+        "id": 156,
         "nodeType": "ImportDirective",
-        "scope": 323,
-        "sourceUnit": 866,
+        "scope": 352,
+        "sourceUnit": 854,
         "src": "66:58:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -429,44 +437,44 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 128,
+              "id": 157,
               "name": "AccessControl",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 865,
+              "referencedDeclaration": 853,
               "src": "145:13:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_AccessControl_$865",
+                "typeIdentifier": "t_contract$_AccessControl_$853",
                 "typeString": "contract AccessControl"
               }
             },
-            "id": 129,
+            "id": 158,
             "nodeType": "InheritanceSpecifier",
             "src": "145:13:2"
           }
         ],
         "contractDependencies": [
-          595,
-          865
+          583,
+          853
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 322,
+        "id": 351,
         "linearizedBaseContracts": [
-          322,
-          865,
-          595
+          351,
+          853,
+          583
         ],
         "name": "Valist",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 134,
+            "id": 163,
             "name": "REPO_OWNER",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "166:58:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -475,7 +483,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 130,
+              "id": 159,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "166:7:2",
@@ -490,7 +498,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "5245504f5f4f574e45525f524f4c45",
-                  "id": 132,
+                  "id": 161,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -513,7 +521,7 @@
                     "typeString": "literal_string \"REPO_OWNER_ROLE\""
                   }
                 ],
-                "id": 131,
+                "id": 160,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -524,7 +532,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 133,
+              "id": 162,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -543,11 +551,11 @@
           },
           {
             "constant": true,
-            "id": 139,
+            "id": 168,
             "name": "ORG_OWNER",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "230:56:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -556,7 +564,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 135,
+              "id": 164,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "230:7:2",
@@ -571,7 +579,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4f52475f4f574e45525f524f4c45",
-                  "id": 137,
+                  "id": 166,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -594,7 +602,7 @@
                     "typeString": "literal_string \"ORG_OWNER_ROLE\""
                   }
                 ],
-                "id": 136,
+                "id": 165,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -605,7 +613,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 138,
+              "id": 167,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -624,11 +632,11 @@
           },
           {
             "constant": true,
-            "id": 144,
+            "id": 173,
             "name": "REPO_ADMIN",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "293:58:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -637,7 +645,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 140,
+              "id": 169,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "293:7:2",
@@ -652,7 +660,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "5245504f5f41444d494e5f524f4c45",
-                  "id": 142,
+                  "id": 171,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -675,7 +683,7 @@
                     "typeString": "literal_string \"REPO_ADMIN_ROLE\""
                   }
                 ],
-                "id": 141,
+                "id": 170,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -686,7 +694,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 143,
+              "id": 172,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -705,11 +713,11 @@
           },
           {
             "constant": true,
-            "id": 149,
+            "id": 178,
             "name": "ORG_ADMIN",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "357:56:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -718,7 +726,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 145,
+              "id": 174,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "357:7:2",
@@ -733,7 +741,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4f52475f41444d494e5f524f4c45",
-                  "id": 147,
+                  "id": 176,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -756,7 +764,7 @@
                     "typeString": "literal_string \"ORG_ADMIN_ROLE\""
                   }
                 ],
-                "id": 146,
+                "id": 175,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -767,7 +775,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 148,
+              "id": 177,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -786,11 +794,11 @@
           },
           {
             "constant": true,
-            "id": 154,
+            "id": 183,
             "name": "APP_DEV",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "420:52:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -799,7 +807,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 150,
+              "id": 179,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "420:7:2",
@@ -814,7 +822,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4150505f4445565f524f4c45",
-                  "id": 152,
+                  "id": 181,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -837,7 +845,7 @@
                     "typeString": "literal_string \"APP_DEV_ROLE\""
                   }
                 ],
-                "id": 151,
+                "id": 180,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -848,7 +856,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 153,
+              "id": 182,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -867,15 +875,15 @@
           },
           {
             "canonicalName": "Valist.Repository",
-            "id": 172,
+            "id": 201,
             "members": [
               {
                 "constant": false,
-                "id": 159,
+                "id": 188,
                 "name": "usersByRole",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "507:41:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -884,9 +892,9 @@
                   "typeString": "mapping(bytes32 => address[])"
                 },
                 "typeName": {
-                  "id": 158,
+                  "id": 187,
                   "keyType": {
-                    "id": 155,
+                    "id": 184,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "515:7:2",
@@ -903,7 +911,7 @@
                   },
                   "valueType": {
                     "baseType": {
-                      "id": 156,
+                      "id": 185,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "526:7:2",
@@ -913,7 +921,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 157,
+                    "id": 186,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "526:9:2",
@@ -928,11 +936,11 @@
               },
               {
                 "constant": false,
-                "id": 162,
+                "id": 191,
                 "name": "changelog",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "558:18:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -942,7 +950,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 160,
+                    "id": 189,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "558:6:2",
@@ -951,7 +959,7 @@
                       "typeString": "string"
                     }
                   },
-                  "id": 161,
+                  "id": 190,
                   "length": null,
                   "nodeType": "ArrayTypeName",
                   "src": "558:8:2",
@@ -965,11 +973,11 @@
               },
               {
                 "constant": false,
-                "id": 165,
+                "id": 194,
                 "name": "releases",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "667:17:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -979,7 +987,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 163,
+                    "id": 192,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "667:6:2",
@@ -988,7 +996,7 @@
                       "typeString": "string"
                     }
                   },
-                  "id": 164,
+                  "id": 193,
                   "length": null,
                   "nodeType": "ArrayTypeName",
                   "src": "667:8:2",
@@ -1002,11 +1010,11 @@
               },
               {
                 "constant": false,
-                "id": 167,
+                "id": 196,
                 "name": "meta",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "734:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1015,7 +1023,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 166,
+                  "id": 195,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "734:6:2",
@@ -1029,11 +1037,11 @@
               },
               {
                 "constant": false,
-                "id": 169,
+                "id": 198,
                 "name": "latest",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "806:13:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1042,7 +1050,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 168,
+                  "id": 197,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "806:6:2",
@@ -1056,11 +1064,11 @@
               },
               {
                 "constant": false,
-                "id": 171,
+                "id": 200,
                 "name": "active",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "898:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1069,7 +1077,7 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 170,
+                  "id": 199,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "898:4:2",
@@ -1084,21 +1092,21 @@
             ],
             "name": "Repository",
             "nodeType": "StructDefinition",
-            "scope": 322,
+            "scope": 351,
             "src": "479:437:2",
             "visibility": "public"
           },
           {
             "canonicalName": "Valist.Organization",
-            "id": 186,
+            "id": 215,
             "members": [
               {
                 "constant": false,
-                "id": 177,
+                "id": 206,
                 "name": "usersByRole",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "952:41:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1107,9 +1115,9 @@
                   "typeString": "mapping(bytes32 => address[])"
                 },
                 "typeName": {
-                  "id": 176,
+                  "id": 205,
                   "keyType": {
-                    "id": 173,
+                    "id": 202,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "960:7:2",
@@ -1126,7 +1134,7 @@
                   },
                   "valueType": {
                     "baseType": {
-                      "id": 174,
+                      "id": 203,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "971:7:2",
@@ -1136,7 +1144,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 175,
+                    "id": 204,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "971:9:2",
@@ -1151,22 +1159,22 @@
               },
               {
                 "constant": false,
-                "id": 181,
+                "id": 210,
                 "name": "repos",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1003:35:2",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                  "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                   "typeString": "mapping(string => struct Valist.Repository)"
                 },
                 "typeName": {
-                  "id": 180,
+                  "id": 209,
                   "keyType": {
-                    "id": 178,
+                    "id": 207,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1011:6:2",
@@ -1178,18 +1186,18 @@
                   "nodeType": "Mapping",
                   "src": "1003:29:2",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                     "typeString": "mapping(string => struct Valist.Repository)"
                   },
                   "valueType": {
                     "contractScope": null,
-                    "id": 179,
+                    "id": 208,
                     "name": "Repository",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 172,
+                    "referencedDeclaration": 201,
                     "src": "1021:10:2",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Repository_$172_storage_ptr",
+                      "typeIdentifier": "t_struct$_Repository_$201_storage_ptr",
                       "typeString": "struct Valist.Repository"
                     }
                   }
@@ -1199,11 +1207,11 @@
               },
               {
                 "constant": false,
-                "id": 183,
+                "id": 212,
                 "name": "meta",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1048:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1212,7 +1220,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 182,
+                  "id": 211,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "1048:6:2",
@@ -1226,11 +1234,11 @@
               },
               {
                 "constant": false,
-                "id": 185,
+                "id": 214,
                 "name": "active",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1122:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -1239,7 +1247,7 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 184,
+                  "id": 213,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "1122:4:2",
@@ -1254,28 +1262,28 @@
             ],
             "name": "Organization",
             "nodeType": "StructDefinition",
-            "scope": 322,
+            "scope": 351,
             "src": "922:218:2",
             "visibility": "public"
           },
           {
             "anonymous": false,
             "documentation": null,
-            "id": 198,
+            "id": 227,
             "name": "Update",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 197,
+              "id": 226,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 188,
+                  "id": 217,
                   "indexed": false,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1159:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1284,7 +1292,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 187,
+                    "id": 216,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1159:6:2",
@@ -1298,12 +1306,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 190,
+                  "id": 219,
                   "indexed": false,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1175:15:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1312,7 +1320,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 189,
+                    "id": 218,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1175:6:2",
@@ -1326,12 +1334,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 192,
+                  "id": 221,
                   "indexed": false,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1192:11:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1340,7 +1348,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 191,
+                    "id": 220,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1192:6:2",
@@ -1354,12 +1362,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 194,
+                  "id": 223,
                   "indexed": false,
                   "name": "changelog",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1205:16:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1368,7 +1376,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 193,
+                    "id": 222,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1205:6:2",
@@ -1382,12 +1390,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 196,
+                  "id": 225,
                   "indexed": false,
                   "name": "release",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1223:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -1396,7 +1404,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 195,
+                    "id": 224,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1223:6:2",
@@ -1416,22 +1424,22 @@
           {
             "constant": false,
             "functionSelector": "067816ea",
-            "id": 202,
+            "id": 231,
             "name": "orgs",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "1353:43:2",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
               "typeString": "mapping(string => struct Valist.Organization)"
             },
             "typeName": {
-              "id": 201,
+              "id": 230,
               "keyType": {
-                "id": 199,
+                "id": 228,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "1361:6:2",
@@ -1443,18 +1451,18 @@
               "nodeType": "Mapping",
               "src": "1353:31:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                 "typeString": "mapping(string => struct Valist.Organization)"
               },
               "valueType": {
                 "contractScope": null,
-                "id": 200,
+                "id": 229,
                 "name": "Organization",
                 "nodeType": "UserDefinedTypeName",
-                "referencedDeclaration": 186,
+                "referencedDeclaration": 215,
                 "src": "1371:12:2",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_struct$_Organization_$186_storage_ptr",
+                  "typeIdentifier": "t_struct$_Organization_$215_storage_ptr",
                   "typeString": "struct Valist.Organization"
                 }
               }
@@ -1464,7 +1472,7 @@
           },
           {
             "body": {
-              "id": 219,
+              "id": 248,
               "nodeType": "Block",
               "src": "1531:58:2",
               "statements": [
@@ -1479,25 +1487,25 @@
                           "argumentTypes": null,
                           "baseExpression": {
                             "argumentTypes": null,
-                            "id": 211,
+                            "id": 240,
                             "name": "orgs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 202,
+                            "referencedDeclaration": 231,
                             "src": "1548:4:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                               "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                             }
                           },
-                          "id": 213,
+                          "id": 242,
                           "indexExpression": {
                             "argumentTypes": null,
-                            "id": 212,
+                            "id": 241,
                             "name": "orgName",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 204,
+                            "referencedDeclaration": 233,
                             "src": "1553:7:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -1511,32 +1519,32 @@
                           "nodeType": "IndexAccess",
                           "src": "1548:13:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Organization_$186_storage",
+                            "typeIdentifier": "t_struct$_Organization_$215_storage",
                             "typeString": "struct Valist.Organization storage ref"
                           }
                         },
-                        "id": 214,
+                        "id": 243,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "repos",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 181,
+                        "referencedDeclaration": 210,
                         "src": "1548:19:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                           "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                         }
                       },
-                      "id": 216,
+                      "id": 245,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 215,
+                        "id": 244,
                         "name": "repoName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 206,
+                        "referencedDeclaration": 235,
                         "src": "1568:8:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -1550,26 +1558,26 @@
                       "nodeType": "IndexAccess",
                       "src": "1548:29:2",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Repository_$172_storage",
+                        "typeIdentifier": "t_struct$_Repository_$201_storage",
                         "typeString": "struct Valist.Repository storage ref"
                       }
                     },
-                    "id": 217,
+                    "id": 246,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
                     "memberName": "meta",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 167,
+                    "referencedDeclaration": 196,
                     "src": "1548:34:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "functionReturnParameters": 210,
-                  "id": 218,
+                  "functionReturnParameters": 239,
+                  "id": 247,
                   "nodeType": "Return",
                   "src": "1541:41:2"
                 }
@@ -1577,7 +1585,7 @@
             },
             "documentation": null,
             "functionSelector": "2b90801a",
-            "id": 220,
+            "id": 249,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1585,16 +1593,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 207,
+              "id": 236,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 204,
+                  "id": 233,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1444:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1603,7 +1611,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 203,
+                    "id": 232,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1444:6:2",
@@ -1617,11 +1625,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 206,
+                  "id": 235,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1467:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1630,7 +1638,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 205,
+                    "id": 234,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1467:6:2",
@@ -1646,16 +1654,16 @@
               "src": "1443:47:2"
             },
             "returnParameters": {
-              "id": 210,
+              "id": 239,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 209,
+                  "id": 238,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1511:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1664,7 +1672,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 208,
+                    "id": 237,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1511:6:2",
@@ -1679,7 +1687,7 @@
               ],
               "src": "1510:20:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1403:186:2",
             "stateMutability": "view",
             "virtual": false,
@@ -1687,7 +1695,7 @@
           },
           {
             "body": {
-              "id": 237,
+              "id": 266,
               "nodeType": "Block",
               "src": "1732:60:2",
               "statements": [
@@ -1702,25 +1710,25 @@
                           "argumentTypes": null,
                           "baseExpression": {
                             "argumentTypes": null,
-                            "id": 229,
+                            "id": 258,
                             "name": "orgs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 202,
+                            "referencedDeclaration": 231,
                             "src": "1749:4:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                               "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                             }
                           },
-                          "id": 231,
+                          "id": 260,
                           "indexExpression": {
                             "argumentTypes": null,
-                            "id": 230,
+                            "id": 259,
                             "name": "orgName",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 222,
+                            "referencedDeclaration": 251,
                             "src": "1754:7:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -1734,32 +1742,32 @@
                           "nodeType": "IndexAccess",
                           "src": "1749:13:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Organization_$186_storage",
+                            "typeIdentifier": "t_struct$_Organization_$215_storage",
                             "typeString": "struct Valist.Organization storage ref"
                           }
                         },
-                        "id": 232,
+                        "id": 261,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "repos",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 181,
+                        "referencedDeclaration": 210,
                         "src": "1749:19:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                           "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                         }
                       },
-                      "id": 234,
+                      "id": 263,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 233,
+                        "id": 262,
                         "name": "repoName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 224,
+                        "referencedDeclaration": 253,
                         "src": "1769:8:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -1773,26 +1781,26 @@
                       "nodeType": "IndexAccess",
                       "src": "1749:29:2",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Repository_$172_storage",
+                        "typeIdentifier": "t_struct$_Repository_$201_storage",
                         "typeString": "struct Valist.Repository storage ref"
                       }
                     },
-                    "id": 235,
+                    "id": 264,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
                     "memberName": "latest",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 169,
+                    "referencedDeclaration": 198,
                     "src": "1749:36:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "functionReturnParameters": 228,
-                  "id": 236,
+                  "functionReturnParameters": 257,
+                  "id": 265,
                   "nodeType": "Return",
                   "src": "1742:43:2"
                 }
@@ -1800,7 +1808,7 @@
             },
             "documentation": null,
             "functionSelector": "4899daa9",
-            "id": 238,
+            "id": 267,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -1808,16 +1816,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 225,
+              "id": 254,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 222,
+                  "id": 251,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1645:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1826,7 +1834,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 221,
+                    "id": 250,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1645:6:2",
@@ -1840,11 +1848,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 224,
+                  "id": 253,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1668:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1853,7 +1861,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 223,
+                    "id": 252,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1668:6:2",
@@ -1869,16 +1877,16 @@
               "src": "1644:47:2"
             },
             "returnParameters": {
-              "id": 228,
+              "id": 257,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 227,
+                  "id": 256,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1712:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -1887,7 +1895,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 226,
+                    "id": 255,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1712:6:2",
@@ -1902,7 +1910,7 @@
               ],
               "src": "1711:20:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1595:197:2",
             "stateMutability": "view",
             "virtual": false,
@@ -1910,7 +1918,7 @@
           },
           {
             "body": {
-              "id": 273,
+              "id": 302,
               "nodeType": "Block",
               "src": "1876:215:2",
               "statements": [
@@ -1924,7 +1932,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 251,
+                        "id": 280,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -1935,25 +1943,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 246,
+                              "id": 275,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "1894:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 248,
+                            "id": 277,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 247,
+                              "id": 276,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 240,
+                              "referencedDeclaration": 269,
                               "src": "1899:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -1967,18 +1975,18 @@
                             "nodeType": "IndexAccess",
                             "src": "1894:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 249,
+                          "id": 278,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "active",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 185,
+                          "referencedDeclaration": 214,
                           "src": "1894:20:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -1990,7 +1998,7 @@
                         "rightExpression": {
                           "argumentTypes": null,
                           "hexValue": "66616c7365",
-                          "id": 250,
+                          "id": 279,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -2014,7 +2022,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "4f7267616e697a6174696f6e20616c72656164792065786973747321",
-                        "id": 252,
+                        "id": 281,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -2041,7 +2049,7 @@
                           "typeString": "literal_string \"Organization already exists!\""
                         }
                       ],
-                      "id": 245,
+                      "id": 274,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -2055,7 +2063,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 253,
+                    "id": 282,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2070,14 +2078,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 254,
+                  "id": 283,
                   "nodeType": "ExpressionStatement",
                   "src": "1886:70:2"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 260,
+                    "id": 289,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2088,25 +2096,25 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 255,
+                          "id": 284,
                           "name": "orgs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 202,
+                          "referencedDeclaration": 231,
                           "src": "1966:4:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                             "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                           }
                         },
-                        "id": 257,
+                        "id": 286,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 256,
+                          "id": 285,
                           "name": "orgName",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 240,
+                          "referencedDeclaration": 269,
                           "src": "1971:7:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_string_memory_ptr",
@@ -2120,18 +2128,18 @@
                         "nodeType": "IndexAccess",
                         "src": "1966:13:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Organization_$186_storage",
+                          "typeIdentifier": "t_struct$_Organization_$215_storage",
                           "typeString": "struct Valist.Organization storage ref"
                         }
                       },
-                      "id": 258,
+                      "id": 287,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
                       "memberName": "meta",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 183,
+                      "referencedDeclaration": 212,
                       "src": "1966:18:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
@@ -2142,11 +2150,11 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 259,
+                      "id": 288,
                       "name": "meta",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 242,
+                      "referencedDeclaration": 271,
                       "src": "1987:4:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
@@ -2159,7 +2167,7 @@
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 261,
+                  "id": 290,
                   "nodeType": "ExpressionStatement",
                   "src": "1966:25:2"
                 },
@@ -2171,7 +2179,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 269,
+                          "id": 298,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -2182,7 +2190,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 270,
+                        "id": 299,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2212,25 +2220,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 262,
+                              "id": 291,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "2001:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 264,
+                            "id": 293,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 263,
+                              "id": 292,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 240,
+                              "referencedDeclaration": 269,
                               "src": "2006:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -2244,32 +2252,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2001:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 265,
+                          "id": 294,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "usersByRole",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 177,
+                          "referencedDeclaration": 206,
                           "src": "2001:25:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_address_$dyn_storage_$",
                             "typeString": "mapping(bytes32 => address[] storage ref)"
                           }
                         },
-                        "id": 267,
+                        "id": 296,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 266,
+                          "id": 295,
                           "name": "ORG_OWNER",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 139,
+                          "referencedDeclaration": 168,
                           "src": "2027:9:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes32",
@@ -2287,7 +2295,7 @@
                           "typeString": "address[] storage ref"
                         }
                       },
-                      "id": 268,
+                      "id": 297,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -2301,7 +2309,7 @@
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 271,
+                    "id": 300,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2316,7 +2324,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 272,
+                  "id": 301,
                   "nodeType": "ExpressionStatement",
                   "src": "2001:53:2"
                 }
@@ -2324,7 +2332,7 @@
             },
             "documentation": null,
             "functionSelector": "a411ef20",
-            "id": 274,
+            "id": 303,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -2332,16 +2340,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 243,
+              "id": 272,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 240,
+                  "id": 269,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 274,
+                  "scope": 303,
                   "src": "1826:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2350,7 +2358,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 239,
+                    "id": 268,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1826:6:2",
@@ -2364,11 +2372,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 242,
+                  "id": 271,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 274,
+                  "scope": 303,
                   "src": "1849:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2377,7 +2385,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 241,
+                    "id": 270,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1849:6:2",
@@ -2393,12 +2401,12 @@
               "src": "1825:43:2"
             },
             "returnParameters": {
-              "id": 244,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1876:0:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1798:293:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -2406,7 +2414,7 @@
           },
           {
             "body": {
-              "id": 320,
+              "id": 349,
               "nodeType": "Block",
               "src": "2197:421:2",
               "statements": [
@@ -2420,7 +2428,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 292,
+                        "id": 321,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2435,25 +2443,25 @@
                                 "argumentTypes": null,
                                 "baseExpression": {
                                   "argumentTypes": null,
-                                  "id": 284,
+                                  "id": 313,
                                   "name": "orgs",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 202,
+                                  "referencedDeclaration": 231,
                                   "src": "2215:4:2",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                     "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                                   }
                                 },
-                                "id": 286,
+                                "id": 315,
                                 "indexExpression": {
                                   "argumentTypes": null,
-                                  "id": 285,
+                                  "id": 314,
                                   "name": "orgName",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 276,
+                                  "referencedDeclaration": 305,
                                   "src": "2220:7:2",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_string_memory_ptr",
@@ -2467,32 +2475,32 @@
                                 "nodeType": "IndexAccess",
                                 "src": "2215:13:2",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Organization_$186_storage",
+                                  "typeIdentifier": "t_struct$_Organization_$215_storage",
                                   "typeString": "struct Valist.Organization storage ref"
                                 }
                               },
-                              "id": 287,
+                              "id": 316,
                               "isConstant": false,
                               "isLValue": true,
                               "isPure": false,
                               "lValueRequested": false,
                               "memberName": "repos",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 181,
+                              "referencedDeclaration": 210,
                               "src": "2215:19:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                               }
                             },
-                            "id": 289,
+                            "id": 318,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 288,
+                              "id": 317,
                               "name": "repoName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 278,
+                              "referencedDeclaration": 307,
                               "src": "2235:8:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -2506,18 +2514,18 @@
                             "nodeType": "IndexAccess",
                             "src": "2215:29:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Repository_$172_storage",
+                              "typeIdentifier": "t_struct$_Repository_$201_storage",
                               "typeString": "struct Valist.Repository storage ref"
                             }
                           },
-                          "id": 290,
+                          "id": 319,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "active",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 171,
+                          "referencedDeclaration": 200,
                           "src": "2215:36:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -2529,7 +2537,7 @@
                         "rightExpression": {
                           "argumentTypes": null,
                           "hexValue": "66616c7365",
-                          "id": 291,
+                          "id": 320,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -2553,7 +2561,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "5265706f7369746f727920616c72656164792065786973747321",
-                        "id": 293,
+                        "id": 322,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -2580,7 +2588,7 @@
                           "typeString": "literal_string \"Repository already exists!\""
                         }
                       ],
-                      "id": 283,
+                      "id": 312,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -2594,7 +2602,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 294,
+                    "id": 323,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2609,14 +2617,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 295,
+                  "id": 324,
                   "nodeType": "ExpressionStatement",
                   "src": "2207:84:2"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 304,
+                    "id": 333,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2631,25 +2639,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 296,
+                              "id": 325,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "2490:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 298,
+                            "id": 327,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 297,
+                              "id": 326,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 276,
+                              "referencedDeclaration": 305,
                               "src": "2495:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -2663,32 +2671,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2490:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 299,
+                          "id": 328,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "repos",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 181,
+                          "referencedDeclaration": 210,
                           "src": "2490:19:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                             "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                           }
                         },
-                        "id": 301,
+                        "id": 330,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 300,
+                          "id": 329,
                           "name": "repoName",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 278,
+                          "referencedDeclaration": 307,
                           "src": "2510:8:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_string_memory_ptr",
@@ -2702,18 +2710,18 @@
                         "nodeType": "IndexAccess",
                         "src": "2490:29:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Repository_$172_storage",
+                          "typeIdentifier": "t_struct$_Repository_$201_storage",
                           "typeString": "struct Valist.Repository storage ref"
                         }
                       },
-                      "id": 302,
+                      "id": 331,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
                       "memberName": "meta",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 167,
+                      "referencedDeclaration": 196,
                       "src": "2490:34:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
@@ -2724,11 +2732,11 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 303,
+                      "id": 332,
                       "name": "meta",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 280,
+                      "referencedDeclaration": 309,
                       "src": "2527:4:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
@@ -2741,7 +2749,7 @@
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 305,
+                  "id": 334,
                   "nodeType": "ExpressionStatement",
                   "src": "2490:41:2"
                 },
@@ -2753,7 +2761,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 316,
+                          "id": 345,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -2764,7 +2772,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 317,
+                        "id": 346,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -2798,25 +2806,25 @@
                                 "argumentTypes": null,
                                 "baseExpression": {
                                   "argumentTypes": null,
-                                  "id": 306,
+                                  "id": 335,
                                   "name": "orgs",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 202,
+                                  "referencedDeclaration": 231,
                                   "src": "2541:4:2",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                     "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                                   }
                                 },
-                                "id": 308,
+                                "id": 337,
                                 "indexExpression": {
                                   "argumentTypes": null,
-                                  "id": 307,
+                                  "id": 336,
                                   "name": "orgName",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 276,
+                                  "referencedDeclaration": 305,
                                   "src": "2546:7:2",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_string_memory_ptr",
@@ -2830,32 +2838,32 @@
                                 "nodeType": "IndexAccess",
                                 "src": "2541:13:2",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Organization_$186_storage",
+                                  "typeIdentifier": "t_struct$_Organization_$215_storage",
                                   "typeString": "struct Valist.Organization storage ref"
                                 }
                               },
-                              "id": 309,
+                              "id": 338,
                               "isConstant": false,
                               "isLValue": true,
                               "isPure": false,
                               "lValueRequested": false,
                               "memberName": "repos",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 181,
+                              "referencedDeclaration": 210,
                               "src": "2541:19:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                               }
                             },
-                            "id": 311,
+                            "id": 340,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 310,
+                              "id": 339,
                               "name": "repoName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 278,
+                              "referencedDeclaration": 307,
                               "src": "2561:8:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -2869,32 +2877,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2541:29:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Repository_$172_storage",
+                              "typeIdentifier": "t_struct$_Repository_$201_storage",
                               "typeString": "struct Valist.Repository storage ref"
                             }
                           },
-                          "id": 312,
+                          "id": 341,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "usersByRole",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 159,
+                          "referencedDeclaration": 188,
                           "src": "2541:41:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_address_$dyn_storage_$",
                             "typeString": "mapping(bytes32 => address[] storage ref)"
                           }
                         },
-                        "id": 314,
+                        "id": 343,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 313,
+                          "id": 342,
                           "name": "REPO_OWNER",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 134,
+                          "referencedDeclaration": 163,
                           "src": "2583:10:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes32",
@@ -2912,7 +2920,7 @@
                           "typeString": "address[] storage ref"
                         }
                       },
-                      "id": 315,
+                      "id": 344,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -2926,7 +2934,7 @@
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 318,
+                    "id": 347,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -2941,7 +2949,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 319,
+                  "id": 348,
                   "nodeType": "ExpressionStatement",
                   "src": "2541:70:2"
                 }
@@ -2949,7 +2957,7 @@
             },
             "documentation": null,
             "functionSelector": "3c733e6f",
-            "id": 321,
+            "id": 350,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -2957,16 +2965,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 281,
+              "id": 310,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 276,
+                  "id": 305,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2123:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -2975,7 +2983,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 275,
+                    "id": 304,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2123:6:2",
@@ -2989,11 +2997,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 278,
+                  "id": 307,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2146:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -3002,7 +3010,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 277,
+                    "id": 306,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2146:6:2",
@@ -3016,11 +3024,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 280,
+                  "id": 309,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2170:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -3029,7 +3037,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 279,
+                    "id": 308,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2170:6:2",
@@ -3045,19 +3053,19 @@
               "src": "2122:67:2"
             },
             "returnParameters": {
-              "id": 282,
+              "id": 311,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "2197:0:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "2097:521:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 323,
+        "scope": 352,
         "src": "126:2495:2"
       }
     ],
@@ -3067,14 +3075,14 @@
     "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/ValistOld.sol",
     "exportedSymbols": {
       "Valist": [
-        322
+        351
       ]
     },
-    "id": 323,
+    "id": 352,
     "nodeType": "SourceUnit",
     "nodes": [
       {
-        "id": 126,
+        "id": 155,
         "literals": [
           "solidity",
           ">=",
@@ -3090,10 +3098,10 @@
       {
         "absolutePath": "@openzeppelin/contracts/access/AccessControl.sol",
         "file": "@openzeppelin/contracts/access/AccessControl.sol",
-        "id": 127,
+        "id": 156,
         "nodeType": "ImportDirective",
-        "scope": 323,
-        "sourceUnit": 866,
+        "scope": 352,
+        "sourceUnit": 854,
         "src": "66:58:2",
         "symbolAliases": [],
         "unitAlias": ""
@@ -3105,44 +3113,44 @@
             "arguments": null,
             "baseName": {
               "contractScope": null,
-              "id": 128,
+              "id": 157,
               "name": "AccessControl",
               "nodeType": "UserDefinedTypeName",
-              "referencedDeclaration": 865,
+              "referencedDeclaration": 853,
               "src": "145:13:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_contract$_AccessControl_$865",
+                "typeIdentifier": "t_contract$_AccessControl_$853",
                 "typeString": "contract AccessControl"
               }
             },
-            "id": 129,
+            "id": 158,
             "nodeType": "InheritanceSpecifier",
             "src": "145:13:2"
           }
         ],
         "contractDependencies": [
-          595,
-          865
+          583,
+          853
         ],
         "contractKind": "contract",
         "documentation": null,
         "fullyImplemented": true,
-        "id": 322,
+        "id": 351,
         "linearizedBaseContracts": [
-          322,
-          865,
-          595
+          351,
+          853,
+          583
         ],
         "name": "Valist",
         "nodeType": "ContractDefinition",
         "nodes": [
           {
             "constant": true,
-            "id": 134,
+            "id": 163,
             "name": "REPO_OWNER",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "166:58:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -3151,7 +3159,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 130,
+              "id": 159,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "166:7:2",
@@ -3166,7 +3174,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "5245504f5f4f574e45525f524f4c45",
-                  "id": 132,
+                  "id": 161,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -3189,7 +3197,7 @@
                     "typeString": "literal_string \"REPO_OWNER_ROLE\""
                   }
                 ],
-                "id": 131,
+                "id": 160,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -3200,7 +3208,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 133,
+              "id": 162,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -3219,11 +3227,11 @@
           },
           {
             "constant": true,
-            "id": 139,
+            "id": 168,
             "name": "ORG_OWNER",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "230:56:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -3232,7 +3240,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 135,
+              "id": 164,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "230:7:2",
@@ -3247,7 +3255,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4f52475f4f574e45525f524f4c45",
-                  "id": 137,
+                  "id": 166,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -3270,7 +3278,7 @@
                     "typeString": "literal_string \"ORG_OWNER_ROLE\""
                   }
                 ],
-                "id": 136,
+                "id": 165,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -3281,7 +3289,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 138,
+              "id": 167,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -3300,11 +3308,11 @@
           },
           {
             "constant": true,
-            "id": 144,
+            "id": 173,
             "name": "REPO_ADMIN",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "293:58:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -3313,7 +3321,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 140,
+              "id": 169,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "293:7:2",
@@ -3328,7 +3336,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "5245504f5f41444d494e5f524f4c45",
-                  "id": 142,
+                  "id": 171,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -3351,7 +3359,7 @@
                     "typeString": "literal_string \"REPO_ADMIN_ROLE\""
                   }
                 ],
-                "id": 141,
+                "id": 170,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -3362,7 +3370,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 143,
+              "id": 172,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -3381,11 +3389,11 @@
           },
           {
             "constant": true,
-            "id": 149,
+            "id": 178,
             "name": "ORG_ADMIN",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "357:56:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -3394,7 +3402,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 145,
+              "id": 174,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "357:7:2",
@@ -3409,7 +3417,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4f52475f41444d494e5f524f4c45",
-                  "id": 147,
+                  "id": 176,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -3432,7 +3440,7 @@
                     "typeString": "literal_string \"ORG_ADMIN_ROLE\""
                   }
                 ],
-                "id": 146,
+                "id": 175,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -3443,7 +3451,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 148,
+              "id": 177,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -3462,11 +3470,11 @@
           },
           {
             "constant": true,
-            "id": 154,
+            "id": 183,
             "name": "APP_DEV",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "420:52:2",
             "stateVariable": true,
             "storageLocation": "default",
@@ -3475,7 +3483,7 @@
               "typeString": "bytes32"
             },
             "typeName": {
-              "id": 150,
+              "id": 179,
               "name": "bytes32",
               "nodeType": "ElementaryTypeName",
               "src": "420:7:2",
@@ -3490,7 +3498,7 @@
                 {
                   "argumentTypes": null,
                   "hexValue": "4150505f4445565f524f4c45",
-                  "id": 152,
+                  "id": 181,
                   "isConstant": false,
                   "isLValue": false,
                   "isPure": true,
@@ -3513,7 +3521,7 @@
                     "typeString": "literal_string \"APP_DEV_ROLE\""
                   }
                 ],
-                "id": 151,
+                "id": 180,
                 "name": "keccak256",
                 "nodeType": "Identifier",
                 "overloadedDeclarations": [],
@@ -3524,7 +3532,7 @@
                   "typeString": "function (bytes memory) pure returns (bytes32)"
                 }
               },
-              "id": 153,
+              "id": 182,
               "isConstant": false,
               "isLValue": false,
               "isPure": true,
@@ -3543,15 +3551,15 @@
           },
           {
             "canonicalName": "Valist.Repository",
-            "id": 172,
+            "id": 201,
             "members": [
               {
                 "constant": false,
-                "id": 159,
+                "id": 188,
                 "name": "usersByRole",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "507:41:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3560,9 +3568,9 @@
                   "typeString": "mapping(bytes32 => address[])"
                 },
                 "typeName": {
-                  "id": 158,
+                  "id": 187,
                   "keyType": {
-                    "id": 155,
+                    "id": 184,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "515:7:2",
@@ -3579,7 +3587,7 @@
                   },
                   "valueType": {
                     "baseType": {
-                      "id": 156,
+                      "id": 185,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "526:7:2",
@@ -3589,7 +3597,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 157,
+                    "id": 186,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "526:9:2",
@@ -3604,11 +3612,11 @@
               },
               {
                 "constant": false,
-                "id": 162,
+                "id": 191,
                 "name": "changelog",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "558:18:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3618,7 +3626,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 160,
+                    "id": 189,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "558:6:2",
@@ -3627,7 +3635,7 @@
                       "typeString": "string"
                     }
                   },
-                  "id": 161,
+                  "id": 190,
                   "length": null,
                   "nodeType": "ArrayTypeName",
                   "src": "558:8:2",
@@ -3641,11 +3649,11 @@
               },
               {
                 "constant": false,
-                "id": 165,
+                "id": 194,
                 "name": "releases",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "667:17:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3655,7 +3663,7 @@
                 },
                 "typeName": {
                   "baseType": {
-                    "id": 163,
+                    "id": 192,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "667:6:2",
@@ -3664,7 +3672,7 @@
                       "typeString": "string"
                     }
                   },
-                  "id": 164,
+                  "id": 193,
                   "length": null,
                   "nodeType": "ArrayTypeName",
                   "src": "667:8:2",
@@ -3678,11 +3686,11 @@
               },
               {
                 "constant": false,
-                "id": 167,
+                "id": 196,
                 "name": "meta",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "734:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3691,7 +3699,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 166,
+                  "id": 195,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "734:6:2",
@@ -3705,11 +3713,11 @@
               },
               {
                 "constant": false,
-                "id": 169,
+                "id": 198,
                 "name": "latest",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "806:13:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3718,7 +3726,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 168,
+                  "id": 197,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "806:6:2",
@@ -3732,11 +3740,11 @@
               },
               {
                 "constant": false,
-                "id": 171,
+                "id": 200,
                 "name": "active",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 172,
+                "scope": 201,
                 "src": "898:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3745,7 +3753,7 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 170,
+                  "id": 199,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "898:4:2",
@@ -3760,21 +3768,21 @@
             ],
             "name": "Repository",
             "nodeType": "StructDefinition",
-            "scope": 322,
+            "scope": 351,
             "src": "479:437:2",
             "visibility": "public"
           },
           {
             "canonicalName": "Valist.Organization",
-            "id": 186,
+            "id": 215,
             "members": [
               {
                 "constant": false,
-                "id": 177,
+                "id": 206,
                 "name": "usersByRole",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "952:41:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3783,9 +3791,9 @@
                   "typeString": "mapping(bytes32 => address[])"
                 },
                 "typeName": {
-                  "id": 176,
+                  "id": 205,
                   "keyType": {
-                    "id": 173,
+                    "id": 202,
                     "name": "bytes32",
                     "nodeType": "ElementaryTypeName",
                     "src": "960:7:2",
@@ -3802,7 +3810,7 @@
                   },
                   "valueType": {
                     "baseType": {
-                      "id": 174,
+                      "id": 203,
                       "name": "address",
                       "nodeType": "ElementaryTypeName",
                       "src": "971:7:2",
@@ -3812,7 +3820,7 @@
                         "typeString": "address"
                       }
                     },
-                    "id": 175,
+                    "id": 204,
                     "length": null,
                     "nodeType": "ArrayTypeName",
                     "src": "971:9:2",
@@ -3827,22 +3835,22 @@
               },
               {
                 "constant": false,
-                "id": 181,
+                "id": 210,
                 "name": "repos",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1003:35:2",
                 "stateVariable": false,
                 "storageLocation": "default",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                  "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                   "typeString": "mapping(string => struct Valist.Repository)"
                 },
                 "typeName": {
-                  "id": 180,
+                  "id": 209,
                   "keyType": {
-                    "id": 178,
+                    "id": 207,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1011:6:2",
@@ -3854,18 +3862,18 @@
                   "nodeType": "Mapping",
                   "src": "1003:29:2",
                   "typeDescriptions": {
-                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                     "typeString": "mapping(string => struct Valist.Repository)"
                   },
                   "valueType": {
                     "contractScope": null,
-                    "id": 179,
+                    "id": 208,
                     "name": "Repository",
                     "nodeType": "UserDefinedTypeName",
-                    "referencedDeclaration": 172,
+                    "referencedDeclaration": 201,
                     "src": "1021:10:2",
                     "typeDescriptions": {
-                      "typeIdentifier": "t_struct$_Repository_$172_storage_ptr",
+                      "typeIdentifier": "t_struct$_Repository_$201_storage_ptr",
                       "typeString": "struct Valist.Repository"
                     }
                   }
@@ -3875,11 +3883,11 @@
               },
               {
                 "constant": false,
-                "id": 183,
+                "id": 212,
                 "name": "meta",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1048:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3888,7 +3896,7 @@
                   "typeString": "string"
                 },
                 "typeName": {
-                  "id": 182,
+                  "id": 211,
                   "name": "string",
                   "nodeType": "ElementaryTypeName",
                   "src": "1048:6:2",
@@ -3902,11 +3910,11 @@
               },
               {
                 "constant": false,
-                "id": 185,
+                "id": 214,
                 "name": "active",
                 "nodeType": "VariableDeclaration",
                 "overrides": null,
-                "scope": 186,
+                "scope": 215,
                 "src": "1122:11:2",
                 "stateVariable": false,
                 "storageLocation": "default",
@@ -3915,7 +3923,7 @@
                   "typeString": "bool"
                 },
                 "typeName": {
-                  "id": 184,
+                  "id": 213,
                   "name": "bool",
                   "nodeType": "ElementaryTypeName",
                   "src": "1122:4:2",
@@ -3930,28 +3938,28 @@
             ],
             "name": "Organization",
             "nodeType": "StructDefinition",
-            "scope": 322,
+            "scope": 351,
             "src": "922:218:2",
             "visibility": "public"
           },
           {
             "anonymous": false,
             "documentation": null,
-            "id": 198,
+            "id": 227,
             "name": "Update",
             "nodeType": "EventDefinition",
             "parameters": {
-              "id": 197,
+              "id": 226,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 188,
+                  "id": 217,
                   "indexed": false,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1159:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3960,7 +3968,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 187,
+                    "id": 216,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1159:6:2",
@@ -3974,12 +3982,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 190,
+                  "id": 219,
                   "indexed": false,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1175:15:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -3988,7 +3996,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 189,
+                    "id": 218,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1175:6:2",
@@ -4002,12 +4010,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 192,
+                  "id": 221,
                   "indexed": false,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1192:11:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4016,7 +4024,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 191,
+                    "id": 220,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1192:6:2",
@@ -4030,12 +4038,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 194,
+                  "id": 223,
                   "indexed": false,
                   "name": "changelog",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1205:16:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4044,7 +4052,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 193,
+                    "id": 222,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1205:6:2",
@@ -4058,12 +4066,12 @@
                 },
                 {
                   "constant": false,
-                  "id": 196,
+                  "id": 225,
                   "indexed": false,
                   "name": "release",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 198,
+                  "scope": 227,
                   "src": "1223:14:2",
                   "stateVariable": false,
                   "storageLocation": "default",
@@ -4072,7 +4080,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 195,
+                    "id": 224,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1223:6:2",
@@ -4092,22 +4100,22 @@
           {
             "constant": false,
             "functionSelector": "067816ea",
-            "id": 202,
+            "id": 231,
             "name": "orgs",
             "nodeType": "VariableDeclaration",
             "overrides": null,
-            "scope": 322,
+            "scope": 351,
             "src": "1353:43:2",
             "stateVariable": true,
             "storageLocation": "default",
             "typeDescriptions": {
-              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
               "typeString": "mapping(string => struct Valist.Organization)"
             },
             "typeName": {
-              "id": 201,
+              "id": 230,
               "keyType": {
-                "id": 199,
+                "id": 228,
                 "name": "string",
                 "nodeType": "ElementaryTypeName",
                 "src": "1361:6:2",
@@ -4119,18 +4127,18 @@
               "nodeType": "Mapping",
               "src": "1353:31:2",
               "typeDescriptions": {
-                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                 "typeString": "mapping(string => struct Valist.Organization)"
               },
               "valueType": {
                 "contractScope": null,
-                "id": 200,
+                "id": 229,
                 "name": "Organization",
                 "nodeType": "UserDefinedTypeName",
-                "referencedDeclaration": 186,
+                "referencedDeclaration": 215,
                 "src": "1371:12:2",
                 "typeDescriptions": {
-                  "typeIdentifier": "t_struct$_Organization_$186_storage_ptr",
+                  "typeIdentifier": "t_struct$_Organization_$215_storage_ptr",
                   "typeString": "struct Valist.Organization"
                 }
               }
@@ -4140,7 +4148,7 @@
           },
           {
             "body": {
-              "id": 219,
+              "id": 248,
               "nodeType": "Block",
               "src": "1531:58:2",
               "statements": [
@@ -4155,25 +4163,25 @@
                           "argumentTypes": null,
                           "baseExpression": {
                             "argumentTypes": null,
-                            "id": 211,
+                            "id": 240,
                             "name": "orgs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 202,
+                            "referencedDeclaration": 231,
                             "src": "1548:4:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                               "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                             }
                           },
-                          "id": 213,
+                          "id": 242,
                           "indexExpression": {
                             "argumentTypes": null,
-                            "id": 212,
+                            "id": 241,
                             "name": "orgName",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 204,
+                            "referencedDeclaration": 233,
                             "src": "1553:7:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -4187,32 +4195,32 @@
                           "nodeType": "IndexAccess",
                           "src": "1548:13:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Organization_$186_storage",
+                            "typeIdentifier": "t_struct$_Organization_$215_storage",
                             "typeString": "struct Valist.Organization storage ref"
                           }
                         },
-                        "id": 214,
+                        "id": 243,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "repos",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 181,
+                        "referencedDeclaration": 210,
                         "src": "1548:19:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                           "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                         }
                       },
-                      "id": 216,
+                      "id": 245,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 215,
+                        "id": 244,
                         "name": "repoName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 206,
+                        "referencedDeclaration": 235,
                         "src": "1568:8:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -4226,26 +4234,26 @@
                       "nodeType": "IndexAccess",
                       "src": "1548:29:2",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Repository_$172_storage",
+                        "typeIdentifier": "t_struct$_Repository_$201_storage",
                         "typeString": "struct Valist.Repository storage ref"
                       }
                     },
-                    "id": 217,
+                    "id": 246,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
                     "memberName": "meta",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 167,
+                    "referencedDeclaration": 196,
                     "src": "1548:34:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "functionReturnParameters": 210,
-                  "id": 218,
+                  "functionReturnParameters": 239,
+                  "id": 247,
                   "nodeType": "Return",
                   "src": "1541:41:2"
                 }
@@ -4253,7 +4261,7 @@
             },
             "documentation": null,
             "functionSelector": "2b90801a",
-            "id": 220,
+            "id": 249,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -4261,16 +4269,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 207,
+              "id": 236,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 204,
+                  "id": 233,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1444:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4279,7 +4287,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 203,
+                    "id": 232,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1444:6:2",
@@ -4293,11 +4301,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 206,
+                  "id": 235,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1467:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4306,7 +4314,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 205,
+                    "id": 234,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1467:6:2",
@@ -4322,16 +4330,16 @@
               "src": "1443:47:2"
             },
             "returnParameters": {
-              "id": 210,
+              "id": 239,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 209,
+                  "id": 238,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 220,
+                  "scope": 249,
                   "src": "1511:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4340,7 +4348,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 208,
+                    "id": 237,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1511:6:2",
@@ -4355,7 +4363,7 @@
               ],
               "src": "1510:20:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1403:186:2",
             "stateMutability": "view",
             "virtual": false,
@@ -4363,7 +4371,7 @@
           },
           {
             "body": {
-              "id": 237,
+              "id": 266,
               "nodeType": "Block",
               "src": "1732:60:2",
               "statements": [
@@ -4378,25 +4386,25 @@
                           "argumentTypes": null,
                           "baseExpression": {
                             "argumentTypes": null,
-                            "id": 229,
+                            "id": 258,
                             "name": "orgs",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 202,
+                            "referencedDeclaration": 231,
                             "src": "1749:4:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                              "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                               "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                             }
                           },
-                          "id": 231,
+                          "id": 260,
                           "indexExpression": {
                             "argumentTypes": null,
-                            "id": 230,
+                            "id": 259,
                             "name": "orgName",
                             "nodeType": "Identifier",
                             "overloadedDeclarations": [],
-                            "referencedDeclaration": 222,
+                            "referencedDeclaration": 251,
                             "src": "1754:7:2",
                             "typeDescriptions": {
                               "typeIdentifier": "t_string_memory_ptr",
@@ -4410,32 +4418,32 @@
                           "nodeType": "IndexAccess",
                           "src": "1749:13:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_struct$_Organization_$186_storage",
+                            "typeIdentifier": "t_struct$_Organization_$215_storage",
                             "typeString": "struct Valist.Organization storage ref"
                           }
                         },
-                        "id": 232,
+                        "id": 261,
                         "isConstant": false,
                         "isLValue": true,
                         "isPure": false,
                         "lValueRequested": false,
                         "memberName": "repos",
                         "nodeType": "MemberAccess",
-                        "referencedDeclaration": 181,
+                        "referencedDeclaration": 210,
                         "src": "1749:19:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                          "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                           "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                         }
                       },
-                      "id": 234,
+                      "id": 263,
                       "indexExpression": {
                         "argumentTypes": null,
-                        "id": 233,
+                        "id": 262,
                         "name": "repoName",
                         "nodeType": "Identifier",
                         "overloadedDeclarations": [],
-                        "referencedDeclaration": 224,
+                        "referencedDeclaration": 253,
                         "src": "1769:8:2",
                         "typeDescriptions": {
                           "typeIdentifier": "t_string_memory_ptr",
@@ -4449,26 +4457,26 @@
                       "nodeType": "IndexAccess",
                       "src": "1749:29:2",
                       "typeDescriptions": {
-                        "typeIdentifier": "t_struct$_Repository_$172_storage",
+                        "typeIdentifier": "t_struct$_Repository_$201_storage",
                         "typeString": "struct Valist.Repository storage ref"
                       }
                     },
-                    "id": 235,
+                    "id": 264,
                     "isConstant": false,
                     "isLValue": true,
                     "isPure": false,
                     "lValueRequested": false,
                     "memberName": "latest",
                     "nodeType": "MemberAccess",
-                    "referencedDeclaration": 169,
+                    "referencedDeclaration": 198,
                     "src": "1749:36:2",
                     "typeDescriptions": {
                       "typeIdentifier": "t_string_storage",
                       "typeString": "string storage ref"
                     }
                   },
-                  "functionReturnParameters": 228,
-                  "id": 236,
+                  "functionReturnParameters": 257,
+                  "id": 265,
                   "nodeType": "Return",
                   "src": "1742:43:2"
                 }
@@ -4476,7 +4484,7 @@
             },
             "documentation": null,
             "functionSelector": "4899daa9",
-            "id": 238,
+            "id": 267,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -4484,16 +4492,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 225,
+              "id": 254,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 222,
+                  "id": 251,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1645:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4502,7 +4510,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 221,
+                    "id": 250,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1645:6:2",
@@ -4516,11 +4524,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 224,
+                  "id": 253,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1668:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4529,7 +4537,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 223,
+                    "id": 252,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1668:6:2",
@@ -4545,16 +4553,16 @@
               "src": "1644:47:2"
             },
             "returnParameters": {
-              "id": 228,
+              "id": 257,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 227,
+                  "id": 256,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 238,
+                  "scope": 267,
                   "src": "1712:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -4563,7 +4571,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 226,
+                    "id": 255,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1712:6:2",
@@ -4578,7 +4586,7 @@
               ],
               "src": "1711:20:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1595:197:2",
             "stateMutability": "view",
             "virtual": false,
@@ -4586,7 +4594,7 @@
           },
           {
             "body": {
-              "id": 273,
+              "id": 302,
               "nodeType": "Block",
               "src": "1876:215:2",
               "statements": [
@@ -4600,7 +4608,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 251,
+                        "id": 280,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4611,25 +4619,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 246,
+                              "id": 275,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "1894:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 248,
+                            "id": 277,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 247,
+                              "id": 276,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 240,
+                              "referencedDeclaration": 269,
                               "src": "1899:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -4643,18 +4651,18 @@
                             "nodeType": "IndexAccess",
                             "src": "1894:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 249,
+                          "id": 278,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "active",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 185,
+                          "referencedDeclaration": 214,
                           "src": "1894:20:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -4666,7 +4674,7 @@
                         "rightExpression": {
                           "argumentTypes": null,
                           "hexValue": "66616c7365",
-                          "id": 250,
+                          "id": 279,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -4690,7 +4698,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "4f7267616e697a6174696f6e20616c72656164792065786973747321",
-                        "id": 252,
+                        "id": 281,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -4717,7 +4725,7 @@
                           "typeString": "literal_string \"Organization already exists!\""
                         }
                       ],
-                      "id": 245,
+                      "id": 274,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -4731,7 +4739,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 253,
+                    "id": 282,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4746,14 +4754,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 254,
+                  "id": 283,
                   "nodeType": "ExpressionStatement",
                   "src": "1886:70:2"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 260,
+                    "id": 289,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4764,25 +4772,25 @@
                         "argumentTypes": null,
                         "baseExpression": {
                           "argumentTypes": null,
-                          "id": 255,
+                          "id": 284,
                           "name": "orgs",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 202,
+                          "referencedDeclaration": 231,
                           "src": "1966:4:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                             "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                           }
                         },
-                        "id": 257,
+                        "id": 286,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 256,
+                          "id": 285,
                           "name": "orgName",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 240,
+                          "referencedDeclaration": 269,
                           "src": "1971:7:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_string_memory_ptr",
@@ -4796,18 +4804,18 @@
                         "nodeType": "IndexAccess",
                         "src": "1966:13:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Organization_$186_storage",
+                          "typeIdentifier": "t_struct$_Organization_$215_storage",
                           "typeString": "struct Valist.Organization storage ref"
                         }
                       },
-                      "id": 258,
+                      "id": 287,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
                       "memberName": "meta",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 183,
+                      "referencedDeclaration": 212,
                       "src": "1966:18:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
@@ -4818,11 +4826,11 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 259,
+                      "id": 288,
                       "name": "meta",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 242,
+                      "referencedDeclaration": 271,
                       "src": "1987:4:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
@@ -4835,7 +4843,7 @@
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 261,
+                  "id": 290,
                   "nodeType": "ExpressionStatement",
                   "src": "1966:25:2"
                 },
@@ -4847,7 +4855,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 269,
+                          "id": 298,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -4858,7 +4866,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 270,
+                        "id": 299,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -4888,25 +4896,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 262,
+                              "id": 291,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "2001:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 264,
+                            "id": 293,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 263,
+                              "id": 292,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 240,
+                              "referencedDeclaration": 269,
                               "src": "2006:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -4920,32 +4928,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2001:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 265,
+                          "id": 294,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "usersByRole",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 177,
+                          "referencedDeclaration": 206,
                           "src": "2001:25:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_address_$dyn_storage_$",
                             "typeString": "mapping(bytes32 => address[] storage ref)"
                           }
                         },
-                        "id": 267,
+                        "id": 296,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 266,
+                          "id": 295,
                           "name": "ORG_OWNER",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 139,
+                          "referencedDeclaration": 168,
                           "src": "2027:9:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes32",
@@ -4963,7 +4971,7 @@
                           "typeString": "address[] storage ref"
                         }
                       },
-                      "id": 268,
+                      "id": 297,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -4977,7 +4985,7 @@
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 271,
+                    "id": 300,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -4992,7 +5000,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 272,
+                  "id": 301,
                   "nodeType": "ExpressionStatement",
                   "src": "2001:53:2"
                 }
@@ -5000,7 +5008,7 @@
             },
             "documentation": null,
             "functionSelector": "a411ef20",
-            "id": 274,
+            "id": 303,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5008,16 +5016,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 243,
+              "id": 272,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 240,
+                  "id": 269,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 274,
+                  "scope": 303,
                   "src": "1826:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5026,7 +5034,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 239,
+                    "id": 268,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1826:6:2",
@@ -5040,11 +5048,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 242,
+                  "id": 271,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 274,
+                  "scope": 303,
                   "src": "1849:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5053,7 +5061,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 241,
+                    "id": 270,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "1849:6:2",
@@ -5069,12 +5077,12 @@
               "src": "1825:43:2"
             },
             "returnParameters": {
-              "id": 244,
+              "id": 273,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "1876:0:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "1798:293:2",
             "stateMutability": "nonpayable",
             "virtual": false,
@@ -5082,7 +5090,7 @@
           },
           {
             "body": {
-              "id": 320,
+              "id": 349,
               "nodeType": "Block",
               "src": "2197:421:2",
               "statements": [
@@ -5096,7 +5104,7 @@
                           "typeIdentifier": "t_bool",
                           "typeString": "bool"
                         },
-                        "id": 292,
+                        "id": 321,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -5111,25 +5119,25 @@
                                 "argumentTypes": null,
                                 "baseExpression": {
                                   "argumentTypes": null,
-                                  "id": 284,
+                                  "id": 313,
                                   "name": "orgs",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 202,
+                                  "referencedDeclaration": 231,
                                   "src": "2215:4:2",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                     "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                                   }
                                 },
-                                "id": 286,
+                                "id": 315,
                                 "indexExpression": {
                                   "argumentTypes": null,
-                                  "id": 285,
+                                  "id": 314,
                                   "name": "orgName",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 276,
+                                  "referencedDeclaration": 305,
                                   "src": "2220:7:2",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_string_memory_ptr",
@@ -5143,32 +5151,32 @@
                                 "nodeType": "IndexAccess",
                                 "src": "2215:13:2",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Organization_$186_storage",
+                                  "typeIdentifier": "t_struct$_Organization_$215_storage",
                                   "typeString": "struct Valist.Organization storage ref"
                                 }
                               },
-                              "id": 287,
+                              "id": 316,
                               "isConstant": false,
                               "isLValue": true,
                               "isPure": false,
                               "lValueRequested": false,
                               "memberName": "repos",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 181,
+                              "referencedDeclaration": 210,
                               "src": "2215:19:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                               }
                             },
-                            "id": 289,
+                            "id": 318,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 288,
+                              "id": 317,
                               "name": "repoName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 278,
+                              "referencedDeclaration": 307,
                               "src": "2235:8:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -5182,18 +5190,18 @@
                             "nodeType": "IndexAccess",
                             "src": "2215:29:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Repository_$172_storage",
+                              "typeIdentifier": "t_struct$_Repository_$201_storage",
                               "typeString": "struct Valist.Repository storage ref"
                             }
                           },
-                          "id": 290,
+                          "id": 319,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "active",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 171,
+                          "referencedDeclaration": 200,
                           "src": "2215:36:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bool",
@@ -5205,7 +5213,7 @@
                         "rightExpression": {
                           "argumentTypes": null,
                           "hexValue": "66616c7365",
-                          "id": 291,
+                          "id": 320,
                           "isConstant": false,
                           "isLValue": false,
                           "isPure": true,
@@ -5229,7 +5237,7 @@
                       {
                         "argumentTypes": null,
                         "hexValue": "5265706f7369746f727920616c72656164792065786973747321",
-                        "id": 293,
+                        "id": 322,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": true,
@@ -5256,7 +5264,7 @@
                           "typeString": "literal_string \"Repository already exists!\""
                         }
                       ],
-                      "id": 283,
+                      "id": 312,
                       "name": "require",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [
@@ -5270,7 +5278,7 @@
                         "typeString": "function (bool,string memory) pure"
                       }
                     },
-                    "id": 294,
+                    "id": 323,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5285,14 +5293,14 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 295,
+                  "id": 324,
                   "nodeType": "ExpressionStatement",
                   "src": "2207:84:2"
                 },
                 {
                   "expression": {
                     "argumentTypes": null,
-                    "id": 304,
+                    "id": 333,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5307,25 +5315,25 @@
                             "argumentTypes": null,
                             "baseExpression": {
                               "argumentTypes": null,
-                              "id": 296,
+                              "id": 325,
                               "name": "orgs",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 202,
+                              "referencedDeclaration": 231,
                               "src": "2490:4:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                               }
                             },
-                            "id": 298,
+                            "id": 327,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 297,
+                              "id": 326,
                               "name": "orgName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 276,
+                              "referencedDeclaration": 305,
                               "src": "2495:7:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -5339,32 +5347,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2490:13:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Organization_$186_storage",
+                              "typeIdentifier": "t_struct$_Organization_$215_storage",
                               "typeString": "struct Valist.Organization storage ref"
                             }
                           },
-                          "id": 299,
+                          "id": 328,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "repos",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 181,
+                          "referencedDeclaration": 210,
                           "src": "2490:19:2",
                           "typeDescriptions": {
-                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                            "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                             "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                           }
                         },
-                        "id": 301,
+                        "id": 330,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 300,
+                          "id": 329,
                           "name": "repoName",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 278,
+                          "referencedDeclaration": 307,
                           "src": "2510:8:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_string_memory_ptr",
@@ -5378,18 +5386,18 @@
                         "nodeType": "IndexAccess",
                         "src": "2490:29:2",
                         "typeDescriptions": {
-                          "typeIdentifier": "t_struct$_Repository_$172_storage",
+                          "typeIdentifier": "t_struct$_Repository_$201_storage",
                           "typeString": "struct Valist.Repository storage ref"
                         }
                       },
-                      "id": 302,
+                      "id": 331,
                       "isConstant": false,
                       "isLValue": true,
                       "isPure": false,
                       "lValueRequested": true,
                       "memberName": "meta",
                       "nodeType": "MemberAccess",
-                      "referencedDeclaration": 167,
+                      "referencedDeclaration": 196,
                       "src": "2490:34:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_storage",
@@ -5400,11 +5408,11 @@
                     "operator": "=",
                     "rightHandSide": {
                       "argumentTypes": null,
-                      "id": 303,
+                      "id": 332,
                       "name": "meta",
                       "nodeType": "Identifier",
                       "overloadedDeclarations": [],
-                      "referencedDeclaration": 280,
+                      "referencedDeclaration": 309,
                       "src": "2527:4:2",
                       "typeDescriptions": {
                         "typeIdentifier": "t_string_memory_ptr",
@@ -5417,7 +5425,7 @@
                       "typeString": "string storage ref"
                     }
                   },
-                  "id": 305,
+                  "id": 334,
                   "nodeType": "ExpressionStatement",
                   "src": "2490:41:2"
                 },
@@ -5429,7 +5437,7 @@
                         "argumentTypes": null,
                         "expression": {
                           "argumentTypes": null,
-                          "id": 316,
+                          "id": 345,
                           "name": "msg",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
@@ -5440,7 +5448,7 @@
                             "typeString": "msg"
                           }
                         },
-                        "id": 317,
+                        "id": 346,
                         "isConstant": false,
                         "isLValue": false,
                         "isPure": false,
@@ -5474,25 +5482,25 @@
                                 "argumentTypes": null,
                                 "baseExpression": {
                                   "argumentTypes": null,
-                                  "id": 306,
+                                  "id": 335,
                                   "name": "orgs",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 202,
+                                  "referencedDeclaration": 231,
                                   "src": "2541:4:2",
                                   "typeDescriptions": {
-                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$186_storage_$",
+                                    "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Organization_$215_storage_$",
                                     "typeString": "mapping(string memory => struct Valist.Organization storage ref)"
                                   }
                                 },
-                                "id": 308,
+                                "id": 337,
                                 "indexExpression": {
                                   "argumentTypes": null,
-                                  "id": 307,
+                                  "id": 336,
                                   "name": "orgName",
                                   "nodeType": "Identifier",
                                   "overloadedDeclarations": [],
-                                  "referencedDeclaration": 276,
+                                  "referencedDeclaration": 305,
                                   "src": "2546:7:2",
                                   "typeDescriptions": {
                                     "typeIdentifier": "t_string_memory_ptr",
@@ -5506,32 +5514,32 @@
                                 "nodeType": "IndexAccess",
                                 "src": "2541:13:2",
                                 "typeDescriptions": {
-                                  "typeIdentifier": "t_struct$_Organization_$186_storage",
+                                  "typeIdentifier": "t_struct$_Organization_$215_storage",
                                   "typeString": "struct Valist.Organization storage ref"
                                 }
                               },
-                              "id": 309,
+                              "id": 338,
                               "isConstant": false,
                               "isLValue": true,
                               "isPure": false,
                               "lValueRequested": false,
                               "memberName": "repos",
                               "nodeType": "MemberAccess",
-                              "referencedDeclaration": 181,
+                              "referencedDeclaration": 210,
                               "src": "2541:19:2",
                               "typeDescriptions": {
-                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$172_storage_$",
+                                "typeIdentifier": "t_mapping$_t_string_memory_$_t_struct$_Repository_$201_storage_$",
                                 "typeString": "mapping(string memory => struct Valist.Repository storage ref)"
                               }
                             },
-                            "id": 311,
+                            "id": 340,
                             "indexExpression": {
                               "argumentTypes": null,
-                              "id": 310,
+                              "id": 339,
                               "name": "repoName",
                               "nodeType": "Identifier",
                               "overloadedDeclarations": [],
-                              "referencedDeclaration": 278,
+                              "referencedDeclaration": 307,
                               "src": "2561:8:2",
                               "typeDescriptions": {
                                 "typeIdentifier": "t_string_memory_ptr",
@@ -5545,32 +5553,32 @@
                             "nodeType": "IndexAccess",
                             "src": "2541:29:2",
                             "typeDescriptions": {
-                              "typeIdentifier": "t_struct$_Repository_$172_storage",
+                              "typeIdentifier": "t_struct$_Repository_$201_storage",
                               "typeString": "struct Valist.Repository storage ref"
                             }
                           },
-                          "id": 312,
+                          "id": 341,
                           "isConstant": false,
                           "isLValue": true,
                           "isPure": false,
                           "lValueRequested": false,
                           "memberName": "usersByRole",
                           "nodeType": "MemberAccess",
-                          "referencedDeclaration": 159,
+                          "referencedDeclaration": 188,
                           "src": "2541:41:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_mapping$_t_bytes32_$_t_array$_t_address_$dyn_storage_$",
                             "typeString": "mapping(bytes32 => address[] storage ref)"
                           }
                         },
-                        "id": 314,
+                        "id": 343,
                         "indexExpression": {
                           "argumentTypes": null,
-                          "id": 313,
+                          "id": 342,
                           "name": "REPO_OWNER",
                           "nodeType": "Identifier",
                           "overloadedDeclarations": [],
-                          "referencedDeclaration": 134,
+                          "referencedDeclaration": 163,
                           "src": "2583:10:2",
                           "typeDescriptions": {
                             "typeIdentifier": "t_bytes32",
@@ -5588,7 +5596,7 @@
                           "typeString": "address[] storage ref"
                         }
                       },
-                      "id": 315,
+                      "id": 344,
                       "isConstant": false,
                       "isLValue": false,
                       "isPure": false,
@@ -5602,7 +5610,7 @@
                         "typeString": "function (address)"
                       }
                     },
-                    "id": 318,
+                    "id": 347,
                     "isConstant": false,
                     "isLValue": false,
                     "isPure": false,
@@ -5617,7 +5625,7 @@
                       "typeString": "tuple()"
                     }
                   },
-                  "id": 319,
+                  "id": 348,
                   "nodeType": "ExpressionStatement",
                   "src": "2541:70:2"
                 }
@@ -5625,7 +5633,7 @@
             },
             "documentation": null,
             "functionSelector": "3c733e6f",
-            "id": 321,
+            "id": 350,
             "implemented": true,
             "kind": "function",
             "modifiers": [],
@@ -5633,16 +5641,16 @@
             "nodeType": "FunctionDefinition",
             "overrides": null,
             "parameters": {
-              "id": 281,
+              "id": 310,
               "nodeType": "ParameterList",
               "parameters": [
                 {
                   "constant": false,
-                  "id": 276,
+                  "id": 305,
                   "name": "orgName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2123:21:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5651,7 +5659,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 275,
+                    "id": 304,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2123:6:2",
@@ -5665,11 +5673,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 278,
+                  "id": 307,
                   "name": "repoName",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2146:22:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5678,7 +5686,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 277,
+                    "id": 306,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2146:6:2",
@@ -5692,11 +5700,11 @@
                 },
                 {
                   "constant": false,
-                  "id": 280,
+                  "id": 309,
                   "name": "meta",
                   "nodeType": "VariableDeclaration",
                   "overrides": null,
-                  "scope": 321,
+                  "scope": 350,
                   "src": "2170:18:2",
                   "stateVariable": false,
                   "storageLocation": "memory",
@@ -5705,7 +5713,7 @@
                     "typeString": "string"
                   },
                   "typeName": {
-                    "id": 279,
+                    "id": 308,
                     "name": "string",
                     "nodeType": "ElementaryTypeName",
                     "src": "2170:6:2",
@@ -5721,19 +5729,19 @@
               "src": "2122:67:2"
             },
             "returnParameters": {
-              "id": 282,
+              "id": 311,
               "nodeType": "ParameterList",
               "parameters": [],
               "src": "2197:0:2"
             },
-            "scope": 322,
+            "scope": 351,
             "src": "2097:521:2",
             "stateMutability": "nonpayable",
             "virtual": false,
             "visibility": "public"
           }
         ],
-        "scope": 323,
+        "scope": 352,
         "src": "126:2495:2"
       }
     ],
@@ -5743,9 +5751,130 @@
     "name": "solc",
     "version": "0.6.2+commit.bacdbe57.Emscripten.clang"
   },
-  "networks": {},
+  "networks": {
+    "5777": {
+      "events": {
+        "0xbd79b86ffe0ab8e8776151514217cd7cacd52c909f66475c3af44e129f0b00ff": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "previousAdminRole",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "newAdminRole",
+              "type": "bytes32"
+            }
+          ],
+          "name": "RoleAdminChanged",
+          "type": "event"
+        },
+        "0x2f8788117e7eff1d82e926ec794901d17c78024a50270940304540a733656f0d": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleGranted",
+          "type": "event"
+        },
+        "0xf6391f5c32d9c69d2a47ea670b442974b53935d1edc7fd64eb21e047a839171b": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": true,
+              "internalType": "bytes32",
+              "name": "role",
+              "type": "bytes32"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "account",
+              "type": "address"
+            },
+            {
+              "indexed": true,
+              "internalType": "address",
+              "name": "sender",
+              "type": "address"
+            }
+          ],
+          "name": "RoleRevoked",
+          "type": "event"
+        },
+        "0xd23de61de2944d5f41c90441565ff78ea0ee07bde313e54e060f3d8c93e0f002": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "repoName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "meta",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "changelog",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "release",
+              "type": "string"
+            }
+          ],
+          "name": "Update",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0x3385607d548fD6A823098C1952D841C02D6A104f",
+      "transactionHash": "0x511069261c0ea95d04212f6f3f2a9de6f148f6cef3d33d426612bf8411f54ebf"
+    }
+  },
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-07-30T18:24:20.061Z",
+  "updatedAt": "2020-07-30T19:23:29.142Z",
+  "networkType": "ethereum",
   "devdoc": {
     "methods": {
       "getRoleAdmin(bytes32)": {

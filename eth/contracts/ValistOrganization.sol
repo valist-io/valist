@@ -8,41 +8,28 @@ contract ValistOrganization is AccessControl {
     bytes32 constant ORG_OWNER = keccak256("ORG_OWNER_ROLE");
     bytes32 constant ORG_ADMIN = keccak256("ORG_ADMIN_ROLE");
 
-    struct Organization {
-        mapping(string => ValistRepository) repos;
-        string meta; // org metadata (full name, image, description, etc)
-        bool active;
+    string public meta; // org metadata (full name, image, description, etc)
+
+    mapping(string => ValistRepository) public repos;
+
+    constructor(address _owner, string memory _meta) public {
+        _setupRole(ORG_OWNER, _owner);
+        meta = _meta;
     }
 
-    Organization public org;
-
-    constructor(string memory meta, address owner) public {
-        _setupRole(ORG_OWNER, owner);
-        org.meta = meta;
-        org.active = true;
+    function getRepositoryAddress(string memory _repoName) public view returns(address) {
+        return address(repos[_repoName]);
     }
 
-    function isActive() public view returns(bool) {
-        return org.active;
+    function createRepository(string memory _repoName, string memory _meta, address _owner) public returns(address) {
+        require(address(repos[_repoName]) == address(0), "Repository already exists!");
+        repos[_repoName] = new ValistRepository(_owner, _meta);
+        return address(repos[_repoName]);
     }
 
-    function createRepository(string memory repoName, string memory meta, address owner) public returns(address) {
-        require(org.repos[repoName].isActive() == false, "Repository already exists!");
-        org.repos[repoName] = new ValistRepository(meta, owner);
-        return address(org.repos[repoName]);
-    }
-
-    function getRepositoryAddress(string memory repoName) public view returns(address) {
-        return address(org.repos[repoName]);
-    }
-
-    function getRepository(string memory repoName) public view returns(ValistRepository) {
-        return org.repos[repoName];
-    }
-
-    function updateMetadata(string memory meta) public {
+    function updateOrgMeta(string memory _meta) public returns (string memory) {
         require(hasRole(ORG_OWNER, msg.sender) || hasRole(ORG_ADMIN, msg.sender), "You do not have permission to modify this organization!");
-        org.meta = meta;
+        meta = _meta;
     }
 
 }
