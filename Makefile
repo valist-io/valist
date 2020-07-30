@@ -36,13 +36,17 @@ frontend: lib relay
 # build all artifacts
 all: contracts lib relay
 
-install:
+install-lib:
 	cd lib && npm i
+
+install-relay:
 	cd relay && npm i
 
-install-all:
-	cd lib && npm i
-	cd relay && npm i
+install-eth:
 	cd eth && npm i
+
+install-all: install-lib install-relay install-eth
+
+install: install-all
 
 .PHONY: relay lib contracts
