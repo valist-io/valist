@@ -15,10 +15,6 @@ contract Valist {
         return orgs[orgName].meta();
     }
 
-    function getOrganizationAddress(string memory orgName) public view returns(address org) {
-        return address(orgs[orgName]);
-    }
-
     function getRepoMetaByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
         return orgs[orgName].repos(repoName).meta();
     }

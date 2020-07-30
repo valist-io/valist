@@ -17,11 +17,7 @@ contract ValistOrganization is AccessControl {
         meta = _meta;
     }
 
-    function getRepositoryAddress(string memory _repoName) public view returns(address) {
-        return address(repos[_repoName]);
-    }
-
-    function createRepository(string memory _repoName, string memory _meta, address _owner) public returns(address) {
+    function createRepository(address _owner, string memory _repoName, string memory _meta) public returns(address) {
         require(address(repos[_repoName]) == address(0), "Repository already exists!");
         repos[_repoName] = new ValistRepository(_owner, _meta);
         return address(repos[_repoName]);
