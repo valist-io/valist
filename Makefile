@@ -1,24 +1,24 @@
 SHELL=/bin/bash
 
 # builds frontend to ui/public
-ui:
-	cd ui && npm run build
+relay:
+	cd relay && npm run build
 
 # builds valist npm package
 lib:
 	cd lib && npm run build
 
-# runs local gatsby server
-dev-ui:
-	cd ui && npm run develop
+# runs local next server
+dev-relay:
+	cd relay && npm run dev
 
-# runs local gatsby server
+# runs local next server
 dev-lib:
-	cd lib && npm run develop
+	cd lib && npm run dev
 
 # runs both dev servers in parallel, piping output to same shell
 dev:
-	@make -j 2 dev-lib dev-ui
+	@make -j 2 dev-lib dev-relay
 
 # compile contracts
 contracts:
@@ -31,18 +31,18 @@ migrate:
 deploy: migrate
 
 # build frontend
-frontend: lib ui
+frontend: lib relay
 
 # build all artifacts
-all: contracts lib ui
+all: contracts lib relay
 
 install:
 	cd lib && npm i
-	cd ui && npm i
+	cd relay && npm i
 
 install-all:
 	cd lib && npm i
-	cd ui && npm i
+	cd relay && npm i
 	cd eth && npm i
 
-.PHONY: ui lib contracts
+.PHONY: relay lib contracts

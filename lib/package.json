@@ -19,7 +19,7 @@
   "types": "dist/main.d.ts",
   "scripts": {
     "build": "tsc",
-    "develop": "tsc -w"
+    "dev": "tsc -w"
   },
   "devDependencies": {
     "typescript": "^3.9.7"
