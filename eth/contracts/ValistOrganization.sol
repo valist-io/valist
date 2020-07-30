@@ -12,6 +12,11 @@ contract ValistOrganization is AccessControl {
 
     mapping(string => ValistRepository) public repos;
 
+    modifier admin() {
+        require(hasRole(ORG_OWNER, msg.sender) || hasRole(ORG_ADMIN, msg.sender), "You do not have permission to modify this organization!");
+        _;
+    }
+
     constructor(address _owner, string memory _meta) public {
         _setupRole(ORG_OWNER, _owner);
         meta = _meta;
@@ -23,8 +28,7 @@ contract ValistOrganization is AccessControl {
         return address(repos[_repoName]);
     }
 
-    function updateOrgMeta(string memory _meta) public returns (string memory) {
-        require(hasRole(ORG_OWNER, msg.sender) || hasRole(ORG_ADMIN, msg.sender), "You do not have permission to modify this organization!");
+    function updateOrgMeta(string memory _meta) public admin returns (string memory) {
         meta = _meta;
     }
 

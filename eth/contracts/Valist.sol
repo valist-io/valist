@@ -9,8 +9,6 @@ contract Valist {
     // [valist.io]/[organization]/[repository]
     mapping(string => ValistOrganization) public orgs;
 
-    event Update(string orgName, string repoName, string meta, string changelog, string release);
-
     function getOrganizationMeta(string memory orgName) public view returns(string memory meta) {
         return orgs[orgName].meta();
     }

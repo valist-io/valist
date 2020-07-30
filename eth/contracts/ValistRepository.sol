@@ -14,16 +14,35 @@ contract ValistRepository is AccessControl {
     string[] public changelog; // list of IPFS uris for any changelogs (also emitted as an event during update)
     string[] public releases; // list of previous release ipfs hashes
 
-    event Update(string meta, string changelog, string release);
+    event Release(string changelog, string release);
+
+    modifier admin() {
+      require(hasRole(REPO_OWNER, msg.sender) || hasRole(REPO_ADMIN, msg.sender), "You do not have permission to modify this repository!");
+      _;
+    }
+
+    modifier developers() {
+      require(hasRole(REPO_OWNER, msg.sender) ||
+              hasRole(REPO_ADMIN, msg.sender) ||
+              hasRole(REPO_DEV, msg.sender),
+              "You do not have permission to modify this repository!");
+      _;
+    }
 
     constructor(address _owner, string memory _meta) public {
         _setupRole(REPO_OWNER, _owner);
         meta = _meta;
     }
 
-    function updateRepoMeta(string memory _meta) public returns (string memory) {
-        require(hasRole(REPO_OWNER, msg.sender) || hasRole(REPO_ADMIN, msg.sender), "You do not have permission to modify this repository!");
+    function updateRepoMeta(string memory _meta) public admin returns (string memory) {
         meta = _meta;
+    }
+
+    function publishUpdate(string memory _changelog, string memory _release) public admin developers {
+        changelog.push(_changelog);
+        releases.push(_release);
+
+        emit Release(_changelog, _release);
     }
 
 }
