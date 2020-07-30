@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-# builds frontend to ui/public
+# builds static frontend
 relay:
 	cd relay && npm run build
 
