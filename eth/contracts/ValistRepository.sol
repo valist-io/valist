@@ -14,6 +14,8 @@ contract ValistRepository is AccessControl {
     string[] public changelog; // list of IPFS uris for any changelogs (also emitted as an event during update)
     string[] public releases; // list of previous release ipfs hashes
 
+    event Update(string meta, string changelog, string release);
+
     constructor(address _owner, string memory _meta) public {
         _setupRole(REPO_OWNER, _owner);
         meta = _meta;
