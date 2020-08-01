@@ -11,21 +11,22 @@ contract ValistRepository is AccessControl {
     address immutable deployer;
 
     string public repoMeta; // ipfs URI for metadata (image, description, etc)\
-    string public releaseMeta; // version/build number,changelog, other release specific metadata (valist json schema)
+    string public releaseMeta; // version/build number, changelog, other release specific metadata (valist json schema)
     string public latestRelease; // latest release hash
+    string public tag;
 
-    event Release(string release, string releaseMeta);
+    event Release(string tag, string release, string releaseMeta);
 
     event MetaUpdated(string repoMeta);
 
     modifier admin() {
-      require(hasRole(REPO_ADMIN, msg.sender), "You do not have permission to perform this action!");
-      _;
+        require(hasRole(REPO_ADMIN, msg.sender), "You do not have permission to perform this action!");
+        _;
     }
 
     modifier developer() {
-      require(hasRole(REPO_ADMIN, msg.sender) || hasRole(REPO_DEV, msg.sender), "You do not have permission to perform this action!");
-      _;
+        require(hasRole(REPO_ADMIN, msg.sender) || hasRole(REPO_DEV, msg.sender), "You do not have permission to perform this action!");
+        _;
     }
 
     constructor(address _admin, string memory _repoMeta) public {
@@ -44,11 +45,12 @@ contract ValistRepository is AccessControl {
         emit MetaUpdated(repoMeta);
     }
 
-    function publishRelease(string memory _latestRelease, string memory _releaseMeta) public developer {
+    function publishRelease(string memory _tag, string memory _latestRelease, string memory _releaseMeta) public developer {
         latestRelease = _latestRelease;
         releaseMeta = _releaseMeta;
+        tag = _tag;
 
-        emit Release(latestRelease, releaseMeta);
+        emit Release(tag, latestRelease, releaseMeta);
     }
 
     function _deleteRepository(address payable _admin) external {

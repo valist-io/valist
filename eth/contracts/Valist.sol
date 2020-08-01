@@ -16,16 +16,24 @@ contract Valist {
 
     event OrganizationDeleted(string orgName);
 
-    function getOrganizationMeta(string memory orgName) public view returns(string memory meta) {
+    function getOrganizationMeta(string memory orgName) public view returns(string memory) {
         return orgs[orgName].orgMeta();
     }
 
-    function getRepoMetaByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
+    function getMetaFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
         return orgs[orgName].repos(repoName).repoMeta();
     }
 
-    function getRepoLatestReleaseByOrganization(string memory orgName, string memory repoName) public view returns(string memory meta) {
+    function getLatestReleaseFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
         return orgs[orgName].repos(repoName).latestRelease();
+    }
+
+    function getLatestReleaseMetaFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
+        return orgs[orgName].repos(repoName).repoMeta();
+    }
+
+    function getLatestTagFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
+        return orgs[orgName].repos(repoName).tag();
     }
 
     // register organization/username to the global valist namespace
