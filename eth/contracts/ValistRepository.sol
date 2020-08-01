@@ -8,14 +8,15 @@ contract ValistRepository is AccessControl {
     bytes32 constant REPO_ADMIN = keccak256("REPO_ADMIN_ROLE");
     bytes32 constant REPO_DEV = keccak256("REPO_DEV_ROLE");
 
-    string public meta; // ipfs URI for metadata (image, description, etc)
-    string public latestRelease; // latest release hash (should equal releases[-1])
+    address immutable deployer;
 
-    string[] public releases; // list of previous release ipfs hashes
+    string public repoMeta; // ipfs URI for metadata (image, description, etc)\
+    string public releaseMeta; // version/build number,changelog, other release specific metadata (valist json schema)
+    string public latestRelease; // latest release hash
 
-    event Release(string release, string changelog);
+    event Release(string release, string releaseMeta);
 
-    event MetaUpdate(string meta);
+    event MetaUpdated(string repoMeta);
 
     modifier admin() {
       require(hasRole(REPO_ADMIN, msg.sender), "You do not have permission to perform this action!");
@@ -27,24 +28,33 @@ contract ValistRepository is AccessControl {
       _;
     }
 
-    constructor(address _owner, string memory _meta) public {
-        _setupRole(REPO_ADMIN, _owner);
+    constructor(address _admin, string memory _repoMeta) public {
+        deployer = msg.sender;
+
+        _setupRole(REPO_ADMIN, _admin);
         _setRoleAdmin(REPO_ADMIN, REPO_ADMIN);
         _setRoleAdmin(REPO_DEV, REPO_ADMIN);
 
-        meta = _meta;
+        repoMeta = _repoMeta;
     }
 
-    function updateRepoMeta(string memory _meta) public admin returns (string memory) {
-        meta = _meta;
+    function updateRepoMeta(string memory _repoMeta) public admin returns (string memory) {
+        repoMeta = _repoMeta;
 
-        emit MetaUpdate(_meta);
+        emit MetaUpdated(repoMeta);
     }
 
-    function publishRelease(string memory _changelog, string memory _release) public developer {
-        releases.push(_release);
+    function publishRelease(string memory _latestRelease, string memory _releaseMeta) public developer {
+        latestRelease = _latestRelease;
+        releaseMeta = _releaseMeta;
 
-        emit Release(_release, _changelog);
+        emit Release(latestRelease, releaseMeta);
+    }
+
+    function _deleteRepository(address payable _admin) external {
+        require(msg.sender == deployer, "Can only be called from parent contract!");
+
+        selfdestruct(_admin);
     }
 
 }
