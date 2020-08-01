@@ -16,29 +16,9 @@ contract Valist {
 
     event OrganizationDeleted(string orgName);
 
-    function getOrganizationMeta(string memory orgName) public view returns(string memory) {
-        return orgs[orgName].orgMeta();
-    }
-
-    function getMetaFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
-        return orgs[orgName].repos(repoName).repoMeta();
-    }
-
-    function getLatestReleaseFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
-        return orgs[orgName].repos(repoName).latestRelease();
-    }
-
-    function getLatestReleaseMetaFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
-        return orgs[orgName].repos(repoName).repoMeta();
-    }
-
-    function getLatestTagFromRepo(string memory orgName, string memory repoName) public view returns(string memory) {
-        return orgs[orgName].repos(repoName).tag();
-    }
-
     // register organization/username to the global valist namespace
     function createOrganization(string memory orgName, string memory orgMeta) public returns(address) {
-        require(address(orgs[orgName]) == address(0), "Organization already exists!");
+        require(address(orgs[orgName]) == address(0), "Organization exists");
 
         orgs[orgName] = new ValistOrganization(msg.sender, orgMeta);
 
@@ -48,7 +28,7 @@ contract Valist {
     }
 
     function deleteOrganization(string memory orgName) public {
-        require(orgs[orgName].hasRole(ORG_ADMIN, msg.sender), "You do not have permission to perform this action!");
+        require(orgs[orgName].hasRole(ORG_ADMIN, msg.sender), "Access Denied");
 
         orgs[orgName]._deleteOrganization(msg.sender);
 

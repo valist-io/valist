@@ -13,6 +13,8 @@ contract ValistOrganization is AccessControl {
 
     string public orgMeta; // org metadata (full name, image, description, etc)
 
+    uint16 internal repoCount;
+
     event MetaUpdated(string orgMeta);
 
     event RepositoryCreated(string repoName, string repoMeta);
@@ -22,7 +24,7 @@ contract ValistOrganization is AccessControl {
     mapping(string => ValistRepository) public repos;
 
     modifier admin() {
-        require(hasRole(ORG_ADMIN, msg.sender), "You do not have permission to perform this action!");
+        require(hasRole(ORG_ADMIN, msg.sender), "Access Denied");
         _;
     }
 
@@ -36,9 +38,11 @@ contract ValistOrganization is AccessControl {
     }
 
     function createRepository(string memory _repoName, string memory _repoMeta) public admin returns(address) {
-        require(address(repos[_repoName]) == address(0), "Repository already exists!");
+        require(address(repos[_repoName]) == address(0), "Repo exists");
 
         repos[_repoName] = new ValistRepository(msg.sender, _repoMeta);
+
+        repoCount++;
 
         emit RepositoryCreated(_repoName, _repoMeta);
 
@@ -52,17 +56,20 @@ contract ValistOrganization is AccessControl {
     }
 
     function deleteRepository(string memory _repoName) public {
-        require(repos[_repoName].hasRole(REPO_ADMIN, msg.sender), "You do not have permission to perform this action!");
+        require(repos[_repoName].hasRole(REPO_ADMIN, msg.sender), "Access Denied");
 
-        repos[_repoName]._deleteRepository(msg.sender);
+        repos[_repoName]._deleteRepository(msg.sender); // will fail if does not exist, no need for safemath on repoCount
 
         delete repos[_repoName];
+
+        repoCount--;
 
         emit RepositoryDeleted(_repoName);
     }
 
     function _deleteOrganization(address payable _admin) external {
-        require(msg.sender == deployer, "Can only be called from parent contract!");
+        require(msg.sender == deployer, "Can only be called from parent contract");
+        require(repoCount == 0, "You must delete all repos before deleting the organization");
 
         selfdestruct(_admin);
     }

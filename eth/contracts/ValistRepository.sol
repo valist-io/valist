@@ -20,12 +20,12 @@ contract ValistRepository is AccessControl {
     event MetaUpdated(string repoMeta);
 
     modifier admin() {
-        require(hasRole(REPO_ADMIN, msg.sender), "You do not have permission to perform this action!");
+        require(hasRole(REPO_ADMIN, msg.sender), "Access Denied");
         _;
     }
 
     modifier developer() {
-        require(hasRole(REPO_ADMIN, msg.sender) || hasRole(REPO_DEV, msg.sender), "You do not have permission to perform this action!");
+        require(hasRole(REPO_ADMIN, msg.sender) || hasRole(REPO_DEV, msg.sender), "Access Denied");
         _;
     }
 
@@ -54,7 +54,7 @@ contract ValistRepository is AccessControl {
     }
 
     function _deleteRepository(address payable _admin) external {
-        require(msg.sender == deployer, "Can only be called from parent contract!");
+        require(msg.sender == deployer, "Can only be called from parent contract");
 
         selfdestruct(_admin);
     }
