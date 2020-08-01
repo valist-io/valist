@@ -6,7 +6,6 @@ import "./ValistOrganization.sol";
 contract Valist {
 
     bytes32 constant ORG_ADMIN = keccak256("ORG_ADMIN_ROLE");
-    bytes32 constant REPO_ADMIN = keccak256("REPO_ADMIN_ROLE");
 
     // map an organization/username handle to an Organization contract
     // [valist.io]/[organization]/[repository]
