@@ -1,1 +1,1 @@
-export default function valist(): string;
+export declare function Web3(provider: any): any;

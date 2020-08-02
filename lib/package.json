@@ -17,11 +17,17 @@
   },
   "main": "dist/main.js",
   "types": "dist/main.d.ts",
+  "files": [
+    "dist/"
+  ],
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w"
   },
   "devDependencies": {
     "typescript": "^3.9.7"
+  },
+  "dependencies": {
+    "web3": "^1.2.11"
   }
 }
