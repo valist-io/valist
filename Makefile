@@ -32,6 +32,10 @@ migrate:
 blockchain:
 	cd eth && npm run develop
 
+# launches truffle console
+console:
+	cd eth && npm run console
+
 deploy: migrate
 
 # build frontend

@@ -13,6 +13,7 @@ export const Web3Container:FunctionComponent<any> = () => {
     const [contract, setContract] = useState(null);
     const [provider, setProvider] = useState(null)
     const [web3, setWeb3] = useState(null)
+    const [contractOutput, setContractOutput] = useState(null)
 
     useEffect(() => {
         async function connectWeb3() {
@@ -29,6 +30,7 @@ export const Web3Container:FunctionComponent<any> = () => {
                 setContract(contract)
                 setProvider(provider)
                 setWeb3(web3)
+                setContractOutput(await contract.methods.orgs("Akashic tech").call())
                 
             } catch (error) {
                 alert(
@@ -42,9 +44,7 @@ export const Web3Container:FunctionComponent<any> = () => {
 
     return (
         <div>
-            {web3}
-            {provider}
-            {contract}
+            {JSON.stringify(contractOutput)}
         </div>
     )
 }

@@ -1,2 +1,2 @@
-declare const getValistContract: (web3: any) => unknown;
+declare const getValistContract: (web3: any) => Promise<any>;
 export default getValistContract;
