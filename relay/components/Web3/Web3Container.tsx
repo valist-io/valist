@@ -1,4 +1,3 @@
-// import useState next to FunctionComponent
 import React, { FunctionComponent, useState, useEffect  } from 'react';
 import getValistContract from 'valist/dist/getValistContract';
 import getValistOrganizationContract from 'valist/dist/getValistOrganizationContract'
@@ -11,7 +10,7 @@ export const Web3Container:FunctionComponent<any> = () => {
         /* See Provider Options Section */
     };
 
-    const [contract, setContract] = useState(null);
+    const [contract, setContract] = useState(null)
     const [provider, setProvider] = useState(null)
     const [web3, setWeb3] = useState(null)
     const [contractOutput, setContractOutput] = useState(null)
