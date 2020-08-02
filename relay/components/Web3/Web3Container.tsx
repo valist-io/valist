@@ -1,6 +1,7 @@
 // import useState next to FunctionComponent
 import React, { FunctionComponent, useState, useEffect  } from 'react';
 import getValistContract from 'valist/dist/getValistContract';
+import getValistOrganizationContract from 'valist/dist/getValistOrganizationContract'
 import Web3Modal from "web3modal";
 import { Web3 } from 'valist';
 
@@ -14,6 +15,7 @@ export const Web3Container:FunctionComponent<any> = () => {
     const [provider, setProvider] = useState(null)
     const [web3, setWeb3] = useState(null)
     const [contractOutput, setContractOutput] = useState(null)
+    const [organizationContractOutput, setOrganizationContractOutput] = useState(null)
 
     useEffect(() => {
         async function connectWeb3() {
@@ -27,10 +29,16 @@ export const Web3Container:FunctionComponent<any> = () => {
                 const provider = await web3Modal.connect();
                 const web3 = Web3(provider);
                 const contract = await getValistContract(web3);
+                const organization = await contract.methods.orgs("Akashic tech").call()
+                const organizationContract = await getValistOrganizationContract(web3, organization)
+                console.log( await organizationContract.methods.orgMeta.call())
+
                 setContract(contract)
                 setProvider(provider)
                 setWeb3(web3)
-                setContractOutput(await contract.methods.orgs("Akashic tech").call())
+
+                setContractOutput(organization)
+                // setOrganizationContractOutput(orgOutput)
                 
             } catch (error) {
                 alert(
