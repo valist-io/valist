@@ -39,9 +39,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({contract}) => {
 
     return (
         <form className={classes.root} noValidate autoComplete="off">
-            <TextField onChange={(e) => updateOrganizationShortName(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" />
+            <TextField onChange={(e) => updateOrganizationShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" />
             <br></br>
-            <TextField onChange={(e) => updateOrganizationFullName(e.target.value)} id="outlined-basic" label="Organization Metadata" variant="outlined" />
+            <TextField onChange={(e) => updateOrganizationFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" />
             <br></br>
             <TextField onChange={(e) => updateOrganizationDescription(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" />
             <br></br>
