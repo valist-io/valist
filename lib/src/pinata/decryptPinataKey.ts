@@ -1,5 +1,5 @@
-import sjcl from 'sjcl'
+// import sjcl from 'sjcl'
 
-export function decryptPinataKey(cipherTextJson: string, password: string) {
-    return sjcl.decrypt(password, cipherTextJson)
-}
+// export function decryptPinataKey(cipherTextJson: string, password: string) {
+//     return sjcl.decrypt(password, cipherTextJson)
+// }

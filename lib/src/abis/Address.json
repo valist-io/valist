@@ -5823,7 +5823,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-02T05:15:51.151Z",
+  "updatedAt": "2020-08-02T20:23:48.530Z",
   "devdoc": {
     "details": "Collection of functions related to the address type",
     "methods": {}
