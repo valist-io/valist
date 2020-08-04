@@ -70,4 +70,4 @@ class Valist {
 
 }
 
-module.exports = Valist;
+export = Valist;
