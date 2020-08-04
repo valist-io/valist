@@ -1,4 +1,7 @@
 import Web3 from 'web3';
+import axios from 'axios'
+  // @ts-ignore
+import ipfsClient from 'ipfs-http-client'
 
 import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
@@ -32,14 +35,22 @@ class Valist {
 
   web3: Web3;
   valist: any;
+  ipfs: any;
+  fileBuffer: any;
+  ipfsEnabled: boolean;
 
-  constructor(provider: any) {
+  constructor(provider: any, ipfsEnabled:boolean) {
     this.web3 = new Web3(provider);
+    this.ipfsEnabled = true;
   }
 
   // initialize main valist contract instance for future calls
   async connect() {
     this.valist = await getValistContract(this.web3);
+    if (this.ipfsEnabled === true){
+      this.ipfs = ipfsClient({ host: 'https://ipfs.infura.io', port: '5001', apiPath: '/api/v0/' })
+      this.fileBuffer = (data: any) => this.ipfs.types.Buffer.from(JSON.stringify(data))
+    }
   }
 
   // returns organization contract instance
@@ -74,6 +85,25 @@ class Valist {
     return result;
   }
 
+  async addFileIpfs(data: any){
+    const file = this.fileBuffer(data)
+    try {
+      const result = await this.ipfs.add(file)
+      return result[0].hash
+    } catch (err) {
+      console.error('Error', err)
+    }
+  }
+
+  async getFileIpfs(hash: any){
+    const endpoint = `https://ipfs.infura.io:5001/api/v0/pin/add?arg=/ipfs/${hash}`
+    try {
+      const { data } = await axios.get(endpoint)
+      return data
+    } catch (err) {
+      console.error('Error', err)
+    }
+  }
 }
 
 export = Valist;

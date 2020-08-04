@@ -1,7 +1,7 @@
-import type { AppProps /*, AppContext */ } from 'next/app'
-import Web3Modal from 'web3modal'
+import type { AppProps /*, AppContext */ } from 'next/app';
+import Web3Modal from 'web3modal';
 import React, { useState, useEffect } from 'react';
-import Valist from 'valist'
+import Valist from 'valist';
 import '../styles/main.css';
 
 function App({ Component, pageProps }: AppProps) {
@@ -21,7 +21,7 @@ function App({ Component, pageProps }: AppProps) {
 
           const provider = await web3Modal.connect();
 
-          setValist(new Valist(provider));
+          setValist(new Valist(provider, false));
 
         } catch (error) {
             alert(
