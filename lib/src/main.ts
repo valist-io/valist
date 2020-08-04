@@ -96,7 +96,7 @@ class Valist {
   }
 
   async getFileIpfs(hash: any){
-    const endpoint = `https://ipfs.infura.io:5001/api/v0/pin/add?arg=/ipfs/${hash}`
+    const endpoint = `"https://ipfs.infura.io:5001/api/v0/block/get?arg=/ipfs/${hash}`
     try {
       const { data } = await axios.get(endpoint)
       return data
