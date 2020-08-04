@@ -15,37 +15,46 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export const CreateOrganizationForm:FunctionComponent<any> = ({contract}) => {
+export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
 
-    console.log(contract)
-    
-    const [organizationShortName, updateOrganizationShortName] = useState("")
-    const [organizationFullName, updateOrganizationFullName] = useState("")
-    const [organizationDescription, updateOrganizationDescription] = useState("")
-    
-    const createOrganizationData = () => {
+    const [account, setAccount] = useState("");
 
-        const meta = {
-            Name: organizationFullName,
-            Description: organizationDescription 
-        };
-
-        alert(organizationShortName)
-
-        contract.methods.createOrganization(organizationShortName, JSON.stringify(meta)).call()
-    };
+    const [orgShortName, setOrgShortName] = useState("")
+    const [orgFullName, setOrgFullName] = useState("")
+    const [orgDescription, setOrgDescription] = useState("")
 
     const classes = useStyles();
 
+    useEffect(() => {
+        (async function () {
+            try {
+                const accounts = await valist.web3.eth.getAccounts();
+                setAccount(accounts[0]);
+            } catch (error) {
+                alert(`Failed to load accounts.`);
+                console.log(error);
+            }
+        })();
+    }, []);
+
+    const createOrganization = async () => {
+        const meta = {
+            name: orgFullName,
+            description: orgDescription
+        };
+
+        await valist.createOrganization(orgShortName, JSON.stringify(meta), account);
+    }
+
     return (
         <form className={classes.root} noValidate autoComplete="off">
-            <TextField onChange={(e) => updateOrganizationShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" />
             <br></br>
-            <TextField onChange={(e) => updateOrganizationFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" />
             <br></br>
-            <TextField onChange={(e) => updateOrganizationDescription(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgDescription(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" />
             <br></br>
-            <Button onClick={createOrganizationData} value="Submit" variant="contained" color="primary">Create</Button>
+            <Button onClick={createOrganization} value="Submit" variant="contained" color="primary">Create</Button>
         </form>
     );
 

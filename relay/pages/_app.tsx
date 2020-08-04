@@ -4,37 +4,53 @@ import React, { useState, useEffect } from 'react';
 import Valist from 'valist'
 import '../styles/main.css';
 
-
 function App({ Component, pageProps }: AppProps) {
 
-  const [valistWeb3, setValistWeb3] = useState(null)
+  const [valist, setValist] = useState<Valist>();
+
   const providerOptions = {}
 
-    useEffect(() => {
-      async function connectWeb3() {
-          try {
-            const web3Modal = new Web3Modal({
-              cacheProvider: true, // optional
-              providerOptions // required
-            });
-          
-            const provider = await web3Modal.connect();
-              const valist = new Valist(provider)
-              await valist.connect();
-              console.log(await valist.getOrganization("Akashic tech"))
-              setValistWeb3(valist)
-              
-          } catch (error) {
-              alert(
-                  `Failed to load web3, accounts, or contract. Check console for details.`
-              )
-              console.log(error)
-          }
-      }
-      connectWeb3()
-    }, [])
+  // initialize web3 and valist object on document load
+  useEffect(() => {
+    (async function () {
+        try {
+          const web3Modal = new Web3Modal({
+            cacheProvider: true, // optional
+            providerOptions // required
+          });
 
-  return <Component {...pageProps} valist={valistWeb3} />
+          const provider = await web3Modal.connect();
+
+          setValist(new Valist(provider));
+
+        } catch (error) {
+            alert(
+                `Failed to load web3, accounts, or contract. Check console for details.`
+            )
+            console.log(error)
+        }
+    })();
+  }, []);
+
+  // activate valist object
+  useEffect(() => {
+    (async function() {
+      if (valist) {
+        try {
+          await valist.connect();
+        } catch (e) {
+
+        }
+
+        if (process.env.NODE_ENV == 'development') {
+          // @ts-ignore
+          window.valist = valist;
+        }
+      }
+    })();
+  }, [valist]);
+
+  return <Component {...pageProps} valist={valist} />
 }
 
 // Only uncomment this method if you have blocking data requirements for

@@ -11,9 +11,9 @@ const getContractInstance = async (web3: Web3, abi: any, address: string) => {
 
 const getValistContract = async (web3: Web3) => {
   // get network ID and the deployed address
-  const networkId = await web3.eth.net.getId();
+  const networkId: number = await web3.eth.net.getId();
   // @ts-ignore
-  const deployedAddress: any = ValistABI.networks[networkId].address
+  const deployedAddress: string = ValistABI.networks[networkId].address;
 
   return await getContractInstance(web3, ValistABI.abi, deployedAddress);
 }
@@ -49,6 +49,12 @@ class Valist {
     return org;
   }
 
+  async getOrganizationMeta(orgName: string) {
+    const org = await this.getOrganization(orgName);
+    const orgMeta = await org.methods.orgMeta().call();
+    return orgMeta;
+  }
+
   // returns repository contract instance
   async getRepoFromOrganization(orgName: string, repoName: string) {
     const org = await this.getOrganization(orgName);
@@ -63,8 +69,8 @@ class Valist {
     return release;
   }
 
-  async createOrganization(orgName: string, account: any) {
-    const result = await this.valist.methods.createOrganization(orgName).send({ from: account });
+  async createOrganization(orgName: string, orgMeta: string, account: any) {
+    const result = await this.valist.methods.createOrganization(orgName, orgMeta).send({ from: account });
     return result;
   }
 

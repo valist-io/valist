@@ -5,8 +5,9 @@ declare class Valist {
     constructor(provider: any);
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<import("web3-eth-contract").Contract>;
+    getOrganizationMeta(orgName: string): Promise<any>;
     getRepoFromOrganization(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
-    createOrganization(orgName: string, account: any): Promise<any>;
+    createOrganization(orgName: string, orgMeta: string, account: any): Promise<any>;
 }
 export = Valist;
