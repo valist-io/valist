@@ -39,7 +39,7 @@ function App({ Component, pageProps }: AppProps) {
         try {
           await valist.connect();
         } catch (e) {
-
+          alert(`Failed to connect to the Valist contracts!`);
         }
 
         if (process.env.NODE_ENV == 'development') {
