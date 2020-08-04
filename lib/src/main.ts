@@ -106,4 +106,6 @@ class Valist {
   }
 }
 
-export = Valist;
+export const Web3Providers = Web3.providers;
+
+export default Valist;
