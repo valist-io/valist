@@ -44,6 +44,8 @@ frontend: lib relay
 # build all artifacts
 all: contracts lib relay
 
+compile: all
+
 install-lib:
 	cd lib && npm i
 
