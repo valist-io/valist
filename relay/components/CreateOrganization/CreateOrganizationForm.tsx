@@ -26,16 +26,18 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
     const classes = useStyles();
 
     useEffect(() => {
-        (async function () {
-            try {
-                const accounts = await valist.web3.eth.getAccounts();
-                setAccount(accounts[0]);
-            } catch (error) {
-                alert(`Failed to load accounts.`);
-                console.log(error);
-            }
-        })();
-    }, []);
+        if (valist) {
+            (async function () {
+                try {
+                    const accounts = await valist.web3.eth.getAccounts();
+                    setAccount(accounts[0]);
+                } catch (error) {
+                    alert(`Failed to load accounts.`);
+                    console.log(error);
+                }
+            })();
+        }
+    }, [valist]);
 
     const createOrganization = async () => {
         const meta = {
