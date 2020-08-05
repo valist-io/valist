@@ -1,8 +1,6 @@
 import Web3 from 'web3';
 import { provider, Account } from 'web3-core/types';
-
-import axios from 'axios'
-  // @ts-ignore
+// @ts-ignore
 import ipfsClient from 'ipfs-http-client'
 
 import ValistABI from './abis/Valist.json';

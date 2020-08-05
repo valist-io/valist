@@ -28,8 +28,6 @@
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "axios": "^0.19.2",
-    "ipfs": "^0.48.1",
     "ipfs-http-client": "^45.0.0",
     "web3": "^1.2.11"
   }

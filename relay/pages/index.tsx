@@ -1,8 +1,7 @@
 import Layout from '../components/Layout/Layout'
 import { CreateOrganizationForm } from '../components/CreateOrganization/CreateOrganizationForm'
 
-// @ts-ignore
-export const IndexPage:FunctionComponent<any> = ({pageProps, valist}) => {
+export const IndexPage = ({valist}: any) => {
   return (
     <Layout title="valist.io">
       <CreateOrganizationForm valist={valist} />
