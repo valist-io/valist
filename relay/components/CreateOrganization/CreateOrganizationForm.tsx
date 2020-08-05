@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect, isValidElement  } from 'react';
+import React, { FunctionComponent, useState, useEffect } from 'react';
 import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
 import TextField from '@material-ui/core/TextField';
 import Button from '@material-ui/core/Button';

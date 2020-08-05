@@ -1,7 +1,5 @@
 import React, { ReactNode } from 'react'
-import Link from 'next/link'
 import Head from 'next/head'
-import NavBar from '../NavBar/NavBar'
 
 type Props = {
   children?: ReactNode
@@ -16,9 +14,6 @@ const Layout = ({ children, title = 'Valist' }: Props) => (
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
     </Head>
-    <header>
-      <NavBar />
-    </header>
     <div id="valist-content">
       {children}
     </div>

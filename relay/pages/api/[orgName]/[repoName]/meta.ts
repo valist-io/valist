@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Valist, { Web3Providers } from 'valist';
 
-export default async function getOrganizationMeta(req: NextApiRequest, res: NextApiResponse) {
+export default async function getRepoMeta(req: NextApiRequest, res: NextApiResponse) {
 
   // set .env.local to your local chain or set in production deployment
   if (process.env.WEB3_PROVIDER) {
@@ -11,12 +11,12 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
     await valist.connect();
 
     const {
-      query: { orgName },
+      query: { orgName, repoName },
     } = req;
 
-    const orgMeta = await valist.getOrganizationMeta(orgName.toString());
+    const repoMeta = await valist.getRepoMeta(orgName.toString(), repoName.toString());
 
-    return res.status(200).json({orgMeta});
+    return res.status(200).json({repoMeta});
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

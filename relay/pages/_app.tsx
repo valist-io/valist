@@ -1,4 +1,4 @@
-import type { AppProps /*, AppContext */ } from 'next/app';
+import { AppProps } from 'next/app';
 import Web3Modal from 'web3modal';
 import React, { useState, useEffect } from 'react';
 import Valist from 'valist';

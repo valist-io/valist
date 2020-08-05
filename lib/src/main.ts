@@ -1,4 +1,6 @@
 import Web3 from 'web3';
+import { provider, Account } from 'web3-core/types';
+
 import axios from 'axios'
   // @ts-ignore
 import ipfsClient from 'ipfs-http-client'
@@ -35,22 +37,18 @@ class Valist {
 
   web3: Web3;
   valist: any;
-  ipfs: any;
-  fileBuffer: any;
-  ipfsEnabled: boolean;
+  ipfs: ipfsClient;
 
-  constructor(provider: any, ipfsEnabled:boolean) {
-    this.web3 = new Web3(provider);
-    this.ipfsEnabled = true;
+  constructor(web3Provider: provider, ipfsEnabled: boolean) {
+    this.web3 = new Web3(web3Provider);
+    if (ipfsEnabled) {
+      this.ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', apiPath: '/api/v0/', protocol: 'https' });
+    }
   }
 
   // initialize main valist contract instance for future calls
   async connect() {
     this.valist = await getValistContract(this.web3);
-    if (this.ipfsEnabled === true){
-      this.ipfs = ipfsClient({ host: 'https://ipfs.infura.io', port: '5001', apiPath: '/api/v0/' })
-      this.fileBuffer = (data: any) => this.ipfs.types.Buffer.from(JSON.stringify(data))
-    }
   }
 
   // returns organization contract instance
@@ -58,6 +56,14 @@ class Valist {
     const orgAddress = await this.valist.methods.orgs(orgName).call();
     const org = await getValistOrganizationContract(this.web3, orgAddress);
     return org;
+  }
+
+  // returns organization contract instance
+  async getRepository(orgName: string, repoName: string) {
+    const org = await this.getOrganization(orgName);
+    const repoAddress = await org.methods.repos(repoName).call();
+    const repo = await getValistRepositoryContract(this.web3, repoAddress);
+    return repo;
   }
 
   async getOrganizationMeta(orgName: string) {
@@ -74,6 +80,12 @@ class Valist {
     return repo;
   }
 
+  async getRepoMeta(orgName: string, repoName: string) {
+    const repo = await this.getRepoFromOrganization(orgName, repoName);
+    const repoMeta = await repo.methods.repoMeta().call();
+    return repoMeta;
+  }
+
   async getLatestReleaseFromRepo(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
     const release = await repo.methods.latestRelease().call();
@@ -85,25 +97,28 @@ class Valist {
     return result;
   }
 
+  async createRepository(orgName: string, repoName: string, repoMeta: string, account: any) {
+    const org = await this.getOrganization(orgName);
+    const result = await org.methods.createRepository(repoName, repoMeta).send({ from: account });
+    return result;
+  }
+
+  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account });
+    return result;
+  }
+
   async addFileIpfs(data: any){
-    const file = this.fileBuffer(data)
+    const file = Buffer.from(JSON.stringify(data));
     try {
-      const result = await this.ipfs.add(file)
-      return result[0].hash
+      const result = await this.ipfs.add(file);
+      return result
     } catch (err) {
-      console.error('Error', err)
+      console.error('Error', err);
     }
   }
 
-  async getFileIpfs(hash: any){
-    const endpoint = `"https://ipfs.infura.io:5001/api/v0/block/get?arg=/ipfs/${hash}`
-    try {
-      const { data } = await axios.get(endpoint)
-      return data
-    } catch (err) {
-      console.error('Error', err)
-    }
-  }
 }
 
 export const Web3Providers = Web3.providers;
