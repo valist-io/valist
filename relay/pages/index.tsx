@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React from 'react';
 import IndexLayout from '../components/Layout/IndexLayout'
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
@@ -41,7 +41,7 @@ export const IndexPage = () => {
       <div>
           {MapLsit()}
       </div>
-      
+
     </IndexLayout>
   );
 }

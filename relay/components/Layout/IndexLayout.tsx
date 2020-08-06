@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React, { useState, useEffect, ReactNode } from 'react';
+import React, { useEffect, ReactNode } from 'react';
 import Button from '@material-ui/core/Button';
 import Link from 'next/link'
 
@@ -13,12 +13,15 @@ const IndexLayout = ({ children, title = 'Valist' }: Props) => {
     useEffect(() => {
         window.onscroll = function() {stickNav()};
         let navbar = document.getElementById("navbar");
+        // @ts-ignore
         let sticky = navbar.offsetTop;
-    
+
         function stickNav() {
             if (window.pageYOffset >= sticky) {
+                // @ts-ignore
                 navbar.classList.add("sticky")
             } else {
+                // @ts-ignore
                 navbar.classList.remove("sticky");
             }
         }
@@ -30,7 +33,7 @@ const IndexLayout = ({ children, title = 'Valist' }: Props) => {
             <title>{title}</title>
             <meta charSet="utf-8" />
             <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" /> 
+            <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
         </Head>
         <div id="intro">
             <h1>Bring your packages and firmware bundles to the decentralized web!</h1>
