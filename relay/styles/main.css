@@ -1,10 +1,21 @@
 html body {
-  margin: -26px 0 0 0;
+  margin: 0;
   background-color: rgb(248, 248, 253);
 }
 
+@font-face {
+  font-family: Noto Sans;
+  src: url(./NotoSans-Bold.ttf);
+}
+
 #valist-content{
-  min-height: calc(100vh - 64px)
+  min-height: 100vh;
+}
+
+#valist-content-fixed{
+  margin-top: 65px;
+  min-height: calc(100vh - 65px);
+  padding: 30px 20px;
 }
 
 #intro{
@@ -12,6 +23,7 @@ html body {
   color: white;
   min-height: 400px;
   overflow: hidden;
+  padding: 5px;
 }
 
 #intro > h1{
@@ -65,4 +77,27 @@ nav > div{
 
 .sticky + .content {
   padding-top: 60px;
+}
+
+footer{
+  color: white;
+}
+
+@media only screen and (max-width: 600px) {
+  html body{
+    overflow-x: hidden;
+  }
+
+  #intro{
+    padding: 30px 5px 30px 5px;
+  }
+
+  #intro > h1{
+    margin-top: 10px;
+    font-size: 2rem
+  }
+
+  nav{
+    padding: 5px 0;
+  }
 }

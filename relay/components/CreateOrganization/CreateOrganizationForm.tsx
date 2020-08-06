@@ -31,6 +31,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
+                    setOrgShortName("")
+                    setOrgDescription("")
+                    setOrgDescription("")
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -50,11 +53,11 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
 
     return (
         <form className={classes.root} noValidate autoComplete="off">
-            <TextField onChange={(e) => setOrgShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" value={orgShortName}/>
             <br></br>
-            <TextField onChange={(e) => setOrgFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" value={orgFullName} />
             <br></br>
-            <TextField onChange={(e) => setOrgDescription(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" />
+            <TextField onChange={(e) => setOrgDescription(e.target.value)} id="outlined-basic" label="Description" variant="outlined" value={orgDescription} />
             <br></br>
             <Button onClick={createOrganization} value="Submit" variant="contained" color="primary">Create</Button>
         </form>

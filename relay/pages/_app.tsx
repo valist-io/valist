@@ -1,7 +1,6 @@
 import { AppProps } from 'next/app';
-import Web3Modal from 'web3modal';
 import React, { useState, useEffect } from 'react';
-import Valist from 'valist';
+import Valist, {Web3Providers} from 'valist';
 import '../styles/main.css';
 
 function App({ Component, pageProps }: AppProps) {
@@ -14,14 +13,12 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async function () {
         try {
-          const web3Modal = new Web3Modal({
-            cacheProvider: true, // optional
-            providerOptions // required
-          });
-
-          const provider = await web3Modal.connect();
-
-          setValist(new Valist(provider, false));
+          // @ts-ignore
+          
+          if (window.ethereum){
+            window.ethereum.enable();
+            setValist(new Valist(window.ethereum, false));
+          }
 
         } catch (error) {
             alert(

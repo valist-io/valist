@@ -90,15 +90,24 @@ class Valist {
     return release;
   }
 
-  async createOrganization(orgName: string, orgMeta: string, account: any) {
-    const result = await this.valist.methods.createOrganization(orgName, orgMeta).send({ from: account });
+  async createOrganization(orgName: string, orgMeta: JSON, account: any) {
+    const metaFile = this.addJSONtoIPFS(orgMeta)
+    const result = await this.valist.methods.createOrganization(orgName, metaFile).send({ from: account });
     return result;
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: string, account: any) {
-    const org = await this.getOrganization(orgName);
-    const result = await org.methods.createRepository(repoName, repoMeta).send({ from: account });
-    return result;
+  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string}, account: any) {
+    try {
+      const org = await this.getOrganization(orgName);
+      const metaFile = await this.addJSONtoIPFS(repoMeta);
+      const result = await org.methods.createRepository(repoName, metaFile).send({ from: account });
+      return result;
+    }
+    catch(err){
+      console.log(err)
+      return err
+    }
+
   }
 
   async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: any) {
@@ -107,7 +116,7 @@ class Valist {
     return result;
   }
 
-  async addFileIpfs(data: any){
+  async addJSONtoIPFS(data: any){
     const file = Buffer.from(JSON.stringify(data));
     try {
       const result = await this.ipfs.add(file);
