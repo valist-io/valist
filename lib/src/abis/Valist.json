@@ -50,8 +50,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -3059,165 +3058,9 @@
     "name": "solc",
     "version": "0.6.6+commit.6c089d02.Emscripten.clang"
   },
-  "networks": {
-    "3": {
-      "events": {
-        "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgMeta",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationCreated",
-          "type": "event"
-        },
-        "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationDeleted",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0xCD9b5fBae1D44a6Ce5183c60B55BC5dDf4Bd61e8",
-      "transactionHash": "0x23a22955ba6c82f997c8b3ba5c38cf0ec0d72d741cc105f83444c6cc4e37b175"
-    },
-    "5777": {
-      "events": {
-        "0xd23de61de2944d5f41c90441565ff78ea0ee07bde313e54e060f3d8c93e0f002": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "repoName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "meta",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "changelog",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "release",
-              "type": "string"
-            }
-          ],
-          "name": "Update",
-          "type": "event"
-        },
-        "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgMeta",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationCreated",
-          "type": "event"
-        },
-        "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationDeleted",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0xfB537Eec81c86385f5F8eba57D4d6D0E9AED75D4",
-      "transactionHash": "0x147e94dfc9d5263c0e90cc243b050e1f8136210b5c15f14dfc0a44eafcbba510"
-    },
-    "1596303376726": {
-      "events": {
-        "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            },
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgMeta",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationCreated",
-          "type": "event"
-        },
-        "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
-          "anonymous": false,
-          "inputs": [
-            {
-              "indexed": false,
-              "internalType": "string",
-              "name": "orgName",
-              "type": "string"
-            }
-          ],
-          "name": "OrganizationDeleted",
-          "type": "event"
-        }
-      },
-      "links": {},
-      "address": "0x1bd32061bFb757eFF216B0A6D3e84098EC10d122",
-      "transactionHash": "0x3b0bcf9ec68eead6e1589b0eb2a1cbbf3bb41d9e14e1dad49d44e518a7819c6f"
-    }
-  },
+  "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-06T01:51:26.843Z",
-  "networkType": "ethereum",
+  "updatedAt": "2020-08-06T02:14:57.225Z",
   "devdoc": {
     "methods": {}
   },
