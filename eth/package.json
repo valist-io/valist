@@ -10,11 +10,13 @@
     "@openzeppelin/contracts": "^3.1.0"
   },
   "devDependencies": {
+    "@truffle/hdwallet-provider": "^1.0.40",
     "truffle": "^5.1.36"
   },
   "scripts": {
     "compile": "truffle compile",
     "migrate": "truffle migrate",
+    "migrate:ropsten": "truffle migrate  --network ropsten",
     "migrate:reset": "truffle migrate --reset",
     "develop": "truffle develop",
     "console": "truffle console",
