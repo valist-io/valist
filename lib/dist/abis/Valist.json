@@ -3060,6 +3060,45 @@
         "version": "0.6.6+commit.6c089d02.Emscripten.clang"
     },
     "networks": {
+        "3": {
+            "events": {
+                "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "orgName",
+                            "type": "string"
+                        },
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "orgMeta",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "OrganizationCreated",
+                    "type": "event"
+                },
+                "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
+                    "anonymous": false,
+                    "inputs": [
+                        {
+                            "indexed": false,
+                            "internalType": "string",
+                            "name": "orgName",
+                            "type": "string"
+                        }
+                    ],
+                    "name": "OrganizationDeleted",
+                    "type": "event"
+                }
+            },
+            "links": {},
+            "address": "0xCD9b5fBae1D44a6Ce5183c60B55BC5dDf4Bd61e8",
+            "transactionHash": "0x23a22955ba6c82f997c8b3ba5c38cf0ec0d72d741cc105f83444c6cc4e37b175"
+        },
         "5777": {
             "events": {
                 "0xd23de61de2944d5f41c90441565ff78ea0ee07bde313e54e060f3d8c93e0f002": {
@@ -3177,7 +3216,7 @@
         }
     },
     "schemaVersion": "3.2.3",
-    "updatedAt": "2020-08-04T03:11:42.070Z",
+    "updatedAt": "2020-08-06T01:51:26.843Z",
     "networkType": "ethereum",
     "devdoc": {
         "methods": {}

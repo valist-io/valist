@@ -4888,7 +4888,7 @@
   },
   "networks": {},
   "schemaVersion": "3.2.3",
-  "updatedAt": "2020-08-02T20:23:48.523Z",
+  "updatedAt": "2020-08-06T02:14:57.231Z",
   "devdoc": {
     "methods": {
       "getRoleAdmin(bytes32)": {
