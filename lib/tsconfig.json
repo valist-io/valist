@@ -4,11 +4,15 @@
     "module": "commonjs",
     "lib": ["es2017", "es7", "es6", "dom"],
     "declaration": true,
-    "rootDir": "src",
     "outDir": "dist",
+    "rootDir": "src",
     "strict": true,
     "esModuleInterop": true,
-    "resolveJsonModule": true
+    "resolveJsonModule": true,
+    "sourceMap": true,
+    "types": [
+      "node"
+    ]
   },
   "exclude": [
     "node_modules",

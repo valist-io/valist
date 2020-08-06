@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import { provider, Account } from 'web3-core/types';
+import { provider } from 'web3-core/types';
 // @ts-ignore
 import ipfsClient from 'ipfs-http-client'
 
