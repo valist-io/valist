@@ -14,7 +14,6 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
       query: { orgName, repoName, tag },
     } = req;
 
-
     const release = await valist.getReleaseByTag(orgName.toString(), repoName.toString(), tag.toString());
 
     res.status(200).json({release});
