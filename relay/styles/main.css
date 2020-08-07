@@ -101,3 +101,21 @@ footer{
     padding: 5px 0;
   }
 }
+
+#org-card{
+  padding: 30px;
+  max-width: 380px;
+  margin: 0 auto;
+}
+
+.org-image{
+  background-image: url("/images/logo.png");
+  background-color: white;
+  height: 360px;
+  width: 360px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  margin: 0 0 20px 0;
+}
