@@ -53,7 +53,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
 
     return (
         <div id="org-card">
-            <div className="org-image"></div>
+            <div className="repo-image"></div>
             <Card>
                 <form className={classes.root} noValidate autoComplete="off">
                     <TextField onChange={(e) => setOrgName(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" value={orgName}/>
