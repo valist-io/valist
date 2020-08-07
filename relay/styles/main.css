@@ -60,9 +60,15 @@ nav{
   border-bottom: 0.5px solid lightGray
 }
 
-nav > div{
+nav > a{
   margin: 20px;
+  color: black;
+  text-decoration: none;
   font-family: 'Noto Sans', sans-serif;
+}
+
+.nav-active{
+  color: rgb(74, 26, 121)
 }
 
 .list-item{
@@ -110,6 +116,19 @@ footer{
 }
 
 .org-image{
+  background-image: url("/images/valist.png");
+  background-color: white;
+  height: 360px;
+  width: 360px;
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: cover;
+  border-radius: 50%;
+  margin: 0 0 20px 0;
+  padding-left: 45px;
+}
+
+.repo-image{
   background-image: url("/images/logo.png");
   background-color: white;
   height: 360px;
