@@ -90,8 +90,28 @@ class Valist {
     return release;
   }
 
-  async createOrganization(orgName: string, orgMeta: JSON, account: any) {
-    const metaFile = this.addJSONtoIPFS(orgMeta)
+  async getReleasesFromRepo(orgName: string, repoName: string, filter?: any) {
+    const repo = await this.getRepoFromOrganization(orgName, repoName);
+
+    return new Promise((resolve, reject) => {
+      return repo.events.Release({filter, fromBlock: 0}).on('data', (event: any) => {
+        const releases = event?.returnValues;
+        if (releases) {
+          resolve(releases);
+        } else {
+          reject("Unable to find releases on this repository!");
+        }
+      });
+    });
+  }
+
+  async getReleaseByTag(orgName: string, repoName: string, tag: string) {
+    const filter = { tag };
+    return await this.getReleasesFromRepo(orgName, repoName, filter);
+  }
+
+  async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {
+    const metaFile: string = await this.addJSONtoIPFS(orgMeta);
     const result = await this.valist.methods.createOrganization(orgName, metaFile).send({ from: account });
     return result;
   }
@@ -102,12 +122,10 @@ class Valist {
       const metaFile = await this.addJSONtoIPFS(repoMeta);
       const result = await org.methods.createRepository(repoName, metaFile).send({ from: account });
       return result;
-    }
-    catch(err){
-      console.log(err)
+    } catch(err) {
+      console.log(err);
       return err
     }
-
   }
 
   async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: any) {
@@ -120,7 +138,7 @@ class Valist {
     const file = Buffer.from(JSON.stringify(data));
     try {
       const result = await this.ipfs.add(file);
-      return result
+      return result["path"];
     } catch (err) {
       console.error('Error', err);
     }

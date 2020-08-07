@@ -1,30 +1,27 @@
 import { AppProps } from 'next/app';
 import React, { useState, useEffect } from 'react';
-import Valist, {Web3Providers} from 'valist';
+import Valist from 'valist';
 import '../styles/main.css';
 
 function App({ Component, pageProps }: AppProps) {
 
   const [valist, setValist] = useState<Valist>();
 
-  const providerOptions = {}
-
-  // initialize web3 and valist object on document load
+  // initialize web3 and valist object on document load (this effect is only triggered once)
   useEffect(() => {
     (async function () {
         try {
           // @ts-ignore
-          
           if (window.ethereum){
+            // @ts-ignore
             window.ethereum.enable();
-            setValist(new Valist(window.ethereum, false));
+            // @ts-ignore
+            setValist(new Valist(window.ethereum, true));
           }
 
         } catch (error) {
-            alert(
-                `Failed to load web3, accounts, or contract. Check console for details.`
-            )
-            console.log(error)
+            alert(`Failed to connect to MetaMask. Check console for details.`);
+            console.log(error);
         }
     })();
   }, []);

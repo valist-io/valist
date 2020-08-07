@@ -13,14 +13,22 @@ declare class Valist {
     getRepoFromOrganization(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
-    createOrganization(orgName: string, orgMeta: string, account: any): Promise<any>;
-    createRepository(orgName: string, repoName: string, repoMeta: string, account: any): Promise<any>;
+    getReleasesFromRepo(orgName: string, repoName: string, filter?: any): Promise<unknown>;
+    getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<unknown>;
+    createOrganization(orgName: string, orgMeta: {
+        name: string;
+        description: string;
+    }, account: any): Promise<any>;
+    createRepository(orgName: string, repoName: string, repoMeta: {
+        name: string;
+        description: string;
+    }, account: any): Promise<any>;
     publishRelease(orgName: string, repoName: string, release: {
         tag: string;
         hash: string;
         meta: string;
     }, account: any): Promise<any>;
-    addFileIpfs(data: any): Promise<any>;
+    addJSONtoIPFS(data: any): Promise<any>;
 }
 export declare const Web3Providers: import("web3-core").Providers;
 export default Valist;

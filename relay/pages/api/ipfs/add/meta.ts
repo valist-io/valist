@@ -6,11 +6,11 @@ export default async function addOrgMetaIPFS(req: NextApiRequest, res: NextApiRe
       const valist = new Valist(new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), true);
 
       const {
-        body: { orgMeta },
+        body: { metaJSON },
       } = req;
 
       try {
-        const ipfsResponse = await valist.addFileIpfs(orgMeta);
+        const ipfsResponse = await valist.addJSONtoIPFS(metaJSON);
 
         res.setHeader('Content-Type', 'application/json');
         res.status(200).json({ipfsResponse});
