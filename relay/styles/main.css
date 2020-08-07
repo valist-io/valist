@@ -57,6 +57,7 @@ nav{
   display: flex;
   align-items: center;
   z-index: 20;
+  border-bottom: 0.5px solid lightGray
 }
 
 nav > div{
