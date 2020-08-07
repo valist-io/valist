@@ -1,5 +1,6 @@
 import React, { ReactNode } from 'react'
 import Head from 'next/head'
+import Link from 'next/link'
 
 type Props = {
   children?: ReactNode
@@ -16,9 +17,8 @@ const Layout = ({ children, title = 'Valist' }: Props) => (
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" /> 
     </Head>
     <nav className="sticky" id="navbar">
-            <div>Organizations</div>
-            <div>Repositories</div>
-            <div>Newest Releases</div>
+            <Link href="/organizations" className="nav-active">Organizations</Link>
+            <Link href="/repo/create">Create a Repo</Link>
     </nav>
     <div id="valist-content-fixed">
       {children}

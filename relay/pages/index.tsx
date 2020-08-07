@@ -26,7 +26,7 @@ function MapLsit() {
                   <CardActions>
                     <Button size="small">Learn More</Button>
                   </CardActions>
-                </Card>
+            </Card>
       </div>
     </div>
   );

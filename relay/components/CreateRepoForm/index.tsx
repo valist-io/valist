@@ -16,13 +16,12 @@ const useStyles = makeStyles((theme: Theme) =>
     }),
 );
 
-export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
+export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
 
     const [account, setAccount] = useState("");
-
-    const [orgShortName, setOrgShortName] = useState("")
-    const [orgFullName, setOrgFullName] = useState("")
-    const [orgDescription, setOrgDescription] = useState("")
+    const [orgName, setOrgName] = useState("")
+    const [repoName, setRepoName] = useState("")
+    const [repoDescription, setRepoDescription] = useState("")
 
     const classes = useStyles();
 
@@ -32,9 +31,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    setOrgShortName("")
-                    setOrgDescription("")
-                    setOrgDescription("")
+                    setOrgName("")
+                    setRepoName("")
+                    setRepoDescription("")
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -43,27 +42,27 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
         }
     }, [valist]);
 
-    const createOrganization = async () => {
-        const meta = {
-            name: orgFullName,
-            description: orgDescription
+    const createRepo = async () => {
+        const repoMeta = {
+            name: repoName,
+            description: repoDescription
         };
 
-        await valist.createOrganization(orgShortName, JSON.stringify(meta), account);
+        await valist.createRepository(orgName, repoName, repoMeta, account)
     }
 
     return (
         <div id="org-card">
-            <div className="org-image" />
+            <div className="org-image"></div>
             <Card>
                 <form className={classes.root} noValidate autoComplete="off">
-                    <TextField onChange={(e) => setOrgShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" value={orgShortName}/>
+                    <TextField onChange={(e) => setOrgName(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" value={orgName}/>
                     <br></br>
-                    <TextField onChange={(e) => setOrgFullName(e.target.value)} id="outlined-basic" label="Organization Full Name" variant="outlined" value={orgFullName} />
+                    <TextField onChange={(e) => setRepoName(e.target.value)} id="outlined-basic" label="Repo Name" variant="outlined" value={repoName} />
                     <br></br>
-                    <TextField onChange={(e) => setOrgDescription(e.target.value)} id="outlined-basic" label="Description" variant="outlined" value={orgDescription} />
+                    <TextField onChange={(e) => setRepoDescription(e.target.value)} id="outlined-basic" label="Description" variant="outlined" value={repoDescription} />
                     <br></br>
-                    <Button onClick={createOrganization} value="Submit" variant="contained" color="primary">Create</Button>
+                    <Button onClick={createRepo} value="Submit" variant="contained" color="primary">Create</Button>
                     </form>
             </Card>
         </div>
