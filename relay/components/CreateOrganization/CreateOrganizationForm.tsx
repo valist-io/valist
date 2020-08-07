@@ -54,7 +54,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
 
     return (
         <div id="org-card">
-            <div className="org-image" />
+            <div className="repo-image" />
             <Card>
                 <form className={classes.root} noValidate autoComplete="off">
                     <TextField onChange={(e) => setOrgShortName(e.target.value)} id="outlined-basic" label="Organization Short Name" variant="outlined" value={orgShortName}/>
