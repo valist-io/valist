@@ -7,24 +7,27 @@ import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
 function MapLsit() {
-  const numbers = [1, 2, 3, 4, 5, 6, 7, 8, 9]
-  const listItems = numbers.map((number) =>
-    <div className="list">
+  const orgs = [{
+    name: "Akashic Technologies",
+    description: "Bringing the right people together to build the right things."
+  }, {
+    name: "Open Source Inc",
+    description: "Example organization description"
+  }]
+  const listItems = orgs.map((org) =>
+    <div className="list" key={org.name}>
       <div className="list-item">
           <Card>
                   <CardContent>
                     <Typography color="textSecondary" gutterBottom>
-                      Organization Name
-                    </Typography>
-                    <Typography color="textSecondary">
-                      {number}
+                      {org.name}
                     </Typography>
                     <Typography variant="body2" component="p">
-                      Organization Description
+                      {org.description}
                     </Typography>
                   </CardContent>
                   <CardActions>
-                    <Button size="small">Learn More</Button>
+                    <Button size="small">View Organization</Button>
                   </CardActions>
             </Card>
       </div>
