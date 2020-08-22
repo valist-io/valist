@@ -38,19 +38,29 @@ To start, we are providing a simple web frontend and HTTP relay that can be depl
 
 ![Architecture](docs/img/architecture.svg)
 
+### Current implementation
+
+So far, the current implementation of Valist looks like this:
+
+![Current Implementation](docs/img/current-implementation.png)
+
+### What's next
+
+* [ ] Full-featured Web UI with WalletConnect support
+
+* [ ] Filecoin integration
+
+* [ ] CLI and CI/CD support
+
+* [ ] Deployment tooling for Relays
+
+* [ ] Encryption Support
+
+* [ ] Support for other Ethereum-based blockchains
+
 ## Building
 
 A `Makefile` is provided to simplify development workflow.
-
-### Prerequisites
-
-You must have `npm` installed on your system, as well as the `truffle-cli` package.
-
-To install Truffle, run the following:
-
-```bash
-npm install -g truffle
-```
 
 ### Installing Dependencies
 
@@ -60,13 +70,13 @@ To install all dependencies, simply run the following:
 make install
 ```
 
-This will `cd` into the `lib` folder and run an `npm install`, then repeats the same process for `ui`.
+This will `cd` into the `lib`, `relay`, and `eth` folders, running an `npm install` in each.
 
-You can also manually run `npm install` in each of the `lib` and `ui` folders.
+You can also manually run `npm install` in each of the folders.
 
 ### Building the frontend
 
-You can build the `lib` and `ui` separately as Make targets.
+You can build the `lib` and `relay` separately as Make targets.
 
 However, you also can build the whole frontend using:
 
@@ -75,9 +85,10 @@ make frontend
 ```
 
 This works great inside of CI/CD tools as well. For example, `make install frontend` will work in most runners as the build command.
+
 ### Building all artifacts
 
-To build the `contracts`, `lib`, and the `ui`, simply run:
+To build the contracts in `eth`, the core in `lib`, and the `relay`, simply run:
 
 ```bash
 make all
@@ -87,13 +98,13 @@ make all
 
 ### Running the dev server
 
-The frontend is powered by Gatsby.js. To start the development server, run the following command:
+The frontend and API is powered by Next.js. To start the development server, run the following command:
 
 ```bash
 make dev
 ```
 
-This will build the `lib` and `ui` folders and start the local Gatsby development server at `localhost:8000`. Hot reloading works for both `lib` and `ui` using `tsc -w` in `lib`, and `gatsby develop` in `ui`. They are executed in parallel, piping output to the same shell, thanks to `make -j`.
+This will build the `lib` and `relay` folders and start the local Next.js development server at `localhost:3000`. Hot reloading works for both `lib` and `relay` using `tsc -w` in `lib`, and `next dev` in `relay`. They are executed in parallel, piping output to the same shell, thanks to `make -j`.
 
 ### Migrating contracts
 
