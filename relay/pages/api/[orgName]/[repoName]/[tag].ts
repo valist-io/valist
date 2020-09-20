@@ -16,7 +16,11 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
 
     const release = await valist.getReleaseByTag(orgName.toString(), repoName.toString(), tag.toString());
 
-    res.status(200).json({release});
+    if (release) {
+      return res.status(200).json(release);
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No release found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

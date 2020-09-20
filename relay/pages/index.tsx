@@ -6,7 +6,7 @@ import CardActions from '@material-ui/core/CardActions';
 import CardContent from '@material-ui/core/CardContent';
 import Typography from '@material-ui/core/Typography';
 
-function MapLsit() {
+function listItems() {
   const orgs = [{
     name: "Akashic Technologies",
     description: "Bringing the right people together to build the right things."
@@ -42,7 +42,7 @@ export const IndexPage = () => {
   return (
     <IndexLayout title="valist.io">
       <div>
-          {MapLsit()}
+          {listItems()}
       </div>
 
     </IndexLayout>

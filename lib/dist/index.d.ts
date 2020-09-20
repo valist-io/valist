@@ -12,9 +12,14 @@ declare class Valist {
     getOrganizationMeta(orgName: string): Promise<any>;
     getRepoFromOrganization(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
+    getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
-    getReleasesFromRepo(orgName: string, repoName: string, filter?: any): Promise<unknown>;
-    getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<unknown>;
+    getReleasesFromRepo(orgName: string, repoName: string, tag: string): Promise<import("web3-eth-contract").EventData[]>;
+    getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<{
+        tag: string;
+        release: any;
+        releaseMeta: any;
+    } | undefined>;
     createOrganization(orgName: string, orgMeta: {
         name: string;
         description: string;

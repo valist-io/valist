@@ -84,30 +84,36 @@ class Valist {
     return repoMeta;
   }
 
+  async getLatestTagFromRepo(orgName: string, repoName: string) {
+    const repo = await this.getRepoFromOrganization(orgName, repoName);
+    const tag = await repo.methods.tag().call();
+    return tag;
+  }
+
   async getLatestReleaseFromRepo(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
     const release = await repo.methods.latestRelease().call();
     return release;
   }
 
-  async getReleasesFromRepo(orgName: string, repoName: string, filter?: any) {
+  async getReleasesFromRepo(orgName: string, repoName: string, tag: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
 
-    return new Promise((resolve, reject) => {
-      return repo.events.Release({filter, fromBlock: 0}).on('data', (event: any) => {
-        const releases = event?.returnValues;
-        if (releases) {
-          resolve(releases);
-        } else {
-          reject("Unable to find releases on this repository!");
-        }
-      });
-    });
+    return repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
   }
 
   async getReleaseByTag(orgName: string, repoName: string, tag: string) {
-    const filter = { tag };
-    return await this.getReleasesFromRepo(orgName, repoName, filter);
+    const repo = await this.getRepoFromOrganization(orgName, repoName);
+    const topic = this.web3.utils.sha3(tag);
+
+    //@ts-ignore
+    const events = await repo.getPastEvents('Release', { topics: [, topic], fromBlock: 0, toBlock: 'latest'});
+    if (events[0]) {
+      const { release, releaseMeta } = events[0].returnValues;
+      return { tag, release, releaseMeta };
+    } else {
+      return;
+    }
   }
 
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {

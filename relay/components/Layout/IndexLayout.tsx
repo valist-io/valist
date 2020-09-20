@@ -48,7 +48,7 @@ const IndexLayout = ({ children, title = 'Valist' }: Props) => {
         </div>
         <nav id="navbar">
             <a href="#" className="nav-active">Organizations</a>
-            <Link href="/repo/create">Create a Repo</Link>
+            <Link href="/repo/create"><a>Create a Repo</a></Link>
         </nav>
         <div id="valist-content">
             {children}

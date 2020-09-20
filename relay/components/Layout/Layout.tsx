@@ -14,11 +14,11 @@ const Layout = ({ children, title = 'Valist' }: Props) => (
       <title>{title}</title>
       <meta charSet="utf-8" />
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
-      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" /> 
+      <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
     </Head>
     <nav className="sticky" id="navbar">
-            <Link href="/organizations" className="nav-active">Organizations</Link>
-            <Link href="/repo/create">Create a Repo</Link>
+            <Link href="/organizations"><a className="nav-active">Organizations</a></Link>
+            <Link href="/repo/create"><a>Create a Repo</a></Link>
     </nav>
     <div id="valist-content-fixed">
       {children}

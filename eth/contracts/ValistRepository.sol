@@ -15,7 +15,7 @@ contract ValistRepository is AccessControl {
     string public latestRelease; // latest release hash
     string public tag;
 
-    event Release(string tag, string release, string releaseMeta);
+    event Release(string indexed tag, string release, string releaseMeta);
 
     event MetaUpdated(string repoMeta);
 
@@ -46,9 +46,9 @@ contract ValistRepository is AccessControl {
     }
 
     function publishRelease(string memory _tag, string memory _latestRelease, string memory _releaseMeta) public developer {
+        tag = _tag;
         latestRelease = _latestRelease;
         releaseMeta = _releaseMeta;
-        tag = _tag;
 
         emit Release(tag, latestRelease, releaseMeta);
     }
