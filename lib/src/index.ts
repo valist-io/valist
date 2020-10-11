@@ -96,10 +96,10 @@ class Valist {
     return release;
   }
 
-  async getReleasesFromRepo(orgName: string, repoName: string, tag: string) {
+  async getReleasesFromRepo(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
 
-    return repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
+    return await repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
   }
 
   async getReleaseByTag(orgName: string, repoName: string, tag: string) {
