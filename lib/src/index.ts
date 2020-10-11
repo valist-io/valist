@@ -104,16 +104,17 @@ class Valist {
 
   async getReleaseByTag(orgName: string, repoName: string, tag: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
-    const topic = this.web3.utils.sha3(tag);
 
-    //@ts-ignore
-    const events = await repo.getPastEvents('Release', { topics: [, topic], fromBlock: 0, toBlock: 'latest'});
-    if (events[0]) {
-      const { release, releaseMeta } = events[0].returnValues;
-      return { tag, release, releaseMeta };
-    } else {
-      return;
+    const events = await repo.getPastEvents('Release', { fromBlock: 0, toBlock: 'latest'});
+
+    // @TODO make this more efficient later
+    for (let i = 0; i < events.length; i++) {
+      if (events[i].returnValues.tag == tag) {
+          const { tag, release, releaseMeta } = events[i].returnValues;
+          return { tag, release, releaseMeta }
+      }
     }
+    return;
   }
 
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {

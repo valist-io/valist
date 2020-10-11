@@ -1,5 +1,5 @@
 [build]
   base = "/relay"
-  command = "npm run build"
+  command = "npm run netlify"
   functions = "out_functions"
   publish   = "out_publish"

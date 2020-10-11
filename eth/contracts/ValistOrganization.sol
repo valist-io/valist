@@ -13,7 +13,7 @@ contract ValistOrganization is AccessControl {
 
     string public orgMeta; // org metadata (full name, image, description, etc)
 
-    uint16 internal repoCount;
+    uint internal repoCount;
 
     event MetaUpdated(string orgMeta);
 

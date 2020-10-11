@@ -15,7 +15,7 @@ contract ValistRepository is AccessControl {
     string public latestRelease; // latest release hash
     string public tag;
 
-    event Release(string indexed tag, string release, string releaseMeta);
+    event Release(string tag, string release, string releaseMeta);
 
     event MetaUpdated(string repoMeta);
 

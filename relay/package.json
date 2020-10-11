@@ -17,7 +17,7 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "postbuild": "next-on-netlify",
+    "netlify": "next-on-netlify",
     "export": "next export",
     "start": "next start",
     "type-check": "tsc"
