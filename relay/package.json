@@ -1,18 +1,18 @@
 {
   "name": "valist-relay",
   "version": "0.1.0",
-  "author": "Akashic Technologies <contact@akashictech.io> (akashictech.io)",
+  "author": "Valist, Inc.",
   "contributors": [
-    "Alec M. Wantoch <alec@akashictech.io> (akashictech.io)",
-    "Zachary J. Pelkey <zach@akashictech.io> (akashictech.io)"
+    "Alec M. Wantoch <alec@valist.io> (valist.io)",
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akashictech/valist.git"
+    "url": "git+https://github.com/valist-io/valist.git"
   },
   "bugs": {
-    "url": "https://github.com/akashictech/valist/issues"
+    "url": "https://github.com/valist-io/valist/issues"
   },
   "scripts": {
     "dev": "next",
