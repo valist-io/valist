@@ -8,7 +8,7 @@ html body {
   src: url(./NotoSans-Bold.ttf);
 }
 
-#valist-content{
+/*#valist-content{
   min-height: 100vh;
 }
 
@@ -139,3 +139,8 @@ footer{
   border-radius: 50%;
   margin: 0 0 20px 0;
 }
+*/
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;

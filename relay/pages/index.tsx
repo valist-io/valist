@@ -44,7 +44,6 @@ export const IndexPage = () => {
       <div>
           {listItems()}
       </div>
-
     </IndexLayout>
   );
 }
