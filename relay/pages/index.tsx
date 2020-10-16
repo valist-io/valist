@@ -1,5 +1,7 @@
 import React from 'react';
 import IndexLayout from '../components/Layout/IndexLayout'
+
+/*
 import Button from '@material-ui/core/Button';
 import Card from '@material-ui/core/Card';
 import CardActions from '@material-ui/core/CardActions';
@@ -36,13 +38,13 @@ function listItems() {
 
   return listItems
 }
-
+*/
 
 export const IndexPage = () => {
   return (
     <IndexLayout title="valist.io">
       <div>
-          {listItems()}
+          {}
       </div>
     </IndexLayout>
   );

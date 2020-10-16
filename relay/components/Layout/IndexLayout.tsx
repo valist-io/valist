@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React, { useEffect, ReactNode } from 'react';
+import React, { ReactNode } from 'react';
 import Nav from '../Nav/nav'
 import ProjectList from '../ProjectsList/ProjectsList'
 import ActivityFeed from '../ActivityFeed/ActivityFeed';
@@ -82,6 +82,7 @@ const IndexLayout = ({ children, title = 'Valist' }: Props) => {
             </div>
         </div>
     </div>
+    {children}
     </div>
     )
 }
