@@ -59,4 +59,9 @@ install-all: install-lib install-relay install-eth
 
 install: install-all
 
+audit-fix:
+	cd eth && npm audit fix
+	cd lib && npm audit fix
+	cd relay && npm audit fix
+
 .PHONY: relay lib contracts
