@@ -18,13 +18,13 @@ export const ProjectsList:FunctionComponent<any> = ({}) => {
                     </svg>
                     </button>
                 </span>
-                <div className="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg">
+                <div className={"origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden"}>
                     <div className="rounded-md bg-white shadow-xs">
-                    <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
-                        <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
-                        <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date modified</a>
-                        <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date created</a>
-                    </div>
+                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
+                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
+                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date modified</a>
+                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date created</a>
+                        </div>
                     </div>
                 </div>
                 </div>
