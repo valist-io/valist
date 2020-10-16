@@ -24,12 +24,16 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akashictech/valist.git"
+    "url": "git+https://github.com/valist-io/valist.git"
   },
-  "author": "",
-  "license": "ISC",
+  "author": "Valist, Inc.",
+  "contributors": [
+    "Alec M. Wantoch <alec@valist.io> (valist.io)",
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)"
+  ],
+  "license": "MIT",
   "bugs": {
-    "url": "https://github.com/akashictech/valist/issues"
+    "url": "https://github.com/valist-io/valist/issues"
   },
-  "homepage": "https://github.com/akashictech/valist#readme"
+  "homepage": "https://github.com/valist-io/valist#readme"
 }

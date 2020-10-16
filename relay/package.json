@@ -1,18 +1,18 @@
 {
   "name": "valist-relay",
   "version": "0.1.0",
-  "author": "Akashic Technologies <contact@akashictech.io> (akashictech.io)",
+  "author": "Valist, Inc.",
   "contributors": [
-    "Alec M. Wantoch <alec@akashictech.io> (akashictech.io)",
-    "Zachary J. Pelkey <zach@akashictech.io> (akashictech.io)"
+    "Alec M. Wantoch <alec@valist.io> (valist.io)",
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)"
   ],
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/akashictech/valist.git"
+    "url": "git+https://github.com/valist-io/valist.git"
   },
   "bugs": {
-    "url": "https://github.com/akashictech/valist/issues"
+    "url": "https://github.com/valist-io/valist/issues"
   },
   "scripts": {
     "dev": "next",
@@ -27,15 +27,13 @@
     "@material-ui/icons": "^4.9.1",
     "@tailwindcss/ui": "^0.6.2",
     "@walletconnect/web3-provider": "^1.1.0",
-    "@zeit/next-sass": "^1.0.1",
+    "autoprefixer": "^10.0.1",
     "next": "^9.5.5",
     "next-on-netlify": "^2.3.1",
-    "node-sass": "^4.14.1",
     "postcss-import": "^12.0.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "sass": "^1.26.10",
-    "tailwindcss": "^1.9.2",
+    "tailwindcss": "^1.9.3",
     "valist": "file:../lib/",
     "web3modal": "^1.9.0"
   },
