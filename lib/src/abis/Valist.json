@@ -50,8 +50,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -3139,9 +3138,8 @@
       "transactionHash": "0x503b713585b94f83eff3d9152fb9638f2c93f9959ff8fe3782be7600899358a3"
     }
   },
-  "schemaVersion": "3.2.3",
-  "updatedAt": "2020-10-11T22:01:14.649Z",
-  "networkType": "ethereum",
+  "schemaVersion": "3.3.1",
+  "updatedAt": "2020-10-17T03:30:11.919Z",
   "devdoc": {
     "methods": {}
   },
