@@ -54,6 +54,7 @@ install-relay:
 
 install-eth:
 	cd eth && npm i
+	pip3 install slither-analyzer
 
 install-all: install-lib install-relay install-eth
 
@@ -69,5 +70,8 @@ audit-fix:
 	cd eth && npm audit fix
 	cd lib && npm audit fix
 	cd relay && npm audit fix
+
+audit-contracts:
+	slither eth --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
 
 .PHONY: relay lib contracts
