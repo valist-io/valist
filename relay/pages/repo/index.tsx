@@ -11,4 +11,4 @@ export const ProjectPage:FunctionComponent<any> = ({}) => {
     )
 }
 
-export default RepoPage;
+export default ProjectPage;
