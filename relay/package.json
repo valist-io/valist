@@ -27,12 +27,10 @@
     "@material-ui/icons": "^4.9.1",
     "@tailwindcss/ui": "^0.6.2",
     "@walletconnect/web3-provider": "^1.1.0",
-    "autoprefixer": "^9.8.6",
     "next": "^9.5.5",
     "next-on-netlify": "^2.3.1",
     "react": "^16.12.0",
     "react-dom": "^16.12.0",
-    "tailwindcss": "^1.9.3",
     "valist": "file:../lib/",
     "web3modal": "^1.9.0"
   },
@@ -40,8 +38,8 @@
     "@types/node": "^12.12.21",
     "@types/react": "^16.9.16",
     "@types/react-dom": "^16.9.4",
-    "postcss": "^8.1.1",
-    "postcss-loader": "^4.0.4",
+    "postcss-preset-env": "^6.7.0",
+    "tailwindcss": "^1.9.3",
     "typescript": "3.7.3"
   }
 }
