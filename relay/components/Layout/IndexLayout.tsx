@@ -1,6 +1,6 @@
 import Head from 'next/head'
 import React, { ReactNode } from 'react';
-import Nav from '../Nav/nav'
+import Nav from '../Nav/Nav'
 import ProjectList from '../ProjectsList/ProjectsList'
 import ActivityFeed from '../ActivityFeed/ActivityFeed';
 import ProfileSidebar from '../ProfileSidebar/ProfileSIdebar';

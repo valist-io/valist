@@ -1,4 +1,5 @@
 import React, { FunctionComponent} from 'react';
+import Link from 'next/link';
 
 export const Nav:FunctionComponent<any> = ({}) => {
     return (
@@ -6,9 +7,11 @@ export const Nav:FunctionComponent<any> = ({}) => {
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
                 <div className="relative flex items-center justify-between h-16">
                     <div className="flex items-center px-2 lg:px-0 xl:w-64">
-                        <div className="flex-shrink-0">
-                            <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-on-brand.svg" alt="Workflow logo" />
-                        </div>
+                        <Link href="/">
+                            <div className="flex-shrink-0">
+                                <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-on-brand.svg" alt="Workflow logo" />
+                            </div>
+                        </Link>
                     </div>
                     <div className="flex-1 flex justify-center lg:justify-end">
                         <div className="w-full px-2 lg:px-6">
