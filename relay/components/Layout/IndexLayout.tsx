@@ -1,5 +1,5 @@
 import Head from 'next/head'
-import React, { ReactNode } from 'react';
+import React, { ReactNode } from 'react'
 import Nav from '../Nav/Nav'
 
 type Props = {
