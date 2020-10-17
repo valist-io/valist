@@ -1,6 +1,6 @@
 import React, { ReactNode } from 'react'
 import Head from 'next/head'
-import Link from 'next/link'
+import Nav from '../Nav/Nav';
 
 type Props = {
   children?: ReactNode
@@ -16,17 +16,10 @@ const Layout = ({ children, title = 'Valist' }: Props) => (
       <meta name="viewport" content="initial-scale=1.0, width=device-width" />
       <link href="https://fonts.googleapis.com/css2?family=Noto+Sans:wght@400;700&display=swap" rel="stylesheet" />
     </Head>
-    <nav className="sticky" id="navbar">
-            <Link href="/organizations"><a className="nav-active">Organizations</a></Link>
-            <Link href="/repo/create"><a>Create a Repo</a></Link>
-    </nav>
+    <Nav />
     <div id="valist-content-fixed">
       {children}
     </div>
-    <footer>
-        <hr />
-        <span>I'm here to stay (Footer)</span>
-    </footer>
   </div>
 )
 
