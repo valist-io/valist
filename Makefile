@@ -59,6 +59,12 @@ install-all: install-lib install-relay install-eth
 
 install: install-all
 
+update-all:
+	cd eth && npm update
+	cd lib && npm update
+	cd relay && npm update
+	make audit-fix
+
 audit-fix:
 	cd eth && npm audit fix
 	cd lib && npm audit fix
