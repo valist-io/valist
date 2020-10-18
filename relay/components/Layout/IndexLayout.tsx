@@ -1,9 +1,6 @@
 import Head from 'next/head'
 import React, { ReactNode } from 'react'
 import Nav from '../Nav/Nav'
-import ProjectList from '../ProjectsList/ProjectsList'
-import ActivityFeed from '../ActivityFeed/ActivityFeed'
-import ProfileSidebar from '../ProfileSidebar/ProfileSidebar'
 
 type Props = {
     children?: ReactNode
@@ -25,16 +22,9 @@ const IndexLayout = ({ children, title = 'Valist' }: Props) => {
                 <div className="fixed top-0 right-0 w-1/2 h-full bg-gray-50"/>
                 <div className="relative min-h-screen flex flex-col">
                     <Nav />
-                    <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
-                        <ProfileSidebar />
-                        <div className="flex-1 min-w-0 bg-white xl:flex">
-                            <ProjectList />
-                            <ActivityFeed />
-                        </div>
-                    </div>
+                    {children}
                 </div>
             </div>
-            {children}
         </div>
     )
 }
