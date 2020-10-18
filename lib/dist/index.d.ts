@@ -8,8 +8,10 @@ declare class Valist {
     constructor(web3Provider: provider, ipfsEnabled?: boolean);
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<import("web3-eth-contract").Contract>;
-    getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getOrganizationMeta(orgName: string): Promise<any>;
+    getCreatedOrganizations(): Promise<any>;
+    getDeletedOrganizations(): Promise<any>;
+    getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getRepoFromOrganization(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
     getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;

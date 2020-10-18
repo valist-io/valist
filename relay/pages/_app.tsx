@@ -1,5 +1,5 @@
 import { AppProps } from 'next/app';
-import React, { useState, useEffect } from 'react';
+import React, { useEffect, useState } from 'react';
 import Valist from 'valist';
 import '../styles/main.css';
 
@@ -16,34 +16,18 @@ function App({ Component, pageProps }: AppProps) {
             // @ts-ignore
             window.ethereum.enable();
             // @ts-ignore
-            setValist(new Valist(window.ethereum, true));
+            let valist = new Valist(window.ethereum, true);
+            await valist.connect();
+            setValist(valist);
+            // @ts-ignore
+            window.valist = valist;
           }
 
         } catch (error) {
-            alert(`Failed to connect to MetaMask. Check console for details.`);
             console.log(error);
         }
     })();
   }, []);
-
-  // activate valist object
-  useEffect(() => {
-    (async function() {
-      if (valist) {
-        try {
-          await valist.connect();
-        } catch (e) {
-          console.log(e);
-          alert(`Failed to connect to the Valist contracts!`);
-        }
-
-        //if (process.env.NODE_ENV == 'development') {
-          // @ts-ignore
-          window.valist = valist;
-        //}
-      }
-    })();
-  }, [valist]);
 
   return <Component {...pageProps} valist={valist} />
 }

@@ -56,18 +56,30 @@ class Valist {
     return org;
   }
 
+  async getOrganizationMeta(orgName: string) {
+    const org = await this.getOrganization(orgName);
+    const orgMeta = await org.methods.orgMeta().call();
+    return orgMeta;
+  }
+
+  async getCreatedOrganizations() {
+    const organizations = await this.valist.getPastEvents('OrganizationCreated', {fromBlock: 0, toBlock: 'latest'});
+
+    return organizations;
+  }
+
+  async getDeletedOrganizations() {
+    const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
+
+    return organizations;
+  }
+
   // returns organization contract instance
   async getRepository(orgName: string, repoName: string) {
     const org = await this.getOrganization(orgName);
     const repoAddress = await org.methods.repos(repoName).call();
     const repo = await getValistRepositoryContract(this.web3, repoAddress);
     return repo;
-  }
-
-  async getOrganizationMeta(orgName: string) {
-    const org = await this.getOrganization(orgName);
-    const orgMeta = await org.methods.orgMeta().call();
-    return orgMeta;
   }
 
   // returns repository contract instance
