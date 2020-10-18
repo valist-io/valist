@@ -5,7 +5,7 @@ declare class Valist {
     web3: Web3;
     valist: any;
     ipfs: ipfsClient;
-    constructor(web3Provider: provider, ipfsEnabled: boolean);
+    constructor(web3Provider: provider, ipfsEnabled?: boolean);
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<import("web3-eth-contract").Contract>;
     getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;

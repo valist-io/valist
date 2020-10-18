@@ -7,7 +7,7 @@ export default async function getLatestReleaseFromRepo(req: NextApiRequest, res:
   if (process.env.WEB3_PROVIDER) {
     const provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
-    const valist = new Valist(provider, false);
+    const valist = new Valist(provider);
     await valist.connect();
 
     const {

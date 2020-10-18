@@ -2,7 +2,7 @@ import React from 'react';
 import IndexLayout from '../components/Layout/IndexLayout'
 import ProjectList from '../components/ProjectsList/ProjectsList'
 import ActivityFeed from '../components/ActivityFeed/ActivityFeed';
-import ProfileSidebar from '../components/ProfileSidebar/ProfileSIdebar';
+import ProfileSidebar from '../components/ProfileSidebar/ProfileSidebar';
 
 /*
 import Button from '@material-ui/core/Button';

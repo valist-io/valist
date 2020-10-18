@@ -37,7 +37,7 @@ class Valist {
   valist: any;
   ipfs: ipfsClient;
 
-  constructor(web3Provider: provider, ipfsEnabled: boolean) {
+  constructor(web3Provider: provider, ipfsEnabled?: boolean) {
     this.web3 = new Web3(web3Provider);
     if (ipfsEnabled) {
       this.ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', apiPath: '/api/v0/', protocol: 'https' });

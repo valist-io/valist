@@ -35,7 +35,7 @@ export const ActivityFeed:FunctionComponent<any> = ({}) => {
                     <h2 className="text-sm leading-5 font-semibold">Activity</h2>
                 </div>
                 <div>
-                {updates.map((update, index) => (
+                {updates.map((update) => (
                     <ul className="divide-y divide-gray-200">
                         <li className="py-4">
                         <div className="flex space-x-3">
