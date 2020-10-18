@@ -28,7 +28,8 @@ export const ActivityFeed = ({valist}: {valist: any}) => {
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium leading-5">{org.returnValues.orgName}</h3>
                                 </div>
-                                <p className="text-sm leading-5 text-gray-500">Organization {org.returnValues.orgName} created! <a href={`https://ropsten.etherscan.io/tx/${org.transactionHash}`} className="font-bold">View Tx</a></p>
+                                <p className="text-sm leading-5 text-gray-500">Organization {org.returnValues.orgName} created!
+                                <br/><a href={`https://ropsten.etherscan.io/tx/${org.transactionHash}`} className="font-bold">View Tx</a></p>
                             </div>
                         </div>
                         </li>
