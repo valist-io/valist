@@ -1,6 +1,6 @@
 # Valist
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/6f0aea36-6de6-4256-a582-4f2a5f0a482e/deploy-status)](https://app.netlify.com/sites/valist/deploys)
+[![Netlify Status](https://api.netlify.com/api/v1/badges/f2751b0a-a3f8-47c2-88bb-f0f432c384ea/deploy-status)](https://app.netlify.com/sites/valist/deploys)
 
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
 
