@@ -9,7 +9,7 @@ export const Nav:FunctionComponent<any> = ({}) => {
                     <div className="flex items-center px-2 lg:px-0 xl:w-64">
                         <Link href="/">
                             <div className="flex-shrink-0">
-                                <img className="h-8 w-auto" src="https://tailwindui.com/img/logos/workflow-mark-on-brand.svg" alt="Workflow logo" />
+                                <img className="h-8 w-auto" src="/images/ValistLogo128.png" alt="Workflow logo" />
                             </div>
                         </Link>
                     </div>
