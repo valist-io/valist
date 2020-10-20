@@ -46,6 +46,8 @@ all: contracts lib relay
 
 compile: all
 
+build: all
+
 install-lib:
 	cd lib && npm i
 
@@ -65,6 +67,8 @@ update-all:
 	cd lib && npm update
 	cd relay && npm update
 	make audit-fix
+
+update: update-all
 
 audit-fix:
 	cd eth && npm audit fix
