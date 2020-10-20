@@ -1,20 +1,4 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
-import { createStyles, makeStyles, Theme } from '@material-ui/core/styles';
-import TextField from '@material-ui/core/TextField';
-import Button from '@material-ui/core/Button';
-import Card from '@material-ui/core/Card';
-
-const useStyles = makeStyles((theme: Theme) =>
-    createStyles({
-        root: {
-            '& > *': {
-                margin: theme.spacing(1),
-                width: '45ch',
-
-        },
-    },
-    }),
-);
 
 export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
 
@@ -22,8 +6,6 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [repoName, setRepoName] = useState("")
     const [repoDescription, setRepoDescription] = useState("")
-
-    const classes = useStyles();
 
     useEffect(() => {
         if (valist) {
