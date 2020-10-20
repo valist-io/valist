@@ -23,7 +23,6 @@
     "type-check": "tsc"
   },
   "dependencies": {
-    "@material-ui/core": "^4.11.0",
     "@tailwindcss/ui": "^0.6.2",
     "next": "^9.5.5",
     "next-on-netlify": "^2.5.1",
