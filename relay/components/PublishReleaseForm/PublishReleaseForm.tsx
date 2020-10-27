@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
 
@@ -6,6 +6,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [projectName, setProjectName] = useState("")
     const [projectMeta, setProjectMeta] = useState("")
+    const refInput = useRef();
 
     useEffect(() => {
         if (valist) {
@@ -32,6 +33,25 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
 
         await valist.publishRelease(orgName, projectName, releaseBody, account)
     }
+
+
+    const handleDragEnter = (e:any) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    const handleDragLeave = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    const handleDragOver = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+    const handleDrop = (e: any) => {
+        e.preventDefault();
+        e.stopPropagation();
+    };
+
 
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -79,7 +99,11 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                     </div>
                     <div className="sm:col-span-2">
                     <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 relative h-32 ">
-                        <div className="absolute inset-0 flex items-center justify-center">
+                        <div onDrop={e => handleDrop(e)}
+                            onDragOver={e => handleDragOver(e)}
+                            onDragEnter={e => handleDragEnter(e)}
+                            onDragLeave={e => handleDragLeave(e)}
+                            className="absolute inset-0 flex items-center justify-center">
                             Drop Files Here
                         </div> 
                     </div>
