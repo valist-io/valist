@@ -1,4 +1,5 @@
-import React, { FunctionComponent, useState, useEffect, useRef } from 'react';
+import React, { FunctionComponent, useState, useEffect} from 'react';
+import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
 
@@ -6,7 +7,6 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [projectName, setProjectName] = useState("")
     const [projectMeta, setProjectMeta] = useState("")
-    const refInput = useRef();
 
     useEffect(() => {
         if (valist) {
@@ -27,31 +27,30 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
 
     const createRepo = async () => {
         const releaseBody = {
-            name: projectName,
-            description: projectMeta
+            tag: "",
+            hash: "",
+            meta: projectMeta
         };
 
         await valist.publishRelease(orgName, projectName, releaseBody, account)
     }
 
-
-    const handleDragEnter = (e:any) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-    const handleDragLeave = (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-    const handleDragOver = (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
-    };
-    const handleDrop = (e: any) => {
-        e.preventDefault();
-        e.stopPropagation();
+    const reducer = (state: any, action: any) => {
+        switch (action.type) {
+            case 'SET_DROP_DEPTH':
+                return { ...state, dropDepth: action.dropDepth }
+            case 'SET_IN_DROP_ZONE':
+                return { ...state, inDropZone: action.inDropZone };
+            case 'ADD_FILE_TO_LIST':
+                return { ...state, fileList: state.fileList.concat(action.files) };
+            default:
+                return state;
+        }
     };
 
+    const [data, dispatch] = React.useReducer(
+        reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
+    )
 
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -97,17 +96,14 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                             <input onChange={(e) => setProjectMeta(e.target.value)} id="ProjectMeta" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
-                    <div className="sm:col-span-2">
-                    <div className="border-4 border-dashed border-gray-200 rounded-lg h-96 relative h-32 ">
-                        <div onDrop={e => handleDrop(e)}
-                            onDragOver={e => handleDragOver(e)}
-                            onDragEnter={e => handleDragEnter(e)}
-                            onDragLeave={e => handleDragLeave(e)}
-                            className="absolute inset-0 flex items-center justify-center">
-                            Drop Files Here
-                        </div> 
-                    </div>
-                    </div>
+                    <DragAndDrop data={data} dispatch={dispatch}/>
+                    <ol className="dropped-files">
+                        {data.fileList.map((f: any) => {
+                            return (
+                                <li key={f.name}>{f.name}</li>
+                            )
+                        })}
+                    </ol>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
                             <button onClick={createRepo} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
