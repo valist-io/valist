@@ -163,6 +163,16 @@ class Valist {
     }
   }
 
+  async addFileToIPFS(data: any){
+    const file = Buffer.from(data);
+    try {
+      const result = await this.ipfs.add(file);
+      return result["path"];
+    } catch (err) {
+      console.error('Error', err);
+    }
+  }
+
 }
 
 export const Web3Providers = Web3.providers;

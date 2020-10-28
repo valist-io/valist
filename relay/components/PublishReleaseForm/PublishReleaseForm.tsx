@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState, useEffect} from 'react';
-import DragAndDrop from '../../components/DragAndDrop/DragAndDrop';
+
 
 export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
 
@@ -7,6 +7,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [projectName, setProjectName] = useState("")
     const [projectMeta, setProjectMeta] = useState("")
+    const [releaseData, setReleaseData] = useState<FileList | null> (null) 
 
     useEffect(() => {
         if (valist) {
@@ -25,32 +26,18 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
         }
     }, [valist]);
 
-    const createRepo = async () => {
+    const createRelease = async () => {
+
+        const releaseHash = await valist.addFileToIPFS(releaseData)
+
         const releaseBody = {
             tag: "",
-            hash: "",
+            hash: releaseHash,
             meta: projectMeta
         };
 
         await valist.publishRelease(orgName, projectName, releaseBody, account)
     }
-
-    const reducer = (state: any, action: any) => {
-        switch (action.type) {
-            case 'SET_DROP_DEPTH':
-                return { ...state, dropDepth: action.dropDepth }
-            case 'SET_IN_DROP_ZONE':
-                return { ...state, inDropZone: action.inDropZone };
-            case 'ADD_FILE_TO_LIST':
-                return { ...state, fileList: state.fileList.concat(action.files) };
-            default:
-                return state;
-        }
-    };
-
-    const [data, dispatch] = React.useReducer(
-        reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
-    )
 
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -91,22 +78,20 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                         </div>
                     </div>
                     <div className="sm:col-span-2">
-                        <label htmlFor="ProjectMeta" className="block text-sm font-medium leading-5 text-gray-700">Project Meta</label>
+                        <label htmlFor="ProjectMeta" className="block text-sm font-medium leading-5 text-gray-700">Release Meta</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <input onChange={(e) => setProjectMeta(e.target.value)} id="ProjectMeta" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
-                    <DragAndDrop data={data} dispatch={dispatch}/>
-                    <ol className="dropped-files">
-                        {data.fileList.map((f: any) => {
-                            return (
-                                <li key={f.name}>{f.name}</li>
-                            )
-                        })}
-                    </ol>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ReleaseData" className="block text-sm font-medium leading-5 text-gray-700">Release Data</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input type="file" onChange={(e) => setReleaseData(e.target.files)} id="ReleaseData" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
+                    </div>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={createRepo} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={createRelease} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Publish Release
                             </button>
                         </span>
@@ -117,3 +102,32 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
         </div>
     );
 }
+
+/*
+
+    const reducer = (state: any, action: any) => {
+        switch (action.type) {
+            case 'SET_DROP_DEPTH':
+                return { ...state, dropDepth: action.dropDepth }
+            case 'SET_IN_DROP_ZONE':
+                return { ...state, inDropZone: action.inDropZone };
+            case 'ADD_FILE_TO_LIST':
+                return { ...state, fileList: state.fileList.concat(action.files) };
+            default:
+                return state;
+        }
+    };
+
+    const [data, dispatch] = React.useReducer(
+        reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
+    )
+
+                    <DragAndDrop data={data} dispatch={dispatch}/>
+                    <ol className="dropped-files">
+                        {data.fileList.map((f: any) => {
+                            return (
+                                <li key={f.name}>{f.name}</li>
+                            )
+                        })}
+                    </ol>
+*/
