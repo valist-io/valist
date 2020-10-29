@@ -19,7 +19,7 @@
     "build": "next build",
     "netlify": "next build && next-on-netlify",
     "export": "next export",
-    "start": "next start",
+    "start": "next build && next start",
     "type-check": "tsc"
   },
   "dependencies": {
