@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 // @ts-ignore
-import ipfsClient from 'ipfs-http-client'
+import ipfsClient, { globSource } from 'ipfs-http-client'
 
 import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
@@ -164,6 +164,7 @@ class Valist {
   }
 
   async addFileToIPFS(data: any){
+    console.log(data)
     const file = Buffer.from(data);
     try {
       const result = await this.ipfs.add(file);

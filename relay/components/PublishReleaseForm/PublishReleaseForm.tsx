@@ -7,7 +7,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [projectName, setProjectName] = useState("")
     const [projectMeta, setProjectMeta] = useState("")
-    const [releaseData, setReleaseData] = useState<FileList | null> (null) 
+    const [releaseData, setReleaseData] = useState<File | null> (null) 
 
     useEffect(() => {
         if (valist) {
@@ -18,6 +18,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                     setOrgName("")
                     setProjectName("")
                     setProjectMeta("")
+                    console.log(releaseData)
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -26,10 +27,36 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
         }
     }, [valist]);
 
+    const readUploadedFileAsBuffer = (inputFile: any) => {
+        const temporaryFileReader = new FileReader();
+
+        return new Promise((resolve, reject) => {
+            temporaryFileReader.onerror = () => {
+                temporaryFileReader.abort();
+                reject(new DOMException("Problem parsing input file."));
+            };
+        
+            temporaryFileReader.onload = () => {
+                resolve(temporaryFileReader.result);
+            };
+
+            // @ts-ignore
+            temporaryFileReader.readAsArrayBuffer(inputFile);
+        });
+    };
+
+    const handleUpload = async (file: any) => {
+        console.log("Incoming File:", file)
+        try {
+            const fileContents = await readUploadedFileAsBuffer(file)  
+            return await valist.addFileToIPFS(fileContents)
+        } catch (e) {
+            console.warn(e.message)
+        }
+    }
+
     const createRelease = async () => {
-
-        const releaseHash = await valist.addFileToIPFS(releaseData)
-
+        const releaseHash = await handleUpload(releaseData)
         const releaseBody = {
             tag: "",
             hash: releaseHash,
@@ -86,7 +113,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                     <div className="sm:col-span-2">
                         <label htmlFor="ReleaseData" className="block text-sm font-medium leading-5 text-gray-700">Release Data</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input type="file" onChange={(e) => setReleaseData(e.target.files)} id="ReleaseData" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <input type="file" onChange={(e) => setReleaseData(e.target.files && e.target.files[0])} id="ReleaseData" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
