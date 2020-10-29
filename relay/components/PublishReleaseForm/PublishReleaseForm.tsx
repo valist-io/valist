@@ -7,6 +7,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const [orgName, setOrgName] = useState("")
     const [projectName, setProjectName] = useState("")
     const [projectMeta, setProjectMeta] = useState("")
+    const [projectTag, setProjectTag] = useState("")
     const [releaseData, setReleaseData] = useState<File | null> (null) 
 
     useEffect(() => {
@@ -58,7 +59,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const createRelease = async () => {
         const releaseHash = await handleUpload(releaseData)
         const releaseBody = {
-            tag: "",
+            tag: projectTag,
             hash: releaseHash,
             meta: projectMeta
         };
@@ -108,6 +109,12 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                         <label htmlFor="ProjectMeta" className="block text-sm font-medium leading-5 text-gray-700">Release Meta</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <input onChange={(e) => setProjectMeta(e.target.value)} id="ProjectMeta" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ReleaseTag" className="block text-sm font-medium leading-5 text-gray-700">Release Tag</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectTag(e.target.value)} id="ReleaseTag" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
