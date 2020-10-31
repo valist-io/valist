@@ -96,6 +96,12 @@ class Valist {
     return repo;
   }
 
+  async getReposFromOrganization(orgName: string) {
+    const org = await this.getOrganization(orgName);
+    const repos = await org.getPastEvents('RepositoryCreated', {fromBlock: 0, toBlock: 'latest'});
+    return repos;
+  }
+
   async getRepoMeta(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
     const repoMeta = await repo.methods.repoMeta().call();
