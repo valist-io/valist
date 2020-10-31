@@ -68,6 +68,12 @@ class Valist {
     return organizations;
   }
 
+  async getCreatedRepositories() {
+    const organizations = await this.valist.getPastEvents('RepositoryCreated', {fromBlock: 0, toBlock: 'latest'});
+
+    return organizations;
+  }
+
   async getDeletedOrganizations() {
     const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
 

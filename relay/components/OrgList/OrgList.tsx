@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
 
-export const ProjectsList= ({valist}: { valist: any }) => {
+export const OrgList= ({valist}: { valist: any }) => {
 
     const [orgs, setOrgs] = useState([{ returnValues: { orgName: "Loading...", orgMeta: "Loading..." }, blockNumber: 0, transactionHash: "0x0" }]);
 
@@ -98,4 +98,4 @@ export const ProjectsList= ({valist}: { valist: any }) => {
     );
 }
 
-export default ProjectsList;
+export default OrgList;
