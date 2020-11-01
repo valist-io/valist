@@ -114,6 +114,12 @@ class Valist {
     return release;
   }
 
+  async getLatestReleaseMetaFromRepo(orgName: string, repoName: string) {
+    const repo = await this.getRepoFromOrganization(orgName, repoName);
+    const release = await repo.methods.releaseMeta().call();
+    return release;
+  }
+
   async getReleasesFromRepo(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
 
