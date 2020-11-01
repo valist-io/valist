@@ -32,9 +32,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
             description: orgDescription
         };
 
-        await valist.createOrganization(orgShortName, JSON.stringify(meta), account);
+        await valist.createOrganization(orgShortName, meta, account);
     }
-    
+
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
             <div className="relative max-w-xl mx-auto">
