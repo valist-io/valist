@@ -17,7 +17,7 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
     const release = await valist.getReleaseByTag(orgName.toString(), repoName.toString(), tag.toString());
 
     if (release) {
-      return res.redirect(`https://ipfs.io/ipfs/${release.release}`);
+      return res.redirect(200, `https://ipfs.io/ipfs/${release.release}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }

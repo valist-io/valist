@@ -17,7 +17,7 @@ export default async function getReleaseMeta(req: NextApiRequest, res: NextApiRe
     const release = await valist.getReleaseByTag(orgName.toString(), repoName.toString(), tag.toString());
 
     if (release) {
-      return res.redirect(`https://ipfs.io/ipfs/${release.releaseMeta}`);
+      return res.redirect(200, `https://ipfs.io/ipfs/${release.releaseMeta}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }
