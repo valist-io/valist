@@ -16,14 +16,17 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
         const [orgName, repoName] = decodeURIComponent(releaseName.toString()).split("/");
         const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
-        const release = releases[0]
+        const release = releases[0].returnValues
 
         return res.status(200).json({
             _id: "",
             name: "",
-            versions: [
-                {
-                    name: release,
+            "dist-tags": {
+                latest: "0.0.1"
+            },
+            versions: {
+                "0.0.1": {
+                    name: release.release,
                     version: "0.0.1",
                     repository: "",
                     contributors: "",
@@ -31,10 +34,10 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
                     homepage: "",
                     dependencies: {},
                     dist: {
-                        tarball: `https://ipfs.io/ipfs/${release}`
+                        tarball: `https://ipfs.io/ipfs/${release.release}`
                     }
                 }
-            ]
+            }
         });
 
     } else {
