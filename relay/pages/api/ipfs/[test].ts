@@ -6,5 +6,7 @@ export default async function test(req: NextApiRequest, res: NextApiResponse) {
       query: { test },
     } = req;
 
-    return res.redirect(200, `https://ipfs.io/ipfs/${test}`);
+    console.log(test)
+
+    return res.redirect(`https://ipfs.io/ipfs/${test}`);
 }
