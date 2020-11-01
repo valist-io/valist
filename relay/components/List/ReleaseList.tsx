@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import Valist from 'valist';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const ReleaseList= ({ valist, orgName, repoName }: { valist: Valist, orgName: string, repoName: string }) => {
-
-  console.log(orgName, repoName)
+export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: string }) => {
+    const valist = useContext(ValistContext)
+    console.log(orgName, repoName)
     const [releases, setReleases] = useState<any>([
         {
             returnValues:
