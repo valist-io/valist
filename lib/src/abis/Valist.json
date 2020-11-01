@@ -3139,6 +3139,45 @@
       "links": {},
       "address": "0xc02A3dcF2B7dc68E3abbF5E42cbCeD65B962fd49",
       "transactionHash": "0x782267ad73dd3f221aca84c502cb4fa2d47d5e08c4e920b63c7c0bcdfb8b7f2f"
+    },
+    "5333": {
+      "events": {
+        "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgMeta",
+              "type": "string"
+            }
+          ],
+          "name": "OrganizationCreated",
+          "type": "event"
+        },
+        "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgName",
+              "type": "string"
+            }
+          ],
+          "name": "OrganizationDeleted",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xc02A3dcF2B7dc68E3abbF5E42cbCeD65B962fd49",
+      "transactionHash": "0x782267ad73dd3f221aca84c502cb4fa2d47d5e08c4e920b63c7c0bcdfb8b7f2f"
     }
   },
   "schemaVersion": "3.3.1",
