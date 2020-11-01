@@ -16,7 +16,8 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
 
     const releaseMeta = await valist.getLatestReleaseMetaFromRepo(orgName.toString(), repoName.toString());
 
-    return res.redirect(200, `https://ipfs.io/ipfs/${releaseMeta}`);
+    return res.status(200).json({releaseMeta});
+    //return res.redirect(200, `https://ipfs.io/ipfs/${releaseMeta}`);
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});
