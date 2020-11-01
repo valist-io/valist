@@ -1,7 +1,8 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const CreateOrganizationForm:FunctionComponent<any> = ({valist}) => {
-
+export const CreateOrganizationForm:FunctionComponent<any> = () => {
+    const valist = useContext(ValistContext)
     const [account, setAccount] = useState("");
 
     const [orgShortName, setOrgShortName] = useState("")

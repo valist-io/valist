@@ -1,7 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import ValistContext from '../../components/ValistContext/ValistContext';
-import Valist from 'valist/dist';
 
 export const ProjectsList= ({orgName}: { orgName: string }) => {
     const valist = useContext(ValistContext)

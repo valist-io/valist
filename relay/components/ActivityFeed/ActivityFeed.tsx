@@ -1,7 +1,8 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useContext } from 'react';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const ActivityFeed = ({valist}: {valist: any}) => {
-
+export const ActivityFeed = () => {
+    const valist = useContext(ValistContext)
     const [created, setCreated] = useState([{ returnValues: { orgName: "Loading...", orgMeta: "Loading..." }, blockNumber: 0, transactionHash: "0x0" }]);
 
     useEffect(() => {

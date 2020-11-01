@@ -1,8 +1,9 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
+import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const ProfileSidebar:FunctionComponent<any> = ({valist}: { valist: any }) => {
-
+export const ProfileSidebar:FunctionComponent<any> = () => {
+    const valist = useContext(ValistContext)
     const [profile, setProfile] = useState({ address: "0x0",  });
 
     useEffect(() => {

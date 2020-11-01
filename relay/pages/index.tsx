@@ -4,14 +4,14 @@ import OrgList from '../components/List/OrgList'
 import ActivityFeed from '../components/ActivityFeed/ActivityFeed';
 import ProfileSidebar from '../components/ProfileSidebar/ProfileSidebar';
 
-export const IndexPage = ({valist}: {valist: any}) => {
+export const IndexPage = () => {
   return (
     <IndexLayout title="valist.io">
       <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
         <div className="flex-1 min-w-0 bg-white xl:flex">
-          <ProfileSidebar valist={valist} />
+          <ProfileSidebar />
           <OrgList />
-          <ActivityFeed valist={valist} />
+          <ActivityFeed />
         </div>
       </div>
     </IndexLayout>
