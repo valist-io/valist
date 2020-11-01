@@ -1,6 +1,6 @@
 import React from 'react';
 import IndexLayout from '../components/Layout/IndexLayout'
-import OrgList from '../components/OrgList/OrgList'
+import OrgList from '../components/List/OrgList'
 import ActivityFeed from '../components/ActivityFeed/ActivityFeed';
 import ProfileSidebar from '../components/ProfileSidebar/ProfileSidebar';
 

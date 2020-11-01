@@ -1,17 +1,18 @@
 import React, { useEffect, useState } from 'react';
 import Link from 'next/link';
+import Valist from 'valist';
 
-export const ProjectsList= ({valist, orgName}: { valist: any, orgName: any }) => {
+export const ProjectsList= ({valist, orgName}: { valist: Valist, orgName: string }) => {
 
-    const [projects, setProjects] = useState([
-        { 
-            returnValues: 
-                { 
-                projectName: "Loading...", 
-                orgMeta: "Loading..." 
+    const [projects, setProjects] = useState<any>([
+        {
+            returnValues:
+                {
+                    repoName: "Loading...",
+                    repoMeta: "Loading..."
                 },
-        blockNumber: 0, 
-        transactionHash: "0x0" 
+        blockNumber: 0,
+        transactionHash: "0x0"
     }]);
 
     useEffect(() => {
@@ -39,7 +40,7 @@ export const ProjectsList= ({valist, orgName}: { valist: any, orgName: any }) =>
                     </svg>
                     </button>
                 </span>
-                <div className={"origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden"}>
+                <div className="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden">
                     <div className="rounded-md bg-white shadow-xs">
                         <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
                             <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
@@ -52,10 +53,10 @@ export const ProjectsList= ({valist, orgName}: { valist: any, orgName: any }) =>
             </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
-            {projects.map((project: any) => {
+            {projects.map((project: { transactionHash: string, blockNumber: number, returnValues: { repoName: string, repoMeta: string }}) => {
                 console.log(project)
                 return (
-                    <Link href={`/${project.returnValues.repoName}`} key={project.returnValues.repoName}>
+                    <Link href={`${orgName}/${project.returnValues.repoName}`} key={project.transactionHash}>
                         <li className="relative pl-4 pr-6 py-5 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">
                             <div className="flex items-center justify-between space-x-4">
                             <div className="min-w-0 space-y-3">
