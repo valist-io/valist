@@ -1,8 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import Valist from 'valist';
+import ValistContext from '../../components/ValistContext/ValistContext';
+import Valist from 'valist/dist';
 
-export const ProjectsList= ({valist, orgName}: { valist: Valist, orgName: string }) => {
+export const ProjectsList= ({orgName}: { orgName: string }) => {
+    const valist = useContext(ValistContext)
 
     const [projects, setProjects] = useState<any>([
         {

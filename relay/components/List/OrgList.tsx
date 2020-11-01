@@ -1,13 +1,16 @@
-import React, { useEffect, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const OrgList= ({valist}: { valist: any }) => {
+export const OrgList= () => {
 
     const [orgs, setOrgs] = useState([{ returnValues: { orgName: "Loading...", orgMeta: "Loading..." }, blockNumber: 0, transactionHash: "0x0" }]);
+    const valist = useContext(ValistContext)
 
     useEffect(() => {
         (async function() {
             if (valist) {
+                // @ts-ignore
                 setOrgs(await valist.getCreatedOrganizations());
             }
         })()

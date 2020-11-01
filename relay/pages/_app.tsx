@@ -2,6 +2,7 @@ import { AppProps } from 'next/app';
 import React, { useEffect, useState } from 'react';
 import Valist from 'valist';
 import '../styles/main.css';
+import ValistContext from '../components/ValistContext/ValistContext';
 
 function App({ Component, pageProps }: AppProps) {
 
@@ -29,7 +30,12 @@ function App({ Component, pageProps }: AppProps) {
     })();
   }, []);
 
-  return <Component {...pageProps} valist={valist} />
+  return (
+    // @ts-ignore
+    <ValistContext.Provider value={valist}>
+      <Component {...pageProps} valist={valist} />
+    </ValistContext.Provider>
+  )
 }
 
 // Only uncomment this method if you have blocking data requirements for
