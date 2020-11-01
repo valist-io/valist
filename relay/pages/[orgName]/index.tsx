@@ -3,11 +3,12 @@ import IndexLayout from '../../components/Layout/IndexLayout'
 import ProjectList from '../../components/List/ProjectList'
 import ActivityFeed from '../../components/ActivityFeed/ActivityFeed';
 import ProfileSidebar from '../../components/ProfileSidebar/ProfileSidebar';
+
 import { useRouter } from 'next/router';
 
 export const ProjectsPage = ({valist}: {valist: any}) => {
-    const router = useRouter()
-    const { orgName } = router.query
+    const router = useRouter();
+    const { orgName } = router.query;
 
     return (
         <IndexLayout title="valist.io">
@@ -22,4 +23,4 @@ export const ProjectsPage = ({valist}: {valist: any}) => {
     );
 }
 
-export default ProjectsPage
+export default ProjectsPage;

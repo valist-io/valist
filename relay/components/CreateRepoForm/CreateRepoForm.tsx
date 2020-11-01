@@ -1,9 +1,9 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
+import Valist from 'valist';
 
-export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
+export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
 
     const [account, setAccount] = useState("");
-    const [orgName, setOrgName] = useState("")
     const [repoName, setRepoName] = useState("")
     const [repoDescription, setRepoDescription] = useState("")
 
@@ -13,7 +13,6 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    setOrgName("")
                     setRepoName("")
                     setRepoDescription("")
                 } catch (error) {
@@ -69,17 +68,11 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist}) => {
                     Create a New Project
                 </h2>
                 <p className="mt-4 text-lg leading-6 text-gray-500">
-                    Create a new <b>project</b> to begin publishing new releases and keys.
+                    Create a new <b>project</b> to begin publishing new releases.
                 </p>
                 </div>
                 <div className="mt-12">
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-                    <div className="sm:col-span-2">
-                        <label htmlFor="OrgName" className="block text-sm font-medium leading-5 text-gray-700">Organization Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setOrgName(e.target.value)} id="OrgName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
                         <div className="mt-1 relative rounded-md shadow-sm">

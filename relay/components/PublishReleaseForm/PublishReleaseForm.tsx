@@ -1,14 +1,13 @@
 import React, { FunctionComponent, useState, useEffect} from 'react';
 
+import Valist from 'valist';
 
-export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
+export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, repoName }: { valist: Valist, orgName: string, repoName: string }) => {
 
     const [account, setAccount] = useState("");
-    const [orgName, setOrgName] = useState("")
-    const [projectName, setProjectName] = useState("")
-    const [projectMeta, setProjectMeta] = useState("")
+    const [releaseMeta, setReleaseMeta] = useState("")
     const [projectTag, setProjectTag] = useState("")
-    const [releaseData, setReleaseData] = useState<File | null> (null) 
+    const [releaseData, setReleaseData] = useState<File | null> (null)
 
     useEffect(() => {
         if (valist) {
@@ -16,10 +15,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    setOrgName("")
-                    setProjectName("")
-                    setProjectMeta("")
-                    console.log(releaseData)
+                    console.log(releaseData);
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -36,7 +32,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                 temporaryFileReader.abort();
                 reject(new DOMException("Problem parsing input file."));
             };
-        
+
             temporaryFileReader.onload = () => {
                 resolve(temporaryFileReader.result);
             };
@@ -49,7 +45,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     const handleUpload = async (file: any) => {
         console.log("Incoming File:", file)
         try {
-            const fileContents = await readUploadedFileAsBuffer(file)  
+            const fileContents = await readUploadedFileAsBuffer(file)
             return await valist.addFileToIPFS(fileContents)
         } catch (e) {
             console.warn(e.message)
@@ -57,14 +53,15 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
     }
 
     const createRelease = async () => {
-        const releaseHash = await handleUpload(releaseData)
-        const releaseBody = {
+        const releaseHash = await handleUpload(releaseData);
+        const meta = await valist.addJSONtoIPFS(releaseMeta);
+        const release = {
             tag: projectTag,
             hash: releaseHash,
-            meta: projectMeta
+            meta
         };
 
-        await valist.publishRelease(orgName, projectName, releaseBody, account)
+        await valist.publishRelease(orgName, repoName, release, account);
     }
 
     return (
@@ -94,21 +91,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
                 <div className="mt-12">
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
                     <div className="sm:col-span-2">
-                        <label htmlFor="OrgName" className="block text-sm font-medium leading-5 text-gray-700">Organization Name</label>
+                        <label htmlFor="ProjectMeta" className="block text-sm font-medium leading-5 text-gray-700">Metadata</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setOrgName(e.target.value)} id="OrgName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                        <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectName(e.target.value)} id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                        <label htmlFor="ProjectMeta" className="block text-sm font-medium leading-5 text-gray-700">Release Meta</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectMeta(e.target.value)} id="ProjectMeta" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <input onChange={(e) => setReleaseMeta(e.target.value)} id="ProjectMeta" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
@@ -136,6 +121,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({valist}) => {
         </div>
     );
 }
+
+export default PublishReleaseForm;
 
 /*
 
