@@ -25,7 +25,7 @@
   "dependencies": {
     "@tailwindcss/ui": "^0.6.2",
     "next": "^9.5.5",
-    "next-on-netlify": "https://ipfs.io/ipfs/QmWTqSP9XBYA716rzhHtUiHzTN9cJA3VFdiKBM3rHXS9uu",
+    "next-on-netlify": "^2.6.0",
     "react": "^16.14.0",
     "react-dom": "^16.14.0",
     "valist": "file:../lib/"
