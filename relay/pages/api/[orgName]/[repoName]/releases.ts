@@ -16,7 +16,11 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
     const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
 
-    return res.status(200).json({releases});
+    if (releases) {
+      return res.status(200).json({releases});
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No releases found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

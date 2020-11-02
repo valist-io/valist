@@ -16,7 +16,11 @@ export default async function getLatestReleaseTag(req: NextApiRequest, res: Next
 
     const latestTag = await valist.getLatestTagFromRepo(orgName.toString(), repoName.toString());
 
-    return res.status(200).json({latestTag});
+    if (latestTag) {
+      return res.status(200).json({latestTag});
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No release found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

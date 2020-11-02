@@ -16,7 +16,12 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
 
     const orgMeta = await valist.getOrganizationMeta(orgName.toString());
 
-    return res.status(200).json({orgMeta});
+    if (orgMeta) {
+      // return res.status(200).json({orgMeta});
+      return res.redirect(`https://ipfs.io/ipfs/${orgMeta}`);
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No organization found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});
