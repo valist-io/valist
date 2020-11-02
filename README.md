@@ -1,6 +1,6 @@
 # Valist
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/f2751b0a-a3f8-47c2-88bb-f0f432c384ea/deploy-status)](https://app.netlify.com/sites/valist/deploys)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fvalist-io%2Fvalist&env=WEB3_PROVIDER&envDescription=Enter%20a%20Web3%20HTTP%20Provider%20(can%20be%20an%20Infura%20Project%20URL))
 
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
 
