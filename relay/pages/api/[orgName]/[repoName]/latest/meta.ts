@@ -18,7 +18,7 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
 
     if (releaseMeta) {
       //return res.status(200).json({releaseMeta});
-      return res.redirect(`https://ipfs.io/ipfs/${releaseMeta}`);
+      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${releaseMeta}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }

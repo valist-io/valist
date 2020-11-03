@@ -18,7 +18,7 @@ export default async function getRepoMeta(req: NextApiRequest, res: NextApiRespo
 
     if (repoMeta) {
       // return res.status(200).json({repoMeta});
-      return res.redirect(`https://ipfs.io/ipfs/${repoMeta}`);
+      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${repoMeta}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No repository found!"});
     }
