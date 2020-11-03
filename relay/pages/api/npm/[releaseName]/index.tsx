@@ -14,7 +14,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
             query: { releaseName },
         } = req;
 
-        const [orgName, repoName] = decodeURIComponent(releaseName.toString()).split("/");
+        const [orgName, repoName] = decodeURIComponent(releaseName.toString().replace("@", "")).split("/");
         const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
         const release = releases[0].returnValues
 

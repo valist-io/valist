@@ -14,7 +14,7 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
             query: { releaseName, tag },
         } = req;
 
-        const [orgName, repoName] = decodeURIComponent(releaseName.toString()).split("/");
+        const [orgName, repoName] = decodeURIComponent(releaseName.toString().replace("@", "")).split("/");
         const release = await valist.getReleaseByTag(orgName, repoName, tag.toString());
 
         if (release) {
