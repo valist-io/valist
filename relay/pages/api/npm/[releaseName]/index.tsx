@@ -1,7 +1,5 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Valist, { Web3Providers } from 'valist';
-import got from 'got';
-
 
 export default async function getReleasesFromRepo(req: NextApiRequest, res: NextApiResponse) {
 
