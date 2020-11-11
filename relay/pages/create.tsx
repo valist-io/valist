@@ -1,10 +1,10 @@
 import Layout from '../components/Layout/Layout';
 import { CreateOrganizationForm } from '../components/CreateOrganization/CreateOrganizationForm';
 
-export const CreateOrgPage = ({valist}: any) => {
+export const CreateOrgPage = () => {
     return (
         <Layout title="Valist | Create Organization">
-            <CreateOrganizationForm valist={valist} />
+            <CreateOrganizationForm />
         </Layout>
     );
 }
