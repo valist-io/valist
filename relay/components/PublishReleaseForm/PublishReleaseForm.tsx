@@ -54,6 +54,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
 
     const createRelease = async () => {
         const releaseHash = await handleUpload(releaseData);
+        
         const meta = await valist.addJSONtoIPFS(releaseMeta);
         const release = {
             tag: projectTag,

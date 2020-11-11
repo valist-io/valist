@@ -24,7 +24,6 @@ export const ActivityFeed = () => {
                     <ul className="divide-y divide-gray-200" key={org.transactionHash}>
                         <li className="py-4">
                         <div className="flex space-x-3">
-                            <img className="h-6 w-6 rounded-full" src="https://images.unsplash.com/photo-1517365830460-955ce3ccd263?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=256&h=256&q=80" alt="" />
                             <div className="flex-1 space-y-1">
                                 <div className="flex items-center justify-between">
                                     <h3 className="text-sm font-medium leading-5">{org.returnValues.orgName}</h3>
