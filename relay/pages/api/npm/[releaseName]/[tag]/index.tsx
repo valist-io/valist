@@ -19,8 +19,8 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
 
         if (release) {
             return res.status(200).json({
-                name: release.release,
-                version: "0.0.1",
+                name: repoName,
+                version: release.tag,
                 repository: "",
                 contributors: "",
                 bugs: "",
