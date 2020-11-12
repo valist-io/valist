@@ -1,6 +1,6 @@
 import React from 'react';
 import IndexLayout from '../../../components/Layout/IndexLayout'
-import ActivityFeed from '../../../components/ActivityFeed/ActivityFeed';
+import ProjectMetaBar from '../../../components/ProjectMetaBar/ProjectMetaBar';
 import ProfileSidebar from '../../../components/ProfileSidebar/ProfileSidebar';
 import ReleaseList from '../../../components/List/ReleaseList';
 
@@ -16,7 +16,7 @@ export const ReposPage = () => {
                 <div className="flex-1 min-w-0 bg-white xl:flex">
                     <ProfileSidebar />
                     <ReleaseList orgName={`${orgName}`} repoName={`${repoName}`} />
-                    <ActivityFeed />
+                    <ProjectMetaBar orgName={`${orgName}`} repoName={`${repoName}`} />
                 </div>
             </div>
         </IndexLayout>
