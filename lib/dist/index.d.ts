@@ -31,6 +31,9 @@ declare class Valist {
     createRepository(orgName: string, repoName: string, repoMeta: {
         name: string;
         description: string;
+        projectType: string;
+        homepage: string;
+        github: string;
     }, account: any): Promise<any>;
     publishRelease(orgName: string, repoName: string, release: {
         tag: string;

@@ -5,6 +5,9 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
 
     const [account, setAccount] = useState("");
     const [repoName, setRepoName] = useState("")
+    const [projectType, setProjectType] = useState("")
+    const [projectHomepage, setProjectHomepage] = useState("")
+    const [projectGithub, setProjectGithub] = useState("")
     const [repoDescription, setRepoDescription] = useState("")
 
     useEffect(() => {
@@ -26,23 +29,35 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
     const createRepo = async () => {
         const repoMeta = {
             name: repoName,
-            description: repoDescription
+            description: repoDescription,
+            projectType: projectType,
+            homepage: projectHomepage,
+            github: projectGithub
         };
 
         await valist.createRepository(orgName, repoName, repoMeta, account)
     }
 
-    /*
-                    <form className={classes.root} noValidate autoComplete="off">
-                    <TextField onChange={(e) => setOrgName(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" value={orgName}/>
-                    <br></br>
-                    <TextField onChange={(e) => setRepoName(e.target.value)} id="outlined-basic" label="Repo Name" variant="outlined" value={repoName} />
-                    <br></br>
-                    <TextField onChange={(e) => setRepoDescription(e.target.value)} id="outlined-basic" label="Description" variant="outlined" value={repoDescription} />
-                    <br></br>
-                    <Button onClick={createRepo} value="Submit" variant="contained" color="primary">Create</Button>
-                </form>
-    */
+    const renderPackageMeta = (package_type: any) =>{
+        if(package_type == "npm"){
+            return (
+                <div className="sm:col-span-2">
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Project Homepage</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectGithub" className="block text-sm font-medium leading-5 text-gray-700">Project Github Repo</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectGithub(e.target.value)} id="ProjectGithub" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                </div>
+            )
+        }
+    }
 
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -85,6 +100,15 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                             <input onChange={(e) => setRepoDescription(e.target.value)} id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
+                    <div>
+                        <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
+                        <select onChange={(e) => setProjectType(e.target.value)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
+                            <option selected>binary</option>
+                            <option >npm</option>
+                            <option>pip</option>
+                        </select>
+                    </div>
+                    {renderPackageMeta(projectType)}
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
                         <button onClick={createRepo} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">

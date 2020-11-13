@@ -147,7 +147,7 @@ class Valist {
     return result;
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string}, account: any) {
+  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: string, homepage: string, github: string}, account: any) {
     try {
       const org = await this.getOrganization(orgName);
       const metaFile = await this.addJSONtoIPFS(repoMeta);
