@@ -75,11 +75,6 @@ export const OrgList= () => {
                             </div>
 
                             <div className="hidden sm:flex flex-col flex-shrink-0 items-end space-y-3">
-                                <p className="flex items-center space-x-4">
-                                <a href="#" className="relative text-sm leading-5 text-gray-500 hover:text-gray-900 font-medium">
-                                    Visit site
-                                </a>
-                                </p>
                                 <p className="flex text-gray-500 text-sm leading-5 space-x-2">
                                 <span>Block: {org.blockNumber}</span>
                                 </p>
