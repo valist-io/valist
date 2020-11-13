@@ -40,7 +40,7 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
                         <h1 className="flex-1 text-md leading-7 font-medium" >Install From Registry</h1>
                     </div>
                     <div className="border-2 border-solid border-black-200 rounded-lg h-auto break-words p-2">
-                        npm install ${repoName}
+                        npm install @{orgName}/{repoName}
                     </div>
                 </div>
             </div>
