@@ -20,7 +20,7 @@ dev-lib:
 dev:
 	@make -j 2 dev-lib dev-relay
 
-start:
+start: lib
 	cd relay && npm run start
 
 # compile contracts
