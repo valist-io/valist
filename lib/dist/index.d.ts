@@ -42,6 +42,7 @@ declare class Valist {
     }, account: any): Promise<any>;
     addJSONtoIPFS(data: any): Promise<any>;
     addFileToIPFS(data: any): Promise<any>;
+    fetchJSONfromIPFS(ipfsHash: string): Promise<any>;
 }
 export declare const Web3Providers: import("web3-core").Providers;
 export default Valist;

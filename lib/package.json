@@ -29,6 +29,7 @@
   },
   "dependencies": {
     "ipfs-http-client": "^45.0.0",
+    "node-fetch": "^2.6.1",
     "web3": "^1.3.0"
   }
 }

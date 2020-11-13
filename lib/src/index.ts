@@ -7,6 +7,12 @@ import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
 import ValistRepositoryABI from './abis/ValistRepository.json';
 
+const fetch = require('node-fetch');
+
+if (!globalThis.fetch) {
+    globalThis.fetch = fetch;
+}
+
 const getContractInstance = async (web3: Web3, abi: any, address: string) => {
   // create the instance
   return new web3.eth.Contract(abi, address);
@@ -165,7 +171,7 @@ class Valist {
     return result;
   }
 
-  async addJSONtoIPFS(data: any){
+  async addJSONtoIPFS(data: any) {
     const file = Buffer.from(JSON.stringify(data));
     try {
       const result = await this.ipfs.add(file);
@@ -175,7 +181,7 @@ class Valist {
     }
   }
 
-  async addFileToIPFS(data: any){
+  async addFileToIPFS(data: any) {
     console.log(data)
     const file = Buffer.from(data);
     try {
@@ -184,6 +190,13 @@ class Valist {
     } catch (err) {
       console.error('Error', err);
     }
+  }
+
+  async fetchJSONfromIPFS(ipfsHash: string) {
+    const response = await fetch(`https://cloudflare-ipfs.com/ipfs/${ipfsHash}`);
+    const json = await response.json();
+    console.log("JSON Fetched from IPFS", json);
+    return json;
   }
 
 }

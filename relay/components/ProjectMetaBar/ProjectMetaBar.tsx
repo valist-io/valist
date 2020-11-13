@@ -5,6 +5,21 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
     const valist = useContext(ValistContext);
     const [meta, setMeta] = useState<JSX.Element>();
 
+    const PipMeta = () => {
+        return (
+            <div>
+                <div className="pl-6 lg:w-80">
+                    <div className="pt-6 pb-2">
+                        <h1 className="flex-1 text-lg leading-7 font-medium">Pip Install From Url</h1>
+                    </div>
+                    <div className="border-2 border-solid border-black-200 rounded-lg p-2">
+                        pip install {window.location.origin}/api/{orgName}/{repoName}/latest
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const NpmMeta = () => {
         return (
             <div>
@@ -49,14 +64,16 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
 
     const package_type_table = {
         "binary": BinaryMeta,
-        "npm": NpmMeta
+        "npm": NpmMeta,
+        "pip": PipMeta
     }
 
     useEffect(() => {
         (async function() {
             if (valist) {
-                const rawMeta: { packageType: "binary" | "npm" | undefined } = await valist.getRepoMeta(orgName, repoName);
-                const repoMeta = package_type_table[rawMeta.packageType || "binary"];
+                const rawMeta = await valist.getRepoMeta(orgName, repoName);
+                const metaResponse: { projectType: "binary" | "npm" | undefined }  = await valist.fetchJSONfromIPFS(rawMeta);
+                const repoMeta = package_type_table[metaResponse.projectType || "binary"];
                 setMeta(repoMeta);
             }
         })()
