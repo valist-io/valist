@@ -104,8 +104,9 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                         <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
                         <select onChange={(e) => setProjectType(e.target.value)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
                             <option selected>binary</option>
-                            <option >npm</option>
+                            <option>npm</option>
                             <option>pip</option>
+                            <option>docker</option>
                         </select>
                     </div>
                     {renderPackageMeta(projectType)}

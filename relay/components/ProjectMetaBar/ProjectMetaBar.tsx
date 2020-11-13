@@ -62,17 +62,33 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
         );
     }
 
+    const DockerMeta = () => {
+        return (
+            <div>
+                <div className="pl-6 lg:w-80">
+                    <div className="pt-6 pb-2">
+                        <h1 className="flex-1 text-lg leading-7 font-medium">Load Container from Url</h1>
+                    </div>
+                    <div className="border-2 border-solid border-black-200 rounded-lg p-2">
+                        curl -L {window.location.origin}/api/{orgName}/{repoName}/latest | docker load
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
     const package_type_table = {
         "binary": BinaryMeta,
         "npm": NpmMeta,
-        "pip": PipMeta
+        "pip": PipMeta,
+        "docker": DockerMeta
     }
 
     useEffect(() => {
         (async function() {
             if (valist) {
                 const rawMeta = await valist.getRepoMeta(orgName, repoName);
-                const metaResponse: { projectType: "binary" | "npm" | undefined }  = await valist.fetchJSONfromIPFS(rawMeta);
+                const metaResponse: { projectType: "binary" | "npm" | "pip" | "docker" | undefined }= await valist.fetchJSONfromIPFS(rawMeta);
                 const repoMeta = package_type_table[metaResponse.projectType || "binary"];
                 setMeta(repoMeta);
             }
