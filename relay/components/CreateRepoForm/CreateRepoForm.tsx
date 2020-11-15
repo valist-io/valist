@@ -1,8 +1,9 @@
 import React, { FunctionComponent, useState, useEffect } from 'react';
 import Valist from 'valist';
+import { useRouter } from 'next/router'
 
 export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
-
+    const router = useRouter()
     const [account, setAccount] = useState("");
     const [repoName, setRepoName] = useState("")
     const [projectType, setProjectType] = useState("")
@@ -36,6 +37,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
         };
 
         await valist.createRepository(orgName, repoName, repoMeta, account)
+        router.push("/")
     }
 
     const renderPackageMeta = (package_type: any) =>{
