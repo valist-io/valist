@@ -7,11 +7,16 @@ import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
 import ValistRepositoryABI from './abis/ValistRepository.json';
 
+// mon
 const fetch = require('node-fetch');
-
 if (!globalThis.fetch) {
     globalThis.fetch = fetch;
 }
+
+// keccak256 hashes of each role
+const ORG_ADMIN_ROLE = "0x123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e12683553c62";
+const REPO_ADMIN_ROLE = "0xff7d2294a3c189284afb74beb7d578b566cf69863d5cb16db08773c21bea56c9";
+const REPO_DEV_ROLE = "0x069bf569f27d389f2c70410107860b2e82ff561283b097a89e897daa5e34b1b6";
 
 const getContractInstance = async (web3: Web3, abi: any, address: string) => {
   // create the instance
@@ -70,13 +75,11 @@ class Valist {
 
   async getCreatedOrganizations() {
     const organizations = await this.valist.getPastEvents('OrganizationCreated', {fromBlock: 0, toBlock: 'latest'});
-
     return organizations;
   }
 
   async getDeletedOrganizations() {
     const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
-
     return organizations;
   }
 
@@ -128,7 +131,6 @@ class Valist {
 
   async getReleasesFromRepo(orgName: string, repoName: string) {
     const repo = await this.getRepoFromOrganization(orgName, repoName);
-
     return await repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
   }
 
@@ -145,6 +147,51 @@ class Valist {
       }
     }
     return;
+  }
+
+  async isOrgAdmin(orgName: string, account: any) {
+    const org = await this.getOrganization(orgName);
+    return await org.methods.hasRole(ORG_ADMIN_ROLE, account).call();
+  }
+
+  async grantOrgAdmin(orgName: string, account: any) {
+    const org = await this.getOrganization(orgName);
+    await org.methods.grantRole(ORG_ADMIN_ROLE, account).send({ from: account });
+  }
+
+  async revokeOrgAdmin(orgName: string, account: any) {
+    const org = await this.getOrganization(orgName);
+    await org.methods.revokeRole(ORG_ADMIN_ROLE, account).send({ from: account });
+  }
+
+  async isRepoAdmin(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.hasRole(REPO_ADMIN_ROLE, account).call();
+  }
+
+  async isRepoDev(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.hasRole(REPO_DEV_ROLE, account).call();
+  }
+
+  async grantRepoAdmin(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.grantRole(REPO_ADMIN_ROLE, account).call();
+  }
+
+  async revokeRepoAdmin(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.revokeRole(REPO_ADMIN_ROLE, account).call();
+  }
+
+  async grantRepoDev(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.grantRole(REPO_DEV_ROLE, account).call();
+  }
+
+  async revokeRepoDev(orgName: string, repoName: string, account: any) {
+    const repo = await this.getRepository(orgName, repoName);
+    return await repo.methods.revokeRole(REPO_DEV_ROLE, account).call();
   }
 
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {

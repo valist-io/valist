@@ -24,6 +24,15 @@ declare class Valist {
         release: any;
         releaseMeta: any;
     } | undefined>;
+    isOrgAdmin(orgName: string, account: any): Promise<any>;
+    grantOrgAdmin(orgName: string, account: any): Promise<void>;
+    revokeOrgAdmin(orgName: string, account: any): Promise<void>;
+    isRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
+    isRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
+    grantRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
+    revokeRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
+    grantRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
+    revokeRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
     createOrganization(orgName: string, orgMeta: {
         name: string;
         description: string;
