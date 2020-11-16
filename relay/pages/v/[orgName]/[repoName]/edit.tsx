@@ -1,5 +1,5 @@
-import Layout from '../../../components/Layout/Layout';
-import EditOrgForm from '../../../components/EditOrgForm/EditOrgForm';
+import Layout from '../../../../components/Layout/Layout';
+import EditOrgForm from '../../../../components/EditOrgForm/EditOrgForm';
 
 export const EditOrgPage = () => {
     return (

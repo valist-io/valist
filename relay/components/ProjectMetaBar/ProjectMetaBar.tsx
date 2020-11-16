@@ -11,10 +11,12 @@ type ProjectType = "binary" | "npm" | "pip" | "docker";
 export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
     const valist = useContext(ValistContext);
     const [type, setType] = useState<ProjectType>("binary");
+    const [projectMeta, setProjectMeta] = useState();
 
+    console.log("passing value", projectMeta)
     const projectTypes = {
         "binary": BinaryMeta(orgName, repoName),
-        "npm": NpmMeta(orgName, repoName),
+        "npm": NpmMeta(orgName, repoName, projectMeta),
         "pip": PipMeta(orgName, repoName),
         "docker": DockerMeta(orgName, repoName)
     }
@@ -26,6 +28,7 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
                 const metaResponse = await valist.fetchJSONfromIPFS(rawMeta);
                 const projectType = metaResponse.projectType;
                 setType(projectType);
+                setProjectMeta(metaResponse)
             }
         })()
     }, [valist]);
