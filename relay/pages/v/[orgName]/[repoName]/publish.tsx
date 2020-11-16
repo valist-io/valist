@@ -1,5 +1,5 @@
-import Layout from '../../../components/Layout/Layout'
-import PublishReleaseForm from '../../../components/PublishReleaseForm/PublishReleaseForm'
+import Layout from '../../../../components/Layout/Layout'
+import PublishReleaseForm from '../../../../components/PublishReleaseForm/PublishReleaseForm'
 
 import { useRouter } from 'next/router';
 

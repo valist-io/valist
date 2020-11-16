@@ -1,5 +1,5 @@
-import Layout from '../components/Layout/Layout';
-import { CreateOrganizationForm } from '../components/CreateOrganization/CreateOrganizationForm';
+import Layout from '../../components/Layout/Layout';
+import { CreateOrganizationForm } from '../../components/CreateOrganization/CreateOrganizationForm';
 
 export const CreateOrgPage = () => {
     return (

@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useEffect, useState, useContext } from 'react';
+import { FunctionComponent, useEffect, useState, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 
 const IsOrgAdmin:FunctionComponent<any> = (props) => {
@@ -22,4 +22,3 @@ const IsOrgAdmin:FunctionComponent<any> = (props) => {
 }
 
 export default IsOrgAdmin;
-

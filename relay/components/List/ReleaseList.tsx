@@ -32,7 +32,7 @@ export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: s
                 <h1 className="flex-1 text-lg leading-7 font-medium">{repoName || "Releases"}</h1>
                 <div className="relative">
                 <span className="rounded-md shadow-sm">
-                <Link href={`/${orgName}/${repoName}/publish`}>
+                <Link href={`/v/${orgName}/${repoName}/publish`}>
                     <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                         Publish Release
                     </button>
