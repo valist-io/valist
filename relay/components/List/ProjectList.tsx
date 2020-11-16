@@ -31,7 +31,7 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
                 <h1 className="flex-1 text-lg leading-7 font-medium">Projects</h1>
                 <div className="relative">
                 <span className="rounded-md shadow-sm">
-                <Link href={`/${orgName}/create`}>
+                <Link href={`/create/org/${orgName}`}>
                     <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                         New Project
                     </button>

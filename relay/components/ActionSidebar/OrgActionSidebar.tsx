@@ -1,8 +1,9 @@
 import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ValistContext from '../ValistContext/ValistContext';
+import IsOrgAdmin from './IsOrgAdmin';
 
-export const ProfileSidebar:FunctionComponent<any> = () => {
+export const OrgActionSidebar:FunctionComponent<any> = ({orgName}: { orgName: string }) => {
     const valist = useContext(ValistContext)
     const [profile, setProfile] = useState({ address: "0x0",  });
 
@@ -40,11 +41,14 @@ export const ProfileSidebar:FunctionComponent<any> = () => {
                                 </div>
                                 <div className="flex flex-col space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row xl:flex-col xl:space-x-0 xl:space-y-3">
                                 <span className="inline-flex rounded-md shadow-sm">
-                                    <Link href="/settings">
-                                        <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                                            Local Settings
-                                        </button>
-                                    </Link>
+                                    <IsOrgAdmin orgName={orgName}>
+                                        <Link href="/settings">
+                                            <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                                                Edit Org Meta
+                                            </button>
+                                        </Link>
+                                    </IsOrgAdmin>
+                                    
                                 </span>
                                 </div>
                             </div>
@@ -55,4 +59,4 @@ export const ProfileSidebar:FunctionComponent<any> = () => {
     )
 }
 
-export default ProfileSidebar;
+export default OrgActionSidebar;

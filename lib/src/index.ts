@@ -7,7 +7,7 @@ import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
 import ValistRepositoryABI from './abis/ValistRepository.json';
 
-// mon
+// monkey patch node-fetch
 const fetch = require('node-fetch');
 if (!globalThis.fetch) {
     globalThis.fetch = fetch;
