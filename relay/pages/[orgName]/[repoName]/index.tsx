@@ -1,7 +1,7 @@
 import React from 'react';
 import IndexLayout from '../../../components/Layout/IndexLayout'
 import ProjectMetaBar from '../../../components/ProjectMetaBar/ProjectMetaBar';
-import ProfileActionSidebar from '../../../components/ActionSidebar/ProfileActionSidebar';
+import ProjectActionSidebar from '../../../components/ActionSidebar/ProjectActionSidebar';
 import ReleaseList from '../../../components/List/ReleaseList';
 
 import { useRouter } from 'next/router';
@@ -14,7 +14,7 @@ export const ReposPage = () => {
         <IndexLayout title={`${orgName} | ${repoName}`}>
             <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
                 <div className="flex-1 min-w-0 bg-white xl:flex">
-                    <ProfileActionSidebar />
+                    <ProjectActionSidebar orgName={`${orgName}`} repoName={`${repoName}`} />
                     <ReleaseList orgName={`${orgName}`} repoName={`${repoName}`} />
                     <ProjectMetaBar orgName={`${orgName}`} repoName={`${repoName}`} />
                 </div>

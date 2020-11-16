@@ -30,28 +30,20 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
             <div className="flex items-center">
                 <h1 className="flex-1 text-lg leading-7 font-medium">Projects</h1>
                 <div className="relative">
-                <span className="rounded-md shadow-sm">
-                <Link href={`/v/${orgName}/create`}>
-                    <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-transparent text-sm leading-5 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                        New Project
-                    </button>
-                </Link>
-                </span>
-                <div className="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden">
-                    <div className="rounded-md bg-white shadow-xs">
-                        <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
-                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
-                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date modified</a>
-                            <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date created</a>
+                    <div className="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden">
+                        <div className="rounded-md bg-white shadow-xs">
+                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
+                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
+                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date modified</a>
+                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date created</a>
+                            </div>
                         </div>
                     </div>
-                </div>
                 </div>
             </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
             {projects.map((project: { transactionHash: string, blockNumber: number, returnValues: { repoName: string, repoMeta: string }}) => {
-                console.log(project)
                 return (
                     <Link href={`${orgName}/${project.returnValues.repoName}`} key={project.transactionHash}>
                         <li className="relative pl-4 pr-6 py-5 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">

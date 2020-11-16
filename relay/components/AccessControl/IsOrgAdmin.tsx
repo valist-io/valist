@@ -2,7 +2,7 @@ import { FunctionComponent, useEffect, useState, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 
 const IsOrgAdmin:FunctionComponent<any> = (props) => {
-    const valist = useContext(ValistContext)
+    const valist = useContext(ValistContext);
     const [isOrgAdmin, setIsOrgAdmin] = useState(false);
 
     useEffect(() => {
@@ -14,10 +14,10 @@ const IsOrgAdmin:FunctionComponent<any> = (props) => {
         })()
     }, [valist]);
 
-    if(isOrgAdmin){
-        return props.children
-    }else{
-        return null
+    if (isOrgAdmin) {
+        return props.children;
+    } else {
+        return null;
     }
 }
 
