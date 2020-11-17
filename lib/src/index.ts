@@ -321,7 +321,7 @@ class Valist {
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-      const result = await this.valist.methods.createOrganization(orgName, metaFile).send({ from: account });
+      const result = await this.valist.methods.createOrganization(orgName.toLowerCase(), metaFile).send({ from: account });
       return result;
     } catch (e) {
       const msg = `Could not create organization`;

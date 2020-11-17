@@ -93,13 +93,13 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setRepoName(e.target.value)} id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <input onChange={(e) => setRepoName(e.target.value)} required id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoDescription" className="block text-sm font-medium leading-5 text-gray-700">Repo Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setRepoDescription(e.target.value)} id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <textarea onChange={(e) => setRepoDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div>

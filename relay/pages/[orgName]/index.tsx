@@ -1,9 +1,8 @@
 import React from 'react';
 import IndexLayout from '../../components/Layout/IndexLayout'
 import ProjectList from '../../components/List/ProjectList'
-import ActivityFeed from '../../components/ActivityFeed/ActivityFeed';
 import OrgActionSidebar from '../../components/ActionSidebar/OrgActionSidebar';
-
+import OrgMetaBar from '../../components/OrgMetaBar/OrgMetaBar';
 import { useRouter } from 'next/router';
 
 export const ProjectsPage = () => {
@@ -16,7 +15,7 @@ export const ProjectsPage = () => {
                 <div className="flex-1 min-w-0 bg-white xl:flex">
                     <OrgActionSidebar orgName={`${orgName}`}/>
                     <ProjectList orgName={`${orgName}`} />
-                    <ActivityFeed />
+                    <OrgMetaBar orgName={`${orgName}`}/>
                 </div>
             </div>
         </IndexLayout>

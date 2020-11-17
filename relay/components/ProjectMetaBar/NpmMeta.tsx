@@ -28,6 +28,10 @@ const NpmMeta = (orgName: string, repoName: string, projectMeta: any = {}) => {
                         <h1 className="flex-1 text-lg leading-7 font-medium">Github</h1>
                         <a className="text-blue-600" href={projectMeta['github']}>{projectMeta['github']}</a>
                     </div>
+                    <div className="pt-6 pb-2">
+                        <h1 className="flex-1 text-lg leading-7 font-medium">Description</h1>
+                        {projectMeta['description']}
+                    </div>
                 </div>}
 
                 <div className="pt-6 pb-2">

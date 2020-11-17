@@ -3,14 +3,14 @@ import ValistContext from '../ValistContext/ValistContext';
 import { useRouter } from 'next/router';
 
 export const CreateOrganizationForm:FunctionComponent<any> = () => {
-    const valist = useContext(ValistContext)
+    const valist = useContext(ValistContext);
     const router = useRouter();
 
     const [account, setAccount] = useState("");
 
-    const [orgShortName, setOrgShortName] = useState("")
-    const [orgFullName, setOrgFullName] = useState("")
-    const [orgDescription, setOrgDescription] = useState("")
+    const [orgShortName, setOrgShortName] = useState("");
+    const [orgFullName, setOrgFullName] = useState("");
+    const [orgDescription, setOrgDescription] = useState("");
 
     useEffect(() => {
         if (valist) {
@@ -18,9 +18,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    setOrgShortName("")
-                    setOrgDescription("")
-                    setOrgDescription("")
+                    setOrgShortName("");
+                    setOrgDescription("");
+                    setOrgDescription("");
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -35,8 +35,12 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
             description: orgDescription
         };
 
-        await valist.createOrganization(orgShortName, meta, account);
-        router.push(`/${orgShortName}`);
+        if (orgShortName && orgFullName && orgDescription && account) {
+            await valist.createOrganization(orgShortName, meta, account);
+            router.push(`/${orgShortName}`);
+        } else {
+            alert(`Please complete the required fields`);
+        }
     }
 
     return (
@@ -63,27 +67,35 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                     Create a New Organization
                 </h2>
                 <p className="mt-4 text-lg leading-6 text-gray-500">
-                    Create a new <b>organization</b> to begin creating new projects.
+                    Create a new <b>organization</b> or <b>username</b> to begin publishing projects.
                 </p>
                 </div>
                 <div className="mt-12">
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-                    <div className="sm:col-span-2">
-                        <label htmlFor="company" className="block text-sm font-medium leading-5 text-gray-700">Organization Short Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setOrgShortName(e.target.value)} id="company" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                    <div className="col-span-3 sm:col-span-2">
+                        <label htmlFor="OrgShortName" className="block text-sm font-medium leading-5 text-gray-700">
+                        Shortname
+                        </label>
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                        <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                            https://app.valist.io/
+                        </span>
+                        <input onChange={(e) => setOrgShortName(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" />
                         </div>
+                        <p className="mt-2 text-sm text-gray-500">You or your organization's username</p>
+                    </div>
+                    
+                    <div className="sm:col-span-2">
+                        <label htmlFor="OrgFullName" className="block text-sm font-medium leading-5 text-gray-700">Full Name</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setOrgFullName(e.target.value)} required id="OrgFullName" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                        </div>
+                        <p className="mt-2 text-sm text-gray-500">Your name or your organization's name</p>
                     </div>
                     <div className="sm:col-span-2">
-                        <label htmlFor="OrgFullName" className="block text-sm font-medium leading-5 text-gray-700">Organization Full Name</label>
+                        <label htmlFor="OrgDescription" className="block text-sm font-medium leading-5 text-gray-700">Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setOrgFullName(e.target.value)} id="OrgFullName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                        <label htmlFor="OrgDescription" className="block text-sm font-medium leading-5 text-gray-700">Organization Description</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setOrgDescription(e.target.value)} id="OrgDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <textarea onChange={(e) => setOrgDescription(e.target.value)} required id="OrgDescription" className="h-20 form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">

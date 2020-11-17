@@ -32,15 +32,6 @@ export const OrgActionSidebar:FunctionComponent<any> = ({orgName, repoName}: { o
                                     </div>
                                 </div>
                                 <div className="flex flex-col space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row xl:flex-col xl:space-x-0 xl:space-y-3">
-                                    <IsRepoAdmin orgName={orgName} repoName={repoName}>
-                                        <span className="inline-flex rounded-md shadow-sm">
-                                            <Link href={`/v/${orgName}/${repoName}/edit`}>
-                                                <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
-                                                    Edit Project
-                                                </button>
-                                            </Link>
-                                        </span>
-                                    </IsRepoAdmin>
                                     <IsRepoDev orgName={orgName} repoName={repoName}>
                                         <span className="rounded-md shadow-sm">
                                             <Link href={`/v/${orgName}/${repoName}/publish`}>
@@ -50,6 +41,22 @@ export const OrgActionSidebar:FunctionComponent<any> = ({orgName, repoName}: { o
                                             </Link>
                                         </span>
                                     </IsRepoDev>
+                                    <IsRepoAdmin orgName={orgName} repoName={repoName}>
+                                        <span className="inline-flex rounded-md shadow-sm">
+                                            <Link href={`/v/${orgName}/${repoName}/permissions`}>
+                                                <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                                    Manage Permissions
+                                                </button>
+                                            </Link>
+                                        </span>
+                                        <span className="inline-flex rounded-md shadow-sm">
+                                            <Link href={`/v/${orgName}/${repoName}/edit`}>
+                                                <button type="button" className="w-full inline-flex items-center justify-center px-4 py-2 border border-gray-300 text-sm leading-5 font-medium rounded-md text-gray-700 bg-white hover:text-gray-500 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue active:text-gray-800 active:bg-gray-50 transition ease-in-out duration-150">
+                                                    Edit Project
+                                                </button>
+                                            </Link>
+                                        </span>
+                                    </IsRepoAdmin>
                                 </div>
                             </div>
                         </div>
