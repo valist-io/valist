@@ -68,7 +68,7 @@ export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: s
                                 </div>
                                 <a href="#" className="relative group flex items-center space-x-2.5">
                                 <div className="text-sm leading-5 text-gray-500 group-hover:text-gray-900 font-medium truncate">
-                                    {release.returnValues.releaseMeta}
+                                    {release.returnValues.release}
                                 </div>
                                 </a>
                             </div>

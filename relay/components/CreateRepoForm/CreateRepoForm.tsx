@@ -36,8 +36,8 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
             github: projectGithub
         };
 
-        await valist.createRepository(orgName, repoName, repoMeta, account)
-        router.push("/")
+        await valist.createRepository(orgName, repoName, repoMeta, account);
+        router.push(`/${orgName}/${repoName}`);
     }
 
     const renderPackageMeta = (package_type: any) =>{
