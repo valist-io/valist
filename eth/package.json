@@ -10,8 +10,8 @@
     "@openzeppelin/contracts": "^3.2.0"
   },
   "devDependencies": {
-    "@truffle/hdwallet-provider": "^1.1.1",
-    "truffle": "^5.1.51"
+    "@truffle/hdwallet-provider": "^1.2.0",
+    "truffle": "^5.1.53"
   },
   "scripts": {
     "compile": "truffle compile",
