@@ -4,13 +4,13 @@ import ValistContext from '../ValistContext/ValistContext';
 
 const ProfileActionSidebar:FunctionComponent<any> = () => {
     const valist = useContext(ValistContext)
-    const [profile, setProfile] = useState({ address: "0x0",  });
+    const [profile, setProfile] = useState({ address: "0x0" });
 
     useEffect(() => {
         (async function() {
             if (valist) {
                 let accounts = await valist.web3.eth.getAccounts() || ["0x0"];
-                setProfile({ address: accounts[0] });
+                setProfile({ address: accounts[0] || "0x0" });
             }
         })()
     }, [valist]);

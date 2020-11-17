@@ -12,7 +12,7 @@ export const OrgActionSidebar:FunctionComponent<any> = ({orgName, repoName}: { o
         (async function() {
             if (valist) {
                 let accounts = await valist.web3.eth.getAccounts() || ["0x0"];
-                setProfile({ address: accounts[0] });
+                setProfile({ address: accounts[0] || "0x0" });
             }
         })()
     }, [valist]);
