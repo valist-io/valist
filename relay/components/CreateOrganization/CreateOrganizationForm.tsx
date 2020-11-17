@@ -1,10 +1,10 @@
 import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/router';
 
 export const CreateOrganizationForm:FunctionComponent<any> = () => {
     const valist = useContext(ValistContext)
-    const router = useRouter()
+    const router = useRouter();
 
     const [account, setAccount] = useState("");
 
@@ -36,7 +36,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
         };
 
         await valist.createOrganization(orgShortName, meta, account);
-        router.push("/")
+        router.push(`/${orgShortName}`);
     }
 
     return (

@@ -24,11 +24,13 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
     useEffect(() => {
         (async function() {
             if (valist) {
-                const rawMeta = await valist.getRepoMeta(orgName, repoName);
-                const metaResponse = await valist.fetchJSONfromIPFS(rawMeta);
-                const projectType = metaResponse.projectType;
-                setType(projectType);
-                setProjectMeta(metaResponse)
+                try {
+                    const rawMeta = await valist.getRepoMeta(orgName, repoName);
+                    const metaResponse = await valist.fetchJSONfromIPFS(rawMeta);
+                    const projectType = metaResponse.projectType;
+                    setType(projectType);
+                    setProjectMeta(metaResponse)
+                } catch (e) {}
             }
         })()
     }, [valist]);

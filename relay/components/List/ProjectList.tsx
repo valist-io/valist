@@ -19,7 +19,9 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
     useEffect(() => {
         (async function() {
             if (valist) {
-                setProjects(await valist.getReposFromOrganization(orgName));
+                try {
+                    setProjects(await valist.getReposFromOrganization(orgName));
+                } catch (e) {}
             }
         })()
     }, [valist]);

@@ -4,7 +4,7 @@ import ValistContext from '../ValistContext/ValistContext';
 
 export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: string }) => {
     const valist = useContext(ValistContext)
-    console.log(orgName, repoName)
+
     const [releases, setReleases] = useState<any>([
         {
             returnValues:
@@ -20,7 +20,9 @@ export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: s
     useEffect(() => {
         (async function() {
             if (valist) {
-                setReleases(await valist.getReleasesFromRepo(orgName, repoName));
+                try {
+                    setReleases(await valist.getReleasesFromRepo(orgName, repoName));
+                } catch (e) {}
             }
         })()
     }, [valist]);

@@ -1,8 +1,11 @@
-import React, { FunctionComponent, useState, useEffect} from 'react';
+import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
+import { useRouter } from 'next/router';
 
-import Valist from 'valist';
+import ValistContext from '../ValistContext/ValistContext';
 
-export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, repoName }: { valist: Valist, orgName: string, repoName: string }) => {
+export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
+    const valist = useContext(ValistContext);
+    const router = useRouter();
 
     const [account, setAccount] = useState("");
     const [releaseMeta, setReleaseMeta] = useState("")
@@ -15,9 +18,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    console.log(releaseData);
                 } catch (error) {
-                    alert(`Failed to load accounts.`);
                     console.log(error);
                 }
             })();
@@ -54,7 +55,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
 
     const createRelease = async () => {
         const releaseHash = await handleUpload(releaseData);
-        
+
         const meta = await valist.addJSONtoIPFS(releaseMeta);
         const release = {
             tag: projectTag,
@@ -63,6 +64,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
         };
 
         await valist.publishRelease(orgName, repoName, release, account);
+        router.push(`/${orgName}/${repoName}`);
     }
 
     return (
