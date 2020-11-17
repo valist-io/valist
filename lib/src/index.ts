@@ -51,153 +51,283 @@ class Valist {
   constructor(web3Provider: provider, ipfsEnabled?: boolean) {
     this.web3 = new Web3(web3Provider);
     if (ipfsEnabled) {
-      this.ipfs = ipfsClient({ host: 'ipfs.infura.io', port: '5001', apiPath: '/api/v0/', protocol: 'https' });
+      this.ipfs = ipfsClient({ host: `ipfs.infura.io`, port: `5001`, apiPath: `/api/v0/`, protocol: `https` });
     }
   }
 
   // initialize main valist contract instance for future calls
   async connect() {
-    this.valist = await getValistContract(this.web3);
+    try {
+      this.valist = await getValistContract(this.web3);
+    } catch (e) {
+      const msg = `Could not connect to Valist registry contract`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   // returns organization contract instance
   async getOrganization(orgName: string) {
-    const orgAddress = await this.valist.methods.orgs(orgName).call();
-    const org = await getValistOrganizationContract(this.web3, orgAddress);
-    return org;
+    try {
+      const orgAddress = await this.valist.methods.orgs(orgName).call();
+      const org = await getValistOrganizationContract(this.web3, orgAddress);
+      return org;
+    } catch (e) {
+      const msg = `Could not get organization contract`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getOrganizationMeta(orgName: string) {
-    const org = await this.getOrganization(orgName);
-    const orgMeta = await org.methods.orgMeta().call();
-    return orgMeta;
+    try {
+      const org = await this.getOrganization(orgName);
+      const orgMeta = await org.methods.orgMeta().call();
+      return orgMeta;
+    } catch (e) {
+      const msg = `Could not get organization metadata`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getCreatedOrganizations() {
-    const organizations = await this.valist.getPastEvents('OrganizationCreated', {fromBlock: 0, toBlock: 'latest'});
-    return organizations;
+    try {
+      const organizations = await this.valist.getPastEvents('OrganizationCreated', {fromBlock: 0, toBlock: 'latest'});
+      return organizations;
+    } catch (e) {
+      const msg = `Could not get created organizations`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getDeletedOrganizations() {
-    const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
-    return organizations;
-  }
-
-  // returns organization contract instance
-  async getRepository(orgName: string, repoName: string) {
-    const org = await this.getOrganization(orgName);
-    const repoAddress = await org.methods.repos(repoName).call();
-    const repo = await getValistRepositoryContract(this.web3, repoAddress);
-    return repo;
+    try {
+      const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
+      return organizations;
+    } catch (e) {
+      const msg = `Could not get deleted organizations`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   // returns repository contract instance
-  async getRepoFromOrganization(orgName: string, repoName: string) {
-    const org = await this.getOrganization(orgName);
-    const repoAddress = await org.methods.repos(repoName).call();
-    const repo = await getValistRepositoryContract(this.web3, repoAddress);
-    return repo;
+  async getRepository(orgName: string, repoName: string) {
+    try {
+      const org = await this.getOrganization(orgName);
+      const repoAddress = await org.methods.repos(repoName).call();
+      const repo = await getValistRepositoryContract(this.web3, repoAddress);
+      return repo;
+    } catch (e) {
+      const msg = `Could not get repository contract`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getReposFromOrganization(orgName: string) {
-    const org = await this.getOrganization(orgName);
-    const repos = await org.getPastEvents('RepositoryCreated', {fromBlock: 0, toBlock: 'latest'});
-    return repos;
+    try {
+      const org = await this.getOrganization(orgName);
+      const repos = await org.getPastEvents('RepositoryCreated', {fromBlock: 0, toBlock: 'latest'});
+      return repos;
+    } catch (e) {
+      const msg = `Could not get repositories from organization`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getRepoMeta(orgName: string, repoName: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
-    const repoMeta = await repo.methods.repoMeta().call();
-    return repoMeta;
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const repoMeta = await repo.methods.repoMeta().call();
+      return repoMeta;
+    } catch (e) {
+      const msg = `Could not get repository metadata`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getLatestTagFromRepo(orgName: string, repoName: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
-    const tag = await repo.methods.tag().call();
-    return tag;
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const tag = await repo.methods.tag().call();
+      return tag;
+    } catch (e) {
+      const msg = `Could not get latest tag from repo`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getLatestReleaseFromRepo(orgName: string, repoName: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
-    const release = await repo.methods.latestRelease().call();
-    return release;
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const release = await repo.methods.latestRelease().call();
+      return release;
+    } catch (e) {
+      const msg = `Could not get latest release from repo`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getLatestReleaseMetaFromRepo(orgName: string, repoName: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
-    const release = await repo.methods.releaseMeta().call();
-    return release;
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const release = await repo.methods.releaseMeta().call();
+      return release;
+    } catch (e) {
+      const msg = `Could not get latest release metadata from repo`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getReleasesFromRepo(orgName: string, repoName: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
-    return await repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
+    } catch (e) {
+      const msg = `Could not get releases from repo`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async getReleaseByTag(orgName: string, repoName: string, tag: string) {
-    const repo = await this.getRepoFromOrganization(orgName, repoName);
+    try {
+      const events = await this.getReleasesFromRepo(orgName, repoName);
 
-    const events = await repo.getPastEvents('Release', { fromBlock: 0, toBlock: 'latest'});
-
-    // @TODO make this more efficient later
-    for (let i = 0; i < events.length; i++) {
-      if (events[i].returnValues.tag == tag) {
-          const { tag, release, releaseMeta } = events[i].returnValues;
-          return { tag, release, releaseMeta }
+      // @TODO make this more efficient later
+      for (let i = 0; i < events.length; i++) {
+        if (events[i].returnValues.tag == tag) {
+            const { tag, release, releaseMeta } = events[i].returnValues;
+            return { tag, release, releaseMeta }
+        }
       }
+
+      return;
+
+    } catch (e) {
+      const msg = `Could not get release by tag`;
+      console.error(msg, e);
+      throw e;
     }
-    return;
   }
 
   async isOrgAdmin(orgName: string, account: any) {
-    const org = await this.getOrganization(orgName);
-    return await org.methods.hasRole(ORG_ADMIN_ROLE, account).call();
+    try {
+      const org = await this.getOrganization(orgName);
+      return await org.methods.hasRole(ORG_ADMIN_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not check if user has ORG_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async grantOrgAdmin(orgName: string, account: any) {
-    const org = await this.getOrganization(orgName);
-    await org.methods.grantRole(ORG_ADMIN_ROLE, account).send({ from: account });
+    try {
+      const org = await this.getOrganization(orgName);
+      await org.methods.grantRole(ORG_ADMIN_ROLE, account).send({ from: account });
+    } catch (e) {
+      const msg = `Could not grant ORG_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async revokeOrgAdmin(orgName: string, account: any) {
-    const org = await this.getOrganization(orgName);
-    await org.methods.revokeRole(ORG_ADMIN_ROLE, account).send({ from: account });
+    try {
+      const org = await this.getOrganization(orgName);
+      await org.methods.revokeRole(ORG_ADMIN_ROLE, account).send({ from: account });
+    } catch (e) {
+      const msg = `Could not revoke ORG_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async isRepoAdmin(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.hasRole(REPO_ADMIN_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.hasRole(REPO_ADMIN_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not check if user has REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async isRepoDev(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.hasRole(REPO_DEV_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.hasRole(REPO_DEV_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not check if user has REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async grantRepoAdmin(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.grantRole(REPO_ADMIN_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.grantRole(REPO_ADMIN_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not grant REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async revokeRepoAdmin(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.revokeRole(REPO_ADMIN_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.revokeRole(REPO_ADMIN_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not revoke REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async grantRepoDev(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.grantRole(REPO_DEV_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.grantRole(REPO_DEV_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not grant REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async revokeRepoDev(orgName: string, repoName: string, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    return await repo.methods.revokeRole(REPO_DEV_ROLE, account).call();
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.revokeRole(REPO_DEV_ROLE, account).call();
+    } catch (e) {
+      const msg = `Could not revoke REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {
-    const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-    const result = await this.valist.methods.createOrganization(orgName, metaFile).send({ from: account });
-    return result;
+    try {
+      const metaFile: string = await this.addJSONtoIPFS(orgMeta);
+      const result = await this.valist.methods.createOrganization(orgName, metaFile).send({ from: account });
+      return result;
+    } catch (e) {
+      const msg = `Could not create organization`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: string, homepage: string, github: string}, account: any) {
@@ -206,44 +336,60 @@ class Valist {
       const metaFile = await this.addJSONtoIPFS(repoMeta);
       const result = await org.methods.createRepository(repoName, metaFile).send({ from: account });
       return result;
-    } catch(err) {
-      console.log(err);
-      return err
+    } catch(e) {
+      const msg = `Could not create repository`;
+      console.error(msg, e);
+      throw e;
     }
   }
 
   async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: any) {
-    const repo = await this.getRepository(orgName, repoName);
-    const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account });
-    return result;
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account });
+      return result;
+    } catch (e) {
+      const msg = `Could not publish release`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
   async addJSONtoIPFS(data: any) {
-    const file = Buffer.from(JSON.stringify(data));
     try {
+      const file = Buffer.from(JSON.stringify(data));
       const result = await this.ipfs.add(file);
       return result["path"];
-    } catch (err) {
-      console.error('Error', err);
+    } catch (e) {
+      const msg = `Could not add JSON to IPFS`;
+      console.error(msg, e);
+      throw e;
     }
   }
 
   async addFileToIPFS(data: any) {
-    console.log(data)
-    const file = Buffer.from(data);
     try {
+      const file = Buffer.from(data);
       const result = await this.ipfs.add(file);
       return result["path"];
-    } catch (err) {
-      console.error('Error', err);
+    } catch (e) {
+      const msg = `Could not add file to IPFS`;
+      console.error(msg, e);
+      throw e;
     }
   }
 
   async fetchJSONfromIPFS(ipfsHash: string) {
-    const response = await fetch(`https://cloudflare-ipfs.com/ipfs/${ipfsHash}`);
-    const json = await response.json();
-    console.log("JSON Fetched from IPFS", json);
-    return json;
+    try {
+      const response = await fetch(`https://cloudflare-ipfs.com/ipfs/${ipfsHash}`);
+      const json = await response.json();
+      console.log(`JSON Fetched from IPFS`, json);
+      return json;
+    } catch (e) {
+      const msg = `Could not fetch JSON from IPFS`;
+      console.error(msg, e);
+      throw e;
+    }
   }
 
 }

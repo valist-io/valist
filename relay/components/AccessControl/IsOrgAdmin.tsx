@@ -9,7 +9,11 @@ const IsOrgAdmin:FunctionComponent<any> = (props) => {
         (async function() {
             if (valist) {
                 let accounts = await valist.web3.eth.getAccounts();
-                setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, accounts[0]))
+                try {
+                    setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, accounts[0]));
+                } catch (e) {
+                    setIsOrgAdmin(false);
+                }
             }
         })()
     }, [valist]);

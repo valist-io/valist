@@ -10,8 +10,13 @@ const IsRepoDev:FunctionComponent<any> = (props) => {
         (async function() {
             if (valist) {
                 let accounts = await valist.web3.eth.getAccounts();
-                setIsRepoAdmin(await valist.isRepoAdmin(props.orgName, props.repoName, accounts[0]));
-                setIsRepoDev(await valist.isRepoDev(props.orgName, props.repoName, accounts[0]));
+                try {
+                    setIsRepoAdmin(await valist.isRepoAdmin(props.orgName, props.repoName, accounts[0]));
+                    setIsRepoDev(await valist.isRepoDev(props.orgName, props.repoName, accounts[0]));
+                } catch (e) {
+                    setIsRepoAdmin(false);
+                    setIsRepoDev(false);
+                }
             }
         })()
     }, [valist]);

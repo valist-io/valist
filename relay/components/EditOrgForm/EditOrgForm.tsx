@@ -20,7 +20,7 @@ const EditOrganization = () => {
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
                         <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                            http://
+                            https://
                         </span>
                         <input id="company_website" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="www.example.com" />
                         </div>
@@ -32,7 +32,7 @@ const EditOrganization = () => {
                         About
                     </label>
                     <div className="rounded-md shadow-sm">
-                        <textarea id="about" rows="3" className="form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="you@example.com"></textarea>
+                        <textarea id="about" rows={3} className="form-textarea mt-1 block w-full transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="you@example.com"></textarea>
                     </div>
                     <p className="mt-2 text-sm text-gray-500">
                         Brief description for your profile. URLs are hyperlinked.
@@ -73,7 +73,7 @@ const EditOrganization = () => {
                             or drag and drop
                         </p>
                         <p className="mt-1 text-xs text-gray-500">
-                            PNG, JPG, GIF up to 10MB
+                            PNG, JPG, GIF up to 5MB
                         </p>
                         </div>
                     </div>
