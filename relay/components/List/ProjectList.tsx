@@ -1,6 +1,7 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import ValistContext from '../../components/ValistContext/ValistContext';
+import NavTree from '../Nav/NavTree';
 
 export const ProjectsList= ({orgName}: { orgName: string }) => {
     const valist = useContext(ValistContext)
@@ -29,20 +30,9 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
     return (
         <div className="bg-white lg:min-w-0 lg:flex-1">
             <div className="pl-4 pr-6 pt-4 pb-4 border-b border-t border-gray-200 sm:pl-6 lg:pl-8 xl:pl-6 xl:pt-6 xl:border-t-0">
-            <div className="flex items-center">
-                <h1 className="flex-1 text-lg leading-7 font-medium">Projects</h1>
-                <div className="relative">
-                    <div className="origin-top-right z-10 absolute right-0 mt-2 w-56 rounded-md shadow-lg hidden">
-                        <div className="rounded-md bg-white shadow-xs">
-                            <div className="py-1" role="menu" aria-orientation="vertical" aria-labelledby="sort-menu">
-                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Name</a>
-                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date modified</a>
-                                <a href="#" className="block px-4 py-2 text-sm leading-5 text-gray-700 hover:bg-gray-100 hover:text-gray-900 focus:outline-none focus:bg-gray-100 focus:text-gray-900" role="menuitem">Date created</a>
-                            </div>
-                        </div>
-                    </div>
+                <div className="flex items-center">
+                    <NavTree orgName={orgName} />
                 </div>
-            </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
             {projects.map((project: { transactionHash: string, blockNumber: number, returnValues: { repoName: string, repoMeta: string }}) => {
