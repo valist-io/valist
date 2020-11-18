@@ -47,9 +47,11 @@ class Valist {
   web3: Web3;
   valist: any;
   ipfs: ipfsClient;
+  defaultAccount: string;
 
   constructor(web3Provider: provider, ipfsEnabled?: boolean) {
     this.web3 = new Web3(web3Provider);
+    this.defaultAccount = "0x0";
     if (ipfsEnabled) {
       this.ipfs = ipfsClient({ host: `ipfs.infura.io`, port: `5001`, apiPath: `/api/v0/`, protocol: `https` });
     }
@@ -61,6 +63,15 @@ class Valist {
       this.valist = await getValistContract(this.web3);
     } catch (e) {
       const msg = `Could not connect to Valist registry contract`;
+      console.error(msg, e);
+      throw e;
+    }
+
+    try {
+      const accounts = await this.web3.eth.getAccounts();
+      this.defaultAccount = accounts[0];
+    } catch (e) {
+      const msg = `Could not set default account`;
       console.error(msg, e);
       throw e;
     }
@@ -219,7 +230,7 @@ class Valist {
     }
   }
 
-  async isOrgAdmin(orgName: string, account: any) {
+  async isOrgAdmin(orgName: string, account: string) {
     try {
       const org = await this.getOrganization(orgName);
       return await org.methods.hasRole(ORG_ADMIN_ROLE, account).call();
@@ -230,29 +241,7 @@ class Valist {
     }
   }
 
-  async grantOrgAdmin(orgName: string, account: any) {
-    try {
-      const org = await this.getOrganization(orgName);
-      await org.methods.grantRole(ORG_ADMIN_ROLE, account).send({ from: account });
-    } catch (e) {
-      const msg = `Could not grant ORG_ADMIN_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeOrgAdmin(orgName: string, account: any) {
-    try {
-      const org = await this.getOrganization(orgName);
-      await org.methods.revokeRole(ORG_ADMIN_ROLE, account).send({ from: account });
-    } catch (e) {
-      const msg = `Could not revoke ORG_ADMIN_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isRepoAdmin(orgName: string, repoName: string, account: any) {
+  async isRepoAdmin(orgName: string, repoName: string, account: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
       return await repo.methods.hasRole(REPO_ADMIN_ROLE, account).call();
@@ -263,7 +252,7 @@ class Valist {
     }
   }
 
-  async isRepoDev(orgName: string, repoName: string, account: any) {
+  async isRepoDev(orgName: string, repoName: string, account: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
       return await repo.methods.hasRole(REPO_DEV_ROLE, account).call();
@@ -274,7 +263,73 @@ class Valist {
     }
   }
 
-  async getOrgAdmins(orgName: string, repoName: string) {
+  async grantOrgAdmin(orgName: string, granter: string, grantee: string) {
+    try {
+      const org = await this.getOrganization(orgName);
+      await org.methods.grantRole(ORG_ADMIN_ROLE, grantee).send({ from: granter });
+    } catch (e) {
+      const msg = `Could not grant ORG_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async revokeOrgAdmin(orgName: string, revoker: string, revokee: string) {
+    try {
+      const org = await this.getOrganization(orgName);
+      await org.methods.revokeRole(ORG_ADMIN_ROLE, revokee).send({ from: revoker });
+    } catch (e) {
+      const msg = `Could not revoke ORG_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.grantRole(REPO_ADMIN_ROLE, grantee).send( { from: granter });
+    } catch (e) {
+      const msg = `Could not grant REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.revokeRole(REPO_ADMIN_ROLE, revokee).send( { from: revoker });
+    } catch (e) {
+      const msg = `Could not revoke REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.grantRole(REPO_DEV_ROLE, grantee).send( { from: granter });
+    } catch (e) {
+      const msg = `Could not grant REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      return await repo.methods.revokeRole(REPO_DEV_ROLE, revokee).send( { from: revoker });
+    } catch (e) {
+      const msg = `Could not revoke REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrgAdmins(orgName: string) {
     try {
       const org = await this.getOrganization(orgName);
       const adminCount = await org.methods.getRoleMemberCount(ORG_ADMIN_ROLE).call();
@@ -329,51 +384,7 @@ class Valist {
     }
   }
 
-  async grantRepoAdmin(orgName: string, repoName: string, account: any) {
-    try {
-      const repo = await this.getRepository(orgName, repoName);
-      return await repo.methods.grantRole(REPO_ADMIN_ROLE, account).call();
-    } catch (e) {
-      const msg = `Could not grant REPO_ADMIN_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeRepoAdmin(orgName: string, repoName: string, account: any) {
-    try {
-      const repo = await this.getRepository(orgName, repoName);
-      return await repo.methods.revokeRole(REPO_ADMIN_ROLE, account).call();
-    } catch (e) {
-      const msg = `Could not revoke REPO_ADMIN_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async grantRepoDev(orgName: string, repoName: string, account: any) {
-    try {
-      const repo = await this.getRepository(orgName, repoName);
-      return await repo.methods.grantRole(REPO_DEV_ROLE, account).call();
-    } catch (e) {
-      const msg = `Could not grant REPO_DEV_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeRepoDev(orgName: string, repoName: string, account: any) {
-    try {
-      const repo = await this.getRepository(orgName, repoName);
-      return await repo.methods.revokeRole(REPO_DEV_ROLE, account).call();
-    } catch (e) {
-      const msg = `Could not revoke REPO_DEV_ROLE`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: any) {
+  async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: string) {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
       const result = await this.valist.methods.createOrganization(orgName.toLowerCase(), metaFile).send({ from: account });
@@ -385,7 +396,7 @@ class Valist {
     }
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: string, homepage: string, github: string}, account: any) {
+  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: string, homepage: string, github: string}, account: string) {
     try {
       const org = await this.getOrganization(orgName);
       const metaFile = await this.addJSONtoIPFS(repoMeta);
@@ -398,7 +409,7 @@ class Valist {
     }
   }
 
-  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: any) {
+  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
       const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account });

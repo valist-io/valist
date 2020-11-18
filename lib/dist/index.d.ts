@@ -5,6 +5,7 @@ declare class Valist {
     web3: Web3;
     valist: any;
     ipfs: ipfsClient;
+    defaultAccount: string;
     constructor(web3Provider: provider, ipfsEnabled?: boolean);
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<import("web3-eth-contract").Contract>;
@@ -23,34 +24,34 @@ declare class Valist {
         release: any;
         releaseMeta: any;
     } | undefined>;
-    isOrgAdmin(orgName: string, account: any): Promise<any>;
-    grantOrgAdmin(orgName: string, account: any): Promise<void>;
-    revokeOrgAdmin(orgName: string, account: any): Promise<void>;
-    isRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
-    isRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
-    getOrgAdmins(orgName: string, repoName: string): Promise<any[]>;
+    isOrgAdmin(orgName: string, account: string): Promise<any>;
+    isRepoAdmin(orgName: string, repoName: string, account: string): Promise<any>;
+    isRepoDev(orgName: string, repoName: string, account: string): Promise<any>;
+    grantOrgAdmin(orgName: string, granter: string, grantee: string): Promise<void>;
+    revokeOrgAdmin(orgName: string, revoker: string, revokee: string): Promise<void>;
+    grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string): Promise<any>;
+    revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string): Promise<any>;
+    grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string): Promise<any>;
+    revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string): Promise<any>;
+    getOrgAdmins(orgName: string): Promise<any[]>;
     getRepoAdmins(orgName: string, repoName: string): Promise<any[]>;
     getRepoDevs(orgName: string, repoName: string): Promise<any[]>;
-    grantRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
-    revokeRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
-    grantRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
-    revokeRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
     createOrganization(orgName: string, orgMeta: {
         name: string;
         description: string;
-    }, account: any): Promise<any>;
+    }, account: string): Promise<any>;
     createRepository(orgName: string, repoName: string, repoMeta: {
         name: string;
         description: string;
         projectType: string;
         homepage: string;
         github: string;
-    }, account: any): Promise<any>;
+    }, account: string): Promise<any>;
     publishRelease(orgName: string, repoName: string, release: {
         tag: string;
         hash: string;
         meta: string;
-    }, account: any): Promise<any>;
+    }, account: string): Promise<any>;
     addJSONtoIPFS(data: any): Promise<any>;
     addFileToIPFS(data: any): Promise<any>;
     fetchJSONfromIPFS(ipfsHash: string): Promise<any>;
