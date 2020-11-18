@@ -1,12 +1,12 @@
 import Layout from '../../../../components/Layout/Layout';
-import EditOrgForm from '../../../../components/EditOrgForm/EditOrgForm';
+import ProjectPermissions from '../../../../components/AccessControl/ProjectPermissions';
 
-export const EditOrgPage = () => {
+export const ProjectPermissionsPage = () => {
     return (
-        <Layout title="Valist | Edit Project Permissions">
-            <h2>Permissions</h2>
+        <Layout title="Valist | Manage Project Permissions">
+            <ProjectPermissions />
         </Layout>
     );
 }
 
-export default EditOrgPage;
+export default ProjectPermissionsPage;
