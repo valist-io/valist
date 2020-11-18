@@ -5,11 +5,11 @@ import { useRouter } from 'next/router'
 export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
     const router = useRouter()
     const [account, setAccount] = useState("");
-    const [repoName, setRepoName] = useState("")
+    const [projectName, setProjectName] = useState("")
     const [projectType, setProjectType] = useState("")
     const [projectHomepage, setProjectHomepage] = useState("")
-    const [projectGithub, setProjectGithub] = useState("")
-    const [repoDescription, setRepoDescription] = useState("")
+    const [projectRepository, setProjectRepository] = useState("")
+    const [projectDescription, setProjectDescription] = useState("")
 
     useEffect(() => {
         if (valist) {
@@ -17,8 +17,8 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                 try {
                     const accounts = await valist.web3.eth.getAccounts();
                     setAccount(accounts[0]);
-                    setRepoName("")
-                    setRepoDescription("")
+                    setProjectName("")
+                    setProjectDescription("")
                 } catch (error) {
                     alert(`Failed to load accounts.`);
                     console.log(error);
@@ -27,38 +27,36 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
         }
     }, [valist]);
 
-    const createRepo = async () => {
+    const createProject = async () => {
         const repoMeta = {
-            name: repoName,
-            description: repoDescription,
+            name: projectName,
+            description: projectDescription,
             projectType: projectType,
             homepage: projectHomepage,
-            github: projectGithub
+            github: projectRepository
         };
 
-        await valist.createRepository(orgName, repoName, repoMeta, account);
-        router.push(`/${orgName}/${repoName}`);
+        await valist.createRepository(orgName, projectName, repoMeta, account);
+        router.push(`/v/${orgName}/${projectName}/publish`);
     }
 
-    const renderPackageMeta = (package_type: any) =>{
-        if(package_type == "npm"){
-            return (
+    const renderPackageMeta = () =>{
+        return (
+            <div className="sm:col-span-2">
                 <div className="sm:col-span-2">
-                    <div className="sm:col-span-2">
-                        <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Project Homepage</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                        <label htmlFor="ProjectGithub" className="block text-sm font-medium leading-5 text-gray-700">Project Github Repo</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectGithub(e.target.value)} id="ProjectGithub" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
+                    <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                        <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                     </div>
                 </div>
-            )
-        }
+                <div className="sm:col-span-2">
+                    <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository</label>
+                    <div className="mt-1 relative rounded-md shadow-sm">
+                        <input onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                    </div>
+                </div>
+            </div>
+        )
     }
 
     return (
@@ -93,28 +91,28 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setRepoName(e.target.value)} required id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <input onChange={(e) => setProjectName(e.target.value)} required id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoDescription" className="block text-sm font-medium leading-5 text-gray-700">Repo Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <textarea onChange={(e) => setRepoDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <textarea onChange={(e) => setProjectDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div>
                         <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
                         <select onChange={(e) => setProjectType(e.target.value)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
-                            <option selected>binary</option>
+                            <option>binary</option>
                             <option>npm</option>
                             <option>pip</option>
                             <option>docker</option>
                         </select>
                     </div>
-                    {renderPackageMeta(projectType)}
+                    {renderPackageMeta()}
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={createRepo} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                        <button onClick={createProject} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                             Create Project
                         </button>
                     </span>

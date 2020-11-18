@@ -37,7 +37,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
 
         if (orgShortName && orgFullName && orgDescription && account) {
             await valist.createOrganization(orgShortName, meta, account);
-            router.push(`/${orgShortName}`);
+            router.push(`/v/${orgShortName}/create`);
         } else {
             alert(`Please complete the required fields`);
         }
@@ -84,7 +84,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                         </div>
                         <p className="mt-2 text-sm text-gray-500">You or your organization's username</p>
                     </div>
-                    
+
                     <div className="sm:col-span-2">
                         <label htmlFor="OrgFullName" className="block text-sm font-medium leading-5 text-gray-700">Full Name</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
