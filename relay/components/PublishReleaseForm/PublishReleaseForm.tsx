@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
+import React, { FunctionComponent, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 
 import ValistContext from '../ValistContext/ValistContext';
@@ -7,23 +7,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
     const valist = useContext(ValistContext);
     const router = useRouter();
 
-    const [account, setAccount] = useState("");
     const [releaseMeta, setReleaseMeta] = useState("")
     const [projectTag, setProjectTag] = useState("")
     const [releaseData, setReleaseData] = useState<File | null> (null)
-
-    useEffect(() => {
-        if (valist) {
-            (async function () {
-                try {
-                    const accounts = await valist.web3.eth.getAccounts();
-                    setAccount(accounts[0]);
-                } catch (error) {
-                    console.log(error);
-                }
-            })();
-        }
-    }, [valist]);
 
     const readUploadedFileAsBuffer = (inputFile: any) => {
         const temporaryFileReader = new FileReader();
@@ -63,7 +49,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
             meta
         };
 
-        await valist.publishRelease(orgName, repoName, release, account);
+        await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
         router.push(`/${orgName}/${repoName}`);
     }
 

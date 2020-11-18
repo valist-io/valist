@@ -8,9 +8,8 @@ const IsOrgAdmin:FunctionComponent<any> = (props) => {
     useEffect(() => {
         (async function() {
             if (valist) {
-                let accounts = await valist.web3.eth.getAccounts();
                 try {
-                    setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, accounts[0]));
+                    setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, valist.defaultAccount));
                 } catch (e) {
                     setIsOrgAdmin(false);
                 }

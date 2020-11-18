@@ -4,7 +4,7 @@ import { useRouter } from 'next/router'
 
 export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
     const router = useRouter()
-    const [account, setAccount] = useState("");
+
     const [projectName, setProjectName] = useState("")
     const [projectType, setProjectType] = useState("")
     const [projectHomepage, setProjectHomepage] = useState("")
@@ -15,8 +15,6 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
         if (valist) {
             (async function () {
                 try {
-                    const accounts = await valist.web3.eth.getAccounts();
-                    setAccount(accounts[0]);
                     setProjectName("")
                     setProjectDescription("")
                 } catch (error) {
@@ -36,7 +34,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
             github: projectRepository
         };
 
-        await valist.createRepository(orgName, projectName, repoMeta, account);
+        await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
         router.push(`/v/${orgName}/${projectName}/publish`);
     }
 

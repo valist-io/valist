@@ -6,7 +6,6 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
     const valist = useContext(ValistContext);
     const router = useRouter();
 
-    const [account, setAccount] = useState("");
 
     const [orgShortName, setOrgShortName] = useState("");
     const [orgFullName, setOrgFullName] = useState("");
@@ -16,8 +15,6 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
         if (valist) {
             (async function () {
                 try {
-                    const accounts = await valist.web3.eth.getAccounts();
-                    setAccount(accounts[0]);
                     setOrgShortName("");
                     setOrgDescription("");
                     setOrgDescription("");
@@ -35,8 +32,8 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
             description: orgDescription
         };
 
-        if (orgShortName && orgFullName && orgDescription && account) {
-            await valist.createOrganization(orgShortName, meta, account);
+        if (orgShortName && orgFullName && orgDescription && valist.defaultAccount) {
+            await valist.createOrganization(orgShortName, meta, valist.defaultAccount);
             router.push(`/v/${orgShortName}/create`);
         } else {
             alert(`Please complete the required fields`);
