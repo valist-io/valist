@@ -17,8 +17,8 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
     const projectTypes = {
         "binary": BinaryMeta(orgName, repoName, projectMeta),
         "npm": NpmMeta(orgName, repoName, projectMeta),
-        "pip": PipMeta(orgName, repoName,),
-        "docker": DockerMeta(orgName, repoName)
+        "pip": PipMeta(orgName, repoName,projectMeta),
+        "docker": DockerMeta(orgName, repoName, projectMeta)
     }
 
     useEffect(() => {
