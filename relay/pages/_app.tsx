@@ -33,7 +33,7 @@ function App({ Component, pageProps }: AppProps) {
   return (
     // @ts-ignore
     <ValistContext.Provider value={valist}>
-      <Component {...pageProps} valist={valist} />
+      <Component {...pageProps} />
     </ValistContext.Provider>
   )
 }
