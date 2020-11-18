@@ -28,6 +28,9 @@ declare class Valist {
     revokeOrgAdmin(orgName: string, account: any): Promise<void>;
     isRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
     isRepoDev(orgName: string, repoName: string, account: any): Promise<any>;
+    getOrgAdmins(orgName: string, repoName: string): Promise<any[]>;
+    getRepoAdmins(orgName: string, repoName: string): Promise<any[]>;
+    getRepoDevs(orgName: string, repoName: string): Promise<any[]>;
     grantRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
     revokeRepoAdmin(orgName: string, repoName: string, account: any): Promise<any>;
     grantRepoDev(orgName: string, repoName: string, account: any): Promise<any>;

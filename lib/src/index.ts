@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 // @ts-ignore
-import ipfsClient, { globSource } from 'ipfs-http-client'
+import ipfsClient from 'ipfs-http-client'
 
 import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
@@ -269,6 +269,61 @@ class Valist {
       return await repo.methods.hasRole(REPO_DEV_ROLE, account).call();
     } catch (e) {
       const msg = `Could not check if user has REPO_DEV_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrgAdmins(orgName: string, repoName: string) {
+    try {
+      const org = await this.getOrganization(orgName);
+      const adminCount = await org.methods.getRoleMemberCount(ORG_ADMIN_ROLE).call();
+
+      const members = [];
+      for (let i = 0; i < adminCount; ++i) {
+          members.push(await org.methods.getRoleMember(ORG_ADMIN_ROLE, i).call());
+      }
+
+      return members;
+    } catch (e) {
+      const msg = `Could not get users that have REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getRepoAdmins(orgName: string, repoName: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const adminCount = await repo.methods.getRoleMemberCount(REPO_ADMIN_ROLE).call();
+      console.log(adminCount)
+
+      const members = [];
+      for (let i = 0; i < adminCount; ++i) {
+          members.push(await repo.methods.getRoleMember(REPO_ADMIN_ROLE, i).call());
+      }
+
+      return members;
+    } catch (e) {
+      const msg = `Could not get users that have REPO_ADMIN_ROLE`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getRepoDevs(orgName: string, repoName: string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const devCount = await repo.methods.getRoleMemberCount(REPO_DEV_ROLE).call();
+
+      const members = [];
+      for (let i = 0; i < devCount; ++i) {
+          members.push(await repo.methods.getRoleMember(REPO_DEV_ROLE, i).call());
+      }
+
+      return members;
+    } catch (e) {
+      const msg = `Could not get users that have REPO_DEV_ROLE`;
       console.error(msg, e);
       throw e;
     }
