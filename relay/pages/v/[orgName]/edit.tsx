@@ -4,7 +4,9 @@ import EditOrgForm from '../../../components/EditOrgForm/EditOrgForm';
 export const EditOrgPage = () => {
     return (
         <Layout title="Valist | Edit Organization">
-            <EditOrgForm />
+            <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
+                <EditOrgForm />
+            </div>
         </Layout>
     );
 }
