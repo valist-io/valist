@@ -9,7 +9,9 @@ export const OrgPermissionsPage = () => {
 
     return (
         <Layout title="Valist | Manage Organization Permissions">
-            <OrgPermissions orgName={`${orgName}`} />
+            <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
+                <OrgPermissions orgName={`${orgName}`} />
+            </div>
         </Layout>
     );
 }
