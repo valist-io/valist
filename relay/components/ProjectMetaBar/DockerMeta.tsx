@@ -1,6 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
+
+import { copyToCB } from '../../utils/clipboard';
 
 const DockerMeta = (orgName: string = "organization", repoName: string = "repo") => {
+
+    const curlRef = useRef(null);
 
     const [origin, setOrigin] = useState("https://app.valist.io");
     useEffect(() => {
@@ -13,7 +17,7 @@ const DockerMeta = (orgName: string = "organization", repoName: string = "repo")
                 <div className="pt-6 pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Load Container from Url</h1>
                 </div>
-                <div className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200">
+                <div ref={curlRef} onClick={() => copyToCB(curlRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer">
                     curl -L {origin}/api/{orgName}/{repoName}/latest | docker load
                 </div>
             </div>

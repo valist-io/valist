@@ -15,9 +15,9 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
 
     console.log("passing value", projectMeta)
     const projectTypes = {
-        "binary": BinaryMeta(orgName, repoName),
+        "binary": BinaryMeta(orgName, repoName, projectMeta),
         "npm": NpmMeta(orgName, repoName, projectMeta),
-        "pip": PipMeta(orgName, repoName),
+        "pip": PipMeta(orgName, repoName,),
         "docker": DockerMeta(orgName, repoName)
     }
 
