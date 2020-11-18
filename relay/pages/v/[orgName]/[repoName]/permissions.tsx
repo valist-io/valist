@@ -9,7 +9,9 @@ export const ProjectPermissionsPage = () => {
 
     return (
         <Layout title="Valist | Manage Project Permissions">
-            <ProjectPermissions orgName={`${orgName}`} repoName={`${repoName}`} />
+            <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
+                <ProjectPermissions orgName={`${orgName}`} repoName={`${repoName}`} />
+            </div>
         </Layout>
     );
 }

@@ -69,7 +69,7 @@ class Valist {
 
     try {
       const accounts = await this.web3.eth.getAccounts();
-      this.defaultAccount = accounts[0];
+      this.defaultAccount = accounts[0] || "0x0";
     } catch (e) {
       const msg = `Could not set default account`;
       console.error(msg, e);
