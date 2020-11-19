@@ -75,7 +75,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
                             <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                                https://app.valist.io/
+                                app.valist.io/
                             </span>
                             <input onChange={(e) => setOrgShortName(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" />
                         </div>

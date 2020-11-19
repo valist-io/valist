@@ -27,25 +27,6 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
         router.push(`/v/${orgName}/${projectName}/publish`);
     }
 
-    const renderPackageMeta = () =>{
-        return (
-            <div className="sm:col-span-2">
-                <div className="sm:col-span-2">
-                    <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                        <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                    </div>
-                </div>
-                <div className="sm:col-span-2">
-                    <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository</label>
-                    <div className="mt-1 relative rounded-md shadow-sm">
-                        <input onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                    </div>
-                </div>
-            </div>
-        )
-    }
-
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
             <div className="relative max-w-xl mx-auto">
@@ -77,10 +58,14 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectName(e.target.value)} required id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                app.valist.io/{orgName}/
+                            </span>
+                            <input onChange={(e) => setProjectName(e.target.value)} required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" />
                         </div>
                     </div>
+
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoDescription" className="block text-sm font-medium leading-5 text-gray-700">Repo Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
@@ -96,7 +81,18 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                             <option value="docker">docker</option>
                         </select>
                     </div>
-                    {renderPackageMeta()}
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository URL (Github, Gitlab, Bitbucket, etc.)</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                        </div>
+                    </div>
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
                         <button onClick={createProject} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
