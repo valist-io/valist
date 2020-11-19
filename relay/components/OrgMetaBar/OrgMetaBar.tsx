@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 
-export const OrgMetaBar = ({ orgName }: { orgName: string}) => {
+export const OrgMetaBar = ({ orgName }: { orgName: string }) => {
     const valist = useContext(ValistContext);
     const [orgMeta, setOrgMeta] = useState({ description: "Loading..." });
 
@@ -9,9 +9,8 @@ export const OrgMetaBar = ({ orgName }: { orgName: string}) => {
         (async function() {
             if (valist) {
                 try {
-                    const rawMeta = await valist.getOrganizationMeta(orgName);
-                    const metaResponse = await valist.fetchJSONfromIPFS(rawMeta);
-                    setOrgMeta(metaResponse)
+                    const orgMeta = await valist.getOrganizationMeta(orgName);
+                    setOrgMeta(orgMeta);
                 } catch (e) {}
             }
         })()

@@ -12,6 +12,7 @@ declare class Valist {
     getOrganizationMeta(orgName: string): Promise<any>;
     getCreatedOrganizations(): Promise<any>;
     getDeletedOrganizations(): Promise<any>;
+    setOrgMeta(orgName: string, orgMeta: any, account: string): Promise<void>;
     getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getReposFromOrganization(orgName: string): Promise<import("web3-eth-contract").EventData[]>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;

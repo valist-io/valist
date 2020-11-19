@@ -13,11 +13,10 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
     const [type, setType] = useState<ProjectType>("binary");
     const [projectMeta, setProjectMeta] = useState();
 
-    console.log("passing value", projectMeta)
     const projectTypes = {
         "binary": BinaryMeta(orgName, repoName, projectMeta),
         "npm": NpmMeta(orgName, repoName, projectMeta),
-        "pip": PipMeta(orgName, repoName,projectMeta),
+        "pip": PipMeta(orgName, repoName, projectMeta),
         "docker": DockerMeta(orgName, repoName, projectMeta)
     }
 
@@ -25,11 +24,10 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
         (async function() {
             if (valist) {
                 try {
-                    const rawMeta = await valist.getRepoMeta(orgName, repoName);
-                    const metaResponse = await valist.fetchJSONfromIPFS(rawMeta);
-                    const projectType = metaResponse.projectType;
+                    const repoMeta = await valist.getRepoMeta(orgName, repoName);
+                    const projectType = repoMeta['projectType'];
                     setType(projectType);
-                    setProjectMeta(metaResponse)
+                    setProjectMeta(repoMeta);
                 } catch (e) {}
             }
         })()

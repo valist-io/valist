@@ -94,7 +94,10 @@ class Valist {
     try {
       const org = await this.getOrganization(orgName);
       const orgMeta = await org.methods.orgMeta().call();
-      return orgMeta;
+      const json = await this.fetchJSONfromIPFS(orgMeta);
+
+      return json;
+
     } catch (e) {
       const msg = `Could not get organization metadata`;
       console.error(msg, e);
@@ -119,6 +122,18 @@ class Valist {
       return organizations;
     } catch (e) {
       const msg = `Could not get deleted organizations`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async setOrgMeta(orgName: string, orgMeta: any, account: string) {
+    try {
+      const org = await this.getOrganization(orgName);
+      const hash = await this.addJSONtoIPFS(orgMeta);
+      await org.methods.updateOrgMeta(hash).send({ from: account });
+    } catch (e) {
+      const msg = `Could not set organization metadata`;
       console.error(msg, e);
       throw e;
     }
@@ -154,7 +169,10 @@ class Valist {
     try {
       const repo = await this.getRepository(orgName, repoName);
       const repoMeta = await repo.methods.repoMeta().call();
-      return repoMeta;
+      const json = await this.fetchJSONfromIPFS(repoMeta);
+
+      return json;
+
     } catch (e) {
       const msg = `Could not get repository metadata`;
       console.error(msg, e);
@@ -457,7 +475,6 @@ class Valist {
       throw e;
     }
   }
-
 }
 
 export const Web3Providers = Web3.providers;
