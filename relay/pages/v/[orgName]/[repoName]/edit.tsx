@@ -1,10 +1,8 @@
 import Layout from '../../../../components/Layout/Layout';
-import EditOrgForm from '../../../../components/EditOrgForm/EditOrgForm';
 
-export const EditOrgPage = () => {
+export const EditprojectPage = () => {
     return (
         <Layout title="Valist | Edit Organization">
-            <EditOrgForm />
         </Layout>
     );
 }
