@@ -16,6 +16,7 @@ declare class Valist {
     getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
     getReposFromOrganization(orgName: string): Promise<import("web3-eth-contract").EventData[]>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
+    setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string): Promise<void>;
     getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
     getLatestReleaseMetaFromRepo(orgName: string, repoName: string): Promise<any>;

@@ -16,7 +16,7 @@ const EditOrganization = ({ orgName }: { orgName: string}) => {
         }
     }
 
-    const updateOrgMeta = async () => {
+    const updateOrgMeta = async () =>{
         const meta = {
             name: orgFullName,
             description: orgDescription

@@ -180,6 +180,18 @@ class Valist {
     }
   }
 
+  async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account:string) {
+    try {
+      const repo = await this.getRepository(orgName, repoName);
+      const hash = await this.addJSONtoIPFS(repoMeta);
+      await repo.methods.updateRepoMeta(hash).send({ from: account });
+    } catch (e) {
+      const msg = `Could not set repository metadata`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
   async getLatestTagFromRepo(orgName: string, repoName: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
