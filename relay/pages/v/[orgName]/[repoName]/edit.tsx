@@ -1,10 +1,10 @@
 import Layout from '../../../../components/Layout/Layout';
 
-export const EditprojectPage = () => {
+export const EditProjectPage = () => {
     return (
         <Layout title="Valist | Edit Organization">
         </Layout>
     );
 }
 
-export default EditOrgPage;
+export default EditProjectPage;
