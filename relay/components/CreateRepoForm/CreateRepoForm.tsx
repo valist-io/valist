@@ -1,29 +1,18 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import Valist from 'valist';
-import { useRouter } from 'next/router'
+import React, { FunctionComponent, useContext, useState } from 'react';
+import { useRouter } from 'next/router';
 
-export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
-    const router = useRouter()
+import { ProjectType } from 'valist';
+import ValistContext from '../ValistContext/ValistContext';
 
-    const [projectName, setProjectName] = useState("")
-    const [projectType, setProjectType] = useState("")
-    const [projectHomepage, setProjectHomepage] = useState("")
-    const [projectRepository, setProjectRepository] = useState("")
-    const [projectDescription, setProjectDescription] = useState("")
+export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: string}) => {
+    const valist = useContext(ValistContext);
+    const router = useRouter();
 
-    useEffect(() => {
-        if (valist) {
-            (async function () {
-                try {
-                    setProjectName("")
-                    setProjectDescription("")
-                } catch (error) {
-                    alert(`Failed to load accounts.`);
-                    console.log(error);
-                }
-            })();
-        }
-    }, [valist]);
+    const [projectName, setProjectName] = useState("");
+    const [projectType, setProjectType] = useState<ProjectType>("binary");
+    const [projectHomepage, setProjectHomepage] = useState("");
+    const [projectRepository, setProjectRepository] = useState("");
+    const [projectDescription, setProjectDescription] = useState("");
 
     const createProject = async () => {
         const repoMeta = {
@@ -31,7 +20,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
             description: projectDescription,
             projectType: projectType,
             homepage: projectHomepage,
-            github: projectRepository
+            repository: projectRepository
         };
 
         await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
@@ -98,13 +87,13 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                             <textarea onChange={(e) => setProjectDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
-                    <div>
+                    <div className="sm:col-span-2">
                         <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
-                        <select onChange={(e) => setProjectType(e.target.value)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
-                            <option>binary</option>
-                            <option>npm</option>
-                            <option>pip</option>
-                            <option>docker</option>
+                        <select onChange={(e) => setProjectType(e.target.value as ProjectType)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
+                            <option value="binary">binary</option>
+                            <option value="npm">npm</option>
+                            <option value="pip">pip</option>
+                            <option value="docker">docker</option>
                         </select>
                     </div>
                     {renderPackageMeta()}

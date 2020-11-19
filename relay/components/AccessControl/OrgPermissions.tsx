@@ -16,7 +16,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
         }
     }
 
-    const grantRole = async () =>{
+    const grantRole = async () => {
         try {
             if (valist.web3.utils.isAddress(grantee)) {
                 await valist.grantOrgAdmin(orgName, valist.defaultAccount, grantee);

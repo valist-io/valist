@@ -18,7 +18,9 @@ const ORG_ADMIN_ROLE = "0x123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e1
 const REPO_ADMIN_ROLE = "0xff7d2294a3c189284afb74beb7d578b566cf69863d5cb16db08773c21bea56c9";
 const REPO_DEV_ROLE = "0x069bf569f27d389f2c70410107860b2e82ff561283b097a89e897daa5e34b1b6";
 
-const shortnameFilterRegex = /[^A-z-]/;
+const shortnameFilterRegex = /[^A-z0-9-]/;
+
+export type ProjectType = "binary" | "npm" | "pip" | "docker";
 
 const getContractInstance = async (web3: Web3, abi: any, address: string) => {
   // create the instance
@@ -428,7 +430,7 @@ class Valist {
     }
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: string, homepage: string, github: string}, account: string) {
+  async createRepository(orgName: string, repoName: string, repoMeta: {name: string, description: string, projectType: ProjectType, homepage: string, repository: string}, account: string) {
     try {
       const org = await this.getOrganization(orgName);
       const metaFile = await this.addJSONtoIPFS(repoMeta);

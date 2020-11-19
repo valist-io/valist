@@ -6,7 +6,7 @@ import NpmMeta from './NpmMeta';
 import PipMeta from './PipMeta';
 import DockerMeta from './DockerMeta';
 
-type ProjectType = "binary" | "npm" | "pip" | "docker";
+import { ProjectType } from 'valist';
 
 export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
     const valist = useContext(ValistContext);
@@ -25,7 +25,7 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
             if (valist) {
                 try {
                     const repoMeta = await valist.getRepoMeta(orgName, repoName);
-                    const projectType = repoMeta['projectType'];
+                    const projectType = repoMeta['projectType'] as ProjectType;
                     setType(projectType);
                     setProjectMeta(repoMeta);
                 } catch (e) {}

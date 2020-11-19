@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 import ipfsClient from 'ipfs-http-client';
+export declare type ProjectType = "binary" | "npm" | "pip" | "docker";
 declare class Valist {
     web3: Web3;
     valist: any;
@@ -45,9 +46,9 @@ declare class Valist {
     createRepository(orgName: string, repoName: string, repoMeta: {
         name: string;
         description: string;
-        projectType: string;
+        projectType: ProjectType;
         homepage: string;
-        github: string;
+        repository: string;
     }, account: string): Promise<any>;
     publishRelease(orgName: string, repoName: string, release: {
         tag: string;

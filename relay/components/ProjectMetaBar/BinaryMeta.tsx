@@ -42,7 +42,9 @@ const BinaryMeta = (orgName: string = "organization", repoName: string = "repo",
                     <h1 className="flex-1 text-lg leading-7 font-medium">Download (GET) from Url</h1>
                 </div>
                 <div ref={curlRef} onClick={() => copyToCB(curlRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer">
-                    curl -L -o {repoName}-latest.tar.gz {origin}/api/{orgName}/{repoName}/latest
+                    curl -L -o {repoName} {origin}/api/{orgName}/{repoName}/latest
+                    <br/><br/>
+                    chmod +x {repoName}
                 </div>
             </div>
         </div>
