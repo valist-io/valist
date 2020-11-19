@@ -7,7 +7,7 @@ import ValistABI from './abis/Valist.json';
 import ValistOrganizationABI from './abis/ValistOrganization.json';
 import ValistRepositoryABI from './abis/ValistRepository.json';
 
-// monkey patch node-fetch
+// node-fetch polyfill
 const fetch = require('node-fetch');
 if (!globalThis.fetch) {
     globalThis.fetch = fetch;
@@ -17,6 +17,8 @@ if (!globalThis.fetch) {
 const ORG_ADMIN_ROLE = "0x123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e12683553c62";
 const REPO_ADMIN_ROLE = "0xff7d2294a3c189284afb74beb7d578b566cf69863d5cb16db08773c21bea56c9";
 const REPO_DEV_ROLE = "0x069bf569f27d389f2c70410107860b2e82ff561283b097a89e897daa5e34b1b6";
+
+const shortnameFilterRegex = /[^A-z-]/;
 
 const getContractInstance = async (web3: Web3, abi: any, address: string) => {
   // create the instance
@@ -417,7 +419,7 @@ class Valist {
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: string) {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-      const result = await this.valist.methods.createOrganization(orgName.toLowerCase(), metaFile).send({ from: account });
+      const result = await this.valist.methods.createOrganization(orgName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account });
       return result;
     } catch (e) {
       const msg = `Could not create organization`;
@@ -430,7 +432,7 @@ class Valist {
     try {
       const org = await this.getOrganization(orgName);
       const metaFile = await this.addJSONtoIPFS(repoMeta);
-      const result = await org.methods.createRepository(repoName, metaFile).send({ from: account });
+      const result = await org.methods.createRepository(repoName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account });
       return result;
     } catch(e) {
       const msg = `Could not create repository`;

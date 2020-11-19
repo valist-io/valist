@@ -69,38 +69,40 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                 </div>
                 <div className="mt-12">
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
-                    <div className="col-span-3 sm:col-span-2">
+                    <div className="col-span-12">
                         <label htmlFor="OrgShortName" className="block text-sm font-medium leading-5 text-gray-700">
                         Shortname
                         </label>
                         <div className="mt-1 flex rounded-md shadow-sm">
-                        <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
-                            https://app.valist.io/
-                        </span>
-                        <input onChange={(e) => setOrgShortName(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" />
+                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                https://app.valist.io/
+                            </span>
+                            <input onChange={(e) => setOrgShortName(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" />
                         </div>
                         <p className="mt-2 text-sm text-gray-500">You or your organization's username</p>
                     </div>
 
-                    <div className="sm:col-span-2">
+                    <div className="col-span-12">
                         <label htmlFor="OrgFullName" className="block text-sm font-medium leading-5 text-gray-700">Full Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
+                        <div >
                             <input onChange={(e) => setOrgFullName(e.target.value)} required id="OrgFullName" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                         <p className="mt-2 text-sm text-gray-500">Your name or your organization's name</p>
                     </div>
-                    <div className="sm:col-span-2">
+
+                    <div className="col-span-12">
                         <label htmlFor="OrgDescription" className="block text-sm font-medium leading-5 text-gray-700">Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
                             <textarea onChange={(e) => setOrgDescription(e.target.value)} required id="OrgDescription" className="h-20 form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                     </div>
-                    <div className="sm:col-span-2">
-                    <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={createOrganization} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                            Create Organization
-                        </button>
-                    </span>
+
+                    <div className="col-span-12">
+                        <span className="w-full inline-flex rounded-md shadow-sm">
+                            <button onClick={createOrganization} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                                Create Organization
+                            </button>
+                        </span>
                     </div>
                 </form>
                 </div>
