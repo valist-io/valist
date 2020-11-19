@@ -1,8 +1,11 @@
+import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext} from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 
 const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string}) => {
     const valist = useContext(ValistContext);
+    const router = useRouter();
+
     const [projectHomepage, setProjectHomepage] = useState("")
     const [projectRepository, setProjectRepository] = useState("")
     const [projectDescription, setProjectDescription] = useState("")
@@ -29,7 +32,7 @@ const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string
             await valist.setRepoMeta(orgName, repoName, meta, valist.defaultAccount);
         } catch(e) {}
 
-        await getCurrentMeta();
+        router.push(`/${orgName}/${repoName}`);
     }
 
     useEffect(() => {

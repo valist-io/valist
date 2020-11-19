@@ -1,8 +1,11 @@
+import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext} from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 
 const EditOrganization = ({ orgName }: { orgName: string}) => {
     const valist = useContext(ValistContext);
+    const router = useRouter();
+
     const [orgFullName, setOrgFullName] = useState("");
     const [orgDescription, setOrgDescription] = useState("");
 
@@ -26,7 +29,7 @@ const EditOrganization = ({ orgName }: { orgName: string}) => {
             await valist.setOrgMeta(orgName, meta, valist.defaultAccount);
         } catch(e) {}
 
-        await getCurrentMeta();
+        router.push(`/${orgName}`);
     }
 
     useEffect(() => {
