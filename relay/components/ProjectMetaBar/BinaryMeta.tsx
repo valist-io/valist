@@ -16,9 +16,6 @@ const BinaryMeta = (orgName: string = "organization", repoName: string = "repo",
             <div className="pl-6 lg:w-80">
                 {projectMeta &&
                     <div>
-                        <div className="pt-6 pb-2">
-                            <h1 className="flex-1 text-2xl leading-7">Project Metadata</h1>
-                        </div>
                         {projectMeta['homepage'] &&
                             <div className="pt-6 pb-2">
                                 <h1 className="flex-1 text-lg leading-7 font-medium">Homepage</h1>
