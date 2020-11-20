@@ -2,16 +2,16 @@ import React, { FunctionComponent, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 
 import ValistContext from '../ValistContext/ValistContext';
-// import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
     const valist = useContext(ValistContext);
     const router = useRouter();
 
-    const [releaseMeta, setReleaseMeta] = useState("")
-    const [projectTag, setProjectTag] = useState("")
-    const [releaseData, setReleaseData] = useState<File | null> (null)
-    // const [renderLoading, setRenderLoading] = useState(false)
+    const [releaseMeta, setReleaseMeta] = useState("");
+    const [projectTag, setProjectTag] = useState("");
+    const [releaseData, setReleaseData] = useState<File | null> (null);
+    const [renderLoading, setRenderLoading] = useState(false);
 
     const readUploadedFileAsBuffer = (inputFile: any) => {
         const temporaryFileReader = new FileReader();
@@ -51,10 +51,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
             meta
         };
 
-        // setRenderLoading(true)
         await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
         router.push(`/${orgName}/${repoName}`);
-        // setRenderLoading(false)
     }
 
     return (
@@ -103,7 +101,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                     </div>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={createRelease} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={() => { setRenderLoading(true); createRelease(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Publish Release
                             </button>
                         </span>
@@ -111,37 +109,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                 </form>
                 </div>
             </div>
+            { renderLoading && <LoadingDialog statusText="Signing and Releasing..." /> }
         </div>
     );
 }
 
 export default PublishReleaseForm;
-
-/*
-
-    const reducer = (state: any, action: any) => {
-        switch (action.type) {
-            case 'SET_DROP_DEPTH':
-                return { ...state, dropDepth: action.dropDepth }
-            case 'SET_IN_DROP_ZONE':
-                return { ...state, inDropZone: action.inDropZone };
-            case 'ADD_FILE_TO_LIST':
-                return { ...state, fileList: state.fileList.concat(action.files) };
-            default:
-                return state;
-        }
-    };
-
-    const [data, dispatch] = React.useReducer(
-        reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
-    )
-
-                    <DragAndDrop data={data} dispatch={dispatch}/>
-                    <ol className="dropped-files">
-                        {data.fileList.map((f: any) => {
-                            return (
-                                <li key={f.name}>{f.name}</li>
-                            )
-                        })}
-                    </ol>
-*/
