@@ -1,4 +1,4 @@
-import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
+import React, { FunctionComponent, useState, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 import { useRouter } from 'next/router';
 
@@ -6,25 +6,9 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
     const valist = useContext(ValistContext);
     const router = useRouter();
 
-
     const [orgShortName, setOrgShortName] = useState("");
     const [orgFullName, setOrgFullName] = useState("");
     const [orgDescription, setOrgDescription] = useState("");
-
-    useEffect(() => {
-        if (valist) {
-            (async function () {
-                try {
-                    setOrgShortName("");
-                    setOrgDescription("");
-                    setOrgDescription("");
-                } catch (error) {
-                    alert(`Failed to load accounts.`);
-                    console.log(error);
-                }
-            })();
-        }
-    }, [valist]);
 
     const createOrganization = async () => {
         const meta = {
