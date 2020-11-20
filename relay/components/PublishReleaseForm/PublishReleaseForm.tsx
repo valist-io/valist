@@ -2,6 +2,7 @@ import React, { FunctionComponent, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 
 import ValistContext from '../ValistContext/ValistContext';
+// import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
     const valist = useContext(ValistContext);
@@ -10,6 +11,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
     const [releaseMeta, setReleaseMeta] = useState("")
     const [projectTag, setProjectTag] = useState("")
     const [releaseData, setReleaseData] = useState<File | null> (null)
+    // const [renderLoading, setRenderLoading] = useState(false)
 
     const readUploadedFileAsBuffer = (inputFile: any) => {
         const temporaryFileReader = new FileReader();
@@ -49,8 +51,10 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
             meta
         };
 
+        // setRenderLoading(true)
         await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
         router.push(`/${orgName}/${repoName}`);
+        // setRenderLoading(false)
     }
 
     return (
