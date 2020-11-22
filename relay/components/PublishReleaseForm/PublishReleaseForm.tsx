@@ -11,6 +11,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
     const [releaseMeta, setReleaseMeta] = useState("");
     const [projectTag, setProjectTag] = useState("");
     const [releaseData, setReleaseData] = useState<File | null> (null);
+
     const [renderLoading, setRenderLoading] = useState(false);
 
     const readUploadedFileAsBuffer = (inputFile: any) => {

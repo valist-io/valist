@@ -1,7 +1,7 @@
 import React, { FunctionComponent } from 'react';
 // import styles from './LoadingDialog.module.css';
 
-export const LoadedDialog:FunctionComponent<any> = ({ statusText }: { statusText?: string }) => {
+export const LoadingDialog:FunctionComponent<any> = ({ statusText }: { statusText?: string }) => {
     return (
         <div className="fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center" style={{background: "rgba(0, 0, 0, 0.3)"}}>
             <div className="bg-white border py-2 px-5 rounded-lg flex items-center flex-col">
@@ -19,4 +19,4 @@ export const LoadedDialog:FunctionComponent<any> = ({ statusText }: { statusText
     )
 }
 
-export default LoadedDialog;
+export default LoadingDialog;

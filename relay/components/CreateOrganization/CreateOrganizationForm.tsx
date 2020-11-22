@@ -2,6 +2,8 @@ import React, { FunctionComponent, useState, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
 import { useRouter } from 'next/router';
 
+import LoadingDialog from '../LoadingDialog/LoadingDialog';
+
 export const CreateOrganizationForm:FunctionComponent<any> = () => {
     const valist = useContext(ValistContext);
     const router = useRouter();
@@ -9,6 +11,8 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
     const [orgShortName, setOrgShortName] = useState("");
     const [orgFullName, setOrgFullName] = useState("");
     const [orgDescription, setOrgDescription] = useState("");
+
+    const [renderLoading, setRenderLoading] = useState(false);
 
     const createOrganization = async () => {
         const meta = {
@@ -83,7 +87,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
 
                     <div className="col-span-12">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={createOrganization} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={() => { setRenderLoading(true); createOrganization(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Create Organization
                             </button>
                         </span>
@@ -91,6 +95,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                 </form>
                 </div>
             </div>
+            { renderLoading && <LoadingDialog statusText="Creating Organization..." /> }
         </div>
     );
 }
