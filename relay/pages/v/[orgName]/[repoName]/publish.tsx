@@ -3,13 +3,13 @@ import PublishReleaseForm from '../../../../components/PublishReleaseForm/Publis
 
 import { useRouter } from 'next/router';
 
-export const PublishReleasePage = ({valist}: any) => {
+export const PublishReleasePage = () => {
     const router = useRouter();
     const { orgName, repoName } = router.query;
 
     return (
         <Layout title={`Publish Release | ${repoName}`}>
-            <PublishReleaseForm valist={valist} orgName={orgName} repoName={repoName} />
+            <PublishReleaseForm orgName={orgName} repoName={repoName} />
         </Layout>
     );
 }
