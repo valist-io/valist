@@ -106,7 +106,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog statusText="Creating Project..." /> }
+            { renderLoading && <LoadingDialog>Creating Project</LoadingDialog> }
         </div>
     );
 }

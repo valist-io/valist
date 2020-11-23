@@ -95,7 +95,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog statusText="Creating Organization..." /> }
+            { renderLoading && <LoadingDialog>Creating Organization...</LoadingDialog> }
         </div>
     );
 }

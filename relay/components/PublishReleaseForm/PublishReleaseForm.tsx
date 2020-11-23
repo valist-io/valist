@@ -110,7 +110,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog statusText="Signing and Releasing..." /> }
+            { renderLoading && <LoadingDialog>Signing and Releasing...</LoadingDialog> }
         </div>
     );
 }
