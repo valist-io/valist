@@ -24,6 +24,10 @@ Imagine the following scenario:
 
 * Clients with the software installed automatically detect the change and proceed to notify and/or trigger an auto-update.
 
+Here's a visual of what this flow looks like:
+
+![Signed Software Release Flow](docs/img/signed-release-flow.png)
+
 The primary goal for this software is to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from flexible notary systems just as much as future technologies.
 
 As for the open source community, the ability to securely host code in a decentralized way is essential. While it is possible to spin up say, a Debian mirror, it might not be as approachable or commonplace, and places the onus of security and maintenance on the contributor. A system like this could make it easy as possible for a contributor to simply "check a box" next to their favorite app/dApp and help bear the load, without having to worry as much about security or configuration.
