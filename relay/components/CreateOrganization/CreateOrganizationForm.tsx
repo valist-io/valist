@@ -1,5 +1,7 @@
 import React, { FunctionComponent, useState, useContext } from 'react';
 import ValistContext from '../ValistContext/ValistContext';
+import { shortnameFilterRegex } from 'valist';
+
 import { useRouter } from 'next/router';
 
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
@@ -22,7 +24,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
 
         if (orgShortName && orgFullName && orgDescription && valist.defaultAccount) {
             await valist.createOrganization(orgShortName, meta, valist.defaultAccount);
-            router.push(`/v/${orgShortName}/create`);
+            router.push(`/v/${orgShortName.toLowerCase().replace(shortnameFilterRegex, "")}/create`);
         } else {
             alert(`Please complete the required fields`);
         }
