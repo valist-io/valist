@@ -23,8 +23,6 @@ function App({ Component, pageProps }: AppProps) {
             let valist = new Valist(window.ethereum, true);
             await valist.connect();
             setValist(valist);
-            // @ts-ignore
-            window.valist = valist;
             setEthereumEnabled(true);
           }
 
