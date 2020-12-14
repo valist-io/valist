@@ -4,6 +4,24 @@
 
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
 
+## Overview
+
+We are building a secure, trustless software distribution system for both traditional and decentralized infrastructures. No need for expensive and centralized PKIs or manual code signing processes!
+
+We support the following package types with our API natively, with many more in the pipeline:
+
+* Any arbitrary binaries (software, firmware, you name it)
+
+* NPM packages (native `npm install` support)
+
+* Pip packages
+
+* Docker images
+
+The goal is to point **any** software distribution system at a Valist relay, which will ensure the integrity of the packages and act as a universal cache.
+
+You can think of it as a trustless Bintray, or a universal Verdaccio, but with far more powerful access control and data integrity features. This includes multi-factor releases (M of N keys need to sign on some firmware before release), as well as the ability to use any hardware wallet to sign code.
+
 ## Motivation
 
 Secure (and simplified) software updating is a common problem within IoT, traditional systems, and many cases now, dApps. Typically, it is necessary to roll your own upgrading solution, or be stuck with a centralized app store acceptance and delivery process. The former is ineffective, as constant re-implementation of a process that should be as secure as possible dramatically increases risk, while the latter is ineffective since you are tied to a central entity that manages your distribution on your behalf (i.e., requires permission).

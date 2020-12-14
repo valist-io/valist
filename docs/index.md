@@ -2,7 +2,11 @@
 
 ## Overview
 
-Valist is a software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
+Valist is a software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized. No need for expensive and centralized PKIs or manual code signing processes!
+
+The goal is to point **any** software distribution system at a Valist relay, which will ensure the integrity of the packages and act as a universal cache.
+
+You can think of Valist as a trustless Bintray, or a universal Verdaccio, but with far more powerful access control and data integrity features. This includes multi-factor releases (M of N keys need to sign on some firmware before release), as well as the ability to use any hardware wallet to sign code.
 
 ### Signed Binaries, Firmware, and universal package distribution
 
