@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { ProjectType } from 'valist';
+import { ProjectType, shortnameFilterRegex } from 'valist';
 import ValistContext from '../ValistContext/ValistContext';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
@@ -27,7 +27,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
         };
 
         await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
-        router.push(`/v/${orgName}/${projectName}/publish`);
+        router.push(`/v/${orgName}/${projectName.toLowerCase().replace(shortnameFilterRegex, "")}/publish`);
     }
 
     return (

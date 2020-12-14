@@ -1,6 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 import ipfsClient from 'ipfs-http-client';
+export declare const shortnameFilterRegex: RegExp;
 export declare type ProjectType = "binary" | "npm" | "pip" | "docker";
 declare class Valist {
     web3: Web3;
