@@ -22,9 +22,11 @@
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "docs": "typedoc --theme minimal"
   },
   "devDependencies": {
+    "typedoc": "^0.19.2",
     "typescript": "^3.9.7"
   },
   "dependencies": {
