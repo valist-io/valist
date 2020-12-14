@@ -2,4 +2,4 @@
 
 ## Core Lib
 
-To view the API docs for the core lib, [click here.](https://lib.docs.valist.io)
+To view the API docs for the TypeScript core lib, [click here.](/lib/modules/_index_.html)

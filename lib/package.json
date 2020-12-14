@@ -23,7 +23,7 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "docs": "typedoc --theme minimal"
+    "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none"
   },
   "devDependencies": {
     "typedoc": "^0.19.2",

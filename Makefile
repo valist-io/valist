@@ -81,4 +81,8 @@ audit-fix:
 audit-contracts:
 	slither eth --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
 
-.PHONY: relay lib contracts
+docs:
+	mkdocs build
+	cd lib && npm run docs
+
+.PHONY: relay lib contracts docs
