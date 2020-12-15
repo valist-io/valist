@@ -26,7 +26,7 @@
     "next": "^10.0.1",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "valist": "https://app.valist.io/api/valist/valist/latest"
+    "valist": "file:../lib/"
   },
   "devDependencies": {
     "@types/node": "^12.19.4",

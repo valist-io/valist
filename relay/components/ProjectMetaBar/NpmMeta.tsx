@@ -47,19 +47,19 @@ const NpmMeta = (orgName: string, repoName: string, projectMeta: any = {}) => {
                 <div className="pt-6 pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">NPM Direct Install From Url</h1>
                 </div>
-                <div ref={installRef} onClick={() => copyToCB(installRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer">
+                <div ref={installRef} onClick={() => copyToCB(installRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer break-all">
                     npm install {origin}/api/{orgName}/{repoName}/latest
                 </div>
                 <div className="pt-6 pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Set Package Registry</h1>
                 </div>
-                <div ref={registryRef} onClick={() => copyToCB(registryRef)} className="border-2 border-solid border-black-200 rounded-lg h-auto break-words p-2 bg-gray-200 cursor-pointer">
+                <div ref={registryRef} onClick={() => copyToCB(registryRef)} className="border-2 border-solid border-black-200 rounded-lg h-auto p-2 bg-gray-200 cursor-pointer break-all">
                     npm config set registry {origin}/api/npm
                 </div>
                 <div className="pt-6 pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium" >Install From Registry</h1>
                 </div>
-                <div ref={installFromRegistryRef} onClick={() => copyToCB(installFromRegistryRef)} className="border-2 border-solid border-black-200 rounded-lg h-auto break-words p-2 bg-gray-200 cursor-pointer">
+                <div ref={installFromRegistryRef} onClick={() => copyToCB(installFromRegistryRef)} className="border-2 border-solid border-black-200 rounded-lg h-auto p-2 bg-gray-200 cursor-pointer break-all">
                     npm install @{orgName}/{repoName}
                 </div>
             </div>
