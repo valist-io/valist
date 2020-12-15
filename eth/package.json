@@ -7,11 +7,11 @@
     "test": "test"
   },
   "dependencies": {
-    "@openzeppelin/contracts": "^3.3.0"
+    "@openzeppelin/contracts": "^3.2.0"
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "^1.2.0",
-    "truffle": "^5.1.57"
+    "truffle": "^5.1.53"
   },
   "scripts": {
     "compile": "truffle compile",
