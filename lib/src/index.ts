@@ -22,7 +22,7 @@ export const shortnameFilterRegex = /[^A-z0-9-]/;
 
 export type ProjectType = "binary" | "npm" | "pip" | "docker";
 
-const getContractInstance = async (web3: Web3, abi: any, address: string) => {
+const getContractInstance = (web3: Web3, abi: any, address: string) => {
   // create the instance
   return new web3.eth.Contract(abi, address);
 }
@@ -33,17 +33,17 @@ const getValistContract = async (web3: Web3) => {
   // @ts-ignore
   const deployedAddress: string = ValistABI.networks[networkId].address;
 
-  return await getContractInstance(web3, ValistABI.abi, deployedAddress);
+  return getContractInstance(web3, ValistABI.abi, deployedAddress);
 }
 
-const getValistOrganizationContract = async (web3: Web3, address: string) => {
+const getValistOrganizationContract = (web3: Web3, address: string) => {
   // create the instance
-  return await getContractInstance(web3, ValistOrganizationABI.abi, address);
+  return getContractInstance(web3, ValistOrganizationABI.abi, address);
 }
 
-const getValistRepositoryContract = async (web3: Web3, address: string) => {
+const getValistRepositoryContract = (web3: Web3, address: string) => {
   // get network ID and the deployed address
-  return await getContractInstance(web3, ValistRepositoryABI.abi, address);
+  return getContractInstance(web3, ValistRepositoryABI.abi, address);
 }
 
 class Valist {
@@ -85,7 +85,7 @@ class Valist {
   async getOrganization(orgName: string) {
     try {
       const orgAddress = await this.valist.methods.orgs(orgName).call();
-      const org = await getValistOrganizationContract(this.web3, orgAddress);
+      const org = getValistOrganizationContract(this.web3, orgAddress);
       return org;
     } catch (e) {
       const msg = `Could not get organization contract`;
@@ -148,7 +148,7 @@ class Valist {
     try {
       const org = await this.getOrganization(orgName);
       const repoAddress = await org.methods.repos(repoName).call();
-      const repo = await getValistRepositoryContract(this.web3, repoAddress);
+      const repo = getValistRepositoryContract(this.web3, repoAddress);
       return repo;
     } catch (e) {
       const msg = `Could not get repository contract`;

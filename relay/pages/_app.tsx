@@ -1,30 +1,34 @@
 import { AppProps } from 'next/app';
 import React, { useEffect, useState } from 'react';
+
 import Valist from 'valist';
-import '../styles/main.css';
 import ValistContext from '../components/ValistContext/ValistContext';
-import LoadingDialog from '../components/LoadingDialog/LoadingDialog';
+import { Magic } from 'magic-sdk';
+
+import LoginForm from '../components/LoginForm/LoginForm';
+
+import '../styles/main.css';
 
 function App({ Component, pageProps }: AppProps) {
 
   const [valist, setValist] = useState<Valist>();
 
-  const [ethereumEnabled, setEthereumEnabled] = useState(false);
+  const [magic, setMagic] = useState<Magic>();
+
+  const [loggedIn, setLoggedIn] = useState(false);
 
   // initialize web3 and valist object on document load (this effect is only triggered once)
   useEffect(() => {
     (async function () {
         try {
-          // @ts-ignore
-          if (window.ethereum) {
-            // @ts-ignore
-            window.ethereum.enable();
-            // @ts-ignore
-            let valist = new Valist(window.ethereum, true);
-            await valist.connect();
-            setValist(valist);
-            setEthereumEnabled(true);
-          }
+            // Start Magic Provider Code
+            const customNodeOptions = {
+              rpcUrl: 'http://127.0.0.1:8545', // Your own node URL
+              chainId: 5777 // Your own node's chainId
+            }
+
+            const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: customNodeOptions });
+            setMagic(magicObj);
 
         } catch (error) {
             console.log(error);
@@ -32,19 +36,27 @@ function App({ Component, pageProps }: AppProps) {
     })();
   }, []);
 
-  return (
+  useEffect(() => {
+    (async function() {
+      if (magic) {
+        // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types yet
+        const valist = new Valist(magic.rpcProvider, true);
+
+        await valist.connect();
+
+        // @ts-ignore
+        window.valist = valist; // keep for testing purposes
+        setValist(valist);
+      }
+    })();
+  }, [magic]);
+
+  return loggedIn ? (
     // @ts-ignore
     <ValistContext.Provider value={valist}>
       <Component {...pageProps} />
-      { !ethereumEnabled &&
-        <LoadingDialog>
-          <p>MetaMask is currently required to use this app. Please install at <a href="https://metamask.io" className="text-blue-700">metamask.io</a>.</p>
-          <p>We are working hard to remove this requirement.</p><br/>
-          <p>Sign up for our beta at <a href="https://valist.io" className="text-blue-700">valist.io</a> to be notified!</p>
-        </LoadingDialog>
-      }
     </ValistContext.Provider>
-  )
+  ) : magic ? <LoginForm magic={magic} setLoggedIn={setLoggedIn} {...pageProps} /> : <div>Loading...</div>
 }
 
 // Only uncomment this method if you have blocking data requirements for
