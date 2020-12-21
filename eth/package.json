@@ -17,6 +17,7 @@
     "compile": "truffle compile",
     "migrate": "truffle migrate",
     "migrate:ropsten": "truffle migrate  --network ropsten",
+    "migrate:kovan": "truffle migrate  --network kovan",
     "migrate:reset": "truffle migrate --reset",
     "develop": "truffle develop",
     "console": "truffle console",

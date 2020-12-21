@@ -50,7 +50,8 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function"
+      "type": "function",
+      "constant": true
     },
     {
       "inputs": [
@@ -3210,6 +3211,45 @@
       "address": "0x6a0C07F527C25C3a316E6618363A50Fec8D51937",
       "transactionHash": "0x96a8afc3d292ae473abcb4502de74a78f16fa909b6c4b7122ed8b888ab065245"
     },
+    "42": {
+      "events": {
+        "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgName",
+              "type": "string"
+            },
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgMeta",
+              "type": "string"
+            }
+          ],
+          "name": "OrganizationCreated",
+          "type": "event"
+        },
+        "0xbfd59fe086f0bb2aa29ca24d84a3c262fbaabe6821ebfea88d8db73b0e2d207f": {
+          "anonymous": false,
+          "inputs": [
+            {
+              "indexed": false,
+              "internalType": "string",
+              "name": "orgName",
+              "type": "string"
+            }
+          ],
+          "name": "OrganizationDeleted",
+          "type": "event"
+        }
+      },
+      "links": {},
+      "address": "0xfB537Eec81c86385f5F8eba57D4d6D0E9AED75D4",
+      "transactionHash": "0xa765d4e4d657c7de069295f5321a98ff11db917c813ed9545373b03d4fc4dd75"
+    },
     "5333": {
       "events": {
         "0xbcd71a416e8c475f3c8d627ff95e9f14dc59f6a92b4f9b5b2ae46e8b7562a1a4": {
@@ -3290,7 +3330,8 @@
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2020-12-21T06:35:33.056Z",
+  "updatedAt": "2020-12-21T17:16:32.911Z",
+  "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",
     "methods": {},
