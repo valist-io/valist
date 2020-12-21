@@ -23,10 +23,10 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async function () {
         try {
-          const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: "ropsten" });
+          const magicObj = new Magic('pk_test_54C6079CBEF87272', { network: "ropsten" });
           setMagic(magicObj);
-        } catch (error) {
-          console.log(error);
+        } catch (e) {
+          console.log(e);
         }
     })();
   }, []);
@@ -34,14 +34,18 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async function () {
       if (magic) {
-        // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
-        const valist = new Valist(magic.rpcProvider, true);
+        try {
+          // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
+          const valist = new Valist(magic.rpcProvider, true);
 
-        await valist.connect();
+          await valist.connect();
 
-        // @ts-ignore keep for dev purposes
-        window.valist = valist;
-        setValist(valist);
+          // @ts-ignore keep for dev purposes
+          window.valist = valist;
+          setValist(valist);
+        } catch (e) {
+          console.error("Could not initialize Valist object", e);
+        }
       }
     })();
   }, [loggedIn, magic]);
