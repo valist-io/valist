@@ -41,7 +41,7 @@ const BinaryMeta = (orgName: string = "organization", repoName: string = "repo",
                 <div className="pt-6 pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Download (GET) from Url</h1>
                 </div>
-                <div ref={curlRef} onClick={() => copyToCB(curlRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer">
+                <div ref={curlRef} onClick={() => copyToCB(curlRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer break-all">
                     curl -L -o {repoName} {origin}/api/{orgName}/{repoName}/latest
                     <br/><br/>
                     chmod +x {repoName}
