@@ -33,7 +33,7 @@ function App({ Component, pageProps }: AppProps) {
 
   useEffect(() => {
     (async function () {
-      if (magic) {
+      if (magic && loggedIn) {
         try {
           // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
           const valist = new Valist(magic.rpcProvider, true);
