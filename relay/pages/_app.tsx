@@ -26,7 +26,7 @@ function App({ Component, pageProps }: AppProps) {
           const customNodeOptions = {
             rpcUrl: process.env.WEB3_PROVIDER || "http://127.0.0.1:9545"
           };
-          const magicObj = new Magic('pk_test_9DA0DA4DF627E0D3', { network: customNodeOptions });
+          const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: customNodeOptions });
           setMagic(magicObj);
         } catch (error) {
           console.log(error);
