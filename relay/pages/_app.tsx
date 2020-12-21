@@ -23,10 +23,7 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async function () {
         try {
-          const customNodeOptions = {
-            rpcUrl: process.env.WEB3_PROVIDER || "http://127.0.0.1:9545"
-          };
-          const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: customNodeOptions });
+          const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: "ropsten" });
           setMagic(magicObj);
         } catch (error) {
           console.log(error);
