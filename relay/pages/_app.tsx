@@ -17,46 +17,44 @@ function App({ Component, pageProps }: AppProps) {
 
   const [loggedIn, setLoggedIn] = useState(false);
 
+  // const [loginMethod, setLoginMethod] = useState<"magic" | "metamask" | "github">("magic");
+
   // initialize web3 and valist object on document load (this effect is only triggered once)
   useEffect(() => {
     (async function () {
         try {
-            // Start Magic Provider Code
-            const customNodeOptions = {
-              rpcUrl: 'http://127.0.0.1:8545', // Your own node URL
-              chainId: 5777 // Your own node's chainId
-            }
-
-            const magicObj = new Magic('pk_test_69A0114AF6E0F54E', { network: customNodeOptions });
-            setMagic(magicObj);
-
+          const customNodeOptions = {
+            rpcUrl: process.env.WEB3_PROVIDER || "http://127.0.0.1:9545"
+          };
+          const magicObj = new Magic('pk_test_9DA0DA4DF627E0D3', { network: customNodeOptions });
+          setMagic(magicObj);
         } catch (error) {
-            console.log(error);
+          console.log(error);
         }
     })();
   }, []);
 
   useEffect(() => {
-    (async function() {
+    (async function () {
       if (magic) {
-        // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types yet
+        // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
         const valist = new Valist(magic.rpcProvider, true);
 
         await valist.connect();
 
-        // @ts-ignore
-        window.valist = valist; // keep for testing purposes
+        // @ts-ignore keep for dev purposes
+        window.valist = valist;
         setValist(valist);
       }
     })();
-  }, [magic]);
+  }, [loggedIn, magic]);
 
   return loggedIn ? (
     // @ts-ignore
     <ValistContext.Provider value={valist}>
       <Component {...pageProps} />
     </ValistContext.Provider>
-  ) : magic ? <LoginForm magic={magic} setLoggedIn={setLoggedIn} {...pageProps} /> : <div>Loading...</div>
+  ) : <LoginForm magic={magic} setLoggedIn={setLoggedIn} {...pageProps} />
 }
 
 // Only uncomment this method if you have blocking data requirements for
