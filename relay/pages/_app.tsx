@@ -23,8 +23,15 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async function () {
         try {
-          const magicObj = new Magic('pk_test_54C6079CBEF87272', { network: "ropsten" });
+
+          const customNodeOptions = {
+            rpcUrl: 'https://rpc-mumbai.matic.today',
+            chainId: 80001
+          };
+
+          const magicObj = new Magic('pk_test_54C6079CBEF87272', { network: customNodeOptions });
           setMagic(magicObj);
+
         } catch (e) {
           console.log(e);
         }

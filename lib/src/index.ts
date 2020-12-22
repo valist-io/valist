@@ -421,7 +421,8 @@ class Valist {
   async createOrganization(orgName: string, orgMeta: {name: string, description: string}, account: string) {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-      const result = await this.valist.methods.createOrganization(orgName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account });
+      const block = await this.web3.eth.getBlock("latest");
+      const result = await this.valist.methods.createOrganization(orgName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account, gasLimit: block.gasLimit });
       return result;
     } catch (e) {
       const msg = `Could not create organization`;
@@ -434,7 +435,8 @@ class Valist {
     try {
       const org = await this.getOrganization(orgName);
       const metaFile = await this.addJSONtoIPFS(repoMeta);
-      const result = await org.methods.createRepository(repoName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account });
+      const block = await this.web3.eth.getBlock("latest");
+      const result = await org.methods.createRepository(repoName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account, gasLimit: block.gasLimit });
       return result;
     } catch(e) {
       const msg = `Could not create repository`;
@@ -446,7 +448,8 @@ class Valist {
   async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
-      const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account });
+      const block = await this.web3.eth.getBlock("latest");
+      const result = await repo.methods.publishRelease(release.tag, release.hash, release.meta).send({ from: account, gasLimit: block.gasLimit });
       return result;
     } catch (e) {
       const msg = `Could not publish release`;
