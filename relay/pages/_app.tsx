@@ -1,4 +1,5 @@
 import { AppProps } from 'next/app';
+import getConfig from "next/config";
 import React, { useEffect, useState } from 'react';
 
 import Valist from 'valist';
@@ -8,6 +9,8 @@ import { Magic } from 'magic-sdk';
 import LoginForm from '../components/LoginForm/LoginForm';
 
 import '../styles/main.css';
+
+const { publicRuntimeConfig } = getConfig();
 
 function App({ Component, pageProps }: AppProps) {
 
@@ -25,11 +28,10 @@ function App({ Component, pageProps }: AppProps) {
         try {
 
           const customNodeOptions = {
-            rpcUrl: 'https://rpc-mumbai.matic.today',
-            chainId: 80001
+            rpcUrl: publicRuntimeConfig.WEB3_PROVIDER
           };
 
-          const magicObj = new Magic('pk_test_54C6079CBEF87272', { network: customNodeOptions });
+          const magicObj = new Magic("pk_test_54C6079CBEF87272", { network: customNodeOptions });
           setMagic(magicObj);
 
         } catch (e) {
