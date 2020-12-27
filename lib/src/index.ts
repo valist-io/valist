@@ -84,8 +84,8 @@ class Valist {
   // returns organization contract instance
   async getOrganization(orgName: string) {
     try {
-      const orgAddress = await this.valist.methods.orgs(orgName).call();
-      const org = getValistOrganizationContract(this.web3, orgAddress);
+      const orgContract = await this.valist.methods.orgs(orgName).call();
+      const org = getValistOrganizationContract(this.web3, orgContract.org);
       return org;
     } catch (e) {
       const msg = `Could not get organization contract`;
@@ -109,23 +109,12 @@ class Valist {
     }
   }
 
-  async getCreatedOrganizations() {
+  async getOrganizationNames() {
     try {
-      const organizations = await this.valist.getPastEvents('OrganizationCreated', {fromBlock: 0, toBlock: 'latest'});
-      return organizations;
+      const orgs = await this.valist.methods.getOrgNames().call();
+      return orgs;
     } catch (e) {
-      const msg = `Could not get created organizations`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getDeletedOrganizations() {
-    try {
-      const organizations = await this.valist.getPastEvents('OrganizationDeleted', {fromBlock: 0, toBlock: 'latest'});
-      return organizations;
-    } catch (e) {
-      const msg = `Could not get deleted organizations`;
+      const msg = `Could not get organization names`;
       console.error(msg, e);
       throw e;
     }
@@ -147,8 +136,8 @@ class Valist {
   async getRepository(orgName: string, repoName: string) {
     try {
       const org = await this.getOrganization(orgName);
-      const repoAddress = await org.methods.repos(repoName).call();
-      const repo = getValistRepositoryContract(this.web3, repoAddress);
+      const repoContract = await org.methods.repos(repoName).call();
+      const repo = getValistRepositoryContract(this.web3, repoContract.repo);
       return repo;
     } catch (e) {
       const msg = `Could not get repository contract`;
@@ -160,7 +149,7 @@ class Valist {
   async getReposFromOrganization(orgName: string) {
     try {
       const org = await this.getOrganization(orgName);
-      const repos = await org.getPastEvents('RepositoryCreated', {fromBlock: 0, toBlock: 'latest'});
+      const repos = await org.methods.getRepoNames().call();
       return repos;
     } catch (e) {
       const msg = `Could not get repositories from organization`;
@@ -184,25 +173,13 @@ class Valist {
     }
   }
 
-  async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account:string) {
+  async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
       const hash = await this.addJSONtoIPFS(repoMeta);
       await repo.methods.updateRepoMeta(hash).send({ from: account });
     } catch (e) {
       const msg = `Could not set repository metadata`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getLatestTagFromRepo(orgName: string, repoName: string) {
-    try {
-      const repo = await this.getRepository(orgName, repoName);
-      const tag = await repo.methods.tag().call();
-      return tag;
-    } catch (e) {
-      const msg = `Could not get latest tag from repo`;
       console.error(msg, e);
       throw e;
     }
@@ -220,13 +197,24 @@ class Valist {
     }
   }
 
-  async getLatestReleaseMetaFromRepo(orgName: string, repoName: string) {
+  async getLatestTagFromRepo(orgName: string, repoName: string) {
+    try {
+      const release = await this.getLatestReleaseFromRepo(orgName, repoName);
+      return release.tag;
+    } catch (e) {
+      const msg = `Could not get latest tag from repo`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getReleaseTagsFromRepo(orgName: string, repoName: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
-      const release = await repo.methods.releaseMeta().call();
-      return release;
+      const tags = await repo.methods.getTags().call();
+      return [...tags].reverse();
     } catch (e) {
-      const msg = `Could not get latest release metadata from repo`;
+      const msg = `Could not get release tags from repo`;
       console.error(msg, e);
       throw e;
     }
@@ -235,7 +223,15 @@ class Valist {
   async getReleasesFromRepo(orgName: string, repoName: string) {
     try {
       const repo = await this.getRepository(orgName, repoName);
-      return await repo.getPastEvents('Release', {fromBlock: 0, toBlock: 'latest'});
+      const tags = await repo.methods.getTags().call();
+      const releases: any[] = [];
+
+      for (let i = 0; i < tags.length; i++) {
+        const release = await repo.methods.releases(tags[i]).call();
+        releases.push(release);
+      };
+
+      return releases;
     } catch (e) {
       const msg = `Could not get releases from repo`;
       console.error(msg, e);
@@ -245,17 +241,10 @@ class Valist {
 
   async getReleaseByTag(orgName: string, repoName: string, tag: string) {
     try {
-      const events = await this.getReleasesFromRepo(orgName, repoName);
+      const repo = await this.getRepository(orgName, repoName);
+      const release = await repo.methods.releases(tag).call();
 
-      // @TODO make this more efficient later
-      for (let i = 0; i < events.length; i++) {
-        if (events[i].returnValues.tag == tag) {
-            const { tag, release, releaseMeta } = events[i].returnValues;
-            return { tag, release, releaseMeta }
-        }
-      }
-
-      return;
+      return release;
 
     } catch (e) {
       const msg = `Could not get release by tag`;
