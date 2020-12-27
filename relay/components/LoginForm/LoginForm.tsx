@@ -5,11 +5,12 @@ import { Magic } from 'magic-sdk';
 function LoginForm({ magic, setLoggedIn }: { magic: Magic, setLoggedIn: any }) {
 
     const [email, setEmail] = useState("");
+    const [checking, setChecking] = useState(true);
 
     useEffect(() => {
         (async function () {
             if (magic) {
-                setLoggedIn(await magic.user.isLoggedIn());
+                setLoggedIn(await magic.user.isLoggedIn(), setChecking(false));
             }
         })();
     }, [magic]);
@@ -24,10 +25,10 @@ function LoginForm({ magic, setLoggedIn }: { magic: Magic, setLoggedIn: any }) {
             <div className="sm:mx-auto sm:w-full sm:max-w-md">
                 <img className="mx-auto h-12 w-auto" src="/images/ValistLogo128.png" alt="Valist Logo" />
                 <h2 className="mt-6 text-center text-3xl leading-9 font-extrabold text-gray-900">
-                    Sign in, or sign up
-                    </h2>
+                    {checking ? `Checking for Magic session...` : `Sign in, or sign up`}
+                </h2>
             </div>
-            <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
+            { !checking && <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md">
                 <div className="bg-white py-8 px-4 shadow sm:rounded-lg sm:px-10">
                     <div>
                         <label htmlFor="email" className="block text-sm font-medium leading-5 text-gray-700">
@@ -68,7 +69,7 @@ function LoginForm({ magic, setLoggedIn }: { magic: Magic, setLoggedIn: any }) {
                         </div>
                     </div> */}
                 </div>
-            </div>
+            </div> }
         </div>
     )
 }
