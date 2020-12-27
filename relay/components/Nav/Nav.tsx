@@ -27,7 +27,7 @@ export const Nav:FunctionComponent<any> = ({}) => {
                     <div className="hidden lg:block lg:w-80">
                     <div className="flex items-center justify-end">
                         <div className="flex">
-                        <a href="https://github.com/valist-io/valist" className="px-3 py-2 rounded-md text-sm leading-5 font-medium text-indigo-200 hover:text-white focus:outline-none focus:text-white focus:bg-indigo-600 transition duration-150 ease-in-out">Documentation</a>
+                        <a href="https://docs.valist.io" className="px-3 py-2 rounded-md text-sm leading-5 font-medium text-indigo-200 hover:text-white focus:outline-none focus:text-white focus:bg-indigo-600 transition duration-150 ease-in-out">Documentation</a>
                         <a href="mailto:support@valist.io?subject=Valist Support" className="px-3 py-2 rounded-md text-sm leading-5 font-medium text-indigo-200 hover:text-white focus:outline-none focus:text-white focus:bg-indigo-600 transition duration-150 ease-in-out">Support</a>
                         </div>
 

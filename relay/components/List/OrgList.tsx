@@ -6,13 +6,13 @@ import NavTree from '../Nav/NavTree';
 export const OrgList= () => {
     const valist = useContext(ValistContext);
 
-    const [orgs, setOrgs] = useState([{ returnValues: { orgName: "Loading...", orgMeta: "Loading..." }, blockNumber: 0, transactionHash: "0x0" }]);
+    const [orgs, setOrgs] = useState(["Loading..."]);
 
     useEffect(() => {
         (async function() {
             if (valist) {
                 try {
-                    setOrgs(await valist.getCreatedOrganizations());
+                    setOrgs(await valist.getOrganizationNames());
                 } catch (e) {}
             }
         })()
@@ -26,8 +26,8 @@ export const OrgList= () => {
                 </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
-            {orgs.map((org: any) => (
-                <Link href={`${org.returnValues.orgName}`} key={org.transactionHash}>
+            {orgs.map((orgName: string) => (
+                <Link href={`${orgName}`} key={orgName}>
                     <li className="relative pl-4 pr-6 py-5 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">
                         <div className="flex items-center justify-between space-x-4">
                             <div className="min-w-0 space-y-3">
@@ -40,16 +40,11 @@ export const OrgList= () => {
                                         <h2 className="text-sm font-medium leading-5">
                                             <a href="#">
                                                 <span className="absolute inset-0"></span>
-                                                {org.returnValues.orgName}
+                                                {orgName}
                                             </a>
                                         </h2>
                                     </span>
                                 </div>
-                                <a href="#" className="relative group flex items-center space-x-2.5">
-                                    <div className="text-sm leading-5 text-gray-500 group-hover:text-gray-900 font-medium truncate">
-                                        {org.returnValues.orgMeta}
-                                    </div>
-                                </a>
                             </div>
                             <div className="sm:hidden">
                                 <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
@@ -57,11 +52,6 @@ export const OrgList= () => {
                                 </svg>
                             </div>
 
-                            <div className="hidden sm:flex flex-col flex-shrink-0 items-end space-y-3">
-                                <p className="flex text-gray-500 text-sm leading-5 space-x-2">
-                                    <span>Block: {org.blockNumber}</span>
-                                </p>
-                            </div>
                         </div>
                     </li>
                 </Link>
