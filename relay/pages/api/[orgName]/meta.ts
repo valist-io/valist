@@ -17,8 +17,7 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
     const orgMeta = await valist.getOrganizationMeta(orgName.toString());
 
     if (orgMeta) {
-      // return res.status(200).json({orgMeta});
-      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${orgMeta}`);
+      return res.status(200).json({orgMeta});
     } else {
       return res.status(404).json({statusCode: 404, message: "No organization found!"});
     }

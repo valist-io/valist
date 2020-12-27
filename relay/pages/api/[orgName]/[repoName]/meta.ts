@@ -17,8 +17,7 @@ export default async function getRepoMeta(req: NextApiRequest, res: NextApiRespo
     const repoMeta = await valist.getRepoMeta(orgName.toString(), repoName.toString());
 
     if (repoMeta) {
-      // return res.status(200).json({repoMeta});
-      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${repoMeta}`);
+      return res.status(200).json({repoMeta});
     } else {
       return res.status(404).json({statusCode: 404, message: "No repository found!"});
     }

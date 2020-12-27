@@ -18,7 +18,7 @@ export default async function getLatestReleaseFromRepo(req: NextApiRequest, res:
 
     if (latestRelease) {
       //return res.status(200).json({latestRelease});
-      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${latestRelease}`);
+      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${latestRelease.releaseCID}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }

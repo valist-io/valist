@@ -27,10 +27,9 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
                 homepage: "",
                 dependencies: {},
                 dist: {
-                    tarball: `https://ipfs.io/ipfs/${release.release}`
+                    tarball: `https://ipfs.io/ipfs/${release.releaseCID}`
                 }
             });
-            //return res.redirect(`https://ipfs.io/ipfs/${release.release}`);
         } else {
             return res.status(404).json({statusCode: 404, message: "No release found!"});
         }

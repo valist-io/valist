@@ -14,11 +14,11 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
       query: { orgName, repoName },
     } = req;
 
-    const releaseMeta = await valist.getLatestReleaseMetaFromRepo(orgName.toString(), repoName.toString());
+    const latestRelease = await valist.getLatestReleaseFromRepo(orgName.toString(), repoName.toString());
 
-    if (releaseMeta) {
+    if (latestRelease) {
       //return res.status(200).json({releaseMeta});
-      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${releaseMeta}`);
+      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${latestRelease.metaCID}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }
