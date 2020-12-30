@@ -4473,7 +4473,7 @@
     "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.7.0;\npragma experimental ABIEncoderV2;\n\nimport \"./ValistOrganization.sol\";\n\ncontract Valist {\n\n    bytes32 constant ORG_ADMIN = keccak256(\"ORG_ADMIN_ROLE\");\n\n    struct Organization {\n        uint index;\n        ValistOrganization org;\n    }\n\n    // map an organization/username handle to an Organization contract\n    // this enables the following schema:\n    // [valist.io/other relays]/[organization]/[repository]\n    mapping(string => Organization) public orgs;\n\n    string[] public orgNames;\n\n    function getOrgNames() public view returns (string[] memory) {\n        return orgNames;\n    }\n\n    // register organization/username to the global valist namespace\n    function createOrganization(string memory _orgName, string memory _orgMeta) public returns(address) {\n        require(address(orgs[_orgName].org) == address(0), \"Organization exists\");\n\n        orgNames.push(_orgName);\n\n        orgs[_orgName].index = orgNames.length - 1;\n\n        orgs[_orgName].org = new ValistOrganization(msg.sender, _orgMeta);\n\n        return address(orgs[_orgName].org);\n    }\n\n    function deleteOrganization(string memory _orgName) public {\n        require(orgs[_orgName].org.hasRole(ORG_ADMIN, msg.sender), \"Access Denied\");\n\n        ValistOrganization org = orgs[_orgName].org;\n\n        delete orgNames[orgs[_orgName].index];\n        delete orgs[_orgName];\n\n        org._deleteOrganization(msg.sender);\n    }\n\n}\n",
     "sourcePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
     "ast": {
-        "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
+        "absolutePath": "/Users/zach/Development/valist/eth/contracts/Valist.sol",
         "exportedSymbols": {
             "AccessControl": [
                 908
@@ -4522,7 +4522,7 @@
                 "src": "57:33:1"
             },
             {
-                "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/ValistOrganization.sol",
+                "absolutePath": "/Users/zach/Development/valist/eth/contracts/ValistOrganization.sol",
                 "file": "./ValistOrganization.sol",
                 "id": 40,
                 "nodeType": "ImportDirective",
@@ -6263,7 +6263,7 @@
     },
     "legacyAST": {
         "attributes": {
-            "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
+            "absolutePath": "/Users/zach/Development/valist/eth/contracts/Valist.sol",
             "exportedSymbols": {
                 "AccessControl": [
                     908
@@ -8359,8 +8359,8 @@
                 }
             },
             "links": {},
-            "address": "0x97e3F0A6B4E65e30A73e6CB70e4467721E0f07Fc",
-            "transactionHash": "0xe745a66f4f8a3fe43cd0965a362a1dfdd8c8981d096d888697610ea79c97c462"
+            "address": "0x2d80330881D6F61cF722C8ad059a2509b0859891",
+            "transactionHash": "0x108529ef26812cc2d0d483ef873a0522880567b37f716458dad6c35a3c8d04d9"
         },
         "80001": {
             "events": {

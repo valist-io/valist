@@ -48,7 +48,10 @@ function App({ Component, pageProps }: AppProps) {
           const valist = new Valist(magic.rpcProvider, true);
 
           await valist.connect();
-
+          console.log(valist)
+          console.log("Current Account: ", valist.defaultAccount)
+          // @ts-ignore
+          console.log("Current Account Balance: ", await valist.web3.eth.getBalance(valist.defaultAccount) / 1000000000000000000);
           // @ts-ignore keep for dev purposes
           window.valist = valist;
           setValist(valist);
