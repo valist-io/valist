@@ -6,16 +6,7 @@ import NavTree from '../Nav/NavTree';
 export const ProjectsList= ({orgName}: { orgName: string }) => {
     const valist = useContext(ValistContext)
 
-    const [projects, setProjects] = useState<any>([
-        {
-            returnValues:
-                {
-                    repoName: "Loading...",
-                    repoMeta: "Loading..."
-                },
-        blockNumber: 0,
-        transactionHash: "0x0"
-    }]);
+    const [projects, setProjects] = useState(["Loading..."]);
 
     useEffect(() => {
         (async function() {
@@ -35,48 +26,35 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
                 </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
-            {projects.map((project: { transactionHash: string, blockNumber: number, returnValues: { repoName: string, repoMeta: string }}) => {
-                return (
-                    <Link href={`${orgName}/${project.returnValues.repoName}`} key={project.transactionHash}>
+            {projects.map((repoName: string) => (
+                    <Link href={`${orgName}/${repoName}`} key={repoName}>
                         <li className="relative pl-4 pr-6 py-5 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">
                             <div className="flex items-center justify-between space-x-4">
-                            <div className="min-w-0 space-y-3">
-                                <div className="flex items-center space-x-3">
-                                <span aria-label="Running" className="h-4 w-4 bg-green-100 rounded-full flex items-center justify-center">
-                                    <span className="h-2 w-2 bg-green-400 rounded-full"></span>
-                                </span>
+                                <div className="min-w-0 space-y-3">
+                                    <div className="flex items-center space-x-3">
+                                    <span aria-label="Running" className="h-4 w-4 bg-green-100 rounded-full flex items-center justify-center">
+                                        <span className="h-2 w-2 bg-green-400 rounded-full"></span>
+                                    </span>
 
-                                <span className="block">
-                                    <h2 className="text-sm font-medium leading-5">
-                                    <a href="#">
-                                        <span className="absolute inset-0"></span>
-                                        {project.returnValues.repoName}
-                                    </a>
-                                    </h2>
-                                </span>
+                                    <span className="block">
+                                        <h2 className="text-sm font-medium leading-5">
+                                        <a href="#">
+                                            <span className="absolute inset-0"></span>
+                                            {repoName}
+                                        </a>
+                                        </h2>
+                                    </span>
+                                    </div>
                                 </div>
-                                <a href="#" className="relative group flex items-center space-x-2.5">
-                                <div className="text-sm leading-5 text-gray-500 group-hover:text-gray-900 font-medium truncate">
-                                    {project.returnValues.repoMeta}
+                                <div className="sm:hidden">
+                                    <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
+                                    <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
+                                    </svg>
                                 </div>
-                                </a>
-                            </div>
-                            <div className="sm:hidden">
-                                <svg className="h-5 w-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor">
-                                <path fillRule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z" clipRule="evenodd" />
-                                </svg>
-                            </div>
-
-                            <div className="hidden sm:flex flex-col flex-shrink-0 items-end space-y-3">
-                                <p className="flex text-gray-500 text-sm leading-5 space-x-2">
-                                <span>Block: {project.blockNumber}</span>
-                                </p>
-                            </div>
                             </div>
                         </li>
                     </Link>
-                )
-            })}
+                ))}
             </ul>
         </div>
     );

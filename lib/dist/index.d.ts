@@ -12,22 +12,17 @@ declare class Valist {
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<import("web3-eth-contract").Contract>;
     getOrganizationMeta(orgName: string): Promise<any>;
-    getCreatedOrganizations(): Promise<any>;
-    getDeletedOrganizations(): Promise<any>;
+    getOrganizationNames(): Promise<any>;
     setOrgMeta(orgName: string, orgMeta: any, account: string): Promise<void>;
     getRepository(orgName: string, repoName: string): Promise<import("web3-eth-contract").Contract>;
-    getReposFromOrganization(orgName: string): Promise<import("web3-eth-contract").EventData[]>;
+    getReposFromOrganization(orgName: string): Promise<any>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
     setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string): Promise<void>;
-    getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
-    getLatestReleaseMetaFromRepo(orgName: string, repoName: string): Promise<any>;
-    getReleasesFromRepo(orgName: string, repoName: string): Promise<import("web3-eth-contract").EventData[]>;
-    getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<{
-        tag: any;
-        release: any;
-        releaseMeta: any;
-    } | undefined>;
+    getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;
+    getReleaseTagsFromRepo(orgName: string, repoName: string): Promise<any[]>;
+    getReleasesFromRepo(orgName: string, repoName: string): Promise<any[]>;
+    getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<any>;
     isOrgAdmin(orgName: string, account: string): Promise<any>;
     isRepoAdmin(orgName: string, repoName: string, account: string): Promise<any>;
     isRepoDev(orgName: string, repoName: string, account: string): Promise<any>;

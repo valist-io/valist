@@ -1,23 +1,31 @@
 // SPDX-License-Identifier: MIT
-pragma solidity >=0.4.21 <0.7.0;
+pragma solidity >=0.7.0;
+pragma experimental ABIEncoderV2;
 
 import "@openzeppelin/contracts/access/AccessControl.sol";
 
 contract ValistRepository is AccessControl {
 
+    address immutable deployer;
+
     bytes32 constant REPO_ADMIN = keccak256("REPO_ADMIN_ROLE");
     bytes32 constant REPO_DEV = keccak256("REPO_DEV_ROLE");
 
-    address immutable deployer;
+    string public repoMeta; // ipfs URI for metadata (image, description, etc)
 
-    string public repoMeta; // ipfs URI for metadata (image, description, etc)\
-    string public releaseMeta; // version/build number, changelog, other release specific metadata (valist json schema)
-    string public latestRelease; // latest release hash
-    string public tag;
+    struct Release {
+        string tag;
+        string releaseCID;
+        string metaCID;
+    }
 
-    event Release(string tag, string release, string releaseMeta);
+    mapping(string => Release) public releases;
 
-    event MetaUpdated(string repoMeta);
+    string[] public tags;
+
+    Release public latestRelease; // latest release
+
+    event NewRelease(string tag);
 
     modifier admin() {
         require(hasRole(REPO_ADMIN, msg.sender), "Access Denied");
@@ -29,7 +37,7 @@ contract ValistRepository is AccessControl {
         _;
     }
 
-    constructor(address _admin, string memory _repoMeta) public {
+    constructor(address _admin, string memory _repoMeta) {
         deployer = msg.sender;
 
         _setupRole(REPO_ADMIN, _admin);
@@ -39,18 +47,24 @@ contract ValistRepository is AccessControl {
         repoMeta = _repoMeta;
     }
 
-    function updateRepoMeta(string memory _repoMeta) public admin returns (string memory) {
-        repoMeta = _repoMeta;
+    function getTags() public view returns(string[] memory) {
+        return tags;
+    }
 
-        emit MetaUpdated(repoMeta);
+    function updateRepoMeta(string memory _repoMeta) public admin {
+        repoMeta = _repoMeta;
     }
 
     function publishRelease(string memory _tag, string memory _latestRelease, string memory _releaseMeta) public developer {
-        tag = _tag;
-        latestRelease = _latestRelease;
-        releaseMeta = _releaseMeta;
+        require(bytes(releases[_tag].releaseCID).length == 0, "Tag already used");
 
-        emit Release(tag, latestRelease, releaseMeta);
+        tags.push(_tag);
+
+        releases[_tag] = Release(_tag, _latestRelease, _releaseMeta);
+
+        latestRelease = releases[_tag];
+
+        emit NewRelease(_tag);
     }
 
     function _deleteRepository(address payable _admin) external {

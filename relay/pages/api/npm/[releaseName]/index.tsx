@@ -26,22 +26,21 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
         let version_object = {}
 
         for(let i = 0; i < releases.length; i++) {
-            let current_release = releases[i]
-            console.log(current_release)
+            let currentRelease = releases[i];
             let modified_release = {
                 name: repoName,
-                version: releases[i].returnValues.tag,
+                version: releases[i].tag,
                 repository: "",
                 contributors: "",
                 bugs: "",
                 homepage: "",
                 dependencies: {},
                 dist: {
-                    tarball: `https://ipfs.io/ipfs/${releases[i].returnValues.release}`
+                    tarball: `https://ipfs.io/ipfs/${releases[i].releaseCID}`
                 }
             }
             // @ts-ignore
-            version_object[current_release.returnValues.tag] = modified_release
+            version_object[currentRelease.tag] = modified_release
         }
 
         return res.status(200).json({
