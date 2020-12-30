@@ -18,8 +18,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -43,8 +42,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -57,8 +55,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -4473,7 +4470,7 @@
   "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.7.0;\npragma experimental ABIEncoderV2;\n\nimport \"./ValistOrganization.sol\";\n\ncontract Valist {\n\n    bytes32 constant ORG_ADMIN = keccak256(\"ORG_ADMIN_ROLE\");\n\n    struct Organization {\n        uint index;\n        ValistOrganization org;\n    }\n\n    // map an organization/username handle to an Organization contract\n    // this enables the following schema:\n    // [valist.io/other relays]/[organization]/[repository]\n    mapping(string => Organization) public orgs;\n\n    string[] public orgNames;\n\n    function getOrgNames() public view returns (string[] memory) {\n        return orgNames;\n    }\n\n    // register organization/username to the global valist namespace\n    function createOrganization(string memory _orgName, string memory _orgMeta) public returns(address) {\n        require(address(orgs[_orgName].org) == address(0), \"Organization exists\");\n\n        orgNames.push(_orgName);\n\n        orgs[_orgName].index = orgNames.length - 1;\n\n        orgs[_orgName].org = new ValistOrganization(msg.sender, _orgMeta);\n\n        return address(orgs[_orgName].org);\n    }\n\n    function deleteOrganization(string memory _orgName) public {\n        require(orgs[_orgName].org.hasRole(ORG_ADMIN, msg.sender), \"Access Denied\");\n\n        ValistOrganization org = orgs[_orgName].org;\n\n        delete orgNames[orgs[_orgName].index];\n        delete orgs[_orgName];\n\n        org._deleteOrganization(msg.sender);\n    }\n\n}\n",
   "sourcePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
   "ast": {
-    "absolutePath": "/Users/zach/Development/valist/eth/contracts/Valist.sol",
+    "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
     "exportedSymbols": {
       "AccessControl": [
         908
@@ -4522,7 +4519,7 @@
         "src": "57:33:1"
       },
       {
-        "absolutePath": "/Users/zach/Development/valist/eth/contracts/ValistOrganization.sol",
+        "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/ValistOrganization.sol",
         "file": "./ValistOrganization.sol",
         "id": 40,
         "nodeType": "ImportDirective",
@@ -6263,7 +6260,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/Users/zach/Development/valist/eth/contracts/Valist.sol",
+      "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Valist.sol",
       "exportedSymbols": {
         "AccessControl": [
           908
@@ -8403,8 +8400,7 @@
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2020-12-27T06:37:57.071Z",
-  "networkType": "ethereum",
+  "updatedAt": "2020-12-30T03:17:21.834Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},

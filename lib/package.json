@@ -16,7 +16,7 @@
     "url": "https://github.com/valist-io/valist/issues"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],
