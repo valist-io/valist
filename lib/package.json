@@ -23,9 +23,14 @@
   "scripts": {
     "build": "tsc",
     "dev": "tsc -w",
-    "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none"
+    "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none",
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.2.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
     "typedoc": "^0.19.2",
     "typescript": "^3.9.7"
   },
