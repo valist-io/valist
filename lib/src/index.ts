@@ -11,12 +11,6 @@ if (!globalThis.fetch) {
     globalThis.fetch = fetch;
 }
 
-// keccak256 hashes of each role
-const ORG_OWNER_ROLE = "0xb87a5d8a0d5a23072fd4a424fbe287673c1d38009005ff09c80513903e97ad13";
-const ORG_ADMIN_ROLE = "0x123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e12683553c62";
-const REPO_ADMIN_ROLE = "0xff7d2294a3c189284afb74beb7d578b566cf69863d5cb16db08773c21bea56c9";
-const REPO_DEV_ROLE = "0x069bf569f27d389f2c70410107860b2e82ff561283b097a89e897daa5e34b1b6";
-
 export const shortnameFilterRegex = /[^A-z0-9-]/;
 
 export type ProjectType = "binary" | "npm" | "pip" | "docker";
@@ -69,23 +63,31 @@ class Valist {
     }
   }
 
-  // returns organization
-  // async getOrganization(orgName: string) {
-  //   try {
-  //     const orgContract = await this.valist.methods.orgs(orgName).call();
-  //     const org = getValistOrganizationContract(this.web3, orgContract.org);
-  //     return org;
-  //   } catch (e) {
-  //     const msg = `Could not get organization contract`;
-  //     console.error(msg, e);
-  //     throw e;
-  //   }
-  // }
+  // returns organization meta and release tags
+  async getOrganization(orgName: string) {
+    try {
+      const org = await this.valist.methods.getOrganization(orgName).call();
+
+      let json: any = {};
+
+      try { json = await this.fetchJSONfromIPFS(org[0]) } catch (e) {}
+
+      return { meta: json, repoNames: org[1] };
+
+    } catch (e) {
+      const msg = `Could not get organization`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
 
   async getOrganizationMeta(orgName: string) {
     try {
       const orgMeta = await this.valist.methods.getOrgMeta(orgName).call();
-      const json = await this.fetchJSONfromIPFS(orgMeta);
+
+      let json: any = {};
+
+      try { json = await this.fetchJSONfromIPFS(orgMeta) } catch (e) {}
 
       return json;
 
@@ -118,19 +120,23 @@ class Valist {
     }
   }
 
-  // returns repository contract instance
-  // async getRepository(orgName: string, repoName: string) {
-  //   try {
-  //     const org = await this.getOrganization(orgName);
-  //     const repoContract = await org.methods.repos(repoName).call();
-  //     const repo = getValistRepositoryContract(this.web3, repoContract.repo);
-  //     return repo;
-  //   } catch (e) {
-  //     const msg = `Could not get repository contract`;
-  //     console.error(msg, e);
-  //     throw e;
-  //   }
-  // }
+  // returns repository
+  async getRepository(orgName: string, repoName: string) {
+    try {
+      const repo = await this.valist.methods.getRepository(orgName, repoName).call();
+
+      let json: any = {};
+
+      try { json = await this.fetchJSONfromIPFS(repo[0]) } catch (e) {}
+
+      return { meta: json, tags: repo[1] };
+
+    } catch (e) {
+      const msg = `Could not get repository contract`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
 
   async getReposFromOrganization(orgName: string) {
     try {
@@ -146,7 +152,10 @@ class Valist {
   async getRepoMeta(orgName: string, repoName: string) {
     try {
       const repoMeta = await this.valist.methods.getRepoMeta(orgName, repoName).call();
-      const json = await this.fetchJSONfromIPFS(repoMeta);
+
+      let json: any = {};
+
+      try { json = await this.fetchJSONfromIPFS(repoMeta) } catch (e) {};
 
       return json;
 

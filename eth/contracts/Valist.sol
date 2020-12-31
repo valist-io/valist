@@ -85,6 +85,8 @@ contract Valist is EIP712MetaTransaction("Valist","0") {
         _;
     }
 
+    event ReleaseEvent(string _orgName, string _repoName, string _tag);
+
     function isOrgOwner(string memory _orgName, address _address) public view returns (bool) {
         return orgs[_orgName].roles[ORG_OWNER].contains(_address);
     }
@@ -267,6 +269,8 @@ contract Valist is EIP712MetaTransaction("Valist","0") {
         orgs[_orgName].repos[_repoName].tags.push(_tag);
 
         orgs[_orgName].repos[_repoName].releases[_tag] = Release(_releaseCID, _metaCID);
+
+        emit ReleaseEvent(_orgName, _repoName, _tag);
     }
 
     function deleteRepository(string memory _orgName, string memory _repoName) public orgAdmin(_orgName) {

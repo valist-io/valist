@@ -10,9 +10,17 @@ declare class Valist {
     defaultAccount: string;
     constructor(web3Provider: provider, ipfsEnabled?: boolean);
     connect(): Promise<void>;
+    getOrganization(orgName: string): Promise<{
+        meta: any;
+        repoNames: any;
+    }>;
     getOrganizationMeta(orgName: string): Promise<any>;
     getOrganizationNames(): Promise<any>;
     setOrgMeta(orgName: string, orgMeta: any, account: string): Promise<void>;
+    getRepository(orgName: string, repoName: string): Promise<{
+        meta: any;
+        tags: any;
+    }>;
     getReposFromOrganization(orgName: string): Promise<any>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
     setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string): Promise<void>;
