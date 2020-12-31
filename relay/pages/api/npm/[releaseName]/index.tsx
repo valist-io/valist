@@ -16,18 +16,12 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
         const [orgName, repoName] = decodeURIComponent(releaseName.toString().replace("@", "")).split("/");
         const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
-        // const release = releases[0].returnValues
 
-        /*
-        let releaseMetaJson = await got(`https://ipfs.io/ipfs/${release.releaseMeta}`);
-        let releaseMeta = JSON.parse(releaseMetaJson)
-        */
         const latestTag = await valist.getLatestTagFromRepo(orgName, repoName);
-        let version_object = {}
+        let versions: any = {};
 
-        for(let i = 0; i < releases.length; i++) {
-            let currentRelease = releases[i];
-            let modified_release = {
+        for (let i = 0; i < releases.length; i++) {
+            versions[releases[i].tag] = {
                 name: repoName,
                 version: releases[i].tag,
                 repository: "",
@@ -38,9 +32,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
                 dist: {
                     tarball: `https://ipfs.io/ipfs/${releases[i].releaseCID}`
                 }
-            }
-            // @ts-ignore
-            version_object[currentRelease.tag] = modified_release
+            };
         }
 
         return res.status(200).json({
@@ -49,7 +41,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
             "dist-tags": {
                 latest: latestTag
             },
-            versions: version_object
+            versions
         });
 
     } else {

@@ -26,7 +26,7 @@ export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: s
                 </div>
             </div>
             <ul className="relative z-0 divide-y divide-gray-200 border-b border-gray-200">
-            {releases.map((tag) => {
+            {[...releases].reverse().map((tag) => {
                 return (
                     <Link href={`/api/${orgName}/${repoName}/${tag}`} key={tag}>
                         <li className="relative pl-4 pr-6 py-5 hover:bg-gray-50 sm:py-6 sm:pl-6 lg:pl-8 xl:pl-6">
