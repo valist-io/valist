@@ -1,14 +1,17 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
-import ipfsClient from 'ipfs-http-client';
 export declare const shortnameFilterRegex: RegExp;
 export declare type ProjectType = "binary" | "npm" | "pip" | "docker";
 declare class Valist {
     web3: Web3;
     valist: any;
-    ipfs: ipfsClient;
+    ipfs: any;
     defaultAccount: string;
-    constructor(web3Provider: provider, ipfsEnabled?: boolean);
+    constructor({ web3Provider, metaTx, ipfsHost }: {
+        web3Provider: provider;
+        metaTx?: boolean;
+        ipfsHost?: string;
+    });
     connect(): Promise<void>;
     getOrganization(orgName: string): Promise<{
         meta: any;

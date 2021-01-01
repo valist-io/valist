@@ -45,16 +45,16 @@ function App({ Component, pageProps }: AppProps) {
       if (magic && loggedIn) {
         try {
           // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
-          const valist = new Valist(magic.rpcProvider, true);
-
+          const valist = new Valist({ web3Provider: magic.rpcProvider, metaTx: true });
           await valist.connect();
-          console.log(valist)
-          console.log("Current Account: ", valist.defaultAccount)
-          // @ts-ignore
-          console.log("Current Account Balance: ", await valist.web3.eth.getBalance(valist.defaultAccount) / 1000000000000000000);
+
+          setValist(valist);
+
+          console.log("Current Account: ", valist.defaultAccount);
+          console.log("Current Account Balance: ", valist.web3.utils.fromWei(await valist.web3.eth.getBalance(valist.defaultAccount), 'ether'));
+
           // @ts-ignore keep for dev purposes
           window.valist = valist;
-          setValist(valist);
         } catch (e) {
           console.error("Could not initialize Valist object", e);
         }

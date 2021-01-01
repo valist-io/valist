@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 // @ts-ignore
-import ipfsClient from 'ipfs-http-client'
+import ipfsClient from 'ipfs-http-client';
 
 import ValistABI from './abis/Valist.json';
 
@@ -32,15 +32,17 @@ class Valist {
 
   web3: Web3;
   valist: any;
-  ipfs: ipfsClient;
+  ipfs: any;
   defaultAccount: string;
 
-  constructor(web3Provider: provider, ipfsEnabled?: boolean) {
-    this.web3 = new Web3(web3Provider);
-    this.defaultAccount = "0x0";
-    if (ipfsEnabled) {
-      this.ipfs = ipfsClient({ host: `ipfs.infura.io`, port: `5001`, apiPath: `/api/v0/`, protocol: `https` });
+  constructor({ web3Provider, metaTx = false, ipfsHost = `ipfs.infura.io`}: { web3Provider: provider, metaTx?: boolean, ipfsHost?: string }) {
+    if (metaTx) {
+      this.web3 = new Web3(web3Provider);
+    } else {
+      this.web3 = new Web3(web3Provider);
     }
+    this.defaultAccount = "0x0";
+    this.ipfs = ipfsClient({ host: ipfsHost, port: 5001, apiPath: `/api/v0/`, protocol: `https` });
   }
 
   // initialize main valist contract instance for future calls
