@@ -45,7 +45,7 @@ function App({ Component, pageProps }: AppProps) {
       if (magic && loggedIn) {
         try {
           // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
-          const valist = new Valist({ web3Provider: magic.rpcProvider, metaTx: true });
+          const valist = new Valist({ web3Provider: magic.rpcProvider, metaTx: false });
           await valist.connect();
 
           setValist(valist);

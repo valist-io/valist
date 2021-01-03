@@ -1,9 +1,14 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
+
 // @ts-ignore
 import ipfsClient from 'ipfs-http-client';
+// @ts-ignore
+import Biconomy from "@biconomy/mexa";
 
 import ValistABI from './abis/Valist.json';
+
+const sigUtil = require("eth-sig-util");
 
 // node-fetch polyfill
 const fetch = require('node-fetch');
@@ -28,19 +33,54 @@ const getValistContract = async (web3: Web3) => {
 
   return getContractInstance(web3, ValistABI.abi, deployedAddress);
 }
+
+const domainType = [
+  { name: "name", type: "string" },
+  { name: "version", type: "string" },
+  { name: "chainId", type: "uint256" },
+  { name: "verifyingContract", type: "address" }
+];
+
+const metaTransactionType = [
+  { name: "nonce", type: "uint256" },
+  { name: "from", type: "address" },
+  { name: "functionSignature", type: "bytes" }
+];
+
+const domainData = {
+  name: "Valist",
+  version: "0",
+  chainId: 80001,
+  verifyingContract: ValistABI.networks[80001].address
+};
+
 class Valist {
 
   web3: Web3;
   valist: any;
   ipfs: any;
   defaultAccount: string;
+  metaTxEnabled: boolean = false;
+  metaTxReady: boolean = false;
 
   constructor({ web3Provider, metaTx = false, ipfsHost = `ipfs.infura.io`}: { web3Provider: provider, metaTx?: boolean, ipfsHost?: string }) {
     if (metaTx) {
-      this.web3 = new Web3(web3Provider);
+      this.metaTxEnabled = true;
+
+      // setup biconomy instance with public api key
+      const biconomy = new Biconomy(web3Provider, { apiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", strictMode: true } );
+
+      this.web3 = new Web3(biconomy);
+
+      biconomy.onEvent(biconomy.READY, () => {
+        this.metaTxReady = true;
+        console.log("MetaTransactions Enabled");
+      });
+
     } else {
       this.web3 = new Web3(web3Provider);
     }
+
     this.defaultAccount = "0x0";
     this.ipfs = ipfsClient({ host: ipfsHost, port: 5001, apiPath: `/api/v0/`, protocol: `https` });
   }
@@ -390,12 +430,10 @@ class Valist {
     }
   }
 
-  async createOrganization(orgName: string, orgMeta: { name: string, description: string }, account: string) {
+  async createOrganization(orgName: string, orgMeta: { name: string, description: string }, account?: string) {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-      const block = await this.web3.eth.getBlock("latest");
-      const result = await this.valist.methods.createOrganization(orgName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account, gasLimit: block.gasLimit });
-      return result;
+      return await this.sendTransaction(this.valist.methods.createOrganization(orgName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile), account);
     } catch (e) {
       const msg = `Could not create organization`;
       console.error(msg, e);
@@ -403,12 +441,10 @@ class Valist {
     }
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: { name: string, description: string, projectType: ProjectType, homepage: string, repository: string }, account: string) {
+  async createRepository(orgName: string, repoName: string, repoMeta: { name: string, description: string, projectType: ProjectType, homepage: string, repository: string }, account?: string) {
     try {
       const metaFile = await this.addJSONtoIPFS(repoMeta);
-      const block = await this.web3.eth.getBlock("latest");
-      const result = await this.valist.methods.createRepository(orgName, repoName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile).send({ from: account, gasLimit: block.gasLimit });
-      return result;
+      return await this.sendTransaction(this.valist.methods.createRepository(orgName, repoName.toLowerCase().replace(shortnameFilterRegex, ""), metaFile), account);
     } catch(e) {
       const msg = `Could not create repository`;
       console.error(msg, e);
@@ -416,10 +452,9 @@ class Valist {
     }
   }
 
-  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account: string) {
+  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account?: string) {
     try {
-      const block = await this.web3.eth.getBlock("latest");
-      await this.valist.methods.publishRelease(orgName, repoName, release.tag, release.hash, release.meta).send({ from: account, gasLimit: block.gasLimit });
+      return await this.sendTransaction(this.valist.methods.publishRelease(orgName, repoName, release.tag, release.hash, release.meta), account);
     } catch (e) {
       const msg = `Could not publish release`;
       console.error(msg, e);
@@ -461,6 +496,93 @@ class Valist {
       const msg = `Could not fetch JSON from IPFS`;
       console.error(msg, e);
       throw e;
+    }
+  }
+
+  getSignatureParameters(signature: string) {
+    if (!this.web3.utils.isHexStrict(signature)) throw new Error(`Not a valid hex string: ${signature}`);
+
+    let r = signature.slice(0, 66);
+    let s = "0x".concat(signature.slice(66, 130));
+    let v: string | number = "0x".concat(signature.slice(130, 132));
+    v = this.web3.utils.hexToNumber(v);
+    if (![27, 28].includes(v)) v += 27;
+
+    return { r, s, v };
+  }
+
+  async sendTransaction(functionCall: any, account: string = this.defaultAccount) {
+    if (this.metaTxEnabled) {
+      try {
+        const nonce = await this.valist.methods.getNonce(account).call();
+        const functionSignature = functionCall.encodeABI();
+
+        const message = {
+          nonce: parseInt(nonce),
+          from: account,
+          functionSignature
+        };
+
+        const dataToSign = JSON.stringify({
+          types: {
+            EIP712Domain: domainType,
+            MetaTransaction: metaTransactionType
+          },
+          domain: domainData,
+          primaryType: "MetaTransaction",
+          message: message
+        });
+        console.log("FUNCTION", functionCall, "TO SIGN", dataToSign);
+
+
+        // @ts-ignore
+        // const signed = await this.web3.currentProvider.sendAsync({
+        //     jsonrpc: "2.0",
+        //     id: new Date().getTime(),
+        //     method: "eth_signTypedData_v4",
+        //     params: [this.defaultAccount, dataToSign]
+        // });
+        // @ts-ignore
+        await this.web3.currentProvider.sendAsync({
+          jsonrpc: "2.0",
+          id: new Date().getTime(),
+          method: "eth_signTypedData_v4",
+          params: [account, dataToSign]
+      }, async (err: any, signed: any) => {
+
+        const recovered = sigUtil.recoverTypedSignature_v4({
+          data: JSON.parse(dataToSign),
+          sig: signed.result
+        });
+
+        const { r, s, v } = this.getSignatureParameters(signed.result);
+
+        console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account, recovered, recovered == account.toLowerCase())
+
+        const gasLimit = await this.valist.methods
+          .executeMetaTransaction(account, functionSignature, r, s, v)
+          .estimateGas({ from: account });
+
+        const gasPrice = await this.web3.eth.getGasPrice();
+
+        return await this.valist.methods
+          .executeMetaTransaction(account, functionSignature, r, s, v)
+          .send({
+            from: account,
+            gasPrice: gasPrice,
+            gasLimit: gasLimit
+          });
+      });
+
+      } catch (e) {
+        const msg = `Could not send meta transaction`;
+        console.error(msg, e);
+        throw e;
+      }
+
+    } else {
+      const gasLimit = await functionCall.estimateGas({ from: account });
+      return await functionCall.send({ from: account, gasLimit });
     }
   }
 }

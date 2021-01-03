@@ -3,23 +3,7 @@ pragma solidity >=0.7.0;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
 
-contract EIP712MetaTransaction {
-    using SafeMath for uint256;
-    bytes32 private constant META_TRANSACTION_TYPEHASH = keccak256(bytes("MetaTransaction(uint256 nonce,address from,bytes functionSignature)"));
-
-    event MetaTransactionExecuted(address userAddress, address payable relayerAddress, bytes functionSignature);
-    mapping(address => uint256) private nonces;
-
-    /*
-     * Meta transaction structure.
-     * No point of including value field here as if user is doing value transfer then they have the funds to pay for gas
-     * They should call the desired function directly in that case.
-     */
-    struct MetaTransaction {
-        uint256 nonce;
-        address from;
-        bytes functionSignature;
-    }
+contract EIP712Base {
 
     struct EIP712Domain {
         string name;
@@ -63,20 +47,31 @@ contract EIP712MetaTransaction {
         return keccak256(abi.encodePacked("\x19\x01", getDomainSeperator(), messageHash));
     }
 
-    function convertBytesToBytes4(bytes memory inBytes) internal pure returns (bytes4 outBytes4) {
-        if (inBytes.length == 0) {
-            return 0x0;
-        }
+}
 
-        assembly {
-            outBytes4 := mload(add(inBytes, 32))
-        }
+contract EIP712MetaTransaction is EIP712Base {
+    using SafeMath for uint256;
+    bytes32 private constant META_TRANSACTION_TYPEHASH = keccak256(bytes("MetaTransaction(uint256 nonce,address from,bytes functionSignature)"));
+
+    event MetaTransactionExecuted(address userAddress, address payable relayerAddress, bytes functionSignature);
+    mapping(address => uint256) nonces;
+
+    /*
+     * Meta transaction structure.
+     * No point of including value field here as if user is doing value transfer then he has the funds to pay for gas
+     * He should call the desired function directly in that case.
+     */
+    struct MetaTransaction {
+        uint256 nonce;
+        address from;
+        bytes functionSignature;
     }
+
+    constructor(string memory name, string memory version) EIP712Base(name, version) {}
 
     function executeMetaTransaction(address userAddress,
         bytes memory functionSignature, bytes32 sigR, bytes32 sigS, uint8 sigV) public payable returns(bytes memory) {
-        bytes4 destinationFunctionSig = convertBytesToBytes4(functionSignature);
-        require(destinationFunctionSig != msg.sig, "functionSignature can not be of executeMetaTransaction method");
+
         MetaTransaction memory metaTx = MetaTransaction({
             nonce: nonces[userAddress],
             from: userAddress,
@@ -85,7 +80,7 @@ contract EIP712MetaTransaction {
         require(verify(userAddress, metaTx, sigR, sigS, sigV), "Signer and signature do not match");
         nonces[userAddress] = nonces[userAddress].add(1);
         // Append userAddress at the end to extract it from calling context
-        (bool success, bytes memory returnData) = address(this).call(abi.encodePacked(functionSignature, userAddress));
+        (bool success, bytes memory returnData) = address(this).call(abi.encodePacked(functionSignature, userAddress, msg.sender));
 
         require(success, "Function call not successful");
         emit MetaTransactionExecuted(userAddress, msg.sender, functionSignature);
@@ -101,7 +96,7 @@ contract EIP712MetaTransaction {
         ));
     }
 
-    function getNonce(address user) external view returns(uint256 nonce) {
+    function getNonce(address user) public view returns(uint256 nonce) {
         nonce = nonces[user];
     }
 
@@ -113,15 +108,29 @@ contract EIP712MetaTransaction {
 
     function msgSender() internal view returns(address sender) {
         if(msg.sender == address(this)) {
-            bytes memory array = msg.data;
-            uint256 index = msg.data.length;
+            bytes20 userAddress;
+            bytes memory data = msg.data;
+            uint256 dataLength = msg.data.length;
             assembly {
-                // Load the 32 bytes word from memory with the address on the lower 20 bytes, and mask those.
-                sender := and(mload(add(array, index)), 0xffffffffffffffffffffffffffffffffffffffff)
+                calldatacopy(0x0, sub(dataLength, 40), sub(dataLength, 20))
+                userAddress := mload(0x0)
             }
+            sender = address(uint160(userAddress));
         } else {
             sender = msg.sender;
         }
-        return sender;
+    }
+
+    function msgRelayer() internal view returns(address relayer) {
+        if(msg.sender == address(this)) {
+            bytes20 relayerAddress;
+            bytes memory data = msg.data;
+            uint256 dataLength = msg.data.length;
+            assembly {
+                calldatacopy(0x0, sub(dataLength, 20), dataLength)
+                relayerAddress := mload(0x0)
+            }
+            relayer = address(uint160(relayerAddress));
+        }
     }
 }

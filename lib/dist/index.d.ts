@@ -7,6 +7,8 @@ declare class Valist {
     valist: any;
     ipfs: any;
     defaultAccount: string;
+    metaTxEnabled: boolean;
+    metaTxReady: boolean;
     constructor({ web3Provider, metaTx, ipfsHost }: {
         web3Provider: provider;
         metaTx?: boolean;
@@ -49,22 +51,28 @@ declare class Valist {
     createOrganization(orgName: string, orgMeta: {
         name: string;
         description: string;
-    }, account: string): Promise<any>;
+    }, account?: string): Promise<any>;
     createRepository(orgName: string, repoName: string, repoMeta: {
         name: string;
         description: string;
         projectType: ProjectType;
         homepage: string;
         repository: string;
-    }, account: string): Promise<any>;
+    }, account?: string): Promise<any>;
     publishRelease(orgName: string, repoName: string, release: {
         tag: string;
         hash: string;
         meta: string;
-    }, account: string): Promise<void>;
+    }, account?: string): Promise<any>;
     addJSONtoIPFS(data: any): Promise<any>;
     addFileToIPFS(data: any): Promise<any>;
     fetchJSONfromIPFS(ipfsHash: string): Promise<any>;
+    getSignatureParameters(signature: string): {
+        r: string;
+        s: string;
+        v: number;
+    };
+    sendTransaction(functionCall: any, account?: string): Promise<any>;
 }
 export declare const Web3Providers: import("web3-core").Providers;
 export default Valist;
