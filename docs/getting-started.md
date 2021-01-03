@@ -51,9 +51,9 @@ Next, you can import the `Valist` SDK and pass in a `Web3Provider`. Valist expos
 ```typescript
 import Valist, { Web3Providers } from 'valist';
 
-const provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
+const web3Provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
-const valist = new Valist(provider);
+const valist = new Valist({ web3Provider });
 
 await valist.connect();
 
@@ -118,7 +118,7 @@ After the valist object is instantiated the initial wallet connection can be est
         try {
           if (window.ethereum) {
             window.ethereum.enable();
-            let valist = new Valist(window.ethereum, true);
+            let valist = new Valist({ web3Provider: window.ethereum });
             await valist.connect();
             setValist(valist);
           }
@@ -167,9 +167,9 @@ export default async function getLatestReleaseFromRepo(req: NextApiRequest, res:
 
   // set .env.local to your local chain or set in production deployment
   if (process.env.WEB3_PROVIDER) {
-    const provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
+    const web3Provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
-    const valist = new Valist(provider);
+    const valist = new Valist({ web3Provider });
     await valist.connect();
 
     const {
