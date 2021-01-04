@@ -8,8 +8,6 @@ import Biconomy from "@biconomy/mexa";
 
 import ValistABI from './abis/Valist.json';
 
-const sigUtil = require("eth-sig-util");
-
 // node-fetch polyfill
 const fetch = require('node-fetch');
 if (!globalThis.fetch) {
@@ -548,16 +546,11 @@ class Valist {
           id: new Date().getTime(),
           method: "eth_signTypedData_v4",
           params: [account, dataToSign]
-      }, async (err: any, signed: any) => {
-
-        const recovered = sigUtil.recoverTypedSignature_v4({
-          data: JSON.parse(dataToSign),
-          sig: signed.result
-        });
+      }, async (e: any, signed: any) => {
 
         const { r, s, v } = this.getSignatureParameters(signed.result);
 
-        console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account, recovered, recovered == account.toLowerCase())
+        console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
 
         const gasLimit = await this.valist.methods
           .executeMetaTransaction(account, functionSignature, r, s, v)
