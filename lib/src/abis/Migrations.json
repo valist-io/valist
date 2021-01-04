@@ -944,12 +944,12 @@
     "80001": {
       "events": {},
       "links": {},
-      "address": "0xaCFEBB47907c99cF6C4c945b9d59F5BB8F0a5478",
-      "transactionHash": "0xac59d6edc3e54ceae28990e03079b8d9eaaccc442e3a8960171dd1dbda240c56"
+      "address": "0xf1540C79CfaC60CD0876ce3E06A3c9d6a9b64470",
+      "transactionHash": "0xc4b0e477b1adedfa42e4d14aa664137f9f350b827f1047856ba189d4dc082b30"
     }
   },
   "schemaVersion": "3.3.3",
-  "updatedAt": "2021-01-03T22:48:36.752Z",
+  "updatedAt": "2021-01-04T15:50:40.374Z",
   "networkType": "ethereum",
   "devdoc": {
     "kind": "dev",

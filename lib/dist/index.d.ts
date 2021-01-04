@@ -21,14 +21,14 @@ declare class Valist {
     }>;
     getOrganizationMeta(orgName: string): Promise<any>;
     getOrganizationNames(): Promise<any>;
-    setOrgMeta(orgName: string, orgMeta: any, account: string): Promise<void>;
+    setOrgMeta(orgName: string, orgMeta: any, account: string): Promise<any>;
     getRepository(orgName: string, repoName: string): Promise<{
         meta: any;
         tags: any;
     }>;
     getReposFromOrganization(orgName: string): Promise<any>;
     getRepoMeta(orgName: string, repoName: string): Promise<any>;
-    setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string): Promise<void>;
+    setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string): Promise<any>;
     getLatestReleaseFromRepo(orgName: string, repoName: string): Promise<any>;
     getLatestTagFromRepo(orgName: string, repoName: string): Promise<any>;
     getReleaseTagsFromRepo(orgName: string, repoName: string): Promise<any>;
@@ -38,12 +38,12 @@ declare class Valist {
     isOrgAdmin(orgName: string, account: string): Promise<any>;
     isRepoAdmin(orgName: string, repoName: string, account: string): Promise<any>;
     isRepoDev(orgName: string, repoName: string, account: string): Promise<any>;
-    grantOrgAdmin(orgName: string, granter: string, grantee: string): Promise<void>;
-    revokeOrgAdmin(orgName: string, revoker: string, revokee: string): Promise<void>;
-    grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string): Promise<void>;
-    revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string): Promise<void>;
-    grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string): Promise<void>;
-    revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string): Promise<void>;
+    grantOrgAdmin(orgName: string, granter: string, grantee: string): Promise<any>;
+    revokeOrgAdmin(orgName: string, revoker: string, revokee: string): Promise<any>;
+    grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string): Promise<any>;
+    revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string): Promise<any>;
+    grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string): Promise<any>;
+    revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string): Promise<any>;
     getOrgOwners(orgName: string): Promise<any>;
     getOrgAdmins(orgName: string): Promise<any>;
     getRepoAdmins(orgName: string, repoName: string): Promise<any>;
@@ -67,11 +67,6 @@ declare class Valist {
     addJSONtoIPFS(data: any): Promise<any>;
     addFileToIPFS(data: any): Promise<any>;
     fetchJSONfromIPFS(ipfsHash: string): Promise<any>;
-    getSignatureParameters(signature: string): {
-        r: string;
-        s: string;
-        v: number;
-    };
     sendTransaction(functionCall: any, account?: string): Promise<any>;
 }
 export declare const Web3Providers: import("web3-core").Providers;

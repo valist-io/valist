@@ -3,6 +3,7 @@ import { provider } from 'web3-core/types';
 
 // @ts-expect-error ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
+
 // @ts-ignore mexa doesn't support typescript yet
 import Biconomy from "@biconomy/mexa";
 
@@ -30,6 +31,18 @@ const getValistContract = async (web3: Web3) => {
   const deployedAddress: string = ValistABI.networks[networkId].address;
 
   return getContractInstance(web3, ValistABI.abi, deployedAddress);
+}
+
+const getSignatureParameters = (web3: Web3, signature: string) => {
+  if (!web3.utils.isHexStrict(signature)) throw new Error(`Not a valid hex string: ${signature}`);
+
+  let r = signature.slice(0, 66);
+  let s = "0x".concat(signature.slice(66, 130));
+  let v: string | number = "0x".concat(signature.slice(130, 132));
+  v = web3.utils.hexToNumber(v);
+  if (![27, 28].includes(v)) v += 27;
+
+  return { r, s, v };
 }
 
 const domainType = [
@@ -152,7 +165,7 @@ class Valist {
   async setOrgMeta(orgName: string, orgMeta: any, account: string) {
     try {
       const hash = await this.addJSONtoIPFS(orgMeta);
-      await this.valist.methods.setOrgMeta(orgName, hash).send({ from: account });
+      return await this.sendTransaction(this.valist.methods.setOrgMeta(orgName, hash), account);
     } catch (e) {
       const msg = `Could not set organization metadata`;
       console.error(msg, e);
@@ -209,7 +222,7 @@ class Valist {
   async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string) {
     try {
       const hash = await this.addJSONtoIPFS(repoMeta);
-      await this.valist.methods.setRepoMeta(orgName, repoName, hash).send({ from: account });
+      return await this.sendTransaction(this.valist.methods.setRepoMeta(orgName, repoName, hash), account);
     } catch (e) {
       const msg = `Could not set repository metadata`;
       console.error(msg, e);
@@ -322,7 +335,7 @@ class Valist {
 
   async grantOrgAdmin(orgName: string, granter: string, grantee: string) {
     try {
-      await this.valist.methods.grantOrgAdmin(orgName, grantee).send({ from: granter });
+      return await this.sendTransaction(this.valist.methods.grantOrgAdmin(orgName, grantee), granter);
     } catch (e) {
       const msg = `Could not grant ORG_ADMIN_ROLE`;
       console.error(msg, e);
@@ -332,7 +345,7 @@ class Valist {
 
   async revokeOrgAdmin(orgName: string, revoker: string, revokee: string) {
     try {
-      await this.valist.methods.revokeOrgAdmin(orgName, revokee).send({ from: revoker });
+      return await this.sendTransaction(this.valist.methods.revokeOrgAdmin(orgName, revokee), revoker);
     } catch (e) {
       const msg = `Could not revoke ORG_ADMIN_ROLE`;
       console.error(msg, e);
@@ -342,7 +355,7 @@ class Valist {
 
   async grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string) {
     try {
-      await this.valist.methods.grantRepoAdmin(orgName, repoName, grantee).send( { from: granter });
+      return await this.sendTransaction(this.valist.methods.grantRepoAdmin(orgName, repoName, grantee), granter);
     } catch (e) {
       const msg = `Could not grant REPO_ADMIN_ROLE`;
       console.error(msg, e);
@@ -352,7 +365,7 @@ class Valist {
 
   async revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string) {
     try {
-      await this.valist.methods.revokeRepoAdmin(orgName, repoName, revokee).send( { from: revoker });
+      return await this.sendTransaction(this.valist.methods.revokeRepoAdmin(orgName, repoName, revokee), revoker);
     } catch (e) {
       const msg = `Could not revoke REPO_ADMIN_ROLE`;
       console.error(msg, e);
@@ -362,7 +375,7 @@ class Valist {
 
   async grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string) {
     try {
-      await this.valist.methods.grantRepoDev(orgName, repoName, grantee).send( { from: granter });
+      return await this.sendTransaction(this.valist.methods.grantRepoDev(orgName, repoName, grantee), granter);
     } catch (e) {
       const msg = `Could not grant REPO_DEV_ROLE`;
       console.error(msg, e);
@@ -372,7 +385,7 @@ class Valist {
 
   async revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string) {
     try {
-      await this.valist.methods.revokeRepoDev(orgName, repoName, revokee).send( { from: revoker });
+      return await this.sendTransaction(this.valist.methods.revokeRepoDev(orgName, repoName, revokee), revoker);
     } catch (e) {
       const msg = `Could not revoke REPO_DEV_ROLE`;
       console.error(msg, e);
@@ -488,7 +501,6 @@ class Valist {
     try {
       const response = await fetch(`https://cloudflare-ipfs.com/ipfs/${ipfsHash}`);
       const json = await response.json();
-      console.log(`JSON Fetched from IPFS`, json);
       return json;
     } catch (e) {
       const msg = `Could not fetch JSON from IPFS`;
@@ -497,20 +509,21 @@ class Valist {
     }
   }
 
-  getSignatureParameters(signature: string) {
-    if (!this.web3.utils.isHexStrict(signature)) throw new Error(`Not a valid hex string: ${signature}`);
-
-    let r = signature.slice(0, 66);
-    let s = "0x".concat(signature.slice(66, 130));
-    let v: string | number = "0x".concat(signature.slice(130, 132));
-    v = this.web3.utils.hexToNumber(v);
-    if (![27, 28].includes(v)) v += 27;
-
-    return { r, s, v };
-  }
-
   async sendTransaction(functionCall: any, account: string = this.defaultAccount) {
     if (this.metaTxEnabled) {
+
+      if (!this.metaTxReady) throw new Error("MetaTransactions not ready!");
+
+      const sendAsync = (params: any): any => {
+        return new Promise((resolve, reject) => {
+          // @ts-expect-error sendAsync is conflicting with the Magic RPCProvider type
+          this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
+            if (e) reject(e);
+            resolve(signed);
+          });
+        });
+      }
+
       try {
         const nonce = await this.valist.methods.getNonce(account).call();
         const functionSignature = functionCall.encodeABI();
@@ -530,27 +543,17 @@ class Valist {
           primaryType: "MetaTransaction",
           message: message
         });
-        console.log("FUNCTION", functionCall, "TO SIGN", dataToSign);
 
-
-        // @ts-ignore
-        // const signed = await this.web3.currentProvider.sendAsync({
-        //     jsonrpc: "2.0",
-        //     id: new Date().getTime(),
-        //     method: "eth_signTypedData_v4",
-        //     params: [this.defaultAccount, dataToSign]
-        // });
-        // @ts-ignore
-        await this.web3.currentProvider.sendAsync({
+        const signed = await sendAsync({
           jsonrpc: "2.0",
           id: new Date().getTime(),
           method: "eth_signTypedData_v4",
           params: [account, dataToSign]
-      }, async (e: any, signed: any) => {
+        });
 
-        const { r, s, v } = this.getSignatureParameters(signed.result);
+        const { r, s, v } = getSignatureParameters(this.web3, signed.result);
 
-        console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
+        // console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
 
         const gasLimit = await this.valist.methods
           .executeMetaTransaction(account, functionSignature, r, s, v)
@@ -565,7 +568,6 @@ class Valist {
             gasPrice: gasPrice,
             gasLimit: gasLimit
           });
-      });
 
       } catch (e) {
         const msg = `Could not send meta transaction`;
