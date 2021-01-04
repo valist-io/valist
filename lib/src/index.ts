@@ -1,9 +1,9 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 
-// @ts-ignore
+// @ts-expect-error ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
-// @ts-ignore
+// @ts-ignore mexa doesn't support typescript yet
 import Biconomy from "@biconomy/mexa";
 
 import ValistABI from './abis/Valist.json';

@@ -31,7 +31,7 @@ function App({ Component, pageProps }: AppProps) {
             rpcUrl: publicRuntimeConfig.WEB3_PROVIDER
           };
 
-          const magicObj = new Magic("pk_test_54C6079CBEF87272", { network: customNodeOptions });
+          const magicObj = new Magic(publicRuntimeConfig.MAGIC_PUBKEY, { network: customNodeOptions });
           setMagic(magicObj);
 
         } catch (e) {
@@ -44,7 +44,7 @@ function App({ Component, pageProps }: AppProps) {
     (async function () {
       if (magic && loggedIn) {
         try {
-          // @ts-ignore Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
+          // @ts-expect-error Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
           const valist = new Valist({ web3Provider: magic.rpcProvider, metaTx: false });
           await valist.connect();
 
