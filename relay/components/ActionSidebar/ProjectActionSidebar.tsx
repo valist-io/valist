@@ -3,6 +3,7 @@ import Link from 'next/link';
 import ValistContext from '../ValistContext/ValistContext';
 import IsRepoAdmin from '../AccessControl/IsRepoAdmin';
 import IsRepoDev from '../AccessControl/IsRepoDev';
+import AddressIdenticon from './AddressIdenticon';
 
 export const OrgActionSidebar:FunctionComponent<any> = ({orgName, repoName}: { orgName: string , repoName: string }) => {
     const valist = useContext(ValistContext)
@@ -22,14 +23,7 @@ export const OrgActionSidebar:FunctionComponent<any> = ({orgName, repoName}: { o
                     <div className="flex items-center justify-between">
                         <div className="flex-1 space-y-8">
                             <div className="space-y-8 sm:space-y-0 sm:flex sm:justify-between sm:items-center xl:block xl:space-y-8">
-                                <div className="flex items-center space-x-3">
-                                    <div className="flex-shrink-0 h-12 w-12">
-                                        <img className="h-12 w-12 rounded-full bg-black" src={`https://identicon-api.herokuapp.com/${profile.address}/32?format=png`} alt="" />
-                                    </div>
-                                    <div className="space-y-1">
-                                        <div className="text-sm leading-5 font-medium text-gray-900">{profile.address.substring(0, 12)}...</div>
-                                    </div>
-                                </div>
+                                <AddressIdenticon address={profile.address} />
                                 <div className="flex flex-col space-y-3 sm:space-y-0 sm:space-x-3 sm:flex-row xl:flex-col xl:space-x-0 xl:space-y-3">
                                     <IsRepoDev orgName={orgName} repoName={repoName}>
                                         <span className="rounded-md shadow-sm">
