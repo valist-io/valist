@@ -74,7 +74,7 @@ class Valist {
   metaTxEnabled: boolean = false;
   metaTxReady: boolean = false;
 
-  constructor({ web3Provider, metaTx = false, ipfsHost = `ipfs.infura.io`}: { web3Provider: provider, metaTx?: boolean, ipfsHost?: string }) {
+  constructor({ web3Provider, metaTx = true, ipfsHost = `ipfs.infura.io`}: { web3Provider: provider, metaTx?: boolean, ipfsHost?: string }) {
     if (metaTx) {
       this.metaTxEnabled = true;
 
