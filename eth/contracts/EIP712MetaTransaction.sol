@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MIT
+// thank you biconomy.io <3
 pragma solidity >=0.7.0;
 
 import "@openzeppelin/contracts/math/SafeMath.sol";
