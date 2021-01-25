@@ -11,7 +11,7 @@ declare class Valist {
     metaTxReady: boolean;
     constructor({ web3Provider, metaTx, ipfsHost }: {
         web3Provider: provider;
-        metaTx?: boolean;
+        metaTx?: boolean | string;
         ipfsHost?: string;
     });
     connect(): Promise<void>;

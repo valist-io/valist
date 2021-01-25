@@ -1,7 +1,7 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
 
-// @ts-expect-error ipfs client types are finicky
+// @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
 
 // @ts-ignore mexa doesn't support typescript yet
@@ -74,8 +74,8 @@ class Valist {
   metaTxEnabled: boolean = false;
   metaTxReady: boolean = false;
 
-  constructor({ web3Provider, metaTx = true, ipfsHost = `ipfs.infura.io`}: { web3Provider: provider, metaTx?: boolean, ipfsHost?: string }) {
-    if (metaTx) {
+  constructor({ web3Provider, metaTx = true, ipfsHost = `ipfs.infura.io` }: { web3Provider: provider, metaTx?: boolean | string, ipfsHost?: string }) {
+    if (metaTx === true || metaTx === "true") {
       this.metaTxEnabled = true;
 
       // setup biconomy instance with public api key
@@ -516,7 +516,7 @@ class Valist {
 
       const sendAsync = (params: any): any => {
         return new Promise((resolve, reject) => {
-          // @ts-expect-error sendAsync is conflicting with the Magic RPCProvider type
+          // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
           this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
             if (e) reject(e);
             resolve(signed);
