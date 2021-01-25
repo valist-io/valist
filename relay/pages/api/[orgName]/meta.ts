@@ -6,7 +6,7 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
   // set .env.local to your local chain or set in production deployment
   if (process.env.WEB3_PROVIDER) {
 
-    const valist = new Valist({ web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER) });
+    const valist = new Valist({ web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), metaTx: false });
     await valist.connect();
 
     const {
