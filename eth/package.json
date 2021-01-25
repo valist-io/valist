@@ -11,7 +11,7 @@
   },
   "devDependencies": {
     "@truffle/hdwallet-provider": "^1.2.1",
-    "truffle": "^5.1.61"
+    "truffle": "^5.1.63"
   },
   "scripts": {
     "compile": "truffle compile",
