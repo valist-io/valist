@@ -11,7 +11,7 @@ module.exports = {
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },
-          { key: "cache-control", value: "s-maxage=43200, stale-while-revalidate" },
+          { key: "Cache-Control", value: "s-maxage=60, stale-while-revalidate" },
         ]
       }
     ]
