@@ -14,41 +14,33 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
     const [renderLoading, setRenderLoading] = useState(false);
 
-    const readUploadedFileAsBuffer = (inputFile: any) => {
-        const temporaryFileReader = new FileReader();
-
-        return new Promise((resolve, reject) => {
-            temporaryFileReader.onerror = () => {
-                temporaryFileReader.abort();
-                reject(new DOMException("Problem parsing input file."));
-            };
-
-            temporaryFileReader.onload = () => {
-                resolve(temporaryFileReader.result);
-            };
-
-            // @ts-ignore
-            temporaryFileReader.readAsArrayBuffer(inputFile);
-        });
-    };
-
     const handleUpload = async (file: any) => {
-        console.log("Incoming File:", file)
-        try {
-            const fileContents = await readUploadedFileAsBuffer(file)
-            return await valist.addFileToIPFS(fileContents)
-        } catch (e) {
-            console.warn(e.message)
+        const url = `${window.location.origin}/api/ipfs/add/file`;
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+        const upload = await fetch(url, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (upload.ok) {
+            console.log("Uploaded successfully!");
+        } else {
+            console.error("Upload failed.");
         }
+
+        return await upload.json();
     }
 
     const createRelease = async () => {
-        const releaseHash = await handleUpload(releaseData);
+        const response = await handleUpload(releaseData);
 
         const meta = await valist.addJSONtoIPFS(releaseMeta);
         const release = {
             tag: projectTag,
-            hash: releaseHash,
+            hash: response.hash,
             meta
         };
 

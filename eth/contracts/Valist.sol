@@ -57,6 +57,11 @@ contract Valist is EIP712MetaTransaction("Valist","0") {
 
         // release metadata
         string metaCID;
+        
+        /*
+        // boolean to mark compromised
+        bool compromised;
+        */
     }
 
     // list of shortnames
@@ -272,6 +277,11 @@ contract Valist is EIP712MetaTransaction("Valist","0") {
 
         emit ReleaseEvent(_orgName, _repoName, _tag);
     }
+
+    /*
+    function markReleaseCompromised() public{ 
+    }
+    */
 
     function deleteRepository(string memory _orgName, string memory _repoName) public orgAdmin(_orgName) {
         _deleteStringFromArray(orgs[_orgName].repoNames, orgs[_orgName].repos[_repoName].index);
