@@ -24,8 +24,8 @@ const pinFileToIPFS = async (pinataPublicKey: string, pinataPrivateKey: string, 
     data.append('pinataOptions', pinataOptions);
 
     return await axios.post(url, data, {
-        maxContentLength: 2000, // 250MB limit
-        maxBodyLength: 2000,
+        maxContentLength: 262144000, // 250MB limit
+        maxBodyLength: 262144000,
         headers: {
             // @ts-ignore _boundary
             'Content-Type': `multipart/form-data; boundary=${data._boundary}`,
