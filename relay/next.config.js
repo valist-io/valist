@@ -11,8 +11,15 @@ module.exports = {
         source: "/api/:path*",
         headers: [
           { key: "Access-Control-Allow-Origin", value: "*" },
-          { key: "Cache-Control", value: "s-maxage=60, stale-while-revalidate" },    ]
+          { key: "Cache-Control", value: "s-maxage=60, stale-while-revalidate" },
+        ]
       }
     ]
+  },
+  trailingSlash: true,
+  exportPathMap: function() {
+    return {
+      '/': { page: '/' }
+    };
   }
 }
