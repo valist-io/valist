@@ -20,6 +20,9 @@ dev-lib:
 dev:
 	@make -j 2 dev-lib dev-relay
 
+start: lib
+	cd relay && npm run start
+
 # compile contracts
 contracts:
 	cd eth && npm run compile
@@ -78,4 +81,8 @@ audit-fix:
 audit-contracts:
 	slither eth --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
 
-.PHONY: relay lib contracts
+docs:
+	mkdocs build
+	cd lib && npm run docs
+
+.PHONY: relay lib contracts docs

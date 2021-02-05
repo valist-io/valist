@@ -1,8 +1,26 @@
 # Valist
 
-[![Netlify Status](https://api.netlify.com/api/v1/badges/f2751b0a-a3f8-47c2-88bb-f0f432c384ea/deploy-status)](https://app.netlify.com/sites/valist/deploys)
+[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fvalist-io%2Fvalist&env=WEB3_PROVIDER&envDescription=Enter%20a%20Web3%20HTTP%20Provider%20(can%20be%20an%20Infura%20Project%20URL))
 
 A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
+
+## Overview
+
+We are building a secure, trustless software distribution system for both traditional and decentralized infrastructures. No need for expensive and centralized PKIs or manual code signing processes!
+
+We support the following package types with our API natively, with many more in the pipeline:
+
+* Any arbitrary binaries (software, firmware, you name it)
+
+* NPM packages (native `npm install` support)
+
+* Pip packages
+
+* Docker images
+
+The goal is to point **any** software distribution system at a Valist relay, which will ensure the integrity of the packages and act as a universal cache.
+
+You can think of it as a trustless Bintray, or a universal Verdaccio, but with far more powerful access control and data integrity features. This includes multi-factor releases (M of N keys need to sign on some firmware before release), as well as the ability to use any hardware wallet to sign code.
 
 ## Motivation
 
@@ -23,6 +41,10 @@ Imagine the following scenario:
 * The registry (on Ethereum, and potentially other blockchains in the future) is updated with the latest verified version.
 
 * Clients with the software installed automatically detect the change and proceed to notify and/or trigger an auto-update.
+
+Here's a visual of what this flow looks like:
+
+![Signed Software Release Flow](docs/img/signed-release-flow.png)
 
 The primary goal for this software is to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from flexible notary systems just as much as future technologies.
 
@@ -46,7 +68,9 @@ So far, the current implementation of Valist looks like this:
 
 ### What's next
 
-* [ ] Full-featured Web UI with WalletConnect support
+* [x] Full-featured Web UI
+
+* [x] (Basic) Support for NPM registries
 
 * [ ] Filecoin integration
 
@@ -56,66 +80,6 @@ So far, the current implementation of Valist looks like this:
 
 * [ ] Encryption Support
 
-* [ ] Support for other Ethereum-based blockchains
+## Documentation
 
-## Building
-
-A `Makefile` is provided to simplify development workflow.
-
-### Installing Dependencies
-
-To install all dependencies, simply run the following:
-
-```bash
-make install
-```
-
-This will `cd` into the `lib`, `relay`, and `eth` folders, running an `npm install` in each.
-
-You can also manually run `npm install` in each of the folders.
-
-### Building the frontend
-
-You can build the `lib` and `relay` separately as Make targets.
-
-However, you also can build the whole frontend using:
-
-```bash
-make frontend
-```
-
-This works great inside of CI/CD tools as well. For example, `make install frontend` will work in most runners as the build command.
-
-### Building all artifacts
-
-To build the contracts in `eth`, the core in `lib`, and the `relay`, simply run:
-
-```bash
-make all
-```
-
-## Development
-
-### Running the dev server
-
-The frontend and API is powered by Next.js. To start the development server, run the following command:
-
-```bash
-make dev
-```
-
-This will build the `lib` and `relay` folders and start the local Next.js development server at `localhost:3000`. Hot reloading works for both `lib` and `relay` using `tsc -w` in `lib`, and `next dev` in `relay`. They are executed in parallel, piping output to the same shell, thanks to `make -j`.
-
-### Migrating contracts
-
-Truffle is managing the contract migrations and deployments. Make sure you have a development chain setup, and modify the `truffle-config.js` accordingly.
-
-Once your Truffle environment is established, simply run:
-
-```bash
-make migrate
-```
-
-You can also run the `make deploy` alias.
-
-This will deploy the Solidity contracts to your chain of choice. Make sure to update your contract addresses if/when necessary!
+Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io)

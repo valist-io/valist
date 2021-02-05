@@ -1,6 +1,6 @@
 {
   "name": "valist-relay",
-  "version": "0.1.0",
+  "version": "0.2.0",
   "author": "Valist, Inc.",
   "contributors": [
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
@@ -17,24 +17,27 @@
   "scripts": {
     "dev": "next",
     "build": "next build",
-    "netlify": "next build && next-on-netlify",
     "export": "next export",
     "start": "next build && next start",
     "type-check": "tsc"
   },
   "dependencies": {
-    "@tailwindcss/ui": "^0.6.2",
-    "next": "^9.5.5",
-    "next-on-netlify": "^2.5.1",
-    "react": "^16.14.0",
-    "react-dom": "^16.14.0",
+    "@tailwindcss/ui": "^0.7.2",
+    "axios": "^0.21.1",
+    "form-data": "^3.0.0",
+    "formidable": "^1.2.2",
+    "magic-sdk": "^4.1.0",
+    "next": "^10.0.5",
+    "react": "^17.0.1",
+    "react-dom": "^17.0.1",
     "valist": "file:../lib/"
   },
   "devDependencies": {
-    "@types/node": "^12.12.68",
-    "@types/react": "^16.9.53",
-    "@types/react-dom": "^16.9.4",
-    "tailwindcss": "^1.9.3",
-    "typescript": "3.7.3"
+    "@types/formidable": "^1.0.32",
+    "@types/node": "^14.14.22",
+    "@types/react": "^17.0.0",
+    "@types/react-dom": "^17.0.0",
+    "tailwindcss": "^1.9.6",
+    "typescript": "^4.1.3"
   }
 }

@@ -5,9 +5,8 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
   // set .env.local to your local chain or set in production deployment
   if (process.env.WEB3_PROVIDER) {
-    const provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
-    const valist = new Valist(provider);
+    const valist = new Valist({ web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), metaTx: false });
     await valist.connect();
 
     const {
@@ -16,7 +15,11 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
     const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
 
-    return res.status(200).json({releases});
+    if (releases) {
+      return res.status(200).json(releases.reverse());
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No releases found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

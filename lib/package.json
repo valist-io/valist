@@ -1,6 +1,6 @@
 {
   "name": "valist",
-  "version": "0.0.1",
+  "version": "0.2.0",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
   "author": "Valist, Inc.",
   "contributors": [
@@ -16,19 +16,28 @@
     "url": "https://github.com/valist-io/valist/issues"
   },
   "main": "dist/index.js",
-  "types": "dist/index.d.js",
+  "types": "dist/index.d.ts",
   "files": [
     "dist/"
   ],
   "scripts": {
     "build": "tsc",
-    "dev": "tsc -w"
+    "dev": "tsc -w",
+    "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none",
+    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "devDependencies": {
+    "@types/chai": "^4.2.14",
+    "@types/mocha": "^8.2.0",
+    "chai": "^4.2.0",
+    "mocha": "^8.2.1",
+    "typedoc": "^0.19.2",
     "typescript": "^3.9.7"
   },
   "dependencies": {
-    "ipfs-http-client": "^45.0.0",
-    "web3": "^1.3.0"
+    "@biconomy/mexa": "^1.5.15",
+    "ipfs-http-client": "47.0.1",
+    "node-fetch": "^2.6.1",
+    "web3": "^1.3.3"
   }
 }

@@ -2,16 +2,16 @@ import React from 'react';
 import IndexLayout from '../components/Layout/IndexLayout'
 import OrgList from '../components/List/OrgList'
 import ActivityFeed from '../components/ActivityFeed/ActivityFeed';
-import ProfileSidebar from '../components/ProfileSidebar/ProfileSidebar';
+import MainActionSidebar from '../components/ActionSidebar/MainActionSidebar';
 
-export const IndexPage = ({valist}: {valist: any}) => {
+export const IndexPage = () => {
   return (
-    <IndexLayout title="valist.io">
+    <IndexLayout title="Valist | Securely Distribute Software">
       <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
         <div className="flex-1 min-w-0 bg-white xl:flex">
-          <ProfileSidebar valist={valist} />
-          <OrgList valist={valist} />
-          <ActivityFeed valist={valist} />
+          <MainActionSidebar />
+          <OrgList />
+          <ActivityFeed />
         </div>
       </div>
     </IndexLayout>

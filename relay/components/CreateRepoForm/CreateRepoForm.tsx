@@ -1,48 +1,34 @@
-import React, { FunctionComponent, useState, useEffect } from 'react';
-import Valist from 'valist';
+import React, { FunctionComponent, useContext, useState } from 'react';
+import { useRouter } from 'next/router';
 
-export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist: Valist, orgName: string}) => {
+import { ProjectType, shortnameFilterRegex } from 'valist';
+import ValistContext from '../ValistContext/ValistContext';
+import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
-    const [account, setAccount] = useState("");
-    const [repoName, setRepoName] = useState("")
-    const [repoDescription, setRepoDescription] = useState("")
+export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: string}) => {
+    const valist = useContext(ValistContext);
+    const router = useRouter();
 
-    useEffect(() => {
-        if (valist) {
-            (async function () {
-                try {
-                    const accounts = await valist.web3.eth.getAccounts();
-                    setAccount(accounts[0]);
-                    setRepoName("")
-                    setRepoDescription("")
-                } catch (error) {
-                    alert(`Failed to load accounts.`);
-                    console.log(error);
-                }
-            })();
-        }
-    }, [valist]);
+    const [projectName, setProjectName] = useState("");
+    const [projectType, setProjectType] = useState<ProjectType>("binary");
+    const [projectHomepage, setProjectHomepage] = useState("");
+    const [projectRepository, setProjectRepository] = useState("");
+    const [projectDescription, setProjectDescription] = useState("");
 
-    const createRepo = async () => {
+    const [renderLoading, setRenderLoading] = useState(false);
+
+    const createProject = async () => {
         const repoMeta = {
-            name: repoName,
-            description: repoDescription
+            name: projectName,
+            description: projectDescription,
+            projectType: projectType,
+            homepage: projectHomepage,
+            repository: projectRepository
         };
 
-        await valist.createRepository(orgName, repoName, repoMeta, account)
+        await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
+        router.push(`/v/${orgName}/${projectName.toLowerCase().replace(shortnameFilterRegex, "")}/publish`);
     }
-
-    /*
-                    <form className={classes.root} noValidate autoComplete="off">
-                    <TextField onChange={(e) => setOrgName(e.target.value)} id="outlined-basic" label="Organization Name" variant="outlined" value={orgName}/>
-                    <br></br>
-                    <TextField onChange={(e) => setRepoName(e.target.value)} id="outlined-basic" label="Repo Name" variant="outlined" value={repoName} />
-                    <br></br>
-                    <TextField onChange={(e) => setRepoDescription(e.target.value)} id="outlined-basic" label="Description" variant="outlined" value={repoDescription} />
-                    <br></br>
-                    <Button onClick={createRepo} value="Submit" variant="contained" color="primary">Create</Button>
-                </form>
-    */
 
     return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -75,19 +61,44 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                 <form className="grid grid-cols-1 gap-y-6 sm:grid-cols-2 sm:gap-x-8">
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoName" className="block text-sm font-medium leading-5 text-gray-700">Project Name</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setRepoName(e.target.value)} id="RepoName" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        <div className="mt-1 flex rounded-md shadow-sm">
+                            <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
+                                app.valist.io/{orgName}/
+                            </span>
+                            <input onChange={(e) => setProjectName(e.target.value)} required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" />
                         </div>
                     </div>
+
                     <div className="sm:col-span-2">
                         <label htmlFor="RepoDescription" className="block text-sm font-medium leading-5 text-gray-700">Repo Description</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setRepoDescription(e.target.value)} id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <textarea onChange={(e) => setProjectDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
+                        <select onChange={(e) => setProjectType(e.target.value as ProjectType)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
+                            <option value="binary">binary</option>
+                            <option value="npm">npm</option>
+                            <option value="pip">pip</option>
+                            <option value="docker">docker</option>
+                        </select>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                        </div>
+                    </div>
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository URL (Github, Gitlab, Bitbucket, etc.)</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <input onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={createRepo} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                        <button onClick={() => { setRenderLoading(true); createProject(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                             Create Project
                         </button>
                     </span>
@@ -95,6 +106,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({valist, orgName}: {valist
                 </form>
                 </div>
             </div>
+            { renderLoading && <LoadingDialog>Creating Project</LoadingDialog> }
         </div>
     );
 }

@@ -5,18 +5,22 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
 
   // set .env.local to your local chain or set in production deployment
   if (process.env.WEB3_PROVIDER) {
-    const provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
-    const valist = new Valist(provider);
+    const valist = new Valist({ web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), metaTx: false });
     await valist.connect();
 
     const {
       query: { orgName, repoName },
     } = req;
 
-    const releaseMeta = await valist.getLatestReleaseMetaFromRepo(orgName.toString(), repoName.toString());
+    const latestRelease = await valist.getLatestReleaseFromRepo(orgName.toString(), repoName.toString());
 
-    return res.redirect(`https://ipfs.io/ipfs/${releaseMeta}`);
+    if (latestRelease) {
+      //return res.status(200).json({releaseMeta});
+      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${latestRelease.metaCID}`);
+    } else {
+      return res.status(404).json({statusCode: 404, message: "No release found!"});
+    }
 
   } else {
     return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});

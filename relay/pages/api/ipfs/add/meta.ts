@@ -1,9 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import Valist, { Web3Providers } from 'valist';
+import 'fs';
+
 
 export default async function addOrgMetaIPFS(req: NextApiRequest, res: NextApiResponse) {
     if (process.env.WEB3_PROVIDER && req.method === 'POST') {
-      const valist = new Valist(new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), true);
+
+      const valist = new Valist({ web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER), metaTx: false });
+      await valist.connect();
 
       const {
         body: { metaJSON },

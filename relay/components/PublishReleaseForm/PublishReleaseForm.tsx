@@ -1,67 +1,51 @@
-import React, { FunctionComponent, useState, useEffect} from 'react';
+import React, { FunctionComponent, useState, useContext } from 'react';
+import { useRouter } from 'next/router';
 
-import Valist from 'valist';
+import ValistContext from '../ValistContext/ValistContext';
+import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
-export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, repoName }: { valist: Valist, orgName: string, repoName: string }) => {
+export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
+    const valist = useContext(ValistContext);
+    const router = useRouter();
 
-    const [account, setAccount] = useState("");
-    const [releaseMeta, setReleaseMeta] = useState("")
-    const [projectTag, setProjectTag] = useState("")
-    const [releaseData, setReleaseData] = useState<File | null> (null)
+    const [releaseMeta, setReleaseMeta] = useState("");
+    const [projectTag, setProjectTag] = useState("");
+    const [releaseData, setReleaseData] = useState<File | null> (null);
 
-    useEffect(() => {
-        if (valist) {
-            (async function () {
-                try {
-                    const accounts = await valist.web3.eth.getAccounts();
-                    setAccount(accounts[0]);
-                    console.log(releaseData);
-                } catch (error) {
-                    alert(`Failed to load accounts.`);
-                    console.log(error);
-                }
-            })();
-        }
-    }, [valist]);
-
-    const readUploadedFileAsBuffer = (inputFile: any) => {
-        const temporaryFileReader = new FileReader();
-
-        return new Promise((resolve, reject) => {
-            temporaryFileReader.onerror = () => {
-                temporaryFileReader.abort();
-                reject(new DOMException("Problem parsing input file."));
-            };
-
-            temporaryFileReader.onload = () => {
-                resolve(temporaryFileReader.result);
-            };
-
-            // @ts-ignore
-            temporaryFileReader.readAsArrayBuffer(inputFile);
-        });
-    };
+    const [renderLoading, setRenderLoading] = useState(false);
 
     const handleUpload = async (file: any) => {
-        console.log("Incoming File:", file)
-        try {
-            const fileContents = await readUploadedFileAsBuffer(file)
-            return await valist.addFileToIPFS(fileContents)
-        } catch (e) {
-            console.warn(e.message)
+        const url = `${window.location.origin}/api/ipfs/add/file`;
+        const formData = new FormData();
+
+        formData.append("file", file);
+
+        const upload = await fetch(url, {
+            method: "POST",
+            body: formData,
+        });
+
+        if (upload.ok) {
+            console.log("Uploaded successfully!");
+        } else {
+            console.error("Upload failed.");
         }
+
+        return await upload.json();
     }
 
     const createRelease = async () => {
-        const releaseHash = await handleUpload(releaseData);
+        const response = await handleUpload(releaseData);
+
         const meta = await valist.addJSONtoIPFS(releaseMeta);
         const release = {
             tag: projectTag,
-            hash: releaseHash,
+            hash: response.hash,
             meta
         };
 
-        await valist.publishRelease(orgName, repoName, release, account);
+        await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
+        router.push(`/${orgName}/${repoName}`);
     }
 
     return (
@@ -110,7 +94,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
                     </div>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={createRelease} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={() => { setRenderLoading(true); createRelease(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Publish Release
                             </button>
                         </span>
@@ -118,37 +102,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ valist, orgName, rep
                 </form>
                 </div>
             </div>
+            { renderLoading && <LoadingDialog>Signing and Releasing...</LoadingDialog> }
         </div>
     );
 }
 
 export default PublishReleaseForm;
-
-/*
-
-    const reducer = (state: any, action: any) => {
-        switch (action.type) {
-            case 'SET_DROP_DEPTH':
-                return { ...state, dropDepth: action.dropDepth }
-            case 'SET_IN_DROP_ZONE':
-                return { ...state, inDropZone: action.inDropZone };
-            case 'ADD_FILE_TO_LIST':
-                return { ...state, fileList: state.fileList.concat(action.files) };
-            default:
-                return state;
-        }
-    };
-
-    const [data, dispatch] = React.useReducer(
-        reducer, { dropDepth: 0, inDropZone: false, fileList: [] }
-    )
-
-                    <DragAndDrop data={data} dispatch={dispatch}/>
-                    <ol className="dropped-files">
-                        {data.fileList.map((f: any) => {
-                            return (
-                                <li key={f.name}>{f.name}</li>
-                            )
-                        })}
-                    </ol>
-*/
