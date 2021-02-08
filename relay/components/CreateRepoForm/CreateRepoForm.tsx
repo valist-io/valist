@@ -106,7 +106,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                     </div>
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={() => { setRenderLoading(true); createProject(); setRenderLoading(false); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                        <button onClick={async () => { setRenderLoading(true); await createProject(); setRenderLoading(false); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                             Create Project
                         </button>
                     </span>
@@ -114,7 +114,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog>Creating Project</LoadingDialog> }
+            { renderLoading && <LoadingDialog>Creating Project...</LoadingDialog> }
         </div>
     );
 }
