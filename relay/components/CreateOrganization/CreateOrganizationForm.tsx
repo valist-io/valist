@@ -23,11 +23,19 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
         };
 
         if (orgShortName && orgFullName && orgDescription && valist.defaultAccount) {
-            await valist.createOrganization(orgShortName, meta, valist.defaultAccount);
-            router.push(`/v/${orgShortName.toLowerCase().replace(shortnameFilterRegex, "")}/create`);
+            try {
+                await valist.createOrganization(orgShortName, meta, valist.defaultAccount);
+                router.push(`/v/${orgShortName.toLowerCase().replace(shortnameFilterRegex, "")}/create`);
+            } catch (e) {
+                console.error("Could not create organization", e);
+            }
         } else {
             alert(`Please complete the required fields`);
         }
+    }
+
+    const updateShortname = (shortname: string) => {
+        setOrgShortName(shortname.toLowerCase().replace(shortnameFilterRegex, ""));
     }
 
     return (
@@ -67,7 +75,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
                             <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
                                 app.valist.io/
                             </span>
-                            <input onChange={(e) => setOrgShortName(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" />
+                            <input onChange={(e) => updateShortname(e.target.value)} required id="OrgShortName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-organization" value={orgShortName}/>
                         </div>
                         <p className="mt-2 text-sm text-gray-500">You or your organization's username</p>
                     </div>
@@ -89,7 +97,7 @@ export const CreateOrganizationForm:FunctionComponent<any> = () => {
 
                     <div className="col-span-12">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={() => { setRenderLoading(true); createOrganization(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={() => { setRenderLoading(true); createOrganization(); setRenderLoading(false); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Create Organization
                             </button>
                         </span>

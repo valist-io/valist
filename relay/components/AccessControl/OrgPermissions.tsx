@@ -1,18 +1,22 @@
 import React, { useContext, useEffect, useState } from 'react';
+import LoadingDialog from '../LoadingDialog/LoadingDialog';
 import ValistContext from '../ValistContext/ValistContext';
 
 const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
     const valist = useContext(ValistContext);
 
     const [orgAdmins, setOrgAdmins] = useState([ "0x0" ]);
-
     const [grantee, setGrantee] = useState("");
+
+    const [renderLoading, setRenderLoading] = useState(false);
 
     const updateData = async () => {
         if (valist) {
             try {
                 setOrgAdmins(await valist.getOrgAdmins(orgName) || [ "0x0" ]);
-            } catch (e) {}
+            } catch (e) {
+                console.error("Could not fetch ACL data", e);
+            }
         }
     }
 
@@ -25,7 +29,18 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
             } else {
                 alert("Please enter a valid Ethereum address");
             }
-        } catch (e) {}
+        } catch (e) {
+            console.error("Could not grant role", e);
+        }
+    }
+
+    const revokeRole = async (address: string) => {
+        try {
+            await valist.revokeOrgAdmin(orgName, valist.defaultAccount, address);
+            await updateData();
+        } catch (e) {
+            console.error("Could not revoke role", e);
+        }
     }
 
     useEffect(() => {
@@ -42,7 +57,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
                             <option value="ORG_ADMIN_ROLE">Admin</option>
                         </select>
                     </div>
-                    <button value="Submit" type="button" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md" onClick={grantRole}>Grant Role</button>
+                    <button value="Submit" type="button" className="inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md" onClick={async () => { setRenderLoading(true); await grantRole(); setRenderLoading(false); }}>Grant Role</button>
                 </div>
             </div>
             <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
@@ -60,7 +75,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
                         <div className="border-t border-gray-200">
                             <div className="-mt-px flex">
                                 <div className="w-0 flex-1 flex border-r border-gray-200">
-                                <a href="#" onClick={async () => {await valist.revokeOrgAdmin(orgName, valist.defaultAccount, address); await updateData();}} className="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
+                                <a href="#" onClick={async () => { setRenderLoading(true); await revokeRole(address); setRenderLoading(false); }} className="relative -mr-px w-0 flex-1 inline-flex items-center justify-center py-4 text-sm leading-5 text-gray-700 font-medium border border-transparent rounded-bl-lg hover:text-gray-500 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 focus:z-10 transition ease-in-out duration-150">
                                     <svg className="w-5 h-5 text-gray-400" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
                                     </svg>
@@ -72,6 +87,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
                     </li>
                 ))}
             </ul>
+            { renderLoading && <LoadingDialog>Updating Access Control List...</LoadingDialog> }
         </div>
     )
 }

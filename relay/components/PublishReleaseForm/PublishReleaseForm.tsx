@@ -48,17 +48,14 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
         } catch (e) {
             console.error("Could not upload file", e);
-            setRenderLoading(false);
             return;
         }
-
     }
 
     const createRelease = async () => {
         try {
             if (!file) {
                 console.error("No file selected");
-                setRenderLoading(false);
                 return;
             }
             const hash = await handleUpload(file);
@@ -75,7 +72,6 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
         } catch (e) {
             console.error("Could not publish release", e);
-            setRenderLoading(false);
             return;
         }
     }
@@ -126,7 +122,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                     </div>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
-                            <button onClick={() => { setRenderLoading(true); createRelease(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                            <button onClick={() => { setRenderLoading(true); createRelease(); setRenderLoading(false); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                                 Publish Release
                             </button>
                         </span>
