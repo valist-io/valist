@@ -23,17 +23,14 @@
   },
   "dependencies": {
     "@tailwindcss/ui": "^0.7.2",
-    "axios": "^0.21.1",
-    "form-data": "^3.0.0",
-    "formidable": "^1.2.2",
+    "aws-sdk": "^2.839.0",
     "magic-sdk": "^4.1.0",
     "next": "^10.0.5",
     "react": "^17.0.1",
     "react-dom": "^17.0.1",
-    "valist": "https://app.valist.io/api/valist/valist/latest"
+    "valist": "https://app.valist.io/api/valist/sdk/latest"
   },
   "devDependencies": {
-    "@types/formidable": "^1.0.32",
     "@types/node": "^14.14.22",
     "@types/react": "^17.0.0",
     "@types/react-dom": "^17.0.0",

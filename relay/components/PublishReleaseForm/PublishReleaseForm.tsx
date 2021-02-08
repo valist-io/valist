@@ -10,42 +10,74 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
     const [releaseMeta, setReleaseMeta] = useState("");
     const [projectTag, setProjectTag] = useState("");
-    const [releaseData, setReleaseData] = useState<File | null> (null);
+    const [file, setFile] = useState<File | null>(null);
 
     const [renderLoading, setRenderLoading] = useState(false);
 
-    const handleUpload = async (file: any) => {
-        const url = `${window.location.origin}/api/ipfs/add/file`;
-        const formData = new FormData();
+    const handleUpload = async (file: File) => {
+        try {
+            const filename = encodeURIComponent(file.name);
 
-        formData.append("file", file);
+            // get presigned url for uploading to bucket
+            const res = await fetch(`/api/ipfs/add/file?name=${filename}`, { method: "POST" });
 
-        const upload = await fetch(url, {
-            method: "POST",
-            body: formData,
-        });
+            const { url, fields } = await res.json();
+            const formData = new FormData();
 
-        if (upload.ok) {
-            console.log("Uploaded successfully!");
-        } else {
-            console.error("Upload failed.");
+            Object.entries({ ...fields, file }).forEach(([key, value]: [key: string, value: any]) => {
+                formData.append(key, value);
+            });
+
+            const upload = await fetch(url, {
+                method: "POST",
+                body: formData,
+            });
+
+            if (upload.ok) {
+                console.log("Uploaded successfully!");
+            } else {
+                console.error("Upload failed.");
+            }
+
+            await upload.blob();
+
+            // generate only IPFS hash of file
+            const expectedHash = await valist.addFileToIPFS(file, true);
+
+            return expectedHash;
+
+        } catch (e) {
+            console.error("Could not upload file", e);
+            setRenderLoading(false);
+            return;
         }
 
-        return await upload.json();
     }
 
     const createRelease = async () => {
-        const response = await handleUpload(releaseData);
+        try {
+            if (!file) {
+                console.error("No file selected");
+                setRenderLoading(false);
+                return;
+            }
+            const hash = await handleUpload(file);
 
-        const meta = await valist.addJSONtoIPFS(releaseMeta);
-        const release = {
-            tag: projectTag,
-            hash: response.hash,
-            meta
-        };
+            const meta = await valist.addJSONtoIPFS(releaseMeta);
+            const release = {
+                tag: projectTag,
+                hash,
+                meta
+            };
 
-        await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
-        router.push(`/${orgName}/${repoName}`);
+            await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
+            router.push(`/${orgName}/${repoName}`);
+
+        } catch (e) {
+            console.error("Could not publish release", e);
+            setRenderLoading(false);
+            return;
+        }
     }
 
     return (
@@ -89,7 +121,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                     <div className="sm:col-span-2">
                         <label htmlFor="ReleaseData" className="block text-sm font-medium leading-5 text-gray-700">Release Data</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input type="file" onChange={(e) => setReleaseData(e.target.files && e.target.files[0])} id="ReleaseData" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                            <input type="file" onChange={(e) => setFile(e.target.files && e.target.files[0])} id="ReleaseData" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">

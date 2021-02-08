@@ -17,7 +17,7 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
 
     if (release) {
       //return res.status(200).json({release});
-      return res.redirect(`https://cloudflare-ipfs.com/ipfs/${release.releaseCID}`);
+      return res.redirect(`https://ipfs.fleek.co/ipfs/${release.releaseCID}`);
     } else {
       return res.status(404).json({statusCode: 404, message: "No release found!"});
     }

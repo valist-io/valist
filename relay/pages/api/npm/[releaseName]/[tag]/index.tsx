@@ -26,7 +26,7 @@ export default async function getReleaseByTag(req: NextApiRequest, res: NextApiR
                 homepage: "",
                 dependencies: {},
                 dist: {
-                    tarball: `https://ipfs.io/ipfs/${release.releaseCID}`
+                    tarball: `https://ipfs.fleek.co/ipfs/${release.releaseCID}`
                 }
             });
         } else {
