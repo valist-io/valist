@@ -1,6 +1,6 @@
 {
   "name": "valist",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
   "author": "Valist, Inc.",
   "contributors": [
