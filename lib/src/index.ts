@@ -473,11 +473,11 @@ class Valist {
     }
   }
 
-  async addJSONtoIPFS(data: any) {
+  async addJSONtoIPFS(data: any, onlyHash?: boolean) {
     try {
       const file = Buffer.from(JSON.stringify(data));
-      const result = await this.ipfs.add(file);
-      return result["path"];
+      const result = await this.ipfs.add(file, { onlyHash, cidVersion: 1 });
+      return result["cid"]["string"];
     } catch (e) {
       const msg = `Could not add JSON to IPFS`;
       console.error(msg, e);
@@ -485,11 +485,10 @@ class Valist {
     }
   }
 
-  async addFileToIPFS(data: any) {
+  async addFileToIPFS(data: any, onlyHash?: boolean) {
     try {
-      const file = Buffer.from(data);
-      const result = await this.ipfs.add(file);
-      return result["path"];
+      const result = await this.ipfs.add(data, { onlyHash, cidVersion: 1 });
+      return result["cid"]["string"];
     } catch (e) {
       const msg = `Could not add file to IPFS`;
       console.error(msg, e);
@@ -499,7 +498,7 @@ class Valist {
 
   async fetchJSONfromIPFS(ipfsHash: string) {
     try {
-      const response = await fetch(`https://cloudflare-ipfs.com/ipfs/${ipfsHash}`);
+      const response = await fetch(`https://ipfs.fleek.co/ipfs/${ipfsHash}`);
       const json = await response.json();
       return json;
     } catch (e) {
