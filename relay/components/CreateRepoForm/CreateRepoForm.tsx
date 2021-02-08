@@ -26,8 +26,16 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
             repository: projectRepository
         };
 
-        await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
-        router.push(`/v/${orgName}/${projectName.toLowerCase().replace(shortnameFilterRegex, "")}/publish`);
+        try {
+            await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
+            router.push(`/v/${orgName}/${projectName.toLowerCase().replace(shortnameFilterRegex, "")}/publish`);
+        } catch (e) {
+            console.error("Could not create repository", e);
+        }
+    }
+
+    const updateProjectName = (shortname: string) => {
+        setProjectName(shortname.toLowerCase().replace(shortnameFilterRegex, ""));
     }
 
     return (
@@ -65,7 +73,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                             <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
                                 app.valist.io/{orgName}/
                             </span>
-                            <input onChange={(e) => setProjectName(e.target.value)} required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" />
+                            <input onChange={(e) => updateProjectName(e.target.value)} required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" value={projectName} />
                         </div>
                     </div>
 
@@ -98,7 +106,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                     </div>
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={() => { setRenderLoading(true); createProject(); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                        <button onClick={() => { setRenderLoading(true); createProject(); setRenderLoading(false); }} value="Submit" type="button" className="w-full inline-flex items-center justify-center px-6 py-3 border border-transparent text-base leading-6 font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
                             Create Project
                         </button>
                     </span>
