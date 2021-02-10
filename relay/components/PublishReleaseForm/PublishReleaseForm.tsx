@@ -1,5 +1,6 @@
 import React, { FunctionComponent, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
+import axios from 'axios';
 
 import ValistContext from '../ValistContext/ValistContext';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
@@ -12,6 +13,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
     const [projectTag, setProjectTag] = useState("");
     const [file, setFile] = useState<File | null>(null);
 
+    const [loadingMessage, setLoadingMessage] = useState("");
+
     const [renderLoading, setRenderLoading] = useState(false);
 
     const handleUpload = async (file: File) => {
@@ -19,36 +22,36 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
             const filename = encodeURIComponent(file.name);
 
             // get presigned url for uploading to bucket
-            const res = await fetch(`/api/ipfs/add/file?name=${filename}`, { method: "POST" });
+            const res = await axios.post(`/api/ipfs/add/file?name=${filename}`);
 
-            const { url, fields } = await res.json();
+            const { url, fields } = await res.data;
             const formData = new FormData();
 
             Object.entries({ ...fields, file }).forEach(([key, value]: [key: string, value: any]) => {
                 formData.append(key, value);
             });
 
-            const upload = await fetch(url, {
-                method: "POST",
-                body: formData,
+            const upload = await axios.post(url, formData, {
+                headers: { "Content-Type": "multipart/form-data" },
+                onUploadProgress: (progressEvent) => setLoadingMessage(`Uploading file to IPFS: ${Math.round((progressEvent.loaded * 100) / progressEvent.total)}%`),
             });
 
-            if (upload.ok) {
-                console.log("Uploaded successfully!");
-            } else {
-                console.error("Upload failed.");
-            }
-
-            await upload.blob();
+            const responseHash = upload.headers["etag"].replaceAll(`"`, "");
 
             // generate only IPFS hash of file
             const expectedHash = await valist.addFileToIPFS(file, true);
 
-            return expectedHash;
+            if (responseHash === expectedHash) {
+                return expectedHash;
+            } else {
+                const msg = `Integrity check failed, response hash "${responseHash}" does not equal expected hash "${expectedHash}"!`;
+                console.error(msg);
+                throw new Error(msg);
+            }
 
         } catch (e) {
             console.error("Could not upload file", e);
-            return;
+            throw e;
         }
     }
 
@@ -58,7 +61,12 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                 console.error("No file selected");
                 return;
             }
+
+            setLoadingMessage("Uploading file to IPFS...");
+
             const hash = await handleUpload(file);
+
+            setLoadingMessage("Uploading metadata JSON to IPFS...");
 
             const meta = await valist.addJSONtoIPFS(releaseMeta);
             const release = {
@@ -66,6 +74,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                 hash,
                 meta
             };
+
+            setLoadingMessage("Publishing Release...");
 
             await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
             router.push(`/${orgName}/${repoName}`);
@@ -130,7 +140,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog>Signing and Releasing...</LoadingDialog> }
+            { renderLoading && <LoadingDialog>{loadingMessage}</LoadingDialog> }
         </div>
     );
 }
