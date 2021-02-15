@@ -24,6 +24,7 @@
   "dependencies": {
     "@tailwindcss/ui": "^0.7.2",
     "aws-sdk": "^2.839.0",
+    "axios": "^0.21.1",
     "magic-sdk": "^4.1.1",
     "next": "^10.0.6",
     "react": "^17.0.1",
