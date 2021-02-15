@@ -4,7 +4,7 @@ import ValistContext from '../../components/ValistContext/ValistContext';
 import NavTree from '../Nav/NavTree';
 
 export const ProjectsList= ({orgName}: { orgName: string }) => {
-    const valist = useContext(ValistContext)
+    const valist = useContext(ValistContext);
 
     const [projects, setProjects] = useState(["Loading..."]);
 
@@ -13,7 +13,9 @@ export const ProjectsList= ({orgName}: { orgName: string }) => {
             if (valist) {
                 try {
                     setProjects(await valist.getReposFromOrganization(orgName));
-                } catch (e) {}
+                } catch (e) {
+                    console.error("Could not fetch projects", e);
+                }
             }
         })()
     }, [valist]);

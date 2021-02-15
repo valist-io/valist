@@ -13,7 +13,9 @@ export const OrgList= () => {
             if (valist) {
                 try {
                     setOrgs(await valist.getOrganizationNames());
-                } catch (e) {}
+                } catch (e) {
+                    console.error("Could not fetch organization names", e);
+                }
             }
         })()
     }, [valist]);

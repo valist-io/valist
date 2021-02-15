@@ -7,7 +7,7 @@ const IsOrgAdmin:FunctionComponent<any> = (props) => {
 
     useEffect(() => {
         (async function() {
-            if (valist) {
+            if (valist && valist.defaultAccount !== "0x0") {
                 try {
                     setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, valist.defaultAccount));
                 } catch (e) {

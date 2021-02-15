@@ -1,7 +1,10 @@
-import React, { FunctionComponent} from 'react';
+import React, { FunctionComponent, useContext} from 'react';
 import Link from 'next/link';
+import LoginContext from '../LoginContext/LoginContext';
 
-export const Nav:FunctionComponent<any> = ({}) => {
+export const Nav:FunctionComponent<any> = () => {
+    const login = useContext(LoginContext);
+
     return (
         <nav className="flex-shrink-0 bg-indigo-700">
             <div className="max-w-7xl mx-auto px-2 sm:px-4 lg:px-8">
@@ -29,6 +32,12 @@ export const Nav:FunctionComponent<any> = ({}) => {
                         <div className="flex">
                         <a href="https://docs.valist.io" className="px-3 py-2 rounded-md text-sm leading-5 font-medium text-indigo-200 hover:text-white focus:outline-none focus:text-white focus:bg-indigo-600 transition duration-150 ease-in-out">Documentation</a>
                         <a href="mailto:support@valist.io?subject=Valist Support" className="px-3 py-2 rounded-md text-sm leading-5 font-medium text-indigo-200 hover:text-white focus:outline-none focus:text-white focus:bg-indigo-600 transition duration-150 ease-in-out">Support</a>
+                            {login.loggedIn ? <button onClick={() => login.logOut()} type="button" className="inline-flex ml-2 items-center px-6 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-indigo-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Logout
+                            </button> :
+                            <button onClick={() => login.setShowLogin(true)} type="button" className="inline-flex ml-2 items-center px-6 py-1.5 border border-transparent text-xs font-medium rounded-full shadow-sm text-indigo-700 bg-white hover:bg-gray-50 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
+                                Login
+                            </button>}
                         </div>
 
                         <div className="ml-4 relative flex-shrink-0">

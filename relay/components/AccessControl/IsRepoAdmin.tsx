@@ -7,7 +7,7 @@ const IsRepoAdmin:FunctionComponent<any> = (props) => {
 
     useEffect(() => {
         (async function() {
-            if (valist) {
+            if (valist && valist.defaultAccount !== "0x0") {
                 try {
                     setIsRepoAdmin(await valist.isRepoAdmin(props.orgName, props.repoName, valist.defaultAccount));
                 } catch (e) {

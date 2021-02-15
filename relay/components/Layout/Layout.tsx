@@ -3,8 +3,8 @@ import Head from 'next/head'
 import Nav from '../Nav/Nav';
 
 type Props = {
-  children?: ReactNode
-  title?: string
+  children?: ReactNode,
+  title?: string,
 }
 
 const Layout = ({ children, title = 'Valist' }: Props) => (

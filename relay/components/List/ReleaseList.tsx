@@ -4,7 +4,7 @@ import ValistContext from '../ValistContext/ValistContext';
 import NavTree from '../Nav/NavTree';
 
 export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: string }) => {
-    const valist = useContext(ValistContext)
+    const valist = useContext(ValistContext);
 
     const [releases, setReleases] = useState(["Loading..."]);
 
@@ -13,7 +13,9 @@ export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: s
             if (valist) {
                 try {
                     setReleases(await valist.getReleaseTagsFromRepo(orgName, repoName));
-                } catch (e) {}
+                } catch (e) {
+                    console.error("Could not fetch releases", e);
+                }
             }
         })()
     }, [valist]);

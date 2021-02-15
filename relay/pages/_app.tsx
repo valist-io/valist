@@ -4,11 +4,15 @@ import React, { useEffect, useState } from 'react';
 
 import Valist from 'valist';
 import ValistContext from '../components/ValistContext/ValistContext';
+import LoginContext from '../components/LoginContext/LoginContext';
+
+import LoadingDialog from '../components/LoadingDialog/LoadingDialog';
+import LoginForm from '../components/LoginForm/LoginForm';
 import { Magic } from 'magic-sdk';
 
-import LoginForm from '../components/LoginForm/LoginForm';
-
 import '../styles/main.css';
+
+type ProviderType = "magic" | "metaMask" | "readOnly";
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -16,58 +20,128 @@ function App({ Component, pageProps }: AppProps) {
 
   const [valist, setValist] = useState<Valist>();
 
-  const [magic, setMagic] = useState<Magic>();
+  const [email, setEmail] = useState("");
+
+  const [showLogin, setShowLogin] = useState(false);
 
   const [loggedIn, setLoggedIn] = useState(false);
 
-  // const [loginMethod, setLoginMethod] = useState<"magic" | "metamask" | "github">("magic");
+  const [magic, setMagic] = useState<Magic | undefined>();
 
-  // initialize web3 and valist object on document load (this effect is only triggered once)
+  const handleLogin = async (providerType: ProviderType) => {
+    const providers = {
+        magic: async () => {
+            try {
+                const customNodeOptions = {
+                    rpcUrl: publicRuntimeConfig.WEB3_PROVIDER
+                };
+
+                const magicObj = new Magic(publicRuntimeConfig.MAGIC_PUBKEY, { network: customNodeOptions });
+                const magicLoggedIn = await magicObj.user.isLoggedIn();
+                setMagic(magicObj);
+
+                if (magicLoggedIn) {
+                  setLoggedIn(true);
+                  return magicObj.rpcProvider;
+                } else if (email) {
+                  await magicObj.auth.loginWithMagicLink({ email });
+                  setLoggedIn(true);
+                  return magicObj.rpcProvider;
+                }
+
+            } catch (e) {
+                console.error("Could not set Magic as provider", e);
+            }
+        },
+        metaMask: async () => {
+            // @ts-ignore
+            if (window.ethereum) {
+                // @ts-ignore
+                await window.ethereum.enable();
+                setLoggedIn(true);
+                // @ts-ignore
+                return window.ethereum;
+            }
+        },
+        readOnly: async () => {
+            setLoggedIn(false);
+            return publicRuntimeConfig.WEB3_PROVIDER;
+        }
+    }
+
+    let provider;
+
+    try {
+      provider = await providers[providerType]();
+      window.localStorage.setItem("loginType", providerType);
+    } catch (e) {
+      console.log("Could not set provider, falling back to readOnly", e);
+      provider = await providers["readOnly"]();
+      window.localStorage.setItem("loginType", "readOnly");
+    }
+
+    try {
+      const valist = new Valist({
+        web3Provider: provider,
+        metaTx: provider == publicRuntimeConfig.WEB3_PROVIDER ? false : publicRuntimeConfig.METATX_ENABLED
+      });
+
+      await valist.connect();
+
+      setValist(valist);
+
+      console.log("Current Account: ", valist.defaultAccount);
+
+      // @ts-ignore keep for dev purposes
+      window.valist = valist;
+    } catch (e) {
+      console.error("Could not initialize Valist object", e);
+    }
+  }
+
+  const logOut = async () => {
+    window.localStorage.clear();
+    setShowLogin(false);
+    setLoggedIn(false);
+    if (magic) {
+      magic.user.logout();
+      setMagic(undefined);
+    }
+    await handleLogin("readOnly");
+  }
+
+  const loginObject = {
+    setShowLogin: setShowLogin,
+    loggedIn: loggedIn,
+    logOut: logOut
+  }
+
   useEffect(() => {
     (async function () {
-        try {
+      // check login type on first load and set provider to previous state
+      const loginType = window.localStorage.getItem("loginType");
 
-          const customNodeOptions = {
-            rpcUrl: publicRuntimeConfig.WEB3_PROVIDER
-          };
+      if (loginType === "readOnly" || loginType === "magic" || loginType === "metaMask") {
+        await handleLogin(loginType);
+      } else {
+        await handleLogin("readOnly");
+        window.localStorage.setItem("loginType", "readOnly");
+      }
 
-          const magicObj = new Magic(publicRuntimeConfig.MAGIC_PUBKEY, { network: customNodeOptions });
-          setMagic(magicObj);
-
-        } catch (e) {
-          console.log(e);
-        }
     })();
   }, []);
 
-  useEffect(() => {
-    (async function () {
-      if (magic && loggedIn) {
-        try {
-          // @ts-expect-error Magic's RPCProviderModule doesn't fit the web3.js provider types perfectly yet
-          const valist = new Valist({ web3Provider: magic.rpcProvider, metaTx: publicRuntimeConfig.META_TX_ENABLE });
-          await valist.connect();
-
-          setValist(valist);
-
-          console.log("Current Account: ", valist.defaultAccount);
-          console.log("Current Account Balance: ", valist.web3.utils.fromWei(await valist.web3.eth.getBalance(valist.defaultAccount), 'ether'));
-
-          // @ts-ignore keep for dev purposes
-          window.valist = valist;
-        } catch (e) {
-          console.error("Could not initialize Valist object", e);
-        }
+  return (
+    <LoginContext.Provider value={loginObject}>
+      { valist ?
+        <ValistContext.Provider value={valist}>
+          <Component loggedIn={loggedIn} setShowLogin={setShowLogin} {...pageProps} />
+          { showLogin && <LoginForm setShowLogin={setShowLogin} handleLogin={handleLogin} setEmail={setEmail} /> }
+        </ValistContext.Provider>
+        : <LoadingDialog>Loading...</LoadingDialog>
       }
-    })();
-  }, [magic, loggedIn]);
-
-  return loggedIn ? (
-    // @ts-ignore
-    <ValistContext.Provider value={valist}>
-      <Component {...pageProps} />
-    </ValistContext.Provider>
-  ) : <LoginForm magic={magic} setLoggedIn={setLoggedIn} {...pageProps} />
+    </LoginContext.Provider>
+  )
 }
 
 // Only uncomment this method if you have blocking data requirements for
@@ -82,4 +156,4 @@ function App({ Component, pageProps }: AppProps) {
 //   return { ...appProps }
 // }
 
-export default App
+export default App;
