@@ -1,15 +1,30 @@
-import React from 'react';
+import React, { useEffect, useRef } from 'react';
 
-const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, setEmail: any, setShowLogin: any }) =>{
+const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, setEmail: any, setShowLogin: any }) => {
+    const element = useRef<HTMLDivElement>(null);
 
-    const loginMetaMask = async () =>{
+    const loginMetaMask = async () => {
         await handleLogin("metaMask");
         setShowLogin(false);
     }
 
+    const handleClick = (e: any) => {
+        if (element.current && e.target && element.current.contains(e.target)) return;
+
+        setShowLogin(false);
+    };
+
+    useEffect(() => {
+        document.addEventListener("mousedown", handleClick);
+    
+        return () => {
+            document.removeEventListener("mousedown", handleClick);
+        };
+    }, []);
+
     return (
         <div className="fixed top-0 left-0 z-50 w-screen h-screen flex items-center justify-center" style={{background: "rgba(0, 0, 0, 0.3)"}}>
-            <div className="bg-white border py-2 px-5 rounded-lg flex items-center flex-col">
+            <div ref={element} className="bg-white border py-2 px-5 rounded-lg flex items-center flex-col">
                 <div className="text-gray-500 font-light mt-2 text-center">
                     <div className="bg-gray-50 flex flex-col justify-center py-28 sm:px-6 lg:px-8">
                         <div className="sm:mx-auto sm:w-full sm:max-w-md">
@@ -22,7 +37,7 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
                                 <div>
                                     <label htmlFor="email" className="block text-sm font-medium leading-5 text-gray-700">
                                         Email address
-                                        </label>
+                                    </label>
                                     <div className="mt-1 rounded-md shadow-sm">
                                         <input id="email" type="email" onChange={(e) => setEmail(e.target.value)} onKeyDown={(e) => { if (e.key === 'Enter') handleLogin("magic") }} required className="appearance-none block w-full px-3 py-2 border border-gray-300 rounded-md placeholder-gray-400 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 transition duration-150 ease-in-out sm:text-sm sm:leading-5" />
                                     </div>
@@ -42,7 +57,7 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
                                         <div className="relative flex justify-center text-sm leading-5">
                                             <span className="px-2 bg-white text-gray-500">
                                                 Or continue with
-                                                </span>
+                                            </span>
                                         </div>
                                     </div>
                                     <div className="mt-6 grid grid-cols-3 gap-3">
