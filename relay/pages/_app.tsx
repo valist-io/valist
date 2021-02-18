@@ -96,6 +96,11 @@ function App({ Component, pageProps }: AppProps) {
       window.valist = valist;
     } catch (e) {
       console.error("Could not initialize Valist object", e);
+      try {
+        await handleLogin("readOnly");
+      } catch (e) {
+        console.error("Critical error, could not login with desired method or readOnly", e);
+      }
     }
   }
 

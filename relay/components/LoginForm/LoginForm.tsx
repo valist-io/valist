@@ -16,7 +16,7 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
 
     useEffect(() => {
         document.addEventListener("mousedown", handleClick);
-    
+
         return () => {
             document.removeEventListener("mousedown", handleClick);
         };
@@ -61,6 +61,7 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
                                         </div>
                                     </div>
                                     <div className="mt-6 grid grid-cols-3 gap-3">
+                                        <div>{ /* @TODO: Github login */}</div>
                                         <div>
                                             <span className="w-full inline-flex rounded-md shadow-sm">
                                                 <button onClick={async () => await loginMetaMask()} type="button" className="w-full inline-flex justify-center py-2 px-4 border border-gray-300 rounded-md bg-white text-sm leading-5 font-medium text-gray-500 hover:text-gray-400 focus:outline-none focus:border-blue-300 focus:shadow-outline-blue transition duration-150 ease-in-out" aria-label="Sign in with GitHub">
