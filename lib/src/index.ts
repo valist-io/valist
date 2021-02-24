@@ -17,18 +17,23 @@ if (!globalThis.fetch) {
 
 export const shortnameFilterRegex = /[^A-z0-9-]/;
 
-export type ProjectType = "binary" | "npm" | "pip" | "docker";
+export enum ProjectType {
+  BINARY = "binary",
+  NPM = "npm",
+  PIP = "pip",
+  DOCKER = "docker",
+}
 
-const getContractInstance = (web3: Web3, abi: any, address: string) => {
+export const getContractInstance = (web3: Web3, abi: any, address: string) => {
   // create the instance
   return new web3.eth.Contract(abi, address);
 }
 
-const getValistContract = async (web3: Web3) => {
+const getValistContract = async (web3: Web3, address?: string) => {
   // get network ID and the deployed address
   const networkId: number = await web3.eth.net.getId();
   // @ts-ignore
-  const deployedAddress: string = ValistABI.networks[networkId].address;
+  const deployedAddress: string = address || ValistABI.networks[networkId].address;
 
   return getContractInstance(web3, ValistABI.abi, deployedAddress);
 }
@@ -73,8 +78,9 @@ class Valist {
   defaultAccount: string;
   metaTxEnabled: boolean = false;
   metaTxReady: boolean = false;
+  contractAddress: string | undefined;
 
-  constructor({ web3Provider, metaTx = true, ipfsHost = `ipfs.infura.io` }: { web3Provider: provider, metaTx?: boolean | string, ipfsHost?: string }) {
+  constructor({ web3Provider, metaTx = true, ipfsHost = `ipfs.infura.io`, contractAddress }: { web3Provider: provider, metaTx?: boolean | string, ipfsHost?: string, contractAddress?: string }) {
     if (metaTx === true || metaTx === "true") {
       this.metaTxEnabled = true;
 
@@ -94,12 +100,13 @@ class Valist {
 
     this.defaultAccount = "0x0";
     this.ipfs = ipfsClient({ host: ipfsHost, port: 5001, apiPath: `/api/v0/`, protocol: `https` });
+    this.contractAddress = contractAddress;
   }
 
   // initialize main valist contract instance for future calls
   async connect() {
     try {
-      this.valist = await getValistContract(this.web3);
+      this.valist = await getValistContract(this.web3, this.contractAddress);
     } catch (e) {
       const msg = `Could not connect to Valist registry contract`;
       console.error(msg, e);

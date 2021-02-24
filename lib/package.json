@@ -24,13 +24,16 @@
     "build": "tsc",
     "dev": "tsc -w",
     "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none",
-    "test": "env TS_NODE_COMPILER_OPTIONS='{\"module\": \"commonjs\" }' mocha -r ts-node/register 'tests/**/*.ts'"
+    "test": "mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "devDependencies": {
     "@types/chai": "^4.2.14",
     "@types/mocha": "^8.2.0",
     "chai": "^4.3.0",
+    "ganache-cli": "^6.12.2",
+    "ganache-core": "^2.13.2",
     "mocha": "^8.2.1",
+    "ts-node": "^9.1.1",
     "typedoc": "^0.19.2",
     "typescript": "^3.9.7"
   },
@@ -38,6 +41,6 @@
     "@biconomy/mexa": "^1.5.15",
     "ipfs-http-client": "47.0.1",
     "node-fetch": "^2.6.1",
-    "web3": "^1.3.4"
+    "web3": "^1.3.3"
   }
 }
