@@ -1,4 +1,9 @@
 {
   "solidity.packageDefaultDependenciesContractsDirectory": "",
-  "solidity.packageDefaultDependenciesDirectory": "eth/node_modules"
+  "solidity.packageDefaultDependenciesDirectory": "eth/node_modules",
+  "eslint.workingDirectories": [
+    "cli/",
+    "lib/",
+    "relay/",
+  ]
 }

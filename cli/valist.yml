@@ -1,0 +1,5 @@
+type: npm
+org: test
+project: cli
+tag: 0.0.1-rc.2
+meta: RELEASE.md
