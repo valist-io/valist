@@ -37,17 +37,18 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
             });
 
             const responseHash = upload.headers["etag"].replaceAll(`"`, "");
+            return responseHash;
 
             // generate only IPFS hash of file
-            const expectedHash = await valist.addFileToIPFS(file, true);
+            // const expectedHash = await valist.addFileToIPFS(file, true);
 
-            if (responseHash === expectedHash) {
-                return expectedHash;
-            } else {
-                const msg = `Integrity check failed, response hash "${responseHash}" does not equal expected hash "${expectedHash}"!`;
-                console.error(msg);
-                throw new Error(msg);
-            }
+            // if (responseHash === expectedHash) {
+            //    return expectedHash;
+            // } else {
+            //     const msg = `Integrity check failed, response hash "${responseHash}" does not equal expected hash "${expectedHash}"!`;
+            //     console.error(msg);
+            //     throw new Error(msg);
+            // }
 
         } catch (e) {
             console.error("Could not upload file", e);
@@ -64,20 +65,21 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
             setLoadingMessage("Uploading file to IPFS...");
 
-            const hash = await handleUpload(file);
+            const releaseCID = await handleUpload(file);
 
             setLoadingMessage("Uploading metadata JSON to IPFS...");
 
-            const meta = await valist.addJSONtoIPFS(releaseMeta);
+            const metaCID = await valist.addJSONtoIPFS(releaseMeta);
+
             const release = {
                 tag: projectTag,
-                hash,
-                meta
+                releaseCID,
+                metaCID
             };
 
             setLoadingMessage("Publishing Release...");
 
-            await valist.publishRelease(orgName, repoName, release, valist.defaultAccount);
+            await valist.publishRelease(orgName, repoName, release);
             router.push(`/${orgName}/${repoName}`);
 
         } catch (e) {

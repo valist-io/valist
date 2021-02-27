@@ -17,12 +17,7 @@ if (!globalThis.fetch) {
 
 export const shortnameFilterRegex = /[^A-z0-9-]/;
 
-export enum ProjectType {
-  BINARY = "binary",
-  NPM = "npm",
-  PIP = "pip",
-  DOCKER = "docker",
-}
+export type ProjectType = "binary" | "npm" | "pip" | "docker";
 
 export const getContractInstance = (web3: Web3, abi: any, address: string) => {
   // create the instance
@@ -75,6 +70,7 @@ class Valist {
   web3: Web3;
   valist: any;
   ipfs: any;
+  biconomy: any;
   defaultAccount: string;
   metaTxEnabled: boolean = false;
   metaTxReady: boolean = false;
@@ -85,11 +81,11 @@ class Valist {
       this.metaTxEnabled = true;
 
       // setup biconomy instance with public api key
-      const biconomy = new Biconomy(web3Provider, { apiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", strictMode: true } );
+      this.biconomy = new Biconomy(web3Provider, { apiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", strictMode: true } );
 
-      this.web3 = new Web3(biconomy);
+      this.web3 = new Web3(this.biconomy);
 
-      biconomy.onEvent(biconomy.READY, () => {
+      this.biconomy.onEvent(this.biconomy.READY, () => {
         this.metaTxReady = true;
         console.log("MetaTransactions Enabled");
       });
@@ -104,7 +100,7 @@ class Valist {
   }
 
   // initialize main valist contract instance for future calls
-  async connect() {
+  async connect(waitForMetaTx?: boolean) {
     try {
       this.valist = await getValistContract(this.web3, this.contractAddress);
     } catch (e) {
@@ -120,6 +116,15 @@ class Valist {
       const msg = `Could not set default account`;
       console.error(msg, e);
       throw e;
+    }
+
+    if (waitForMetaTx && this.biconomy) {
+      await new Promise((resolve, reject) => {
+        this.biconomy.onEvent(this.biconomy.READY, () => {
+          this.metaTxReady = true;
+          resolve(true);
+        });
+      });
     }
   }
 
@@ -470,11 +475,35 @@ class Valist {
     }
   }
 
-  async publishRelease(orgName: string, repoName: string, release: { tag: string, hash: string, meta: string }, account?: string) {
+  async prepareRelease(tag: string, releaseFile: any, metaFile: any, onUploadProgress?: any) {
     try {
-      return await this.sendTransaction(this.valist.methods.publishRelease(orgName, repoName, release.tag, release.hash, release.meta), account);
+      const releaseCID: string = await this.addFileToIPFS(releaseFile);
+      const metaCID: string = await this.addFileToIPFS(metaFile);
+      return { tag, releaseCID, metaCID };
+    } catch (e) {
+      const msg = 'Could not publish release';
+      console.error(msg, e);
+      throw e;
+    }
+  };
+
+  async publishRelease(orgName: string, repoName: string, release: { tag: string, releaseCID: string, metaCID: string }, account?: string) {
+    try {
+      return await this.sendTransaction(this.valist.methods.publishRelease(orgName, repoName, release.tag, release.releaseCID, release.metaCID), account);
     } catch (e) {
       const msg = `Could not publish release`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async fetchJSONfromIPFS(ipfsHash: string) {
+    try {
+      const response = await fetch(`https://ipfs.fleek.co/ipfs/${ipfsHash}`);
+      const json = await response.json();
+      return json;
+    } catch (e) {
+      const msg = `Could not fetch JSON from IPFS`;
       console.error(msg, e);
       throw e;
     }
@@ -498,18 +527,6 @@ class Valist {
       return result["cid"]["string"];
     } catch (e) {
       const msg = `Could not add file to IPFS`;
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async fetchJSONfromIPFS(ipfsHash: string) {
-    try {
-      const response = await fetch(`https://ipfs.fleek.co/ipfs/${ipfsHash}`);
-      const json = await response.json();
-      return json;
-    } catch (e) {
-      const msg = `Could not fetch JSON from IPFS`;
       console.error(msg, e);
       throw e;
     }
