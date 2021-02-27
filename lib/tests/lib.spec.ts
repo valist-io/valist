@@ -20,10 +20,16 @@ const meta = {
 	description: "We are a secure firmware company."
 };
 
-const repoMeta = {
+const repoMeta: {
+	name: string;
+	description: string;
+	projectType: "binary";
+	homepage: string;
+	repository: string;
+} = {
 	name: projectName,
 	description: "A secure firmware.",
-	projectType: ProjectType.BINARY,
+	projectType: "binary",
 	homepage: "https://pugsandhugs.party",
 	repository: "https://github.com/pugsandhugs.party"
 };
