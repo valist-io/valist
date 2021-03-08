@@ -57,8 +57,6 @@ yargs.command('publish', 'Publish an NPM package to Valist', () => {}, async () 
     const releaseFile = fs.createReadStream(tarballName);
     const metaFile = fs.createReadStream(meta);
 
-    console.log('Files', releaseFile, metaFile);
-
     console.log('Preparing release on IPFS');
     const releaseObject = await valist.prepareRelease(tag, releaseFile, metaFile);
     console.log('Release Object:', releaseObject);
