@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import Valist, { Web3Providers } from 'valist';
 
 export default async function getReleasesFromRepo(req: NextApiRequest, res: NextApiResponse) {
-    console.log("Pulling the package list");
+    console.log("Pulling package list");
   
     // set .env.local to your local chain or set in production deployment
     if (process.env.WEB3_PROVIDER) {
@@ -52,5 +52,5 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
         console.log(`Fetching Package ${releaseName} from https://registry.npmjs.org`);
         return res.redirect(`https://registry.npmjs.org/${releaseName}`);
     }
-    return res.status(500).json({statusCode: 500, message: "No Web3 Provider!"});
+    return res.status(404).json({statusCode: 404, message: "Package Not Found"});
 }

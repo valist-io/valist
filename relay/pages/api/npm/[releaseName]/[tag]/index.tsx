@@ -2,7 +2,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import Valist, { Web3Providers } from 'valist';
 
 export default async function getReleaseByTag(req: NextApiRequest, res: NextApiResponse) {
-
+    console.log("Pulling package by version tag");
     // set .env.local to your local chain or set in production deployment
     if (process.env.WEB3_PROVIDER) {
 
