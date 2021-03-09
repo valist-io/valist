@@ -39,8 +39,9 @@
   },
   "dependencies": {
     "@biconomy/mexa": "^1.5.15",
+    "encoding": "^0.1.13",
     "ipfs-http-client": "47.0.1",
     "node-fetch": "^2.6.1",
-    "web3": "^1.3.4"
+    "web3": "1.3.3"
   }
 }
