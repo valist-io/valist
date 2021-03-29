@@ -19,7 +19,15 @@ let config = {
   webpack: (config, { webpack }) => {
     // Note: we provide webpack above so you should not `require` it
     // Perform customizations to webpack config
-    config.plugins.push(new webpack.IgnorePlugin(/^electron$/))
+    config.plugins.push(new webpack.IgnorePlugin(/^electron$/));
+
+    config.node = {
+      console: false,
+      fs: 'empty',
+      net: 'empty',
+      tls: 'empty',
+      child_process: 'empty',
+    };
 
     // Important: return the modified config
     return config

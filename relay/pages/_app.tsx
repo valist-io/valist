@@ -1,6 +1,6 @@
 import { AppProps } from 'next/app';
 import getConfig from "next/config";
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 
 import Valist from 'valist';
 import ValistContext from '../components/ValistContext/ValistContext';
@@ -10,7 +10,12 @@ import LoadingDialog from '../components/LoadingDialog/LoadingDialog';
 import LoginForm from '../components/LoginForm/LoginForm';
 import { Magic } from 'magic-sdk';
 
+import Ceramic from '@ceramicnetwork/http-client';
+import { IDX } from '@ceramicstudio/idx';
+
 import '../styles/main.css';
+
+const threeID = require("3id-connect");
 
 type ProviderType = "magic" | "metaMask" | "readOnly";
 
@@ -28,8 +33,7 @@ function App({ Component, pageProps }: AppProps) {
 
   const [magic, setMagic] = useState<Magic | undefined>();
 
-  const handleLogin = async (providerType: ProviderType) => {
-    const providers = {
+  const providers = {
         magic: async () => {
             try {
                 const customNodeOptions = {
@@ -67,8 +71,9 @@ function App({ Component, pageProps }: AppProps) {
             setLoggedIn(false);
             return publicRuntimeConfig.WEB3_PROVIDER;
         }
-    }
+  }
 
+  const handleLogin = async (providerType: ProviderType) => {
     let provider;
 
     try {
@@ -87,10 +92,27 @@ function App({ Component, pageProps }: AppProps) {
       });
 
       await valist.connect();
-
       setValist(valist);
 
-      console.log("Current Account: ", valist.defaultAccount);
+      if (window.localStorage.getItem('loginType') !== "readOnly") {
+        console.log('Valist', valist);
+        console.log("Current Account: ", valist.defaultAccount);
+
+        const threeIdConnect = new threeID.ThreeIdConnect();
+        const authProvider = new threeID.EthereumAuthProvider(provider, valist.defaultAccount);
+        await threeIdConnect.connect(authProvider);
+
+        const didProvider = await threeIdConnect.getDidProvider();
+        console.log("DID Provider", didProvider);
+
+        const ceramic: any = new Ceramic('https://gateway-clay.ceramic.network');
+        await ceramic.setDIDProvider(didProvider);
+        console.log("DID PROVIDER SET");
+        const idx = new IDX(ceramic);
+        console.log("IDX Instance", idx);
+        console.log("Basic Profile", await idx.get('basicProfile'));
+      }
+
 
       // @ts-ignore keep for dev purposes
       window.valist = valist;

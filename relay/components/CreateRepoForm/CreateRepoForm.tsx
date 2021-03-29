@@ -78,19 +78,22 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                     </div>
 
                     <div className="sm:col-span-2">
-                        <label htmlFor="RepoDescription" className="block text-sm font-medium leading-5 text-gray-700">Repo Description</label>
-                        <div className="mt-1 relative rounded-md shadow-sm">
-                            <textarea onChange={(e) => setProjectDescription(e.target.value)} required id="RepoDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
-                        </div>
-                    </div>
-                    <div className="sm:col-span-2">
-                        <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Package Type</label>
+                        <label htmlFor="projectType" className="block text-sm leading-5 font-medium text-gray-700">Type</label>
                         <select onChange={(e) => setProjectType(e.target.value as ProjectType)} id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2 text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue focus:border-blue-300 sm:text-sm sm:leading-5">
-                            <option value="binary">binary</option>
-                            <option value="npm">npm</option>
-                            <option value="pip">pip</option>
-                            <option value="docker">docker</option>
+                            <option value="binary">Binary</option>
+                            <option value="static-javascript">Static JS</option>
+                            <option value="npm">NPM</option>
+                            <option value="pip">PIP</option>
+                            <option value="docker">Docker</option>
+                            <option value="web3-asset">Web3 Asset</option>
                         </select>
+                    </div>
+
+                    <div className="sm:col-span-2">
+                        <label htmlFor="ProjectDescription" className="block text-sm font-medium leading-5 text-gray-700">Description</label>
+                        <div className="mt-1 relative rounded-md shadow-sm">
+                            <textarea onChange={(e) => setProjectDescription(e.target.value)} required id="ProjectDescription" className="form-input py-3 px-4 block w-full transition ease-in-out duration-150" />
+                        </div>
                     </div>
                     <div className="sm:col-span-2">
                         <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
