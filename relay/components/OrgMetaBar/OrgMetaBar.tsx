@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 
 export const OrgMetaBar = ({ orgName }: { orgName: string }) => {
     const valist = useContext(ValistContext);

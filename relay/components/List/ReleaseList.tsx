@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 import NavTree from '../Nav/NavTree';
 
 export const ReleaseList= ({ orgName, repoName }: { orgName: string, repoName: string }) => {

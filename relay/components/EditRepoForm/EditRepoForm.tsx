@@ -1,6 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext} from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 
 const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string}) => {
     const valist = useContext(ValistContext);

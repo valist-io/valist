@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 
 import BinaryMeta from './BinaryMeta';
 import NpmMeta from './NpmMeta';

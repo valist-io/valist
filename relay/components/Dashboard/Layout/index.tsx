@@ -18,7 +18,12 @@ const Layout = ({ children, title = 'Valist' }: Props) => {
       </Head>
       <div className="min-h-screen bg-gray-100">
         <Nav/>
-        {children}
+        <main className="-mt-24 pb-8">
+          <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
+            <h1 className="sr-only">Dashboard</h1>
+            {children}
+          </div>
+        </main>
         <Footer />
       </div>
     </div>

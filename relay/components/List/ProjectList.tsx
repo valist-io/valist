@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import ValistContext from '../../components/ValistContext/ValistContext';
+import ValistContext from '../../components/ValistContext';
 import NavTree from '../Nav/NavTree';
 
 export const ProjectsList= ({orgName}: { orgName: string }) => {
