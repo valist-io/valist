@@ -1,7 +1,7 @@
 import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import ValistContext from '../ValistContext/ValistContext';
-import LoginContext from '../LoginContext/LoginContext';
+import ValistContext from '../ValistContext';
+import LoginContext from '../LoginContext';
 import AddressIdenticon from './AddressIdenticon';
 
 const ProfileActionSidebar:FunctionComponent<any> = () => {

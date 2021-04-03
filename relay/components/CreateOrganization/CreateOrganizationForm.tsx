@@ -1,5 +1,5 @@
 import React, { FunctionComponent, useState, useContext } from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 import { shortnameFilterRegex } from 'valist';
 
 import { useRouter } from 'next/router';

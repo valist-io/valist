@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 
 export const ActivityFeed = () => {
     const valist = useContext(ValistContext)
@@ -13,7 +13,7 @@ export const ActivityFeed = () => {
                 } catch (e) {}
             }
         })()
-    }, [valist])
+    }, [valist]);
 
     return (
         <div className="bg-gray-50 pr-4 sm:pr-6 lg:pr-8 lg:flex-shrink-0 lg:border-l lg:border-gray-200 xl:pr-0">

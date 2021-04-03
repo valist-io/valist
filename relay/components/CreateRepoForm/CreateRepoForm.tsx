@@ -2,7 +2,7 @@ import React, { FunctionComponent, useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 
 import { ProjectType, shortnameFilterRegex } from 'valist';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
 export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: string}) => {

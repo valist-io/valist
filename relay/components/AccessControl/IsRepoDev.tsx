@@ -1,5 +1,5 @@
 import { FunctionComponent, useEffect, useState, useContext } from 'react';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 
 const IsRepoDev:FunctionComponent<any> = (props) => {
     const valist = useContext(ValistContext);

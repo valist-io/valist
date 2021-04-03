@@ -1,6 +1,6 @@
 import React, { FunctionComponent, useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 import IsOrgAdmin from '../AccessControl/IsOrgAdmin';
 import AddressIdenticon from './AddressIdenticon';
 
