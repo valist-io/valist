@@ -2,7 +2,7 @@ import React, { FunctionComponent, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import axios from 'axios';
 
-import ValistContext from '../ValistContext/ValistContext';
+import ValistContext from '../ValistContext';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
