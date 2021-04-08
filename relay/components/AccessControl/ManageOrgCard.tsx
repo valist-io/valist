@@ -1,7 +1,7 @@
 import Link from 'next/link';
 import AddressIdenticon from '../Indenticons/AddressIdenticon';
 
-const ManageAccessCard = ({orgName, projectName}: {orgName: string, projectName?: string}) => {
+const ManageAccessCard = ({orgName}: {orgName: string}) => {
   return (
     <section aria-labelledby="recent-hires-title">
       <div className="rounded-lg bg-white overflow-hidden shadow">

@@ -1,15 +1,19 @@
-import React from 'react';
-import Layout from '../components/Layout/Layout';
+import Layout from '../components/Layouts/DashboardLayout';
 
-export const SettingsPage = () => {
-
-    return (
-        <Layout title="Valist | Create Organization">
-            <div>
-                <h1 style={{fontSize: 45, textAlign: "center"}}>Local Device Settings</h1>
+const Settings = () => {
+  return (
+    <Layout>
+      <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+          <section aria-labelledby="profile-overview-title">
+            <div style={{minHeight: "500px"}} className="rounded-lg bg-white p-10 overflow-hidden shadow">
+              <h2 style={{fontSize: '25px'}}>Settings</h2>
             </div>
-        </Layout>
-    );
+          </section>
+        </div>
+      </div>
+    </Layout>
+  )
 }
 
-export default SettingsPage;
+export default Settings;

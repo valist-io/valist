@@ -1,5 +1,5 @@
-import Layout from '../../../components/Layout/Layout';
-import EditOrgForm from '../../../components/EditOrgForm/EditOrgForm';
+import Layout from '../../../components/Layouts/DashboardLayout';
+import EditOrgForm from '../../../components/Organizations/EditOrgForm';
 import { useRouter } from 'next/router';
 
 export const EditOrgPage = () => {

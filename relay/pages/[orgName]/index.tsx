@@ -1,25 +1,29 @@
 import React from 'react';
-import IndexLayout from '../../components/Layout/IndexLayout'
-import ProjectList from '../../components/List/ProjectList'
-import OrgActionSidebar from '../../components/ActionSidebar/OrgActionSidebar';
-import OrgMetaBar from '../../components/OrgMetaBar/OrgMetaBar';
+import Layout from '../../components/Layouts/DashboardLayout';
+import ProjectList from '../../components/Projects/ProjectList';
+import OrgProfileBox from '../../components/Organizations/OrgProfileBox';
+import ActivityBox from '../../components/Activity/ActivityBox';
 import { useRouter } from 'next/router';
+import ManageOrgCard from '../../components/AccessControl/ManageOrgCard';
 
-export const ProjectsPage = () => {
-    const router = useRouter();
-    const { orgName } = router.query;
+export default function Dashboard(){
+  const router = useRouter();
+  const { orgName }: any = router.query;
 
-    return (
-        <IndexLayout title="valist.io">
-            <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
-                <div className="flex-1 min-w-0 bg-white xl:flex">
-                    <OrgActionSidebar orgName={`${orgName}`}/>
-                    <ProjectList orgName={`${orgName}`} />
-                    <OrgMetaBar orgName={`${orgName}`}/>
-                </div>
-            </div>
-        </IndexLayout>
-    );
+  return(
+    <Layout>
+        <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
+        <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+          <OrgProfileBox orgName={orgName}/>
+          <section className="rounded-lg bg-white overflow-hidden shadow">
+            <ProjectList orgName={orgName} />
+          </section>
+        </div>
+        <div className="grid grid-cols-1 gap-4">
+          <ManageOrgCard orgName={orgName} />
+          <ActivityBox />
+        </div>
+      </div>
+    </Layout>
+  )
 }
-
-export default ProjectsPage;

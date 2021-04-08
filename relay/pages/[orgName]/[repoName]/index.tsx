@@ -1,26 +1,29 @@
 import React from 'react';
-import IndexLayout from '../../../components/Layout/IndexLayout'
-import ProjectMetaBar from '../../../components/ProjectMetaBar/ProjectMetaBar';
-import ProjectActionSidebar from '../../../components/ActionSidebar/ProjectActionSidebar';
-import ReleaseList from '../../../components/List/ReleaseList';
-
+import Layout from '../../../components/Layouts/DashboardLayout';
+import ReleaseList from '../../../components/Releases/ReleaseList';
+import ProjectProfileCard from '../../../components/Projects/ProjectProfileCard';
 import { useRouter } from 'next/router';
+import ReleaseBox from '../../../components/Releases/ReleaseMetaCard';
+import ManageProjectCard from '../../../components/AccessControl/ManageProjectCard';
 
-export const ReposPage = () => {
-    const router = useRouter();
-    const { orgName, repoName } = router.query;
+export default function Dashboard(){
+  const router = useRouter();
+  const { orgName, repoName }: any = router.query;
 
-    return (
-        <IndexLayout title={`${orgName} | ${repoName}`}>
-            <div className="flex-grow w-full max-w-7xl mx-auto xl:px-8 lg:flex">
-                <div className="flex-1 min-w-0 bg-white xl:flex">
-                    <ProjectActionSidebar orgName={`${orgName}`} repoName={`${repoName}`} />
-                    <ReleaseList orgName={`${orgName}`} repoName={`${repoName}`} />
-                    <ProjectMetaBar orgName={`${orgName}`} repoName={`${repoName}`} />
-                </div>
-            </div>
-        </IndexLayout>
-    );
+  return (
+    <Layout>
+        <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
+          <div className="grid grid-cols-1 gap-4 lg:col-span-2">
+            <ProjectProfileCard orgName={orgName} projectName={repoName}/>
+            <section className="rounded-lg bg-white overflow-hidden shadow">
+              <ReleaseList orgName={orgName} repoName={repoName} />
+            </section>
+          </div>
+          <div className="grid grid-cols-1 gap-4">
+            <ReleaseBox orgName={orgName} repoName={repoName} />
+            <ManageProjectCard orgName={orgName} projectName={repoName} />
+          </div>
+      </div>
+    </Layout>
+  )
 }
-
-export default ReposPage

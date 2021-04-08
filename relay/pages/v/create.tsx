@@ -1,11 +1,11 @@
-import Layout from '../../components/Layout/Layout';
-import { CreateOrganizationForm } from '../../components/CreateOrganization/CreateOrganizationForm';
+import DashboardLayout from '../../components/Layouts/DashboardLayout';
+import { CreateOrganizationForm } from '../../components/Organizations/CreateOrganizationForm';
 
 const CreateOrgPage = () => {
     return (
-        <Layout title="Valist | Create Organization">
+        <DashboardLayout title="Valist | Create Organization">
             <CreateOrganizationForm />
-        </Layout>
+        </DashboardLayout>
     );
 }
 

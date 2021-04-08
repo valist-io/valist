@@ -3,12 +3,12 @@ import getConfig from "next/config";
 import React, { useEffect, useState } from 'react';
 
 import Valist from 'valist';
-import ValistContext from '../components/ValistContext';
-import LoginContext from '../components/LoginContext';
+import ValistContext from '../components/Valist/ValistContext';
+import LoginContext from '../components/Login/LoginContext';
 import getProviders from '../utils/providers';
 
 import LoadingDialog from '../components/LoadingDialog/LoadingDialog';
-import LoginForm from '../components/LoginForm/LoginForm';
+import LoginForm from '../components/Login/LoginForm';
 import { Magic } from 'magic-sdk';
 
 import '../styles/main.css';

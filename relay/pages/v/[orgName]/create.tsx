@@ -1,5 +1,5 @@
-import Layout from '../../../components/Layout/Layout';
-import { CreateRepoForm } from '../../../components/CreateRepoForm/CreateRepoForm';
+import Layout from '../../../components/Layouts/DashboardLayout';
+import CreateRepoForm from '../../../components/Projects/CreateProjectForm';
 
 import { useRouter } from 'next/router';
 
