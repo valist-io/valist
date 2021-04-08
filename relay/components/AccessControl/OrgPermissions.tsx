@@ -1,6 +1,6 @@
 import React, { useContext, useEffect, useState } from 'react';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
-import ValistContext from '../ValistContext';
+import ValistContext from '../Valist/ValistContext';
 
 const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
     const valist = useContext(ValistContext);
