@@ -28,7 +28,7 @@ const ManageProjectAccessCard = ({orgName, projectName}: {orgName: string, proje
     <section aria-labelledby="recent-hires-title">
       <div className="rounded-lg bg-white overflow-hidden shadow">
         <div className="p-6">
-          <h2 className="text-base font-medium text-gray-900" id="recent-hires-title">Manage Permissions</h2>
+          <h2 className="text-base font-medium text-gray-900" id="recent-hires-title">Project Members</h2>
           <div className="flow-root mt-6">
             <ul className="-my-5 divide-y divide-gray-200">
             {repoDevs[0] !== "0x0" && repoDevs.map((address) => (
@@ -41,11 +41,6 @@ const ManageProjectAccessCard = ({orgName, projectName}: {orgName: string, proje
                     <p className="text-sm font-medium text-gray-900 truncate">
                       {address}
                     </p>
-                  </div>
-                  <div>
-                    <a href="#" className="inline-flex items-center shadow-sm px-2.5 py-0.5 border border-gray-300 text-sm leading-5 font-medium rounded-full text-gray-700 bg-white hover:bg-gray-50">
-                      View
-                    </a>
                   </div>
                 </div>
               </li>
