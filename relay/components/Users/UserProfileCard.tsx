@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ValistContext from '../Valist/ValistContext';
 import LoginContext from '../Login/LoginContext';
-import AddressIdenticon from '../Indenticons/AddressIdenticon';
+import AddressIdenticon from '../Identicons/AddressIdenticon';
 
 const ProfileBox = () => {
   const valist = useContext(ValistContext);
