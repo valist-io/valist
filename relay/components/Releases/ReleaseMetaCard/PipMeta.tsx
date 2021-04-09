@@ -13,25 +13,25 @@ const PipMeta = (orgName: string = "organization", repoName: string = "repo", pr
 
     return (
         <div>
-            <div className="pl-6 lg:w-80">
+            <div className="lg:w-80">
                 {projectMeta &&
                     <div>
                         {projectMeta['homepage'] &&
-                            <div className="pt-6 pb-2">
+                            <div className="pb-2">
                                 <h1 className="flex-1 text-lg leading-7 font-medium">Homepage</h1>
                                 <a className="text-blue-600" href={projectMeta['homepage']}>{projectMeta['homepage']}</a>
                             </div>
                         }
 
                         {projectMeta['repository'] &&
-                        <div className="pt-6 pb-2">
+                        <div className="pb-2">
                             <h1 className="flex-1 text-lg leading-7 font-medium">Repository</h1>
                             <a className="text-blue-600" href={projectMeta['repository']}>{projectMeta['repository']}</a>
                         </div>
                         }
                     </div>
                 }
-                <div className="pt-6 pb-2">
+                <div className="pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Pip Install From Url</h1>
                 </div>
                 <div ref={pipRef} onClick={() => copyToCB(pipRef)} className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer break-all">

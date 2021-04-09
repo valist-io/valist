@@ -67,7 +67,7 @@ const ProjectPermissions = ({ orgName, repoName }: { orgName: string, repoName: 
         <div>
             <div className="col-span-3 sm:col-span-2 pb-8">
                 <div className="mt-1 flex border shadow-md">
-                    <input onChange={(e) => setGrantee(e.target.value)} value={grantee} className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="0x0123456789012345678901234567890123456789" />
+                    <input onChange={(e) => setGrantee(e.target.value)} value={grantee} type="text" className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="0x0123456789012345678901234567890123456789" />
                     <div>
                         <select onChange={(e) => setRole(e.target.value)} id="role" className="form-select rounded-none block w-full text-base leading-6 border-gray-300 focus:outline-none h-13">
                             <option value="REPO_DEV_ROLE">Developer</option>

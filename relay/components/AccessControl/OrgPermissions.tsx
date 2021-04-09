@@ -51,7 +51,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
         <div>
             <div className="col-span-3 sm:col-span-2 pb-8">
                 <div className="mt-1 flex shadow-sm">
-                    <input onChange={(e) => setGrantee(e.target.value)} value={grantee} className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="0x0123456789012345678901234567890123456789" />
+                    <input onChange={(e) => setGrantee(e.target.value)} type="text" value={grantee} className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150 ease-in-out sm:text-sm sm:leading-5 shadow-sm" placeholder="0x0123456789012345678901234567890123456789" />
                     <div>
                         <select id="role" className="form-select rounded-none block w-full text-base leading-6 border-gray-300 focus:outline-none h-13">
                             <option value="ORG_ADMIN_ROLE">Admin</option>
@@ -62,7 +62,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
             </div>
             <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
                 {orgAdmins[0] !== "0x0" && orgAdmins.map((address) => (
-                    <li key={address} className="col-span-1 flex flex-col text-center bg-white rounded-lg shadow">
+                    <li key={address} className="col-span-1 flex flex-col text-center bg-white rounded-lg shadow-md">
                         <div className="flex-1 flex flex-col p-8">
                             <img className="w-32 h-32 flex-shrink-0 mx-auto bg-black rounded-full" src={`https://identicon-api.herokuapp.com/${address}/128?format=png`} alt="" />
                             <h3 className="mt-6 text-gray-900 text-sm leading-5 font-medium break-words">{address}</h3>
