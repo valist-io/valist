@@ -51,7 +51,7 @@ const EditOrganization = ({ orgName }: { orgName: string}) => {
                         <div className="sm:col-span-2">
                             <label htmlFor="OrgFullName" className="block text-sm font-medium leading-5 text-gray-700">Full Name</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <input value={orgFullName} onChange={(e) => setOrgFullName(e.target.value)} required id="OrgFullName" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                                <input value={orgFullName} type="text" onChange={(e) => setOrgFullName(e.target.value)} required id="OrgFullName" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                             </div>
                         </div>
                         <div className="sm:col-span-2">

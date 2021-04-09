@@ -54,13 +54,13 @@ const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string
                         <div className="sm:col-span-2">
                             <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <input value={projectHomepage} onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                                <input value={projectHomepage} type="text" onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                             </div>
                         </div>
                         <div className="sm:col-span-2">
                             <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository</label>
                             <div className="mt-1 relative rounded-md shadow-sm">
-                                <input value={projectRepository} onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                                <input value={projectRepository} type="text" onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                             </div>
                         </div>
                         <div className="sm:col-span-2">

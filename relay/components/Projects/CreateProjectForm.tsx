@@ -39,7 +39,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
     }
 
     return (
-        <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
+        <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-18">
             <div className="relative max-w-xl mx-auto">
                 <svg className="absolute left-full transform translate-x-1/2" width="404" height="404" fill="none" viewBox="0 0 404 404">
                 <defs>
@@ -73,7 +73,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                             <span className="inline-flex items-center px-3 rounded-l-md border border-r-0 border-gray-300 bg-gray-50 text-gray-500 text-sm">
                                 app.valist.io/{orgName}/
                             </span>
-                            <input onChange={(e) => updateProjectName(e.target.value)} required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" value={projectName} />
+                            <input onChange={(e) => updateProjectName(e.target.value)} type="text" required id="RepoName" className="form-input flex-1 block w-full rounded-none rounded-r-md transition duration-150 ease-in-out sm:text-sm sm:leading-5" placeholder="my-project" value={projectName} />
                         </div>
                     </div>
 
@@ -98,13 +98,13 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: {orgName: str
                     <div className="sm:col-span-2">
                         <label htmlFor="ProjectHomepage" className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectHomepage(e.target.value)} id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                            <input onChange={(e) => setProjectHomepage(e.target.value)} type="text" id="ProjectHomepage" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
                         <label htmlFor="ProjectRepository" className="block text-sm font-medium leading-5 text-gray-700">Repository URL (Github, Gitlab, Bitbucket, etc.)</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setProjectRepository(e.target.value)} id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
+                            <input onChange={(e) => setProjectRepository(e.target.value)} type="text" id="ProjectRepository" className="form-input block w-full sm:text-sm sm:leading-5 transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
