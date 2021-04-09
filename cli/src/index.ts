@@ -8,11 +8,13 @@ import { parseValistConfig } from './lib/config';
 
 const initValist = async () => {
   try {
-    const valist = new Valist({ web3Provider: getWeb3Provider(), metaTx: false });
+    const valist = new Valist({ web3Provider: getWeb3Provider() });
 
-    const waitForMetaTx: boolean = false;
+    const waitForMetaTx: boolean = true;
 
     await valist.connect(waitForMetaTx);
+
+    valist.signer = process.env.VALIST_SIGNING_KEY;
 
     console.log('Account:', valist.defaultAccount);
 

@@ -1,5 +1,6 @@
 import Web3 from 'web3';
 import { provider } from 'web3-core/types';
+import * as sigUtil from 'eth-sig-util';
 
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
@@ -71,6 +72,7 @@ class Valist {
   valist: any;
   ipfs: any;
   biconomy: any;
+  signer?: string;
   defaultAccount: string;
   metaTxEnabled: boolean = false;
   metaTxReady: boolean = false;
@@ -275,10 +277,10 @@ class Valist {
     }
   }
 
-  async getReleasesFromRepo(orgName: string, repoName: string) {
+  async getReleasesFromRepo(orgName: string, repoName: string): Promise<{ releaseCID: string, metaCID: string, tag: string }[]> {
     try {
       const tags = await this.valist.methods.getReleaseTags(orgName, repoName).call();
-      const releases: any[] = [];
+      const releases: { releaseCID: string, metaCID: string, tag: string }[] = [];
 
       for (let i = 0; i < tags.length; i++) {
         const release = await this.valist.methods.getRelease(orgName, repoName, tags[i]).call();
@@ -567,14 +569,21 @@ class Valist {
           message: message
         });
 
-        const signed = await sendAsync({
-          jsonrpc: "2.0",
-          id: new Date().getTime(),
-          method: "eth_signTypedData_v4",
-          params: [account, dataToSign]
-        });
+        let signed;
 
-        const { r, s, v } = getSignatureParameters(this.web3, signed.result);
+        if (this.signer) {
+          signed = sigUtil.signTypedData_v4(Buffer.from(this.signer, "hex"), { data: JSON.parse(dataToSign) });
+        } else {
+          const sig = await sendAsync({
+            jsonrpc: "2.0",
+            id: new Date().getTime(),
+            method: "eth_signTypedData_v4",
+            params: [account, dataToSign]
+          });
+          signed = sig.result;
+        }
+
+        const { r, s, v } = getSignatureParameters(this.web3, signed);
 
         // console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
 
