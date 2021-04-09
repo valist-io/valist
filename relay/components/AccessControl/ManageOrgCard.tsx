@@ -1,21 +1,21 @@
 import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
-import AddressIdenticon from '../Indenticons/AddressIdenticon';
+import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
 
-const ManageAccessCard = ({ orgName }: { orgName: string }) => {
+const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
   const valist = useContext(ValistContext);
-  const [orgAdmins, setOrgAdmins] = useState([ "0x0" ]);
+  const [orgAdmins, setOrgAdmins] = useState(['0x0']);
 
   const updateData = async () => {
     if (valist) {
-        try {
-            setOrgAdmins(await valist.getOrgAdmins(orgName) || [ "0x0" ]);
-        } catch (e) {
-            console.error("Could not fetch ACL data", e);
-        }
+      try {
+        setOrgAdmins(await valist.getOrgAdmins(orgName) || ['0x0']);
+      } catch (e) {
+        console.error('Could not fetch ACL data', e);
+      }
     }
-  }
+  };
 
   useEffect(() => {
     updateData();
@@ -28,8 +28,8 @@ const ManageAccessCard = ({ orgName }: { orgName: string }) => {
           <h2 className="text-base font-medium text-gray-900" id="recent-hires-title">Organization Members</h2>
           <div className="flow-root mt-6">
             <ul className="-my-5 divide-y divide-gray-200">
-            {orgAdmins[0] !== "0x0" && orgAdmins.map((address) => (
-              <li className="py-4">
+            {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
+              <li className="py-4" key={address}>
                 <div className="flex items-center space-x-4">
                   <div className="flex-shrink-0">
                     <AddressIdenticon address={address} height={8} />
@@ -45,8 +45,10 @@ const ManageAccessCard = ({ orgName }: { orgName: string }) => {
             </ul>
           </div>
           <div className="mt-6">
-            <Link href={"/v/" + orgName + '/permissions'}>
-              <a className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+            <Link href={`/v/${orgName}/permissions`}>
+              <a className="w-full flex justify-center items-center px-4 py-2 border
+              border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
+              bg-white hover:bg-gray-50">
                 View all
               </a>
             </Link>
@@ -55,6 +57,6 @@ const ManageAccessCard = ({ orgName }: { orgName: string }) => {
       </div>
     </section>
   );
-}
+};
 
 export default ManageAccessCard;

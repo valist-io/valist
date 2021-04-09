@@ -1,46 +1,38 @@
 import { Magic } from 'magic-sdk';
-import getConfig from "next/config";
+import getConfig from 'next/config';
+
 const { publicRuntimeConfig } = getConfig();
 
-function getProviders(setMagic: any, setLoggedIn: any, email:any) {
+function getProviders(setMagic: any, setLoggedIn: any, email:string) {
   return {
     magic: async () => {
-        try {
-            const customNodeOptions = {
-                rpcUrl: publicRuntimeConfig.WEB3_PROVIDER
-            };
+      const customNodeOptions = {
+        rpcUrl: publicRuntimeConfig.WEB3_PROVIDER,
+      };
 
-            const magicObj = new Magic(publicRuntimeConfig.MAGIC_PUBKEY, { network: customNodeOptions });
-            const magicLoggedIn = await magicObj.user.isLoggedIn();
-            setMagic(magicObj);
+      const magicObj = new Magic(publicRuntimeConfig.MAGIC_PUBKEY, { network: customNodeOptions });
+      const magicLoggedIn = await magicObj.user.isLoggedIn();
+      setMagic(magicObj);
 
-            if (magicLoggedIn) {
-              setLoggedIn(true);
-              return magicObj.rpcProvider;
-            } else if (email) {
-              await magicObj.auth.loginWithMagicLink({ email });
-              setLoggedIn(true);
-              return magicObj.rpcProvider;
-            }
+      if (magicLoggedIn) {
+        setLoggedIn(true);
+        return magicObj.rpcProvider;
+      }
 
-        } catch (e) {
-            console.error("Could not set Magic as provider", e);
-        }
+      await magicObj.auth.loginWithMagicLink({ email });
+      setLoggedIn(true);
+      return magicObj.rpcProvider;
     },
     metaMask: async () => {
-        if ((window as any).ethereum) {
-            // @ts-ignore
-            await window.ethereum.enable();
-            setLoggedIn(true);
-            // @ts-ignore
-            return window.ethereum;
-        }
+      await (window as any).ethereum.enable();
+      setLoggedIn(true);
+      return (window as any).ethereum;
     },
     readOnly: async () => {
-        setLoggedIn(false);
-        return publicRuntimeConfig.WEB3_PROVIDER;
-    }
-  }
+      setLoggedIn(false);
+      return publicRuntimeConfig.WEB3_PROVIDER;
+    },
+  };
 }
 
 export default getProviders;

@@ -1,23 +1,23 @@
 import React, { useState, useEffect, useContext } from 'react';
 import ValistContext from '../Valist/ValistContext';
 
-export const Activity = () => {
-    const valist = useContext(ValistContext)
-    const [orgs, setOrgs] = useState(["Loading..."]);
+export const Activity = (): JSX.Element => {
+  const valist = useContext(ValistContext);
+  const [orgs, setOrgs] = useState(['Loading...']);
 
-    useEffect(() => {
-        (async function() {
-            if (valist) {
-                try {
-                    setOrgs(await valist.getOrganizationNames());
-                } catch (e) {}
-            }
-        })()
-    }, [valist]);
+  useEffect(() => {
+    (async () => {
+      if (valist) {
+        try {
+          setOrgs(await valist.getOrganizationNames());
+        } catch (e) { console.log(e); }
+      }
+    })();
+  }, [valist]);
 
-    return (
+  return (
       <ul className="-my-5 divide-y divide-gray-200">
-        {orgs.map((orgName: string) => (
+        {[...orgs].reverse().map((orgName: string) => (
           <li className="py-4" key={orgName}>
             <div className="flex space-x-3">
                 <div className="flex-1 space-y-1">
@@ -30,7 +30,7 @@ export const Activity = () => {
           </li>
         ))}
       </ul>
-    );
-}
+  );
+};
 
 export default Activity;

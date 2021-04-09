@@ -1,12 +1,12 @@
 import React from 'react';
+import { useRouter } from 'next/router';
 import Layout from '../../../components/Layouts/DashboardLayout';
 import ReleaseList from '../../../components/Releases/ReleaseList';
 import ProjectProfileCard from '../../../components/Projects/ProjectProfileCard';
-import { useRouter } from 'next/router';
 import ReleaseBox from '../../../components/Releases/ReleaseMetaCard';
 import ManageProjectCard from '../../../components/AccessControl/ManageProjectCard';
 
-export default function Dashboard(){
+export default function Dashboard() {
   const router = useRouter();
   const { orgName, repoName }: any = router.query;
 
@@ -25,5 +25,5 @@ export default function Dashboard(){
           </div>
       </div>
     </Layout>
-  )
+  );
 }

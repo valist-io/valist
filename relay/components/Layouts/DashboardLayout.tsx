@@ -6,10 +6,9 @@ import Footer from '../Footer/FooterBar';
 type Props = {
   children?: ReactNode,
   title?: string,
-}
+};
 
-const Layout = ({ children, title = 'Valist' }: Props) => {
-  return (
+const Layout = ({ children, title = 'Valist' }: Props): JSX.Element => (
     <div>
       <Head>
         <title>{title}</title>
@@ -27,7 +26,6 @@ const Layout = ({ children, title = 'Valist' }: Props) => {
         <Footer />
       </div>
     </div>
-  )
-}
+);
 
 export default Layout;

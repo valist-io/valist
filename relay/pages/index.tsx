@@ -4,8 +4,8 @@ import OrgList from '../components/Organizations/OrgList';
 import ProfileBox from '../components/Users/UserProfileCard';
 import ActivityBox from '../components/Activity/ActivityBox';
 
-export default function Dashboard(){
-  return(
+export default function Dashboard() {
+  return (
     <Layout>
       <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
         <div className="grid grid-cols-1 gap-4 lg:col-span-2">
@@ -19,5 +19,5 @@ export default function Dashboard(){
         </div>
       </div>
     </Layout>
-  )
+  );
 }

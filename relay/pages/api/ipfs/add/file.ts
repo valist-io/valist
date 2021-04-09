@@ -8,43 +8,41 @@ import aws from 'aws-sdk';
 // To avoid using this, simply plug in an IPFS_HOST via .env
 
 export default async function addFiletoIPFS(req: NextApiRequest, res: NextApiResponse) {
+  if (!process.env.FLEEK_PUBLIC || !process.env.FLEEK_PRIVATE) {
+    return res.status(500).json({ statusCode: 500, message: 'Missing Fleek API Keys' });
+  }
 
-    if (!process.env.FLEEK_PUBLIC || !process.env.FLEEK_PRIVATE) return res.status(500).json({ statusCode: 500, message: "Missing Fleek API Keys" });
+  if (!process.env.BUCKET_NAME) return res.status(500).json({ statusCode: 500, message: 'Bucket name not set' });
 
-    if (!process.env.BUCKET_NAME) return res.status(500).json({ statusCode: 500, message: "Bucket name not set" });
+  if (req.method === 'POST') {
+    try {
+      const s3 = new aws.S3({
+        apiVersion: '2006-03-01',
+        accessKeyId: process.env.FLEEK_PUBLIC,
+        secretAccessKey: process.env.FLEEK_PRIVATE,
+        endpoint: 'https://storageapi.fleek.co',
+        region: 'us-east-1',
+        s3ForcePathStyle: true,
+        signatureVersion: 'v4',
+      });
 
-    if (req.method === 'POST') {
-        try {
+      const post = await s3.createPresignedPost({
+        Bucket: process.env.BUCKET_NAME,
+        Fields: {
+          key: req.query.name,
+        },
+        Expires: 60,
+        Conditions: [
+          ['content-length-range', 0, 262144000], // up to 250 MB
+        ],
+      });
 
-            const s3 = new aws.S3({
-                apiVersion: '2006-03-01',
-                accessKeyId: process.env.FLEEK_PUBLIC,
-                secretAccessKey: process.env.FLEEK_PRIVATE,
-                endpoint: 'https://storageapi.fleek.co',
-                region: 'us-east-1',
-                s3ForcePathStyle: true,
-                signatureVersion: 'v4',
-            });
-
-            const post = await s3.createPresignedPost({
-                Bucket: process.env.BUCKET_NAME,
-                Fields: {
-                    key: req.query.name,
-                },
-                Expires: 60,
-                Conditions: [
-                    ['content-length-range', 0, 262144000], // up to 250 MB
-                ],
-            });
-
-            res.status(200).json(post);
-
-        } catch (e) {
-            console.error(e);
-            res.status(500).json({ statusCode: 500, message: "Could not pin file to IPFS" });
-        }
-
-    } else {
-        res.status(500).json({ statusCode: 500, message: "This endpoint only supports POST" });
+      return res.status(200).json(post);
+    } catch (e) {
+      console.error(e);
+      return res.status(500).json({ statusCode: 500, message: 'Could not pin file to IPFS' });
     }
+  } else {
+    return res.status(500).json({ statusCode: 500, message: 'This endpoint only supports POST' });
+  }
 }
