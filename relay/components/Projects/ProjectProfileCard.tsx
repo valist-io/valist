@@ -2,6 +2,8 @@ import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ValistContext from '../Valist/ValistContext';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
+import IsRepoAdmin from '../AccessControl/IsRepoAdmin';
+import IsRepoDev from '../AccessControl/IsRepoDev';
 
 const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, projectName: string }) => {
   const valist = useContext(ValistContext);
@@ -37,21 +39,25 @@ const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, project
               </div>
             </div>
             <div className="mt-5 flex justify-center sm:mt-0">
-              <Link href={`/v/${orgName}/${projectName}/edit`}>
-                <a className="flex justify-center items-center px-4 py-2 border
-                border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                  Edit Project
-                </a>
-              </Link>
+              <IsRepoAdmin orgName={orgName} repoName={projectName}>
+                <Link href={`/v/${orgName}/${projectName}/edit`}>
+                  <a className="flex justify-center items-center px-4 py-2 border
+                  border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
+                    Edit Project
+                  </a>
+                </Link>
+              </IsRepoAdmin>
 
-              <Link href={`/v/${orgName}/${projectName}/publish`}>
-                <a className="ml-2 flex justify-center items-center px-4 py-2 border
-                border-transparent text-sm leading-5 font-medium rounded-md text-white
-                bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
-                focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                  Publish Release
-                </a>
-              </Link>
+              <IsRepoDev orgName={orgName} repoName={projectName}>
+                <Link href={`/v/${orgName}/${projectName}/publish`}>
+                  <a className="ml-2 flex justify-center items-center px-4 py-2 border
+                  border-transparent text-sm leading-5 font-medium rounded-md text-white
+                  bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
+                  focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                    Publish Release
+                  </a>
+                </Link>
+              </IsRepoDev>
             </div>
           </div>
         </div>
