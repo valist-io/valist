@@ -1,6 +1,8 @@
 {
   "solidity.packageDefaultDependenciesContractsDirectory": "",
   "solidity.packageDefaultDependenciesDirectory": "eth/node_modules",
+  "editor.tabSize": 2,
+  "editor.detectIndentation": false,
   "eslint.workingDirectories": [
     "cli/",
     "lib/",
