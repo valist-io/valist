@@ -23,7 +23,6 @@ function App({ Component, pageProps }: AppProps) {
   const [showLogin, setShowLogin] = useState(false);
   const [loggedIn, setLoggedIn] = useState(false);
   const [magic, setMagic] = useState<Magic | undefined>();
-  const [account, setAccount] = useState();
 
   const handleLogin = async (providerType: ProviderType) => {
     const providers = getProviders(setMagic, setLoggedIn, email);

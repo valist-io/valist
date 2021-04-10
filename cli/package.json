@@ -20,7 +20,6 @@
   },
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.2.6",
-    "form-data": "^4.0.0",
     "js-yaml": "^4.0.0",
     "keytar": "^7.6.0",
     "valist": "file:../lib",
