@@ -1,5 +1,5 @@
 {
-  "name": "valist",
+  "name": "valist-cli",
   "version": "0.0.1",
   "description": "Valist CLI",
   "author": "Valist, Inc.",
@@ -9,7 +9,9 @@
   ],
   "license": "MIT",
   "main": "dist/index.js",
-  "bin": "dist/index.js",
+  "bin": {
+    "valist": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
@@ -20,6 +22,7 @@
     "@truffle/hdwallet-provider": "^1.2.6",
     "form-data": "^4.0.0",
     "js-yaml": "^4.0.0",
+    "keytar": "^7.6.0",
     "valist": "file:../lib",
     "yargs": "^16.2.0"
   },
