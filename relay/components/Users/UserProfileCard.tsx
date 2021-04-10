@@ -71,7 +71,27 @@ const ProfileBox = () => {
     );
   }
 
-  return (<div/>);
+  return (
+    <section aria-labelledby="profile-overview-title">
+      <div className="rounded-lg bg-white overflow-hidden shadow">
+        <div className="bg-white p-6">
+          <div className="sm:flex sm:items-center sm:justify-between">
+          <div className="sm:flex sm:space-x-5">
+            <div className="flex-shrink-0">
+              <img className='h-15' src="/images/ValistLogo128.png" />
+            </div>
+            <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+              <p className="text-3xl font-bold text-gray-900 sm:text-2xl">
+                Welcome to Valist
+              </p>
+              <p className="text-md font-medium text-gray-600">Login to securely distribute software.</p>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
 };
 
 export default ProfileBox;

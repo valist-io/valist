@@ -2,8 +2,9 @@ import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ValistContext from '../Valist/ValistContext';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
+import IsOrgAdmin from '../AccessControl/IsOrgAdmin';
 
-const OrgProfileBox = ({ orgName }: any) => {
+const OrgProfileCard = ({ orgName }: any) => {
   const valist = useContext(ValistContext);
   const [orgMeta, setOrgMeta] = useState({ name: 'Loading...', description: 'Loading...' });
 
@@ -35,22 +36,24 @@ const OrgProfileBox = ({ orgName }: any) => {
               </div>
             </div>
             <div className="mt-5 flex justify-center sm:mt-0">
-              <Link href={`/v/${orgName}/edit/`}>
-                <a className="flex justify-center items-center px-4 py-2 border
-                border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
-                bg-white hover:bg-gray-50">
-                  Edit Organization
-                </a>
-              </Link>
+              <IsOrgAdmin orgName={orgName}>
+                <Link href={`/v/${orgName}/edit/`}>
+                  <a className="flex justify-center items-center px-4 py-2 border
+                  border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
+                  bg-white hover:bg-gray-50">
+                    Edit Organization
+                  </a>
+                </Link>
 
-              <Link href={`/v/${orgName}/create/`}>
-                <a className="ml-2 flex justify-center items-center px-4 py-2 border
-                border-transparent text-sm leading-5 font-medium rounded-md text-white
-                bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
-                focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                  New Project
-                </a>
-              </Link>
+                <Link href={`/v/${orgName}/create/`}>
+                  <a className="ml-2 flex justify-center items-center px-4 py-2 border
+                  border-transparent text-sm leading-5 font-medium rounded-md text-white
+                  bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
+                  focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
+                    New Project
+                  </a>
+                </Link>
+              </IsOrgAdmin>
             </div>
           </div>
         </div>
@@ -59,4 +62,4 @@ const OrgProfileBox = ({ orgName }: any) => {
   );
 };
 
-export default OrgProfileBox;
+export default OrgProfileCard;

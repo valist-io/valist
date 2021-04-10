@@ -52,6 +52,7 @@ function App({ Component, pageProps }: AppProps) {
       console.error('Could not initialize Valist object', e);
 
       try {
+        console.log('Could not set provider, falling back to readOnly mode');
         await handleLogin('readOnly');
       } catch (loginError) {
         console.error('Critical error, could not login with desired method or readOnly', loginError);
@@ -85,12 +86,14 @@ function App({ Component, pageProps }: AppProps) {
         await handleLogin('readOnly');
         window.localStorage.setItem('loginType', 'readOnly');
       }
-    })();
 
-    (window as any).ethereum.on('accountsChanged', (accounts: any) => {
-      setAccount(accounts[0]);
-    });
-  }, [account]);
+      if ((window as any).ethereum && loginType === 'metaMask') {
+        (window as any).ethereum.on('accountsChanged', async () => {
+          await handleLogin('metaMask');
+        });
+      }
+    })();
+  }, []);
 
   return (
     <LoginContext.Provider value={loginObject}>
