@@ -47,7 +47,6 @@ const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, project
                   </a>
                 </Link>
               </IsRepoAdmin>
-
               <IsRepoDev orgName={orgName} repoName={projectName}>
                 <Link href={`/v/${orgName}/${projectName}/publish`}>
                   <a className="ml-2 flex justify-center items-center px-4 py-2 border

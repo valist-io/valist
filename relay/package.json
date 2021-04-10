@@ -1,6 +1,6 @@
 {
   "name": "valist-relay",
-  "version": "0.2.0",
+  "version": "0.3.3",
   "author": "Valist, Inc.",
   "contributors": [
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
@@ -16,9 +16,9 @@
   },
   "scripts": {
     "dev": "next",
-    "build": "next build",
+    "build": "npm run lint && next build",
     "export": "next export",
-    "start": "next build && next start",
+    "start": "npm run build && next start",
     "type-check": "tsc",
     "lint": "eslint . --ext .ts,.tsx",
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
