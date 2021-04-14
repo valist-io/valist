@@ -2,7 +2,7 @@ import { AppProps } from 'next/app';
 import getConfig from 'next/config';
 import React, { useEffect, useState } from 'react';
 
-import Valist from 'valist';
+import Valist, { InvalidNetworkError } from 'valist';
 import { Magic } from 'magic-sdk';
 import ValistContext from '../components/Valist/ValistContext';
 import LoginContext from '../components/Login/LoginContext';
@@ -43,10 +43,21 @@ function App({ Component, pageProps }: AppProps) {
         metaTx: provider === publicRuntimeConfig.WEB3_PROVIDER ? false : publicRuntimeConfig.METATX_ENABLED,
       });
 
-      await valistInstance.connect();
-      setValist(valistInstance);
-      console.log('Current Account: ', valistInstance.defaultAccount);
-      (window as any).valist = valistInstance;
+      try {
+        await valistInstance.connect();
+        setValist(valistInstance);
+        console.log('Current Account: ', valistInstance.defaultAccount);
+        (window as any).valist = valistInstance;
+      } catch (e) {
+        if (e instanceof InvalidNetworkError) {
+          alert('Please switch to matic network (networkID 80001)');
+          await handleLogin('readOnly');
+        } else if (e instanceof Error) {
+          console.log(e);
+        } else {
+          throw e;
+        }
+      }
     } catch (e) {
       console.error('Could not initialize Valist object', e);
 

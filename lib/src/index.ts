@@ -7,7 +7,6 @@ import ipfsClient from 'ipfs-http-client';
 
 // @ts-ignore mexa doesn't support typescript yet
 import Biconomy from "@biconomy/mexa";
-
 import ValistABI from './abis/Valist.json';
 
 // node-fetch polyfill
@@ -17,7 +16,7 @@ if (!globalThis.fetch) {
 }
 
 export class InvalidNetworkError extends Error {
-  constructor(message: any) {
+  constructor(message: string) {
     super(message);
     this.name = "InvalidNetworkError";
   }
