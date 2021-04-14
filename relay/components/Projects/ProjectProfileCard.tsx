@@ -32,9 +32,9 @@ const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, project
               <div className="flex-shrink-0">
                 <AddressIdenticon address={projectMeta.name} height={20}/>
               </div>
-              <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+              <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left max-w-sm">
                 <p className="text-sm font-medium text-gray-600"></p>
-                <p className="text-xl font-bold text-gray-900 sm:text-2xl">{projectMeta.name}</p>
+                <p className="text-xl font-bold text-gray-900 sm:text-2xl">{`${orgName}/${projectName}`}</p>
                 <p className="text-sm font-medium text-gray-600">{projectMeta.description}</p>
               </div>
             </div>

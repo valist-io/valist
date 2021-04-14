@@ -25,7 +25,8 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
           const latestTag = await valist.getLatestTagFromRepo(orgName, repoName);
           const versions: any = {};
 
-          for (let i = 0; i < releases.length; i += 1) {
+          // eslint-disable-next-line no-plusplus
+          for (let i = 0; i < releases.length; i++) {
             versions[releases[i].tag] = {
               name: repoName,
               version: releases[i].tag,
