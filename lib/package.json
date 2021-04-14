@@ -27,15 +27,15 @@
     "test": "mocha -r ts-node/register 'tests/**/*.ts'"
   },
   "devDependencies": {
-    "@types/chai": "^4.2.14",
-    "@types/mocha": "^8.2.0",
+    "@types/chai": "^4.2.16",
+    "@types/mocha": "^8.2.2",
     "@types/web3": "^1.2.2",
-    "chai": "^4.3.0",
+    "chai": "^4.3.4",
     "ganache-core": "^2.13.2",
-    "mocha": "^8.2.1",
+    "mocha": "^8.3.2",
     "ts-node": "^9.1.1",
-    "typedoc": "^0.20.28",
-    "typescript": "^4.2.2"
+    "typedoc": "^0.20.35",
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@biconomy/mexa": "^1.5.15",
@@ -43,6 +43,6 @@
     "eth-sig-util": "^3.0.1",
     "ipfs-http-client": "47.0.1",
     "node-fetch": "^2.6.1",
-    "web3": "1.3.3"
+    "web3": "^1.3.5"
   }
 }

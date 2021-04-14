@@ -2,19 +2,19 @@
 import * as yargs from 'yargs';
 import * as fs from 'fs';
 import Valist from 'valist';
-import { getWeb3Provider } from './lib/crypto';
-import { npmPack } from './lib/npm';
-import { parseValistConfig } from './lib/config';
+import { getWeb3Provider, createSignerKey, getSignerKey } from './utils/crypto';
+import { npmPack } from './utils/npm';
+import { parseValistConfig } from './utils/config';
 
 const initValist = async () => {
   try {
-    const valist = new Valist({ web3Provider: getWeb3Provider() });
+    const valist = new Valist({ web3Provider: await getWeb3Provider() });
 
     const waitForMetaTx: boolean = true;
 
     await valist.connect(waitForMetaTx);
 
-    valist.signer = process.env.VALIST_SIGNING_KEY;
+    valist.signer = await getSignerKey();
 
     console.log('Account:', valist.defaultAccount);
 
@@ -26,9 +26,12 @@ const initValist = async () => {
   }
 };
 
-yargs.command('start', 'Starts the Valist service', () => {}, async (argv) => {
-  // const valist = await initValist();
-  console.log('Valist service started', argv);
+yargs.command('create signer', 'Create a new signer key', () => {}, async () => {
+  console.log('Generating new signer key...');
+  const address = await createSignerKey();
+  console.log('Successfully stored in keychain/keyring');
+  console.log('Your new signer address is', address);
+  process.exit(0);
 });
 
 yargs.command('publish', 'Publish an NPM package to Valist', () => {}, async () => {
@@ -36,7 +39,6 @@ yargs.command('publish', 'Publish an NPM package to Valist', () => {}, async () 
   const valist = await initValist();
   console.log('Connected');
 
-  console.log('Fetching Valist Config...');
   const {
     project,
     org,
@@ -69,6 +71,7 @@ yargs.command('publish', 'Publish an NPM package to Valist', () => {}, async () 
     console.log(`Successfully Released ${project} ${tag}!`);
     console.log('Transaction Hash:', transactionHash);
   }
+  process.exit(0);
 });
 
 yargs.parse();
