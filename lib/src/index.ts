@@ -16,6 +16,13 @@ if (!globalThis.fetch) {
     globalThis.fetch = fetch;
 }
 
+export class InvalidNetworkError extends Error {
+  constructor(message: any) {
+    super(message);
+    this.name = "InvalidNetworkError";
+  }
+}
+
 export const shortnameFilterRegex = /[^A-z0-9-]/;
 
 export type ProjectType = "binary" | "npm" | "pip" | "docker";
@@ -28,6 +35,11 @@ export const getContractInstance = (web3: Web3, abi: any, address: string) => {
 const getValistContract = async (web3: Web3, address?: string) => {
   // get network ID and the deployed address
   const networkId: number = await web3.eth.net.getId();
+
+  if (networkId != 80001 ){
+      throw new InvalidNetworkError('Incorrect network ID must be Matic (80001)');
+  }
+
   // @ts-ignore
   const deployedAddress: string = address || ValistABI.networks[networkId].address;
 
