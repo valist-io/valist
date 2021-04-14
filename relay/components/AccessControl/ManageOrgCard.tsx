@@ -3,16 +3,38 @@ import Link from 'next/link';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
 
+const OrgAccessCardListItem = ({ address }: { address: string }) => (
+  <li className="py-4">
+    <div className="flex items-center space-x-4">
+      <div className="flex-shrink-0">
+        <AddressIdenticon address={address} height={8} />
+      </div>
+      <div className="flex-1 min-w-0">
+        <p className="text-sm font-medium text-gray-900 truncate">
+          {address}
+        </p>
+      </div>
+    </div>
+  </li>
+);
+
 const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
   const valist = useContext(ValistContext);
   const [orgAdmins, setOrgAdmins] = useState(['0x0']);
+  const [orgOwners, setOrgOwners] = useState(['0x0']);
 
   const updateData = async () => {
     if (valist) {
       try {
         setOrgAdmins(await valist.getOrgAdmins(orgName) || ['0x0']);
       } catch (e) {
-        console.error('Could not fetch ACL data', e);
+        console.error('Could not fetch ACL data for Org Admins', e);
+      }
+
+      try {
+        setOrgOwners(await valist.getOrgOwners(orgName) || ['0x0']);
+      } catch (e) {
+        console.error('Could not fetch ACL data for Org Owners', e);
       }
     }
   };
@@ -28,20 +50,13 @@ const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
           <h2 className="text-base font-medium text-gray-900" id="recent-hires-title">Organization Members</h2>
           <div className="flow-root mt-6">
             <ul className="-my-5 divide-y divide-gray-200">
-            {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
-              <li className="py-4" key={address}>
-                <div className="flex items-center space-x-4">
-                  <div className="flex-shrink-0">
-                    <AddressIdenticon address={address} height={8} />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-sm font-medium text-gray-900 truncate">
-                      {address}
-                    </p>
-                  </div>
-                </div>
-              </li>
-            ))}
+              {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
+                <OrgAccessCardListItem key={address} address={address} />
+              ))}
+
+              {orgOwners[0] !== '0x0' && orgOwners.map((address) => (
+                <OrgAccessCardListItem key={address} address={address} />
+              ))}
             </ul>
           </div>
           <div className="mt-6">

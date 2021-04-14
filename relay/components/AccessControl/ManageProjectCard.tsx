@@ -22,14 +22,26 @@ const ManageProjectAccessCard = ({ orgName, projectName }: { orgName: string, pr
   const valist = useContext(ValistContext);
   const [repoAdmins, setRepoAdmins] = useState(['0x0']);
   const [repoDevs, setRepoDevs] = useState(['0x0']);
+  const [orgOwners, setOrgOwners] = useState(['0x0']);
 
   const updateData = async () => {
     if (valist) {
       try {
         setRepoAdmins(await valist.getRepoAdmins(orgName, projectName));
+      } catch (e) {
+        console.error('Could not fetch ACL data for Repo Admins', e);
+      }
+
+      try {
         setRepoDevs(await valist.getRepoDevs(orgName, projectName));
       } catch (e) {
-        console.error('Could not fetch ACL data', e);
+        console.error('Could not fetch ACL data for Repo Devs', e);
+      }
+
+      try {
+        setOrgOwners(await valist.getOrgOwners(orgName));
+      } catch (e) {
+        console.error('Could not fetch ACL data for Org Owner', e);
       }
     }
   };
@@ -45,8 +57,9 @@ const ManageProjectAccessCard = ({ orgName, projectName }: { orgName: string, pr
           <h2 className="text-base font-medium text-gray-900" id="recent-hires-title">Project Members</h2>
           <div className="flow-root mt-6">
             <ul className="-my-5 divide-y divide-gray-200">
-            { repoAdmins[0] !== '0x0' && repoAdmins.map((address) => <User key={address} address={address} />)}
-            { repoDevs[0] !== '0x0' && repoDevs.map((address) => <User key={address} address={address} />)}
+              { repoAdmins[0] !== '0x0' && repoAdmins.map((address) => <User key={address} address={address} />)}
+              { repoDevs[0] !== '0x0' && repoDevs.map((address) => <User key={address} address={address} />)}
+              { orgOwners[0] !== '0x0' && orgOwners.map((address) => <User key={address} address={address} />)}
             </ul>
           </div>
           <div className="mt-6">
