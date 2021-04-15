@@ -66,7 +66,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
     }
     console.log('Package not Registered on Valist');
     console.log(`Fetching Package ${releaseName} from https://registry.npmjs.org`);
-    return res.redirect(`https://registry.npmjs.org/${releaseName}`);
+    return res.redirect(`https://registry.npmjs.org/${releaseName.toString().replace(',', '/')}`);
   }
   return res.status(404).json({ statusCode: 404, message: 'Package Not Found' });
 }
