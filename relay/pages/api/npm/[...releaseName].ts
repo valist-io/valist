@@ -16,7 +16,17 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
       query: { releaseName },
     } = req;
 
-    const [orgName, repoName] = decodeURIComponent(releaseName.toString().replace('@', '')).split('/');
+    let orgName: string;
+    let repoName: string;
+
+    if (Array.isArray(releaseName) && releaseName.length > 1) {
+      orgName = releaseName[0].toString().replace('@', '');
+      repoName = releaseName[1].toString();
+    } else {
+      [orgName, repoName] = decodeURIComponent(releaseName.toString().replace('@', '')).split('/');
+    }
+
+    console.log('Parsed', orgName, repoName, 'from', releaseName);
 
     if (orgName && repoName) {
       try {
