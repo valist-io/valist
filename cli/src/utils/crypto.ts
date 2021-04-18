@@ -5,12 +5,12 @@ const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 export const getSignerKey = async () => {
   const key = process.env.VALIST_SIGNER_KEY || await keytar.getPassword('VALIST', 'SIGNER');
-  if (!key) throw new Error('No key found!');
+  if (!key) throw new Error('🔎 No key found!');
   return key;
 };
 
-export const getWeb3Provider = async () => {
-  const key = await getSignerKey();
+export const getWeb3Provider = async (signer?: string) => {
+  const key = signer || await getSignerKey();
 
   const web3Provider = new HDWalletProvider({
     privateKeys: [key],
