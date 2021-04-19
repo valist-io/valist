@@ -3,7 +3,17 @@ import * as fs from 'fs';
 import Valist from 'valist';
 import { getWeb3Provider, getSignerKey } from './crypto';
 
-export const initValist = async () => {
+export type ValistConfig = {
+  project: string,
+  org: string,
+  tag: string,
+  meta: string,
+  type: 'binary' | 'npm',
+  artifact?: string,
+};
+
+export const initValist = async (): Promise<Valist> => {
+  console.log('📡 Connecting to Valist...');
   try {
     let signer: string | null = await getSignerKey();
 
@@ -16,6 +26,7 @@ export const initValist = async () => {
 
     await valist.connect(waitForMetaTx);
 
+    console.log('⚡️ Connected!');
     console.log('📇 Account:', valist.defaultAccount);
 
     return valist;
@@ -26,10 +37,16 @@ export const initValist = async () => {
   }
 };
 
-export const parseValistConfig = () => {
+export const parseValistConfig = (): ValistConfig => {
   try {
     const config: any = yaml.load(fs.readFileSync('./valist.yml', 'utf8'));
-    return config || {};
+
+    if (!['binary', 'npm'].includes(config.type)) {
+      console.error('🚧 Project type not supported!');
+      process.exit(1);
+    }
+
+    return config;
   } catch (e) {
     const msg = 'Could not load valist.yml';
     console.error(msg, e);

@@ -1,6 +1,6 @@
 import { exec } from 'child_process';
 
-export const npmPack = async () => {
+export const npmPack = async (): Promise<string> => {
   try {
     const out: string = await new Promise((resolve) => {
       // npm pack prints to stderr (?), switch params order
