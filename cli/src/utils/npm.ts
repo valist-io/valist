@@ -1,6 +1,5 @@
 import { exec } from 'child_process';
 
-// eslint-disable-next-line
 export const npmPack = async () => {
   try {
     const out: string = await new Promise((resolve) => {

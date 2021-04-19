@@ -2,33 +2,9 @@
 import * as yargs from 'yargs';
 import * as fs from 'fs';
 import * as path from 'path';
-import Valist from 'valist';
-import { getWeb3Provider, createSignerKey, getSignerKey } from './utils/crypto';
+import { initValist, parseValistConfig } from './utils/config';
+import { createSignerKey } from './utils/crypto';
 import { npmPack } from './utils/npm';
-import { parseValistConfig } from './utils/config';
-
-const initValist = async () => {
-  try {
-    let signer: string | null = await getSignerKey();
-
-    const valist = new Valist({ web3Provider: await getWeb3Provider(signer) });
-
-    valist.signer = signer;
-    signer = null;
-
-    const waitForMetaTx: boolean = true;
-
-    await valist.connect(waitForMetaTx);
-
-    console.log('📇 Account:', valist.defaultAccount);
-
-    return valist;
-  } catch (e) {
-    const msg = '😢 Could not connect to Valist';
-    console.error(msg, e);
-    throw e;
-  }
-};
 
 yargs.command('create signer', 'Create a new signer key', () => {}, async () => {
   console.log('🛠 Generating new signer key...');
@@ -63,7 +39,7 @@ yargs.command('publish', 'Publish package to Valist', () => {}, async () => {
   let metaFile: fs.ReadStream;
 
   if (type === 'npm') {
-    console.log('🛠 Packing NPM Package...');
+    console.log('🛠  Packing NPM Package...');
     const tarballName = await npmPack();
     console.log('💼 Packed:', tarballName);
     releaseFile = fs.createReadStream(path.join(process.cwd(), tarballName));
@@ -91,6 +67,11 @@ yargs.command('publish', 'Publish package to Valist', () => {}, async () => {
   console.log(`✅ Successfully Released ${project} ${tag}!`);
   console.log('📖 IPFS address of release:', `ipfs://${releaseObject.releaseCID}`);
   console.log('🔗 Transaction Hash:', transactionHash);
+
+  // cleanup generated tarball/build artifact
+  if (type === 'npm') {
+    fs.unlinkSync(releaseFile.path);
+  }
 
   process.exit(0);
 });
