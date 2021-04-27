@@ -6,7 +6,7 @@ A software/firmware/binary data notary system, similar to the concept that Apple
 
 ## Overview
 
-We are building a secure, trustless software distribution system for both traditional and decentralized infrastructures. No need for expensive and centralized PKIs or manual code signing processes!
+We are building a secure, trustless software distribution system for both traditional and decentralized infrastructures. No need for expensive, complex, and centralized PKIs or manual code signing processes!
 
 We support the following package types with our API natively, with many more in the pipeline:
 
@@ -21,6 +21,10 @@ We support the following package types with our API natively, with many more in 
 The goal is to point **any** software distribution system at a Valist relay, which will ensure the integrity of the packages and act as a universal cache.
 
 You can think of it as a trustless Bintray, or a universal Verdaccio, but with far more powerful access control and data integrity features. This includes multi-factor releases (M of N keys need to sign on some firmware before release), as well as the ability to use any hardware wallet to sign code.
+
+## Documentation
+
+Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io)
 
 ## Motivation
 
@@ -58,9 +62,7 @@ One of the main challenges with this project is providing different clients that
 
 To start, we are providing a simple web frontend and HTTP relay that can be deployed locally or on a server, and a shared library that will be used in a future CLI (and other clients). The intent is to be CI/CD friendly in the future, enabling automatic publishing of cryptographically verifiable software.
 
-![Architecture](docs/img/architecture.svg)
-
-### Current implementation
+#### Current implementation
 
 So far, the current implementation of Valist looks like this:
 
@@ -72,14 +74,10 @@ So far, the current implementation of Valist looks like this:
 
 * [x] (Basic) Support for NPM registries
 
-* [ ] Filecoin integration
+* [x] CLI and CI/CD support
 
-* [ ] CLI and CI/CD support
+* [ ] Filecoin Integration
 
 * [ ] Deployment tooling for Relays
 
 * [ ] Encryption Support
-
-## Documentation
-
-Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io)
