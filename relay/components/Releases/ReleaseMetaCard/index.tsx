@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useContext } from 'react';
-import { ProjectType } from 'valist';
+import { ProjectType } from 'valist/dist/types';
 import ValistContext from '../../Valist/ValistContext';
 
 import BinaryMeta from './BinaryMeta';

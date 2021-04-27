@@ -3,7 +3,7 @@ import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
 
-function getProviders(setMagic: any, setLoggedIn: any, email:string) {
+function getProviders(setMagic: any, setLoggedIn: any, email: string) {
   return {
     magic: async () => {
       const customNodeOptions = {
@@ -24,7 +24,7 @@ function getProviders(setMagic: any, setLoggedIn: any, email:string) {
       return magicObj.rpcProvider;
     },
     metaMask: async () => {
-      await (window as any).ethereum.enable();
+      await (window as any).ethereum.send('eth_requestAccounts');
       setLoggedIn(true);
       return (window as any).ethereum;
     },

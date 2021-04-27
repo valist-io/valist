@@ -2,8 +2,11 @@ import { AppProps } from 'next/app';
 import getConfig from 'next/config';
 import React, { useEffect, useState } from 'react';
 
-import Valist, { InvalidNetworkError } from 'valist';
+import Valist from 'valist';
+import { InvalidNetworkError } from 'valist/dist/errors';
+
 import { Magic } from 'magic-sdk';
+
 import ValistContext from '../components/Valist/ValistContext';
 import LoginContext from '../components/Login/LoginContext';
 import getProviders from '../utils/providers';
