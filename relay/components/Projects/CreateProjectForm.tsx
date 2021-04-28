@@ -1,7 +1,9 @@
 import React, { FunctionComponent, useContext, useState } from 'react';
 import { useRouter } from 'next/router';
 
-import { ProjectType, shortnameFilterRegex } from 'valist';
+import { shortnameFilterRegex } from 'valist';
+import { ProjectType } from 'valist/dist/types';
+
 import ValistContext from '../Valist/ValistContext';
 import LoadingDialog from '../LoadingDialog/LoadingDialog';
 
