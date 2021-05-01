@@ -5,6 +5,8 @@
   "runArgs": [
     "--init",
   ],
-  "extensions": [],
+  "extensions": [
+    "juanblanco.solidity",
+  ],
   "settings": {},
 }
