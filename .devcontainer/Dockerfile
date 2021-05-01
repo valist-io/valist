@@ -24,5 +24,3 @@ ENV DISABLE_AUTO_UPDATE=true
 # Install Node.js
 RUN curl -o- https://raw.githubusercontent.com/nvm-sh/nvm/v0.38.0/install.sh | zsh && \
     NVM_DIR="$HOME/.nvm" && . "$NVM_DIR/nvm.sh" && nvm install 14
-    # Install npm-based global dependencies
-    #npm install -g eslint
