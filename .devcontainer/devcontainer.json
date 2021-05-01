@@ -1,0 +1,12 @@
+{
+	"build": {
+		"dockerfile": "Dockerfile"
+	},
+	"runArgs": [
+		"--init",
+	],
+	"extensions": [
+	],
+	"settings": {
+	},
+}
