@@ -1,5 +1,5 @@
 type: npm
-org: test
+org: valist
 project: cli
-tag: 0.0.2-rc.3
-meta: RELEASE.md
+tag: 0.0.2
+meta: CHANGELOG.md
