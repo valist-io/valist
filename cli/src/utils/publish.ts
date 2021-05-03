@@ -1,5 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import Valist from 'valist';
 import { initValist, parseValistConfig, ValistConfig } from './config';
 import { npmPack } from './npm';
 
@@ -31,14 +32,27 @@ const getRelease = {
   npm: getNpmPackage,
 };
 
+const releaseExists = async (valist: Valist, org: string, project: string, tag: string) => {
+  const { releaseCID } = await valist.getReleaseByTag(org, project, tag);
+  if (releaseCID && releaseCID.length > 0) {
+    return true;
+  }
+  return false;
+};
+
 export const publish = async () => {
   const valist = await initValist();
 
   const config = parseValistConfig();
 
-  const { releaseFile, metaFile } = await getRelease[config.type](config);
-
   const { org, project, tag } = config;
+
+  if (await releaseExists(valist, org, project, tag)) {
+    console.log('✅ Release already exists, skipping publish');
+    process.exit(0);
+  }
+
+  const { releaseFile, metaFile } = await getRelease[config.type](config);
 
   console.log('🪐 Preparing release on IPFS...');
   const releaseObject = await valist.prepareRelease(tag, releaseFile, metaFile);
