@@ -1,4 +1,5 @@
 import { Magic } from 'magic-sdk';
+import WalletConnectProvider from '@walletconnect/web3-provider';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();
@@ -22,6 +23,18 @@ function getProviders(setMagic: any, setLoggedIn: any, email: string) {
       await magicObj.auth.loginWithMagicLink({ email });
       setLoggedIn(true);
       return magicObj.rpcProvider;
+    },
+    walletConnect: async () => {
+      const provider = new WalletConnectProvider({
+        rpc: {
+          80001: 'https://rpc-mumbai.matic.today',
+        },
+      });
+
+      //  Enable session (triggers QR Code modal)
+      await provider.enable();
+      setLoggedIn(true);
+      return provider;
     },
     metaMask: async () => {
       await (window as any).ethereum.send('eth_requestAccounts');

@@ -8,6 +8,11 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
     setShowLogin(false);
   };
 
+  const loginWalletConnect = async () => {
+    await handleLogin('walletConnect');
+    setShowLogin(false);
+  };
+
   const handleClick = (e: any) => {
     if (element.current && e.target && element.current.contains(e.target)) return;
 
@@ -74,8 +79,7 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
                                             </span>
                                         </div>
                                     </div>
-                                    <div className="mt-6 grid grid-cols-3 gap-3">
-                                        <div>{ /* @TODO: Github login */}</div>
+                                    <div className="mt-6 grid grid-cols-3 gap-3 content-center">
                                         <div>
                                             <span className="w-full inline-flex rounded-md shadow-sm">
                                                 <button onClick={async () => loginMetaMask()} type="button"
@@ -85,6 +89,20 @@ const LoginForm = ({ handleLogin, setEmail, setShowLogin }: { handleLogin: any, 
                                                   focus:border-blue-300 focus:shadow-outline-blue transition
                                                   duration-150 ease-in-out" aria-label="Sign in with GitHub">
                                                     <img width="85px" src="/images/metamask.svg"/>
+                                                </button>
+                                            </span>
+                                        </div>
+                                        <div>
+                                        </div>
+                                        <div>
+                                            <span className="w-full inline-flex rounded-md shadow-sm">
+                                                <button onClick={async () => loginWalletConnect()} type="button"
+                                                  className="w-full inline-flex justify-center py-2 px-4 border
+                                                  border-gray-300 rounded-md bg-white text-sm leading-5 font-medium
+                                                  text-gray-500 hover:text-gray-400 focus:outline-none
+                                                  focus:border-blue-300 focus:shadow-outline-blue transition
+                                                  duration-150 ease-in-out" aria-label="Sign in with GitHub">
+                                                    <img width="85px" src="/images/walletConnect.jpeg"/>
                                                 </button>
                                             </span>
                                         </div>
