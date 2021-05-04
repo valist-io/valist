@@ -16,7 +16,8 @@ import LoginForm from '../components/Login/LoginForm';
 
 import '../styles/main.css';
 
-type ProviderType = 'magic' | 'metaMask' | 'readOnly';
+type ProviderType = 'readOnly' | 'magic' | 'metaMask' | 'walletConnect';
+const ProviderTypes: ProviderType[] = ['readOnly', 'magic', 'metaMask', 'walletConnect'];
 
 const { publicRuntimeConfig } = getConfig();
 
@@ -91,9 +92,9 @@ function App({ Component, pageProps }: AppProps) {
   useEffect(() => {
     (async () => {
       // check login type on first load and set provider to previous state
-      const loginType = window.localStorage.getItem('loginType');
+      const loginType = window.localStorage.getItem('loginType') as ProviderType;
 
-      if (loginType === 'readOnly' || loginType === 'magic' || loginType === 'metaMask') {
+      if (ProviderTypes.includes(loginType)) {
         await handleLogin(loginType);
       } else {
         await handleLogin('readOnly');
