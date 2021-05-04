@@ -89,7 +89,7 @@ class Valist {
   contractAddress: string | undefined;
 
   constructor({
-    web3Provider, metaTx = true, ipfsHost = 'ipfs.infura.io', contractAddress,
+    web3Provider, metaTx = true, ipfsHost = 'https://pin.valist.io', contractAddress,
   }: { web3Provider: provider, metaTx?: boolean | string, ipfsHost?: string, contractAddress?: string }) {
     if (metaTx === true || metaTx === 'true') {
       this.metaTxEnabled = true;
@@ -111,9 +111,7 @@ class Valist {
     }
 
     this.defaultAccount = '0x0';
-    this.ipfs = ipfsClient({
-      host: ipfsHost, port: 5001, apiPath: '/api/v0/', protocol: 'https',
-    });
+    this.ipfs = ipfsClient(ipfsHost);
     this.contractAddress = contractAddress;
   }
 
