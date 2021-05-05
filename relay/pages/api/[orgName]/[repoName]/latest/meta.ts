@@ -18,7 +18,7 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
 
     if (latestRelease) {
       // return res.status(200).json({releaseMeta});
-      return res.redirect(`https://ipfs.fleek.co/ipfs/${latestRelease.metaCID}`);
+      return res.redirect(`https://gateway.valist.io/ipfs/${latestRelease.metaCID}`);
     }
     return res.status(404).json({ statusCode: 404, message: 'No release found!' });
   }

@@ -545,7 +545,7 @@ class Valist {
   // eslint-disable-next-line class-methods-use-this
   async fetchJSONfromIPFS(ipfsHash: string) {
     try {
-      const response = await fetch(`https://ipfs.fleek.co/ipfs/${ipfsHash}`);
+      const response = await fetch(`https://gateway.valist.io/ipfs/${ipfsHash}`);
       const json = await response.json();
       return json;
     } catch (e) {
