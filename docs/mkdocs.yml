@@ -1,2 +1,3 @@
 site_name: Valist Documentation
 theme: 'material'
+docs_dir: 'content'
