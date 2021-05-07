@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.0.3 Notes
+
+This is a maintenance release that upgrades dependencies.
+
 ## 0.0.2 Notes
 
 This release contains several convenience features:
