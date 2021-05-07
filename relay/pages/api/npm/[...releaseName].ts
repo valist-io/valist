@@ -47,7 +47,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
               homepage: '',
               dependencies: {},
               dist: {
-                tarball: `https://ipfs.fleek.co/ipfs/${releases[i].releaseCID}`,
+                tarball: `https://gateway.valist.io/ipfs/${releases[i].releaseCID}`,
               },
             };
           }
