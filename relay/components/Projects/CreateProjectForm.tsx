@@ -96,12 +96,12 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: { orgName: st
                         id="projectType" className="mt-1 form-select block w-full pl-3 pr-10 py-2
                         text-base leading-6 border-gray-300 focus:outline-none focus:shadow-outline-blue
                         focus:border-blue-300 sm:text-sm sm:leading-5">
-                            <option value="binary">Binary</option>
-                            <option value="static-javascript">Static JS</option>
-                            <option value="npm">NPM</option>
-                            <option value="pip">PIP</option>
-                            <option value="docker">Docker</option>
-                            <option value="web3-asset">Web3 Asset</option>
+                          <option value="binary">Binary</option>
+                          <option value="npm">NPM</option>
+                          <option value="pip">PIP</option>
+                          <option value="docker">Docker</option>
+                          <option value="generic-asset">Generic (Data, Asset, Static JS)</option>
+                          <option value="generic-folder">Generic Folder(Data, Assets, Static Website)</option>
                         </select>
                     </div>
 

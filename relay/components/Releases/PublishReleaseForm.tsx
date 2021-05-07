@@ -1,4 +1,7 @@
-import React, { FunctionComponent, useState, useContext } from 'react';
+import React, {
+  FunctionComponent, useState, useEffect, useContext,
+} from 'react';
+
 import { useRouter } from 'next/router';
 
 import ValistContext from '../Valist/ValistContext';
@@ -9,18 +12,40 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
   const valist = useContext(ValistContext);
   const router = useRouter();
 
+  const [repoMeta, setRepoMeta]: any = useState({});
   const [releaseMeta, setReleaseMeta] = useState('');
   const [projectTag, setProjectTag] = useState('');
-  const [file, setFile] = useState<File | null>(null);
+  const [files, setFiles]: any = useState();
 
   const [loadingMessage, setLoadingMessage] = useState('');
 
   const [renderLoading, setRenderLoading] = useState(false);
 
-  const handleUpload = async (_file: File) => {
+  const handleUpload = async (_files: any, repoType: string) => {
     try {
-      const responseHash = await valist.addFileToIPFS(_file);
-      return responseHash;
+      if (repoType !== 'generic-folder') {
+        const responseHash = await valist.addFileToIPFS(_files[0]);
+        return responseHash;
+      }
+
+      const fileHashes = [];
+      const fileList: any = { ..._files };
+      delete fileList.length;
+
+      const filePaths: any = [];
+      Object.values(fileList).forEach((file:any) => {
+        filePaths.push({
+          path: file.webkitRelativePath,
+          content: file,
+        });
+      });
+
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const result of valist.ipfs.addAll(filePaths, { cidVersion: 1 })) {
+        fileHashes.push(result);
+      }
+
+      return fileHashes[fileHashes.length - 1].cid.string;
     } catch (e) {
       console.error('Could not upload file', e);
       throw e;
@@ -29,14 +54,14 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
   const createRelease = async () => {
     try {
-      if (!file) {
+      if (!files) {
         console.error('No file selected');
         return;
       }
 
       setLoadingMessage('Uploading file to IPFS...');
 
-      const releaseCID = await handleUpload(file);
+      const releaseCID = await handleUpload(files, repoMeta.projectType);
 
       setLoadingMessage('Uploading metadata JSON to IPFS...');
 
@@ -48,6 +73,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
         metaCID,
       };
 
+      console.log('Generated Release', release);
+
       setLoadingMessage('Publishing Release...');
 
       await valist.publishRelease(orgName, repoName, release);
@@ -56,6 +83,18 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
       console.error('Could not publish release', e);
     }
   };
+
+  useEffect(() => {
+    (async () => {
+      if (valist) {
+        try {
+          const metaResp = await valist.getRepoMeta(orgName, repoName);
+          console.log(metaResp);
+          setRepoMeta(metaResp);
+        } catch (e) { console.log(e); }
+      }
+    })();
+  }, []);
 
   return (
         <div className="bg-white py-16 px-4 overflow-hidden sm:px-6 lg:px-8 lg:py-24">
@@ -92,9 +131,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                         <label htmlFor="ProjectMeta" className="block text-sm font-medium
                         leading-5 text-gray-700">Metadata</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input onChange={(e) => setReleaseMeta(e.target.value)}
-                            id="ProjectMeta" className="form-input py-3 px-4 block w-full
-                            transition ease-in-out duration-150" />
+                          <input onChange={(e) => setReleaseMeta(e.target.value)}
+                          id="ProjectMeta" className="form-input py-3 px-4 block w-full
+                          transition ease-in-out duration-150" />
                         </div>
                     </div>
                     <div className="sm:col-span-2">
@@ -110,15 +149,21 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                         <label htmlFor="ReleaseData" className="block text-sm font-medium
                         leading-5 text-gray-700">Release Data</label>
                         <div className="mt-1 relative rounded-md shadow-sm">
-                            <input type="file" onChange={(e) => setFile(e.target.files && e.target.files[0])}
+                          {repoMeta.projectType === 'generic-folder'
+                            // @ts-ignore
+                            ? <input type="file" webkitdirectory="true" mozdirectory="true"
+                              onChange={(e) => setFiles(e.target.files)} />
+                            : <input type="file" onChange={(e) => setFiles(e.target.files)}
                             id="ReleaseData" className="form-input py-3 px-4 block w-full transition
                             ease-in-out duration-150" />
+                          }
                         </div>
                     </div>
                     <div className="sm:col-span-2">
                         <span className="w-full inline-flex rounded-md shadow-sm">
                             <button onClick={async () => {
-                              setRenderLoading(true); await createRelease();
+                              setRenderLoading(true);
+                              await createRelease();
                               setRenderLoading(false);
                             }} value="Submit" type="button" className="w-full inline-flex
                             items-center justify-center px-6 py-3 border border-transparent
