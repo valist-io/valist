@@ -16,13 +16,12 @@ let config = {
     MAGIC_PUBKEY: "pk_test_54C6079CBEF87272",
     METATX_ENABLED: process.env.METATX_ENABLED || true,
   },
-  webpack: (config, { webpack }) => {
-    // Note: we provide webpack above so you should not `require` it
-    // Perform customizations to webpack config
-    config.plugins.push(new webpack.IgnorePlugin(/^electron$/));
-
-    // Important: return the modified config
-    return config
+  future: {
+    webpack5: true,
+  },
+  webpack: function (config, options) {
+    config.plugins.push(new options.webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }));
+    return config;
   },
 }
 
