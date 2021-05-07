@@ -1,16 +1,22 @@
 import Web3 from 'web3';
-import { provider } from 'web3-core/types';
-import * as sigUtil from 'eth-sig-util';
-
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
-
 // @ts-ignore mexa doesn't support typescript yet
 import Biconomy from '@biconomy/mexa';
-import ValistABI from './abis/Valist.json';
 
-import { InvalidNetworkError } from './errors';
+import { provider } from 'web3-core/types';
+
+import * as sigUtil from 'eth-sig-util';
+
 import { OrgMeta, Release, RepoMeta } from './types';
+import {
+  domainData,
+  domainType,
+  getSignatureParameters,
+  getValistContract,
+  metaTransactionType,
+  shortnameFilterRegex,
+} from './utils';
 
 // node-fetch polyfill
 const fetch = require('node-fetch');
@@ -18,57 +24,6 @@ const fetch = require('node-fetch');
 if (!globalThis.fetch) {
   globalThis.fetch = fetch;
 }
-
-export const shortnameFilterRegex = /[^A-z0-9-]/;
-
-export const getContractInstance = (web3: Web3, abi: any, address: string) => new web3.eth.Contract(abi, address);
-
-const getValistContract = async (web3: Web3, address?: string) => {
-  // get network ID and the deployed address
-  const networkId: number = await web3.eth.net.getId();
-
-  if (networkId !== 80001) {
-    throw new InvalidNetworkError('Incorrect network ID must be Matic (80001)');
-  }
-
-  // @ts-ignore
-  const deployedAddress: string = address || ValistABI.networks[networkId].address;
-
-  return getContractInstance(web3, ValistABI.abi, deployedAddress);
-};
-
-const getSignatureParameters = (web3: Web3, signature: string) => {
-  if (!web3.utils.isHexStrict(signature)) throw new Error(`Not a valid hex string: ${signature}`);
-
-  const r = signature.slice(0, 66);
-  const s = '0x'.concat(signature.slice(66, 130));
-  let v: string | number = '0x'.concat(signature.slice(130, 132));
-  v = web3.utils.hexToNumber(v);
-  if (![27, 28].includes(v)) v += 27;
-
-  return { r, s, v };
-};
-
-const domainType = [
-  { name: 'name', type: 'string' },
-  { name: 'version', type: 'string' },
-  { name: 'chainId', type: 'uint256' },
-  { name: 'verifyingContract', type: 'address' },
-];
-
-const metaTransactionType = [
-  { name: 'nonce', type: 'uint256' },
-  { name: 'from', type: 'address' },
-  { name: 'functionSignature', type: 'bytes' },
-];
-
-const domainData = {
-  name: 'Valist',
-  version: '0',
-  chainId: 80001,
-  verifyingContract: ValistABI.networks[80001].address,
-};
-
 class Valist {
   web3: Web3;
 
@@ -89,8 +44,16 @@ class Valist {
   contractAddress: string | undefined;
 
   constructor({
-    web3Provider, metaTx = true, ipfsHost = 'https://pin.valist.io', contractAddress,
-  }: { web3Provider: provider, metaTx?: boolean | string, ipfsHost?: string, contractAddress?: string }) {
+    web3Provider,
+    metaTx = true,
+    ipfsHost = 'https://pin.valist.io',
+    contractAddress,
+  }: {
+    web3Provider: provider,
+    metaTx?: boolean | string,
+    ipfsHost?: string,
+    contractAddress?: string,
+  }) {
     if (metaTx === true || metaTx === 'true') {
       this.metaTxEnabled = true;
 
@@ -104,7 +67,7 @@ class Valist {
 
       this.biconomy.onEvent(this.biconomy.READY, () => {
         this.metaTxReady = true;
-        console.log('MetaTransactions Enabled');
+        console.log('👻 MetaTransactions Enabled');
       });
     } else {
       this.web3 = new Web3(web3Provider);
@@ -655,6 +618,4 @@ class Valist {
   }
 }
 
-export const Web3Providers = Web3.providers;
-
-export default Valist;
+export = Valist;
