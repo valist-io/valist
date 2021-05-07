@@ -1,5 +1,6 @@
 import React from 'react';
-import Valist, { Web3Providers } from 'valist';
+import Valist from 'valist';
+import { Web3Providers } from 'valist/dist/utils';
 import getConfig from 'next/config';
 
 const { publicRuntimeConfig } = getConfig();

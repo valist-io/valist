@@ -49,7 +49,8 @@ This is generated entirely from the Valist smart contracts, and are enforced usi
 Next, you can import the `Valist` SDK and pass in a `Web3Provider`. Valist exposes a set of `Web3Providers`, including HTTP:
 
 ```typescript
-import Valist, { Web3Providers } from 'valist';
+import Valist from 'valist';
+import { Web3Providers } from 'valist/dist/utils';
 
 const web3Provider = new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER);
 
@@ -161,7 +162,8 @@ Here's an example for how the `getLatestReleaseFromRepo` API call is implementat
 
 ```typescript
 import { NextApiRequest, NextApiResponse } from 'next'
-import Valist, { Web3Providers } from 'valist';
+import Valist from 'valist';
+import { Web3Providers } from 'valist/dist/utils';
 
 export default async function getLatestReleaseFromRepo(req: NextApiRequest, res: NextApiResponse) {
 

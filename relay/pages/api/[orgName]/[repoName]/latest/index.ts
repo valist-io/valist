@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Valist, { Web3Providers } from 'valist';
+import Valist from 'valist';
+import { Web3Providers } from 'valist/dist/utils';
 
 export default async function getLatestReleaseFromRepo(req: NextApiRequest, res: NextApiResponse) {
   // set .env.local to your local chain or set in production deployment

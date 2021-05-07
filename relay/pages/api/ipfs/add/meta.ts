@@ -1,5 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import Valist, { Web3Providers } from 'valist';
+import Valist from 'valist';
+import { Web3Providers } from 'valist/dist/utils';
 
 export default async function addOrgMetaIPFS(req: NextApiRequest, res: NextApiResponse) {
   if (process.env.WEB3_PROVIDER && req.method === 'POST') {
