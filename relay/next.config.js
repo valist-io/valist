@@ -12,7 +12,7 @@ let config = {
     ]
   },
   publicRuntimeConfig: {
-    WEB3_PROVIDER: process.env.WEB3_PROVIDER || "http://127.0.0.1:9545",
+    WEB3_PROVIDER: process.env.WEB3_PROVIDER || "https://matic-mumbai.chainstacklabs.com",
     MAGIC_PUBKEY: "pk_test_54C6079CBEF87272",
     METATX_ENABLED: process.env.METATX_ENABLED || true,
   },

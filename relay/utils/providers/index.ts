@@ -27,7 +27,7 @@ function getProviders(setMagic: any, setLoggedIn: any, email: string) {
     walletConnect: async () => {
       const provider = new WalletConnectProvider({
         rpc: {
-          80001: 'https://matic-mumbai.chainstacklabs.com',
+          80001: publicRuntimeConfig.WEB3_PROVIDER,
         },
       });
 
