@@ -17,8 +17,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [],
@@ -31,8 +30,7 @@
         }
       ],
       "stateMutability": "view",
-      "type": "function",
-      "constant": true
+      "type": "function"
     },
     {
       "inputs": [
@@ -48,18 +46,18 @@
       "type": "function"
     }
   ],
-  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"last_completed_migration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"completed\",\"type\":\"uint256\"}],\"name\":\"setCompleted\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/zach/Development/valist/eth/contracts/Migrations.sol\":\"Migrations\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/zach/Development/valist/eth/contracts/Migrations.sol\":{\"keccak256\":\"0x0c2e15675798ac44aa3b9e58f3597ac80d129325ac2d04bcc5729aeb4d8e7876\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4d39e11871cc47160d63ff42c96d93965df68f9677e8c742a29495f96b90918f\",\"dweb:/ipfs/Qmcn62DW3bk6k72qNZpnrENzYVaLL5hV1fTWsfNLefwomy\"]}},\"version\":1}",
-  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b0319163317905560fd806100316000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063445df0ac1460415780638da5cb5b146059578063fdacd57614607b575b600080fd5b60476097565b60408051918252519081900360200190f35b605f609d565b604080516001600160a01b039092168252519081900360200190f35b609560048036036020811015608f57600080fd5b503560ac565b005b60015481565b6000546001600160a01b031681565b6000546001600160a01b031633141560c45760018190555b5056fea264697066735822122042c9da5e28e543fb104a270c3a04675e26e92b8b2822b7596d8e1e27b0d2a8a964736f6c63430007060033",
-  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063445df0ac1460415780638da5cb5b146059578063fdacd57614607b575b600080fd5b60476097565b60408051918252519081900360200190f35b605f609d565b604080516001600160a01b039092168252519081900360200190f35b609560048036036020811015608f57600080fd5b503560ac565b005b60015481565b6000546001600160a01b031681565b6000546001600160a01b031633141560c45760018190555b5056fea264697066735822122042c9da5e28e543fb104a270c3a04675e26e92b8b2822b7596d8e1e27b0d2a8a964736f6c63430007060033",
+  "metadata": "{\"compiler\":{\"version\":\"0.7.6+commit.7338295f\"},\"language\":\"Solidity\",\"output\":{\"abi\":[{\"inputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"constructor\"},{\"inputs\":[],\"name\":\"last_completed_migration\",\"outputs\":[{\"internalType\":\"uint256\",\"name\":\"\",\"type\":\"uint256\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[],\"name\":\"owner\",\"outputs\":[{\"internalType\":\"address\",\"name\":\"\",\"type\":\"address\"}],\"stateMutability\":\"view\",\"type\":\"function\"},{\"inputs\":[{\"internalType\":\"uint256\",\"name\":\"completed\",\"type\":\"uint256\"}],\"name\":\"setCompleted\",\"outputs\":[],\"stateMutability\":\"nonpayable\",\"type\":\"function\"}],\"devdoc\":{\"kind\":\"dev\",\"methods\":{},\"version\":1},\"userdoc\":{\"kind\":\"user\",\"methods\":{},\"version\":1}},\"settings\":{\"compilationTarget\":{\"/Users/alec/Workspace/valist/eth/contracts/Migrations.sol\":\"Migrations\"},\"evmVersion\":\"istanbul\",\"libraries\":{},\"metadata\":{\"bytecodeHash\":\"ipfs\"},\"optimizer\":{\"enabled\":true,\"runs\":200},\"remappings\":[]},\"sources\":{\"/Users/alec/Workspace/valist/eth/contracts/Migrations.sol\":{\"keccak256\":\"0x0c2e15675798ac44aa3b9e58f3597ac80d129325ac2d04bcc5729aeb4d8e7876\",\"license\":\"MIT\",\"urls\":[\"bzz-raw://4d39e11871cc47160d63ff42c96d93965df68f9677e8c742a29495f96b90918f\",\"dweb:/ipfs/Qmcn62DW3bk6k72qNZpnrENzYVaLL5hV1fTWsfNLefwomy\"]}},\"version\":1}",
+  "bytecode": "0x608060405234801561001057600080fd5b50600080546001600160a01b0319163317905560fd806100316000396000f3fe6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063445df0ac1460415780638da5cb5b146059578063fdacd57614607b575b600080fd5b60476097565b60408051918252519081900360200190f35b605f609d565b604080516001600160a01b039092168252519081900360200190f35b609560048036036020811015608f57600080fd5b503560ac565b005b60015481565b6000546001600160a01b031681565b6000546001600160a01b031633141560c45760018190555b5056fea264697066735822122036e2756e072a5cf3d1498cc82eab69c2c7a05da56c9ad1a49068701b921eb78b64736f6c63430007060033",
+  "deployedBytecode": "0x6080604052348015600f57600080fd5b5060043610603c5760003560e01c8063445df0ac1460415780638da5cb5b146059578063fdacd57614607b575b600080fd5b60476097565b60408051918252519081900360200190f35b605f609d565b604080516001600160a01b039092168252519081900360200190f35b609560048036036020811015608f57600080fd5b503560ac565b005b60015481565b6000546001600160a01b031681565b6000546001600160a01b031633141560c45760018190555b5056fea264697066735822122036e2756e072a5cf3d1498cc82eab69c2c7a05da56c9ad1a49068701b921eb78b64736f6c63430007060033",
   "immutableReferences": {},
   "generatedSources": [],
   "deployedGeneratedSources": [],
   "sourceMap": "58:304:1:-:0;;;147:43;;;;;;;;;-1:-1:-1;167:5:1;:18;;-1:-1:-1;;;;;;167:18:1;175:10;167:18;;;58:304;;;;;;",
   "deployedSourceMap": "58:304:1:-:0;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;106:36;;;:::i;:::-;;;;;;;;;;;;;;;;82:20;;;:::i;:::-;;;;-1:-1:-1;;;;;82:20:1;;;;;;;;;;;;;;257:103;;;;;;;;;;;;;;;;-1:-1:-1;257:103:1;;:::i;:::-;;106:36;;;;:::o;82:20::-;;;-1:-1:-1;;;;;82:20:1;;:::o;257:103::-;240:5;;-1:-1:-1;;;;;240:5:1;226:10;:19;222:26;;;319:24:::1;:36:::0;;;222:26;257:103;:::o",
   "source": "// SPDX-License-Identifier: MIT\npragma solidity >=0.7.0;\n\ncontract Migrations {\n  address public owner;\n  uint public last_completed_migration;\n\n  constructor() {\n    owner = msg.sender;\n  }\n\n  modifier restricted() {\n    if (msg.sender == owner) _;\n  }\n\n  function setCompleted(uint completed) public restricted {\n    last_completed_migration = completed;\n  }\n}\n",
-  "sourcePath": "/Users/zach/Development/valist/eth/contracts/Migrations.sol",
+  "sourcePath": "/Users/alec/Workspace/valist/eth/contracts/Migrations.sol",
   "ast": {
-    "absolutePath": "/Users/zach/Development/valist/eth/contracts/Migrations.sol",
+    "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Migrations.sol",
     "exportedSymbols": {
       "Migrations": [
         397
@@ -454,7 +452,7 @@
   },
   "legacyAST": {
     "attributes": {
-      "absolutePath": "/Users/zach/Development/valist/eth/contracts/Migrations.sol",
+      "absolutePath": "/Users/alec/Workspace/valist/eth/contracts/Migrations.sol",
       "exportedSymbols": {
         "Migrations": [
           397
@@ -948,9 +946,8 @@
       "transactionHash": "0xc4b0e477b1adedfa42e4d14aa664137f9f350b827f1047856ba189d4dc082b30"
     }
   },
-  "schemaVersion": "3.3.3",
-  "updatedAt": "2021-01-27T04:51:42.110Z",
-  "networkType": "ethereum",
+  "schemaVersion": "3.4.1",
+  "updatedAt": "2021-05-10T18:54:32.034Z",
   "devdoc": {
     "kind": "dev",
     "methods": {},
