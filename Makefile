@@ -1,20 +1,24 @@
 SHELL=/bin/bash
 
-# builds static frontend
-relay:
-	cd relay && npm run build
-
 # builds valist npm package
 lib:
 	cd lib && npm run build
 
+# builds cli
+cli:
+	cd cli && npm run build
+
+# builds static frontend
+relay:
+	cd relay && npm run build
+
+# runs local typescript compiler in watch mode
+dev-lib:
+	cd lib && npm run dev
+
 # runs local next server
 dev-relay:
 	cd relay && npm run dev
-
-# runs local next server
-dev-lib:
-	cd lib && npm run dev
 
 # runs both dev servers in parallel, piping output to same shell
 dev:
@@ -51,23 +55,27 @@ compile: all
 
 build: all
 
-install-lib:
-	cd lib && npm i
-
-install-relay:
-	cd relay && npm i
-
 install-eth:
 	cd eth && npm i
 	pip3 install slither-analyzer
 
-install-all: install-lib install-relay install-eth
+install-lib:
+	cd lib && npm i
+
+install-cli:
+	cd cli && npm i
+
+install-relay:
+	cd relay && npm i
+
+install-all: install-eth install-lib install-cli install-relay
 
 install: install-all
 
 update-all:
 	cd eth && npm update
 	cd lib && npm update
+	cd cli && npm update
 	cd relay && npm update
 	make audit-fix
 
@@ -76,6 +84,7 @@ update: update-all
 audit-fix:
 	cd eth && npm audit fix
 	cd lib && npm audit fix
+	cd cli && npm audit fix
 	cd relay && npm audit fix
 
 audit-contracts:
@@ -85,4 +94,4 @@ docs:
 	mkdocs build
 	cd lib && npm run docs
 
-.PHONY: relay lib contracts docs
+.PHONY: relay lib contracts docs cli
