@@ -24,8 +24,16 @@ dev-relay:
 dev:
 	@make -j 2 dev-lib dev-relay
 
+# builds and runs relay in production mode
 start: lib
 	cd relay && npm run start
+
+# build frontend
+frontend: lib relay
+
+# build static site (no APIs) into /relay/out
+static: frontend
+	cd relay && npm run export
 
 # compile contracts
 contracts:
@@ -35,18 +43,15 @@ contracts:
 migrate:
 	cd eth && npm run migrate
 
-# runs local ganache cli
-blockchain:
-	cd eth && npm run develop
+deploy: migrate
 
 # launches truffle console
 console:
 	cd eth && npm run console
 
-deploy: migrate
-
-# build frontend
-frontend: lib relay
+# runs local ganache cli
+blockchain:
+	cd eth && npm run develop
 
 # build all artifacts
 all: contracts lib relay
@@ -57,7 +62,6 @@ build: all
 
 install-eth:
 	cd eth && npm i
-	pip3 install slither-analyzer
 
 install-lib:
 	cd lib && npm i
@@ -67,6 +71,8 @@ install-cli:
 
 install-relay:
 	cd relay && npm i
+
+install-frontend: install-lib install-relay
 
 install-all: install-eth install-lib install-cli install-relay
 
