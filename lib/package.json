@@ -35,9 +35,8 @@
     "chai": "^4.3.4",
     "ganache-core": "^2.13.2",
     "mocha": "^8.4.0",
-    "ts-node": "^9.1.1",
     "typedoc": "^0.20.36",
-    "typescript": "^4.3.2"
+    "typescript": "^4.2.4"
   },
   "dependencies": {
     "@biconomy/mexa": "^1.5.15",
