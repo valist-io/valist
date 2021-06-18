@@ -57,11 +57,7 @@ contract Valist is EIP712MetaTransaction("Valist","0") {
 
         // release metadata
         string metaCID;
-        
-        /*
-        // boolean to mark compromised
-        bool compromised;
-        */
+
     }
 
     // list of shortnames
