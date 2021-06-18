@@ -14,7 +14,7 @@ describe("Valist Contract", function() {
   before(async() => {
     // Deploy Valist Contract
     Valist = await ethers.getContractFactory("Valist");
-    valist = await Valist.deploy();
+    valist = await Valist.deploy("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b");
 
     // Setup Accounts and Constants
     ORG_OWNER = "123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e12683553c62"; // keccak256 hash of "ORG_OWNER" string

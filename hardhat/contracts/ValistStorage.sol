@@ -1,9 +1,17 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
+import "./BaseRelayRecipient.sol";
 import "hardhat/console.sol";
 
-contract ValistStorage {
+contract ValistStorage is BaseRelayRecipient {
+
+  constructor(address metaTxForwarder) {
+    trustedForwarder = metaTxForwarder;
+  }
+
+  string public override versionRecipient = "2.2.0";
+
   using EnumerableSet for EnumerableSet.AddressSet;
   
   // organization level roles
@@ -81,32 +89,28 @@ contract ValistStorage {
   mapping(string => Organization) public orgs;
 
   modifier orgOwner(string memory _orgName) {
-    require(isOrgOwner(_orgName, msg.sender), "Access Denied");
+    require(isOrgOwner(_orgName, _msgSender()), "Access Denied");
     _;
   }
 
   modifier orgAdmin(string memory _orgName) {
-    require(isOrgAdmin(_orgName, msg.sender), "Access Denied");
+    require(isOrgAdmin(_orgName, _msgSender()), "Access Denied");
     _;
   }
 
   modifier repoAdmin(string memory _orgName, string memory _repoName) {
-    require(isRepoAdmin(_orgName, _repoName, msg.sender), "Access Denied");
+    require(isRepoAdmin(_orgName, _repoName, _msgSender()), "Access Denied");
     _;
   }
 
   modifier repoDev(string memory _orgName, string memory _repoName) {
-    require(isRepoDev(_orgName, _repoName, msg.sender), "Access Denied");
+    require(isRepoDev(_orgName, _repoName, _msgSender()), "Access Denied");
     _;
   }
 
   event PendingReleaseEvent(string _orgName, string _repoName, string _tag);
 
   event ReleaseEvent(string _orgName, string _repoName, string _tag, string releaseCID, string metaCID);
-
-  function getOrgCount() public view returns (uint) {
-    return orgNames.length;
-  }
 
   function isOrgOwner(string memory _orgName, address _address) public view returns (bool) {
     return orgs[_orgName].roles[ORG_OWNER].contains(_address);
@@ -124,9 +128,54 @@ contract ValistStorage {
     return orgs[_orgName].repos[_repoName].roles[REPO_DEV].contains(_address) || isRepoAdmin(_orgName, _repoName, _address);
   }
 
+  function getOrganization(string memory _orgName) public view returns (uint, string memory, string[] memory) {
+    Organization storage org = orgs[_orgName];
+    return (org.index, org.metaCID, org.repoNames);
+  }
+
+  function getOrgAdmins(string memory _orgName) public view returns(address[] memory) {
+    EnumerableSet.AddressSet storage adminSet = orgs[_orgName].roles[ORG_ADMIN];
+
+    address[] memory admins = new address[](adminSet.length());
+
+    for (uint i = 0; i < adminSet.length(); i++) {
+        admins[i] = adminSet.at(i);
+    }
+
+    return admins;
+  }
+
+  function getRepoAdmins(string memory _orgName, string memory _repoName) public view returns(address[] memory) {
+    EnumerableSet.AddressSet storage adminSet = orgs[_orgName].repos[_repoName].roles[REPO_ADMIN];
+
+    address[] memory admins = new address[](adminSet.length());
+
+    for (uint i = 0; i < adminSet.length(); i++) {
+        admins[i] = adminSet.at(i);
+    }
+
+    return admins;
+  }
+
+  function getRepoDevs(string memory _orgName, string memory _repoName) public view returns(address[] memory) {
+    EnumerableSet.AddressSet storage devSet = orgs[_orgName].repos[_repoName].roles[REPO_DEV];
+
+    address[] memory devs = new address[](devSet.length());
+
+    for (uint i = 0; i < devSet.length(); i++) {
+        devs[i] = devSet.at(i);
+    }
+
+    return devs;
+  }
+
+  function setRepoMeta(string memory _orgName, string memory _repoName, string memory _repoMeta) public repoAdmin(_orgName, _repoName) {
+    orgs[_orgName].repos[_repoName].metaCID = _repoMeta;
+  }
+
   function voteAddRepoKey(string memory _orgName, string memory _repoName, bytes32 _role, address _key) internal repoAdmin(_orgName, _repoName) {
     // stop if key has already signed
-    require(!orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.contains(msg.sender), "User already voted to add this key");
+    require(!orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.contains(_msgSender()), "User already voted to add this key");
     
     // check if key has already been proposed
     if (orgs[_orgName].repos[_repoName].pendingRoles[_key].role.length == 0) {
@@ -134,7 +183,7 @@ contract ValistStorage {
     }
 
     // add user to list of signers approving this key
-    orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.add(msg.sender);
+    orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.add(_msgSender());
 
     // check if signature threshold has been met
     if (orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.length() >= orgs[_orgName].repos[_repoName].signerThreshold) {
@@ -145,7 +194,7 @@ contract ValistStorage {
 
   function voteRevokeRepoKey(string memory _orgName, string memory _repoName, bytes32 _role, address _key) internal repoAdmin(_orgName, _repoName) {
     // stop if key has already signed
-    require(!orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.contains(msg.sender), "User already voted to revoke this key");
+    require(!orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.contains(_msgSender()), "User already voted to revoke this key");
     
     // check if key has already been proposed
     if (orgs[_orgName].repos[_repoName].pendingRoles[_key].role.length == 0) {
@@ -153,7 +202,7 @@ contract ValistStorage {
     }
 
     // add user to list of signers approving this key
-    orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.add(msg.sender);
+    orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.add(_msgSender());
 
     // check if signature threshold has been met
     if (orgs[_orgName].repos[_repoName].pendingRoles[_key].signers.length() >= orgs[_orgName].repos[_repoName].signerThreshold) {
@@ -183,9 +232,13 @@ contract ValistStorage {
     require(bytes(_orgName).length > 0, "Must provide orgName");
     require(bytes(_orgMeta).length > 0, "Must provide orgMeta");
 
-    orgs[_orgName].roles[ORG_OWNER].add(msg.sender);
+    orgs[_orgName].roles[ORG_OWNER].add(_msgSender());
     orgNames.push(_orgName);
     orgs[_orgName].index = orgNames.length - 1;
+    orgs[_orgName].metaCID = _orgMeta;
+  }
+
+  function setOrgMeta(string memory _orgName, string memory _orgMeta) public orgAdmin(_orgName) {
     orgs[_orgName].metaCID = _orgMeta;
   }
 
@@ -219,6 +272,16 @@ contract ValistStorage {
     orgs[_orgName].repos[_repoName].signerThreshold = _threshold;
   }
 
+  function getRelease(string memory _orgName, string memory _repoName, string memory _tag) public view returns(string memory, string memory, address[] memory) {
+    Release storage release = orgs[_orgName].repos[_repoName].releases[_tag];
+    EnumerableSet.AddressSet storage _signers = orgs[_orgName].repos[_repoName].releases[_tag].signers;
+    address[] memory signers = new address[](_signers.length());
+    for (uint i = 0; i < _signers.length(); i++) {
+        signers[i] = _signers.at(i);
+    }
+    return (release.releaseCID, release.metaCID, signers);
+  }
+
   function voteRelease(
     string memory _orgName,
     string memory _repoName,
@@ -235,16 +298,16 @@ contract ValistStorage {
     if (bytes(orgs[_orgName].repos[_repoName].pendingReleases[releaseID].releaseCID).length == 0) {
       orgs[_orgName].repos[_repoName].pendingReleases[releaseID].releaseCID = _releaseCID;
       orgs[_orgName].repos[_repoName].pendingReleases[releaseID].metaCID = _metaCID;
-      orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.add(msg.sender);
+      orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.add(_msgSender());
       emit PendingReleaseEvent(_orgName, _repoName, _tag);
     } else {
       // release already proposed, continue with adding signers
-      require(!orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.contains(msg.sender), "User already signed this release");
+      require(!orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.contains(_msgSender()), "User already signed this release");
       require(keccak256(bytes(_releaseCID)) == keccak256(bytes(orgs[_orgName].repos[_repoName].pendingReleases[releaseID].releaseCID)), "releaseCID does not match proposed");
       require(keccak256(bytes(_metaCID)) == keccak256(bytes(orgs[_orgName].repos[_repoName].pendingReleases[releaseID].metaCID)), "metaCID does not match proposed");
 
       // add user to list of signers for this release
-      orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.add(msg.sender);
+      orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.add(_msgSender());
 
       // if signature threshold has been met, finalize release
       if (orgs[_orgName].repos[_repoName].pendingReleases[releaseID].signers.length() == orgs[_orgName].repos[_repoName].signerThreshold) {
@@ -256,11 +319,9 @@ contract ValistStorage {
         // copy signers from pendingRelease to finalized Release
         for (uint i = 0; i < release.signers.length(); i++) {
           orgs[_orgName].repos[_repoName].releases[_tag].signers.add(release.signers.at(i));
-        }
-
+        } 
         emit ReleaseEvent(_orgName, _repoName, _tag, release.releaseCID, release.metaCID);
       }
     }
   }
-
 }
