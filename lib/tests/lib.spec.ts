@@ -1,7 +1,8 @@
 import Web3 from 'web3';
 import { expect } from 'chai';
 import { describe, before, it } from 'mocha';
-import Valist, { getContractInstance } from '../src/index';
+import Valist from '../src/index';
+import { getContractInstance } from '../src/utils';
 
 import ValistABI from '../src/abis/Valist.json';
 
@@ -12,6 +13,7 @@ const ganache = require('ganache-core');
 const web3Provider = ganache.provider();
 let contractInstance: any;
 let valistInstance: Valist;
+let accounts: string[];
 
 const orgShortName = 'secureco';
 const projectName = 'firmware';
@@ -37,13 +39,13 @@ const repoMeta: {
 
 const release = {
   tag: '0.0.1',
-  hash: 'QmU2PN4NVcAP2wCGKNpmjoEaM2xjRzjjjy9YUh25TEUPta',
-  meta: 'QmNTDYaHbB88ezsQuYpugXMx1X8NP2xj9S8HtSTzmKQ5XS',
+  releaseCID: 'QmU2PN4NVcAP2wCGKNpmjoEaM2xjRzjjjy9YUh25TEUPta',
+  metaCID: 'QmNTDYaHbB88ezsQuYpugXMx1X8NP2xj9S8HtSTzmKQ5XS',
 };
 
 const deployContract = async (provider: any) => {
   const web3 = new Web3(provider);
-  const accounts = await web3.eth.getAccounts();
+  accounts = await web3.eth.getAccounts();
 
   // @ts-ignore
   const valistContract = await new web3.eth.Contract(ValistABI.abi)
@@ -129,6 +131,30 @@ describe('Test Valist Lib', async () => {
       expect(transactionResponse).to.have.property('transactionHash');
       expect(transactionResponse).to.have.property('blockHash');
       expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should fail when user does not have permission', async () => {
+      try {
+        await valistInstance.publishRelease(orgShortName, projectName, release, accounts[1]);
+      } catch (e) {
+        expect(e.toString()).to.contain('User does not have permission to publish release');
+      }
+    });
+
+    it ('Should fail when org does not exist', async () => {
+      try {
+        await valistInstance.publishRelease('', projectName, release);
+      } catch (e) {
+        expect(e.toString()).to.contain('User does not have permission to publish release');
+      }
+    });
+
+    it ('Should fail when repo does not exist', async () => {
+      try {
+        await valistInstance.publishRelease(orgShortName, '', release);
+      } catch (e) {
+        expect(e.toString()).to.contain('User does not have permission to publish release');
+      }
     });
   });
 

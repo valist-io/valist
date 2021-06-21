@@ -489,8 +489,25 @@ class Valist {
     }
   }
 
+  async canRelease(orgName: string, repoName: string, account: string = this.defaultAccount) {
+    try {
+      const isOrgOwner = await this.isOrgOwner(orgName, account);
+      const isOrgAdmin = await this.isOrgAdmin(orgName, account);
+      const isRepoAdmin = await this.isRepoAdmin(orgName, repoName, account);
+      const isRepoDev = await this.isRepoDev(orgName, repoName, account);
+      return isOrgOwner || isOrgAdmin || isRepoAdmin || isRepoDev;
+    } catch (e) {
+      const msg = 'Could not check if user can release'
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
   async publishRelease(orgName: string, repoName: string, release: Release, account?: string) {
     try {
+      const canRelease = await this.canRelease(orgName, repoName, account);
+      if (!canRelease) throw new Error('User does not have permission to publish release');
+      
       const tx = await this.sendTransaction(
         this.valist.methods.publishRelease(
           orgName, repoName, release.tag, release.releaseCID, release.metaCID,
