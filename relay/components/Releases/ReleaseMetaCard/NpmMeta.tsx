@@ -38,7 +38,10 @@ const NpmMeta = (orgName: string, repoName: string, projectMeta: any = {}) => {
                 <div ref={installRef} onClick={() => copyToCB(installRef)}
                   className="border-2 border-solid border-black-200 rounded-lg
                   p-2 bg-gray-200 cursor-pointer break-all mb-8">
-                    npm install {origin}/api/{orgName}/{repoName}/latest
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 float-right" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p>npm install {origin}/api/{orgName}/{repoName}/latest</p>
                 </div>
                 <div className="pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Set Package Registry</h1>
@@ -46,7 +49,10 @@ const NpmMeta = (orgName: string, repoName: string, projectMeta: any = {}) => {
                 <div ref={registryRef} onClick={() => copyToCB(registryRef)}
                   className="border-2 border-solid border-black-200 rounded-lg
                   h-auto p-2 bg-gray-200 cursor-pointer break-all mb-8">
-                    npm config set registry {origin}/api/npm
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 float-right" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p>npm config set registry {origin}/api/npm</p>
                 </div>
                 <div className="pb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium" >Install From Registry</h1>
@@ -54,7 +60,10 @@ const NpmMeta = (orgName: string, repoName: string, projectMeta: any = {}) => {
                 <div ref={installFromRegistryRef} onClick={() => copyToCB(installFromRegistryRef)}
                   className="border-2 border-solid border-black-200 rounded-lg
                   h-auto p-2 bg-gray-200 cursor-pointer break-all">
-                    npm install @{orgName}/{repoName}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 float-right" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
+                    <p>npm install @{orgName}/{repoName}</p>
                 </div>
             </div>
         </div>
