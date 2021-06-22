@@ -10,13 +10,9 @@ export const getContractInstance = (web3: Web3, abi: any, address: string) => ne
 export const getValistContract = async (web3: Web3, address?: string) => {
   // get network ID and the deployed address
   const networkId: number = await web3.eth.net.getId();
+  if (!address && networkId !== 80001) throw new InvalidNetworkError('Incorrect network ID must be Matic (80001)');
 
-  if (networkId !== 80001) {
-    throw new InvalidNetworkError('Incorrect network ID must be Matic (80001)');
-  }
-
-  const deployedAddress: string = address || ValistABI.networks[networkId].address;
-
+  const deployedAddress: string = address || ValistABI.networks['80001'].address;
   return getContractInstance(web3, ValistABI.abi, deployedAddress);
 };
 
