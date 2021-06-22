@@ -494,7 +494,7 @@ class Valist {
       const isRepoDev = await this.isRepoDev(orgName, repoName, account);
       return isRepoDev;
     } catch (e) {
-      const msg = 'Could not check if user can release'
+      const msg = 'Could not check if user can release';
       console.error(msg, e);
       throw e;
     }
@@ -504,7 +504,7 @@ class Valist {
     try {
       const canRelease = await this.canRelease(orgName, repoName, account);
       if (!canRelease) throw new Error('User does not have permission to publish release');
-      
+
       const tx = await this.sendTransaction(
         this.valist.methods.publishRelease(
           orgName, repoName, release.tag, release.releaseCID, release.metaCID,
