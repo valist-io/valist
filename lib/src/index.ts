@@ -491,11 +491,8 @@ class Valist {
 
   async canRelease(orgName: string, repoName: string, account: string = this.defaultAccount) {
     try {
-      const isOrgOwner = await this.isOrgOwner(orgName, account);
-      const isOrgAdmin = await this.isOrgAdmin(orgName, account);
-      const isRepoAdmin = await this.isRepoAdmin(orgName, repoName, account);
       const isRepoDev = await this.isRepoDev(orgName, repoName, account);
-      return isOrgOwner || isOrgAdmin || isRepoAdmin || isRepoDev;
+      return isRepoDev;
     } catch (e) {
       const msg = 'Could not check if user can release'
       console.error(msg, e);

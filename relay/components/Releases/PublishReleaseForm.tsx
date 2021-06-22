@@ -94,8 +94,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
           console.log(metaResp);
           setRepoMeta(metaResp);
 
-          const canRelease = await valist.canRelease(orgName, repoName);
-          setCanRelease(canRelease);
+          const userCanRelease = await valist.canRelease(orgName, repoName);
+          setCanRelease(userCanRelease);
         } catch (e) { console.log(e); }
       }
     })();
