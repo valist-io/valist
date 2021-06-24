@@ -20,12 +20,18 @@ Documentation for how to get started with Valist can be found at [https://docs.v
 
 ## Packages
 
-| Name | Description |
-| ---- | ----------- |
-| [cli](./cli) | Valist command line interface |
-| [eth](./eth) | Ethereum smart contracts |
-| [lib](./lib) | Valist core library |
-| [relay](./relay) | Valist relay |
+| Directory        | Description                   |
+| ---------------- | ----------------------------- |
+| [cli](./cli)     | Valist command line interface |
+| [eth](./eth)     | Ethereum smart contracts      |
+| [lib](./lib)     | Valist core library           |
+| [relay](./relay) | Valist relay application      |
+
+## Contributing
+
+We welcome pull requests and would love to support our early contributors with some awesome perks!
+
+Found a bug or have an idea for a feature? [Create an issue](https://github.com/valist-io/valist/issues/new).
 
 ## Maintainers
 
