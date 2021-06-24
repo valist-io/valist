@@ -3,7 +3,7 @@
 [![Discord](https://img.shields.io/discord/785535462311591976)](https://discord.com/channels/785535462311591976)
 [![Valist](https://img.shields.io/badge/valist-published-blue)](https://app.valist.io/valist)
 
-A trustless universal package repository that enables you to digitally sign and distribute software in just a few steps.
+A trustless universal package repository enabling you to digitally sign and distribute software in just a few steps.
 
 ## Features
 
