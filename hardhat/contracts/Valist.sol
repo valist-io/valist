@@ -1,6 +1,5 @@
 // SPDX-License-Identifier: MIT
 pragma solidity >=0.8.0;
-import "hardhat/console.sol";
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./ValistStorage.sol";
 
@@ -51,11 +50,23 @@ contract Valist is ValistStorage {
     return orgs[_orgName].repos[_repoName].tags;
   }
 
+  function getPendingReleases(string memory _orgName, string memory _repoName, string memory _tag) public view returns(bytes32[] memory) {
+    return orgs[_orgName].repos[_repoName].pendingReleaseIDs;
+  }
+
   function getLatestRelease(string memory _orgName, string memory _repoName) public view returns(string memory, string memory) {
     string[] storage tags = orgs[_orgName].repos[_repoName].tags;
     return (
       orgs[_orgName].repos[_repoName].releases[tags[tags.length - 1]].releaseCID,
       orgs[_orgName].repos[_repoName].releases[tags[tags.length - 1]].metaCID
     );
+  }
+
+  function getPendingRepoThresholds(string memory _orgName, string memory _repoName) public returns(uint[] memory) {
+    return orgs[_orgName].repos[_repoName].pendingThresholds;
+  }
+
+  function getPendingOrgThresholds(string memory _orgName) public returns(uint[] memory) {
+    return orgs[_orgName].pendingThresholds;
   }
 }

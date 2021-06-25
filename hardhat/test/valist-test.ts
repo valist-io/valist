@@ -1,24 +1,21 @@
-const { expect, assert } = require("chai");
+import { expect } from "chai";
+import { ethers } from "hardhat";
+import { Signer } from "ethers";
 
 describe("Valist Contract", function() {
-  let Valist;
-  let valist;
-  let signer1;
-  let signer2;
-  let signer3;
-  let ORG_OWNER;
+  let valist: any;
+  let accounts: Signer[];
 
   const releaseCID = "Qmc5gCcjYypU7y28oCALwfSvxCBskLuPKWpK4qpterKC7z";
   const metaCID = "Qmc5gCcjYypU7y28oCALwfSvxCBskLuPKWpK4qpterKC7z";
 
   before(async() => {
     // Deploy Valist Contract
-    Valist = await ethers.getContractFactory("Valist");
-    valist = await Valist.deploy("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b");
+    const contractFactory = await ethers.getContractFactory("Valist");
+    valist = await contractFactory.deploy("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b");
 
     // Setup Accounts and Constants
-    ORG_OWNER = "123b642491709420c2370bb98c4e7de2b1bc05c5f9fd95ac4111e12683553c62"; // keccak256 hash of "ORG_OWNER" string
-    [signer1, signer2, signer3, signer4, _] = await ethers.getSigners();
+    accounts = await ethers.getSigners();
   });
 
   describe('Deployment', () => {
@@ -33,11 +30,11 @@ describe("Valist Contract", function() {
     });
 
     it("Creator should be the organization owner", async function() {
-      expect(await valist.isOrgOwner("testOrg", signer1.address)).to.be.true;
+      expect(await valist.isOrgOwner("testOrg", accounts[0].getAddress())).to.be.true;
     });
 
     it("Creator should also have admin privs", async function() {
-      expect(await valist.isOrgAdmin("testOrg", signer1.address)).to.be.true;
+      expect(await valist.isOrgAdmin("testOrg", accounts[0].getAddress())).to.be.true;
     });
 
     it("Should create a repo under testOrg", async function() {
@@ -45,18 +42,18 @@ describe("Valist Contract", function() {
     });
 
     it("Add addr2 as repoDev under testOrg", async function() {
-      await valist.voteAddRepoAdmin("testOrg", "testRepo", signer2.address);
-      expect(await valist.isRepoDev("testOrg", "testRepo", signer2.address)).to.be.true;
+      await valist.voteAddRepoAdmin("testOrg", "testRepo", accounts[1].getAddress());
+      expect(await valist.isRepoDev("testOrg", "testRepo", accounts[1].getAddress())).to.be.true;
     });
 
     it("Add addr3 as repoDev under testOrg", async function() {
-      await valist.voteAddRepoAdmin("testOrg", "testRepo", signer3.address);
-      expect(await valist.isRepoDev("testOrg", "testRepo", signer3.address)).to.be.true;
+      await valist.voteAddRepoAdmin("testOrg", "testRepo", accounts[2].getAddress());
+      expect(await valist.isRepoDev("testOrg", "testRepo", accounts[2].getAddress())).to.be.true;
     });
 
     it("Should enable multi-factor release policy", async function() {
-      await valist.setRepoSignerThreshold("testOrg", "testRepo", 3);
-      expect(await valist.isRepoDev("testOrg", "testRepo", signer3.address)).to.be.true;
+      await valist.voteRepoThreshold("testOrg", "testRepo", 3);
+      expect(await valist.isRepoDev("testOrg", "testRepo", accounts[2].getAddress())).to.be.true;
     });
 
     it("Should propose a pending release under testOrg/testRepo", async function() {
@@ -70,7 +67,7 @@ describe("Valist Contract", function() {
     });
 
     it("Should sign a pending release under testOrg/testRepo (2nd key)", async function() {
-      await valist.connect(signer2).voteRelease(
+      await valist.connect(accounts[1]).voteRelease(
         "testOrg",
         "testRepo",
         "0.0.1",
@@ -80,7 +77,7 @@ describe("Valist Contract", function() {
     });
 
     it("Should sign a pending release under testOrg/testRepo (3rd key)", async function() {
-      await valist.connect(signer3).voteRelease(
+      await valist.connect(accounts[2]).voteRelease(
         "testOrg",
         "testRepo",
         "0.0.1",
@@ -98,24 +95,28 @@ describe("Valist Contract", function() {
     // publish release
     // add users/keys
     // remove users/keys
-    // 
+    //
+
+    it("Should be able to clear old pending release that has already met threshold", async function() {
+      await valist.cleanPendingRelease("testOrg", "testRepo", "1.0.0", releaseCID);
+    });
   });
 
   describe('Vote on adding a new repoAdminKey to testOrg/testRepo with multi-factor policy 3', () => {
     it("Vote on adding key 4 (1st key)", async function() {
-      await valist.voteAddRepoAdmin("testOrg", "testRepo", signer4.address);
+      await valist.voteAddRepoAdmin("testOrg", "testRepo", accounts[3].getAddress());
     });
 
     it("Vote on adding key 4 (2nd key)", async function() {
-      await valist.connect(signer2).voteAddRepoAdmin("testOrg", "testRepo", signer4.address);
+      await valist.connect(accounts[1]).voteAddRepoAdmin("testOrg", "testRepo", accounts[3].getAddress());
     });
 
     it("Vote on adding key 4 (3rd key)", async function() {
-      await valist.connect(signer3).voteAddRepoAdmin("testOrg", "testRepo", signer4.address);
+      await valist.connect(accounts[2]).voteAddRepoAdmin("testOrg", "testRepo", accounts[3].getAddress());
     });
 
     it("Validate that key 4 is now repo admin", async function() {
-      expect(await valist.isRepoAdmin("testOrg", "testRepo", signer4.address)).to.be.true;
+      expect(await valist.isRepoAdmin("testOrg", "testRepo", accounts[3].getAddress())).to.be.true;
     });
   });
 
