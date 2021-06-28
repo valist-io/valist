@@ -40,11 +40,15 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
           for (let i = 0; i < releases.length; i++) {
             const { tag, metaCID, releaseCID } = releases[i];
             // eslint-disable-next-line no-await-in-loop
-            versions[tag] = await valist.fetchJSONfromIPFS(metaCID);
-            versions[tag].name = repoName;
-            versions[tag].version = tag;
-            versions[tag].dist = {
-              tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
+            const meta = await valist.fetchJSONfromIPFS(metaCID);
+            // overwrite name, version, dist with valist info
+            versions[tag] = {
+              ...meta,
+              name: repoName,
+              version: tag,
+              dist: {
+                tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
+              },
             };
           }
 
