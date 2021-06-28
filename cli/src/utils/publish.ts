@@ -16,13 +16,13 @@ const getBinary = async ({ artifact, meta }: ValistConfig) => {
   return { releaseFile, metaFile };
 };
 
-const getNpmPackage = async ({ meta }: ValistConfig) => {
+const getNpmPackage = async () => {
   console.log('🛠  Packing NPM Package...');
   const tarballName = await npmPack();
   console.log('💼 Packed:', tarballName);
 
   const releaseFile = fs.createReadStream(path.join(process.cwd(), tarballName));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
+  const metaFile = fs.createReadStream(path.join(process.cwd(), 'package.json'));
 
   return { releaseFile, metaFile };
 };

@@ -38,17 +38,13 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
           // eslint-disable-next-line no-plusplus
           for (let i = 0; i < releases.length; i++) {
-            versions[releases[i].tag] = {
-              name: repoName,
-              version: releases[i].tag,
-              repository: '',
-              contributors: '',
-              bugs: '',
-              homepage: '',
-              dependencies: {},
-              dist: {
-                tarball: `https://gateway.valist.io/ipfs/${releases[i].releaseCID}`,
-              },
+            // fetch package.json from release meta
+            versions[releases[i].tag] = await valist.fetchJSONfromIPFS(releases[i].metaCID);
+            // explicitly overwrite these fields
+            versions[releases[i].tag].name = repoName;
+            versions[releases[i].tag].version = releases[i].tag;
+            versions[releases[i].tag].dist = {
+              tarball: `https://gateway.valist.io/ipfs/${releases[i].releaseCID}`
             };
           }
 
