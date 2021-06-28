@@ -1,83 +1,46 @@
-# Valist
+[![Logo](./assets/Logo.png)](https://valist.io)
 
-[![Deploy with Vercel](https://vercel.com/button)](https://vercel.com/new/git/external?repository-url=https%3A%2F%2Fgithub.com%2Fvalist-io%2Fvalist&env=WEB3_PROVIDER&envDescription=Enter%20a%20Web3%20HTTP%20Provider%20(can%20be%20an%20Infura%20Project%20URL))
+[![Discord](https://img.shields.io/discord/785535462311591976)](https://discord.com/channels/785535462311591976)
+[![Valist](https://img.shields.io/badge/valist-published-blue)](https://app.valist.io/valist)
 
-A software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized.
+A trustless universal package repository enabling you to digitally sign and distribute software in just a few steps.
 
-## Overview
+## Features
 
-We are building a secure, trustless software distribution system for both traditional and decentralized infrastructures. No need for expensive, complex, and centralized PKIs or manual code signing processes!
+Valist supports the following package types natively (with many more in the pipeline).
 
-We support the following package types with our API natively, with many more in the pipeline:
-
-* Any arbitrary binaries (software, firmware, you name it)
-
-* NPM packages (native `npm install` support)
-
-* Pip packages
-
-* Docker images
-
-The goal is to point **any** software distribution system at a Valist relay, which will ensure the integrity of the packages and act as a universal cache.
-
-You can think of it as a trustless Bintray, or a universal Verdaccio, but with far more powerful access control and data integrity features. This includes multi-factor releases (M of N keys need to sign on some firmware before release), as well as the ability to use any hardware wallet to sign code.
+* Binaries (software, firmware, you name it)
+* NPM (native `npm install` support)
+* Pip
+* Docker
 
 ## Documentation
 
-Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io)
+Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io).
 
-## Motivation
+## Packages
 
-Secure (and simplified) software updating is a common problem within IoT, traditional systems, and many cases now, dApps. Typically, it is necessary to roll your own upgrading solution, or be stuck with a centralized app store acceptance and delivery process. The former is ineffective, as constant re-implementation of a process that should be as secure as possible dramatically increases risk, while the latter is ineffective since you are tied to a central entity that manages your distribution on your behalf (i.e., requires permission).
+| Directory        | Description                   |
+| ---------------- | ----------------------------- |
+| [cli](./cli)     | Valist command line interface |
+| [eth](./eth)     | Ethereum smart contracts      |
+| [lib](./lib)     | Valist core library           |
+| [relay](./relay) | Valist relay application      |
 
-The idea is to leverage Ethereum, IPFS and/or Filecoin to create a public "base" layer for a simplified binary repository that both integrates with traditional systems and is built upon decentralized protocols. Smart contracts on Ethereum manage the latest source of truth for binary data stored in another layer such as IPFS and/or Filecoin. Clients can then query the software notary for the latest version of some software and be pointed to a verifiable, decentralized store.
+## Contributing
 
-Imagine the following scenario:
+We welcome pull requests and would love to support our early contributors with some awesome perks!
 
-* A developer wants to distribute a new firmware version for a hardware wallet (or some other arbitrary software) they have been building in a secure, verifiable way.
+Found a bug or have an idea for a feature? [Create an issue](https://github.com/valist-io/valist/issues/new).
 
-* Using a simple frontend, the developer registers their credentials (one or more public keys, perhaps leveraging ERC-725) to the software notary dApp. This can also be organization-level credentials, with individual developer/team access control.
+## Maintainers
 
-* The developer then signs the firmware with a private key associated with the public identity.
+[@awantoch](https://github.com/awantoch)
 
-* The developer uploads the firmware to the binary store (IPFS/Filecoin) using the simple frontend, and can set any relevant metadata such as version number, update notes, etc.
+[@jiyuu-jin](https://github.com/jiyuu-jin)
 
-* The registry (on Ethereum, and potentially other blockchains in the future) is updated with the latest verified version.
+[@nasdf](https://github.com/nasdf)
 
-* Clients with the software installed automatically detect the change and proceed to notify and/or trigger an auto-update.
+## License
 
-Here's a visual of what this flow looks like:
-
-![Signed Software Release Flow](docs/img/signed-release-flow.png)
-
-The primary goal for this software is to integrate with both traditional (centralized) and decentralized systems. Enterprises would benefit significantly from flexible notary systems just as much as future technologies.
-
-As for the open source community, the ability to securely host code in a decentralized way is essential. While it is possible to spin up say, a Debian mirror, it might not be as approachable or commonplace, and places the onus of security and maintenance on the contributor. A system like this could make it easy as possible for a contributor to simply "check a box" next to their favorite app/dApp and help bear the load, without having to worry as much about security or configuration.
-
-This is also a major use-case that could help folks see the tangible value of blockchain/decentralized protocols outside of monetary applications, as it can increase security in many existing systems.
-
-One of the main challenges with this project is providing different clients that require various levels of integrity checking. For example, one should be able to use cURL to fetch this data. This should serve most people's needs while adding lots of ancillary benefits. Common public mirrors can operate in the same fashion as many current systems, and users and enterprises will have the freedom to self-host and contribute storage to the public network, or create their own internal or private notaries.
-
-### Architecture Overview
-
-To start, we are providing a simple web frontend and HTTP relay that can be deployed locally or on a server, and a shared library that will be used in a future CLI (and other clients). The intent is to be CI/CD friendly in the future, enabling automatic publishing of cryptographically verifiable software.
-
-#### Current implementation
-
-So far, the current implementation of Valist looks like this:
-
-![Current Implementation](docs/img/current-implementation.png)
-
-### What's next
-
-* [x] Full-featured Web UI
-
-* [x] (Basic) Support for NPM registries
-
-* [x] CLI and CI/CD support
-
-* [ ] Filecoin Integration
-
-* [ ] Deployment tooling for Relays
-
-* [ ] Encryption Support
+Valist is licensed under the [Mozilla Public License Version 2.0](https://www.mozilla.org/en-US/MPL/2.0/).

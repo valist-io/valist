@@ -16,9 +16,7 @@ let config = {
     MAGIC_PUBKEY: "pk_test_54C6079CBEF87272",
     METATX_ENABLED: process.env.METATX_ENABLED || true,
   },
-  future: {
-    webpack5: true,
-  },
+  webpack5: true,
   webpack: function (config, options) {
     config.plugins.push(new options.webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }));
     return config;
