@@ -38,13 +38,13 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
           // eslint-disable-next-line no-plusplus
           for (let i = 0; i < releases.length; i++) {
-            // fetch package.json from release meta
-            versions[releases[i].tag] = await valist.fetchJSONfromIPFS(releases[i].metaCID);
-            // explicitly overwrite these fields
-            versions[releases[i].tag].name = repoName;
-            versions[releases[i].tag].version = releases[i].tag;
-            versions[releases[i].tag].dist = {
-              tarball: `https://gateway.valist.io/ipfs/${releases[i].releaseCID}`
+            const { tag, metaCID, releaseCID } = releases[i];
+            // eslint-disable-next-line no-await-in-loop
+            versions[tag] = await valist.fetchJSONfromIPFS(metaCID);
+            versions[tag].name = repoName;
+            versions[tag].version = tag;
+            versions[tag].dist = {
+              tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
             };
           }
 
