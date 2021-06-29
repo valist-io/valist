@@ -1,24 +1,8 @@
-import {
-  FunctionComponent, useEffect, useState, useContext,
-} from 'react';
-import ValistContext from '../Valist/ValistContext';
+import { FunctionComponent } from 'react';
+import useOrgAdmin from '../../hooks/useOrgAdmin';
 
 const IsOrgAdmin:FunctionComponent<any> = (props) => {
-  const valist = useContext(ValistContext);
-  const [isOrgAdmin, setIsOrgAdmin] = useState(false);
-
-  useEffect(() => {
-    (async () => {
-      if (valist && valist.defaultAccount !== '0x0') {
-        try {
-          setIsOrgAdmin(await valist.isOrgAdmin(props.orgName, valist.defaultAccount));
-        } catch (e) {
-          setIsOrgAdmin(false);
-        }
-      }
-    })();
-  }, [valist]);
-
+  const isOrgAdmin = useOrgAdmin(props.orgName);
   if (isOrgAdmin) {
     return props.children;
   }
