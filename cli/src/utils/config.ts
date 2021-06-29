@@ -9,7 +9,9 @@ export type ValistConfig = {
   tag: string,
   meta: string,
   type: 'binary' | 'npm',
-  artifact?: string,
+  image: string,
+  build: string,
+  artifact: string,
 };
 
 export const initValist = async (): Promise<Valist> => {

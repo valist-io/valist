@@ -1,36 +1,11 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import Valist from 'valist';
-import { initValist, parseValistConfig, ValistConfig } from './config';
-import { npmPack } from './npm';
+import { buildRelease } from './builds';
+import { initValist, parseValistConfig } from './config';
 
-const getBinary = async ({ artifact, meta }: ValistConfig) => {
-  if (!artifact) {
-    console.error('👻 No build artifact found!');
-    process.exit(1);
-  }
-
-  const releaseFile = fs.createReadStream(path.join(process.cwd(), artifact));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
-
-  return { releaseFile, metaFile };
-};
-
-const getNpmPackage = async ({ meta }: ValistConfig) => {
-  console.log('🛠  Packing NPM Package...');
-  const tarballName = await npmPack();
-  console.log('💼 Packed:', tarballName);
-
-  const releaseFile = fs.createReadStream(path.join(process.cwd(), tarballName));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
-
-  return { releaseFile, metaFile };
-};
-
-const getRelease = {
-  binary: getBinary,
-  npm: getNpmPackage,
-};
+// Store status of CI env-variable
+const isCI = process.env.CI;
 
 const releaseExists = async (valist: Valist, org: string, project: string, tag: string) => {
   const { releaseCID } = await valist.getReleaseByTag(org, project, tag);
@@ -41,18 +16,36 @@ const releaseExists = async (valist: Valist, org: string, project: string, tag: 
 };
 
 export const publish = async () => {
+  // Placeholder for release file path
+  let releaseFile;
+
+  // Create a new valist instance and connect
   const valist = await initValist();
 
+  // Get current config from valist.yml
   const config = parseValistConfig();
 
-  const { org, project, tag } = config;
+  // Get org, project, tag, artifact, meta from config
+  const {
+    org, project, tag, artifact, meta,
+  } = config;
 
+  // Check if release exists
   if (await releaseExists(valist, org, project, tag)) {
     console.log('✅ Release already exists, skipping publish');
     process.exit(0);
   }
 
-  const { releaseFile, metaFile } = await getRelease[config.type](config);
+  // Check if environment is CI/CD and artifact exists
+  if (isCI && artifact) {
+    // Read artifact and metadata from disk
+    releaseFile = fs.createReadStream(path.join(process.cwd(), artifact));
+  } else {
+    // Call buildRelease with project type (npm, binary, etc) to return artifact path
+    releaseFile = await buildRelease(config);
+  }
+
+  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
 
   console.log('🪐 Preparing release on IPFS...');
   const releaseObject = await valist.prepareRelease(tag, releaseFile, metaFile);
