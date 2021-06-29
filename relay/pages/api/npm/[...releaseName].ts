@@ -1,14 +1,17 @@
 import { NextApiRequest, NextApiResponse } from 'next';
+import getConfig from 'next/config';
 import Valist from 'valist';
 import { Web3Providers } from 'valist/dist/utils';
 
 export default async function getReleasesFromRepo(req: NextApiRequest, res: NextApiResponse) {
   console.log('Pulling package list');
 
+  const { publicRuntimeConfig } = getConfig();
+
   // set .env.local to your local chain or set in production deployment
-  if (process.env.WEB3_PROVIDER) {
+  if (publicRuntimeConfig.WEB3_PROVIDER) {
     const valist = new Valist({
-      web3Provider: new Web3Providers.HttpProvider(process.env.WEB3_PROVIDER),
+      web3Provider: new Web3Providers.HttpProvider(publicRuntimeConfig.WEB3_PROVIDER),
       metaTx: false,
     });
     await valist.connect();
@@ -39,16 +42,17 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
           // eslint-disable-next-line no-plusplus
           for (let i = 0; i < releases.length; i++) {
             const { tag, metaCID, releaseCID } = releases[i];
-            // eslint-disable-next-line no-await-in-loop
-            const meta = await valist.fetchJSONfromIPFS(metaCID);
-            // overwrite name, version, dist with valist info
-            versions[tag] = {
-              ...meta,
-              name: repoName,
-              version: tag,
-              dist: {
-                tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
-              },
+            try {
+              // eslint-disable-next-line no-await-in-loop
+              versions[tag] = await valist.fetchJSONfromIPFS(metaCID);
+            } catch (e) {
+              versions[tag] = {};
+            }
+
+            versions[tag].name = repoName;
+            versions[tag].version = tag;
+            versions[tag].dist = {
+              tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
             };
           }
 
