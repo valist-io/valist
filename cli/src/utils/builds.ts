@@ -1,11 +1,15 @@
 import * as fs from 'fs';
+import * as path from 'path';
 import { createImage, runBuild } from 'reproducible';
 import { ValistConfig } from './config';
 
-const sleep = (time: any) => new Promise((resolve) => setTimeout(resolve, time));
-
-export const generateDockerfile = (baseImage: string,
-  source: string, projectType: string, buildCommand?: string, installCommand?: string) => {
+export const generateDockerfile = (
+  baseImage: string,
+  source: string,
+  projectType: string,
+  buildCommand?: string,
+  installCommand?: string,
+) => {
   let dockerfile = `FROM ${baseImage}
 WORKDIR /opt/build/${source}
 COPY ./${source} ./`;
@@ -25,9 +29,7 @@ COPY ./${source} ./`;
   return dockerfile;
 };
 
-export const buildRelease = async ({
-  image, build, type,
-}: ValistConfig) => {
+export const buildRelease = async ({ image, build, type }: ValistConfig) => {
   const dockerfile = generateDockerfile(image, 'src', type, build);
 
   fs.writeFile('Dockerfile', dockerfile, async (err: any) => {
@@ -37,14 +39,11 @@ export const buildRelease = async ({
   await createImage('build-image');
   await runBuild({
     image: 'build-image',
-    outputPath: `${process.cwd()}/dist`,
+    outputPath: path.join(process.cwd(), '/dist/'),
     artifacts: ['main'],
   });
 
-  // hack-y fix (needs refactor)
-  await sleep(5000);
-
-  const releaseFile = fs.createReadStream(`${process.cwd()}/dist/main`);
+  const releaseFile = fs.createReadStream(path.join(process.cwd(), '/dist/main'));
 
   return releaseFile;
 };
