@@ -71,11 +71,11 @@ contract Valist is BaseRelayRecipient {
   }
 
   // incrementing orgNumber used for assigning unique IDs to organizations
-  // this also prevents hash collision attacks on mapping selectors across orgs/repos
+  // this + chainID also prevents hash collision attacks on mapping selectors across orgs/repos
   uint public orgCount;
 
   // list of unique orgIDs
-  // keccak256(abi.encodePacked(++orgCount))[]
+  // keccak256(abi.encodePacked(++orgCount, block.chainid))[]
   bytes32[] public orgIDs;
 
   // list of unique orgNames
@@ -132,8 +132,15 @@ contract Valist is BaseRelayRecipient {
     _;
   }
 
-  event PendingReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string releaseCID, string metaCID);
-  event ReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string releaseCID, string metaCID);
+  event MetaUpdate(bytes32 _orgID, string _repoName, address _signer, string _metaCID);
+
+  event VoteReleaseEvent(bytes32 _orgID, string _repoName, address _signer, string _tag, string _releaseCID, string _metaCID);
+
+  event VoteThresholdEvent(bytes32 _orgID, string _repoName, address _signer, uint _threshold);
+
+  event VoteKeyEvent(bytes32 _orgID, string _repoName, address _signer, bytes32 _operation, address _key);
+
+  event ReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string _releaseCID, string _metaCID);
 
   // check if user has orgAdmin role
   function isOrgAdmin(bytes32 _orgID, address _address) public view returns (bool) {
@@ -153,7 +160,7 @@ contract Valist is BaseRelayRecipient {
     require(bytes(_orgName).length > 0, "No orgName");
     require(bytes(_orgMeta).length > 0, "No orgMeta");
     // generate new orgID by incrementing and hashing orgCount
-    bytes32 orgID = keccak256(abi.encodePacked(++orgCount));
+    bytes32 orgID = keccak256(abi.encodePacked(++orgCount, block.chainid));
     // map orgName to orgID
     orgIDByName[_orgName] = orgID;
     // set Organization ID and metadata
@@ -211,13 +218,15 @@ contract Valist is BaseRelayRecipient {
         pendingVotes[pendingReleaseSelector].signers.add(_msgSender());
         // push PendingRelease to pendingReleaseRequests for clients to see
         pendingReleaseRequests[repoSelector].push(PendingRelease(_tag, _releaseCID, _metaCID));
-        // fire PendingReleaseEvent to notify live clients
-        emit PendingReleaseEvent(_orgID, _repoName, _tag, _releaseCID, _metaCID);
+        // fire VoteReleaseEvent to notify live clients
+        emit VoteReleaseEvent(_orgID, _repoName, _msgSender(), _tag, _releaseCID, _metaCID);
       } else {
         require(block.timestamp <= pendingVotes[pendingReleaseSelector].expiration, "Expired");
         require(!pendingVotes[pendingReleaseSelector].signers.contains(_msgSender()), "User voted");
         // add user to list of signers
         pendingVotes[pendingReleaseSelector].signers.add(_msgSender());
+        // fire VoteReleaseEvent to notify live clients
+        emit VoteReleaseEvent(_orgID, _repoName, _msgSender(), _tag, _releaseCID, _metaCID);
         // clean up any revoked keys
         for (uint i = 0; i < pendingVotes[pendingReleaseSelector].signers.length(); ++i) {
           if (!isRepoDev(_orgID, _repoName, pendingVotes[pendingReleaseSelector].signers.at(i))) {
@@ -245,10 +254,12 @@ contract Valist is BaseRelayRecipient {
 
   function setOrgMeta(bytes32 _orgID, string memory _metaCID) public orgAdmin(_orgID) {
     orgs[_orgID].metaCID = _metaCID;
+    emit MetaUpdate(_orgID, "", _msgSender(), _metaCID);
   }
 
   function setRepoMeta(bytes32 _orgID, string memory _repoName, string memory _metaCID) public orgAdmin(_orgID) {
     repos[keccak256(abi.encodePacked(_orgID, _repoName))].metaCID = _metaCID;
+    emit MetaUpdate(_orgID, _repoName, _msgSender(), _metaCID);
   }
 
   function voteKey(bytes32 _orgID, string memory _repoName, bytes32 _operation, address _key) public repoDev(_orgID, _repoName) {
@@ -331,6 +342,7 @@ contract Valist is BaseRelayRecipient {
         // client needs to now call clearPendingRepoKey
       }
     }
+    emit VoteKeyEvent(_orgID, _repoName, _msgSender(), _operation, _key);
   }
 
   function voteThreshold(bytes32 _orgID, string memory _repoName, uint _threshold) public repoDev(_orgID, _repoName) {
@@ -391,6 +403,7 @@ contract Valist is BaseRelayRecipient {
       repos[repoSelector].thresholdDate = block.timestamp;
       // client needs to now call clearPendingRepoThreshold
     }
+    emit VoteThresholdEvent(_orgID, _repoName, _msgSender(), _threshold);
   }
 
   function clearPendingRelease(
@@ -481,7 +494,7 @@ contract Valist is BaseRelayRecipient {
       limit = orgNames.length;
     }
     string[] memory _orgNames = new string[](_resultsPerPage);
-    for (i; i < limit; i++) {
+    for (i; i < limit; ++i) {
       _orgNames[i] = orgNames[i];
     }
     return _orgNames;
@@ -489,7 +502,7 @@ contract Valist is BaseRelayRecipient {
 
   function getPendingVotes(bytes32 _selector) public view returns (uint, address[] memory) {
     address[] memory signers = new address[](pendingVotes[_selector].signers.length());
-    for (uint i = 0; i < pendingVotes[_selector].signers.length(); i++) {
+    for (uint i = 0; i < pendingVotes[_selector].signers.length(); ++i) {
       signers[i] = pendingVotes[_selector].signers.at(i);
     }
     return (pendingVotes[_selector].expiration, signers);
@@ -497,7 +510,7 @@ contract Valist is BaseRelayRecipient {
 
   function getRoleMembers(bytes32 _selector) public view returns (address[] memory) {
     address[] memory members = new address[](roles[_selector].length());
-    for (uint i = 0; i < roles[_selector].length(); i++) {
+    for (uint i = 0; i < roles[_selector].length(); ++i) {
       members[i] = roles[_selector].at(i);
     }
     return members;

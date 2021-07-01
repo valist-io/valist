@@ -2,12 +2,11 @@
   "name": "valist-hardhat",
   "version": "1.0.0",
   "description": "",
-  "main": "index.js",
   "scripts": {
     "test": "hardhat test"
   },
   "author": "Zachary Pelkey, Alec Wantoch",
-  "license": "ISC",
+  "license": "MPL",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",

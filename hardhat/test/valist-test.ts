@@ -6,6 +6,7 @@ import { release } from 'os';
 describe('Valist Contract', () => {
   let valist: any;
   let accounts: Signer[];
+  // const { chainId } = await ethers.provider.getNetwork();
 
   const ADD_KEY = ethers.utils.keccak256(ethers.utils.solidityPack(['string'], ['ADD_KEY_OPERATION']));
   const REVOKE_KEY = ethers.utils.keccak256(ethers.utils.solidityPack(['string'], ['REVOKE_KEY_OPERATION']));
@@ -16,7 +17,7 @@ describe('Valist Contract', () => {
   const releaseCID = 'bafybeig5g7gpjxl5mmkufdkf4amj4ttmy4eni5ghgi4huw5w57s6e3cf6y';
   const metaCID = 'bafybeigmfwlweiecbubdw4lq6uqngsioqepntcfohvrccr2o5f7flgydme';
 
-  let orgID = ethers.utils.keccak256(ethers.utils.solidityPack(['uint'], [1]));
+  let orgID = ethers.utils.keccak256(ethers.utils.solidityPack(['uint', 'uint'], [1, 31337]));
   let repoSelector = ethers.utils.keccak256(ethers.utils.solidityPack(['bytes32', 'string'], [orgID, repoName]));
 
   before(async () => {
@@ -37,7 +38,7 @@ describe('Valist Contract', () => {
     });
 
     it('Org ID should be generated using keccak256(++orgCount)', async () => {
-      const expectedOrgID = ethers.utils.keccak256(ethers.utils.solidityPack(['uint'], [await valist.orgCount()]));
+      const expectedOrgID = ethers.utils.keccak256(ethers.utils.solidityPack(['uint', 'uint'], [await valist.orgCount(), 31337]));
       expect(orgID).to.equal(expectedOrgID);
     });
 
@@ -65,7 +66,7 @@ describe('Valist Contract', () => {
 
     it('Should publish a release under testOrg/testRepo', async () => {
       const releaseSelector = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(['bytes32', 'string', 'string'],[orgID, repoName, '0.0.0'])
+        ethers.utils.defaultAbiCoder.encode(['bytes32', 'string', 'string'], [orgID, repoName, '0.0.0'])
       );
       await valist.voteRelease(
         orgID,
@@ -81,7 +82,7 @@ describe('Valist Contract', () => {
 
     it('Should fetch release using releaseSelector', async () => {
       const releaseSelector = ethers.utils.keccak256(
-        ethers.utils.defaultAbiCoder.encode(['bytes32', 'string', 'string'],[orgID, repoName, '0.0.0'])
+        ethers.utils.defaultAbiCoder.encode(['bytes32', 'string', 'string'], [orgID, repoName, '0.0.0'])
       );
       const release = await valist.releases(releaseSelector);
       expect(release.releaseCID).to.equal(releaseCID);
@@ -217,7 +218,7 @@ describe('Valist Contract', () => {
     });
 
     it('Should get number of orgs', async () => {
-      expect(Number(await valist.orgCount())).to.equal(1);
+      expect(await valist.orgCount()).to.equal(1);
     });
   });
 });
