@@ -59,7 +59,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
         });
       }
     } catch (e) {
-      console.error('Could not find', cleanReleaseName,'on Valist', e);
+      console.error('Could not find', cleanReleaseName, 'on Valist', e);
     }
   }
   console.log(`Fetching Package ${cleanReleaseName} from https://registry.npmjs.org`);
