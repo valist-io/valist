@@ -41,7 +41,8 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
           } catch (e) {
             // noop
           }
-          versions[tag]._id= `${cleanReleaseName}@${tag}`
+          // eslint-disable-next-line no-underscore-dangle
+          versions[tag]._id = `${cleanReleaseName}@${tag}`;
           versions[tag].name = cleanReleaseName;
           versions[tag].version = tag;
           versions[tag].dist = {
