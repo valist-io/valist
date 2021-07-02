@@ -41,10 +41,10 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
           } catch (e) {
             // noop
           }
-          versions[tag]['_id'] = `${cleanReleaseName}@${tag}`
-          versions[tag]['name'] = cleanReleaseName;
-          versions[tag]['version'] = tag;
-          versions[tag]['dist'] = {
+          versions[tag]._id= `${cleanReleaseName}@${tag}`
+          versions[tag].name = cleanReleaseName;
+          versions[tag].version = tag;
+          versions[tag].dist = {
             tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
           };
         }
