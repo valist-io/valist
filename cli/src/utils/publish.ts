@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Valist from 'valist';
+import Valist from '@valist/sdk';
 import { initValist, parseValistConfig, ValistConfig } from './config';
 import { npmPack } from './npm';
 
@@ -16,13 +16,13 @@ const getBinary = async ({ artifact, meta }: ValistConfig) => {
   return { releaseFile, metaFile };
 };
 
-const getNpmPackage = async ({ meta }: ValistConfig) => {
+const getNpmPackage = async () => {
   console.log('🛠  Packing NPM Package...');
   const tarballName = await npmPack();
   console.log('💼 Packed:', tarballName);
 
   const releaseFile = fs.createReadStream(path.join(process.cwd(), tarballName));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
+  const metaFile = fs.createReadStream(path.join(process.cwd(), 'package.json'));
 
   return { releaseFile, metaFile };
 };

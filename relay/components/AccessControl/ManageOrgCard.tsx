@@ -2,6 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
+import useOrgAdmin from '../../hooks/useOrgAdmin';
 
 const OrgAccessCardListItem = ({ address }: { address: string }) => (
   <li className="py-4">
@@ -22,6 +23,7 @@ const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
   const valist = useContext(ValistContext);
   const [orgAdmins, setOrgAdmins] = useState(['0x0']);
   const [orgOwners, setOrgOwners] = useState(['0x0']);
+  const isOrgAdmin = useOrgAdmin(orgName);
 
   const updateData = async () => {
     if (valist) {
@@ -64,7 +66,7 @@ const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
               <a className="w-full flex justify-center items-center px-4 py-2 border
               border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
               bg-white hover:bg-gray-50">
-                View all
+                { isOrgAdmin ? 'Manage access' : 'View all' }
               </a>
             </Link>
           </div>
