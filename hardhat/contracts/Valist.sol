@@ -286,6 +286,9 @@ contract Valist is BaseRelayRecipient {
     }
     // allow self-serve key rotation
     if (_operation == ROTATE_KEY) {
+      // double check role -- if _msgSender() is an orgAdmin, just relying on the repoDev modifier would allow
+      // this function to bypass the threshold and would add the new key and keep the old key
+      require(roles[roleSelector].contains(_msgSender()), "Denied");
       roles[roleSelector].remove(_msgSender());
       roles[roleSelector].add(_key);
     } else if (
@@ -514,6 +517,18 @@ contract Valist is BaseRelayRecipient {
       members[i] = roles[_selector].at(i);
     }
     return members;
+  }
+
+  function getPendingReleaseCount(bytes32 _selector) public view returns (uint) {
+    return pendingReleaseRequests[_selector].length;
+  }
+
+  function getRoleRequestCount(bytes32 _selector) public view returns (uint) {
+    return pendingRoleRequests[_selector].length;
+  }
+
+  function getThresholdRequestCount(bytes32 _selector) public view returns (uint) {
+    return pendingThresholdRequests[_selector].length;
   }
 
 }
