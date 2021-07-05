@@ -22,7 +22,7 @@
     "@truffle/hdwallet-provider": "^1.4.0",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
-    "reproducible": "0.0.3-rc.2",
+    "reproducible": "0.0.3-rc.4",
     "valist": "file:../lib",
     "yargs": "^16.2.0"
   },

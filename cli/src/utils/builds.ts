@@ -1,49 +1,33 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import { createImage, runBuild } from 'reproducible';
+import { createBuild, exportBuild, generateDockerfile } from 'reproducible';
 import { ValistConfig } from './config';
+import { npmPack } from './npm';
 
-export const generateDockerfile = (
-  baseImage: string,
-  source: string,
-  projectType: string,
-  buildCommand?: string,
-  installCommand?: string,
-) => {
-  let dockerfile = `FROM ${baseImage}
-WORKDIR /opt/build/${source}
-COPY ./${source} ./`;
+export const buildRelease = async ({
+  image, build, out, type,
+}: ValistConfig) => {
+  let outPath = out;
+  let releaseFile;
 
-  if (installCommand) {
-    dockerfile += `\nRUN ${installCommand}`;
+  // Generate Dockerfile (uses current directory as source)
+  generateDockerfile(image, './', build);
+
+  if (type !== 'npm') {
+    // if out path is a file, cut file from mount path/get parent directory
+    outPath = path.basename(path.dirname(out));
   }
 
-  if (buildCommand) {
-    dockerfile += `\nRUN ${buildCommand}`;
+  await createBuild('valist-build-image');
+  await exportBuild('valist-build-image', outPath);
+
+  // if package type is npm run npm pack
+  if (type === 'npm') {
+    const packagePath = await npmPack();
+    releaseFile = fs.createReadStream(packagePath);
+  } else {
+    releaseFile = fs.createReadStream(path.join(process.cwd(), out));
   }
-
-  if (projectType === 'npm') {
-    dockerfile += '\nRUN npm pack';
-  }
-
-  return dockerfile;
-};
-
-export const buildRelease = async ({ image, build, type }: ValistConfig) => {
-  const dockerfile = generateDockerfile(image, 'src', type, build);
-
-  fs.writeFile('Dockerfile', dockerfile, async (err: any) => {
-    if (err) throw err;
-  });
-
-  await createImage('build-image');
-  await runBuild({
-    image: 'build-image',
-    outputPath: path.join(process.cwd(), '/dist/'),
-    artifacts: ['main'],
-  });
-
-  const releaseFile = fs.createReadStream(path.join(process.cwd(), '/dist/main'));
 
   return releaseFile;
 };

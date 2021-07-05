@@ -11,7 +11,7 @@ export type ValistConfig = {
   type: 'binary' | 'npm',
   image: string,
   build: string,
-  artifact: string,
+  out: string,
 };
 
 export const initValist = async (): Promise<Valist> => {

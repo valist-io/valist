@@ -27,7 +27,7 @@ export const publish = async () => {
 
   // Get org, project, tag, artifact, meta from config
   const {
-    org, project, tag, artifact, meta,
+    org, project, tag, out, meta,
   } = config;
 
   // Check if release exists
@@ -37,9 +37,9 @@ export const publish = async () => {
   }
 
   // Check if environment is CI/CD and artifact exists
-  if (isCI && artifact) {
+  if (isCI && out) {
     // Read artifact and metadata from disk
-    releaseFile = fs.createReadStream(path.join(process.cwd(), artifact));
+    releaseFile = fs.createReadStream(path.join(process.cwd(), out));
   } else {
     // Call buildRelease with project type (npm, binary, etc) to return artifact path
     releaseFile = await buildRelease(config);
