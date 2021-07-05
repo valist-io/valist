@@ -1,7 +1,16 @@
-import keytar from 'keytar';
 import { randomBytes } from 'crypto';
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
+
+let keytar: any;
+if (process.env.CI) {
+  if (!process.env.VALIST_SIGNER_KEY) {
+    throw new Error('VALIST_SIGNER_KEY needed in CI environment');
+  }
+} else {
+  // eslint-disable-next-line global-require
+  keytar = require('keytar');
+}
 
 export const getSignerKey = async (): Promise<string> => {
   const key = process.env.VALIST_SIGNER_KEY || await keytar.getPassword('VALIST', 'SIGNER');
