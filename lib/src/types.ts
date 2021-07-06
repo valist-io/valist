@@ -1,9 +1,13 @@
-export type ProjectType = 'binary' | 'npm' | 'pip' | 'docker';
+export type OrgID = string;
+
+export type OrgName = string;
 
 export type OrgMeta = {
   name: string,
   description: string
 };
+
+export type ProjectType = 'binary' | 'npm' | 'pip' | 'docker';
 
 export type RepoMeta = {
   name: string,
@@ -13,8 +17,68 @@ export type RepoMeta = {
   repository: string
 };
 
-export type Release = {
-  releaseCID: string,
+export type Organization = {
+  // organization ID
+  orgID: OrgID,
+  // multi-party threshold
+  threshold: number,
+  // date threshold was set
+  thresholdDate: number,
+  // parsed JSON from metaCID
+  meta: OrgMeta,
+  // metadata CID
   metaCID: string,
-  tag: string
+  // list of repo names
+  repoNames: string[]
+};
+
+export type Repository = {
+  // organization ID
+  orgID: OrgID,
+  // multi-party threshold
+  threshold: number,
+  // date threshold was set
+  thresholdDate: number,
+  // parsed JSON from metaCID
+  meta: RepoMeta,
+  // metadata CID
+  metaCID: string,
+  // list of release tags
+  tags: string[]
+};
+
+export type Release = {
+  // release tag/version
+  tag: string,
+  // release artifact
+  releaseCID: string,
+  // release metadata
+  metaCID: string,
+  // finalized release signers
+  signers?: string[],
+};
+
+export type PendingVote = {
+  // expiration date of vote
+  expiration: string,
+  // signers that have voted on this release
+  signers: string[]
+};
+
+export type PendingRelease = {
+  // proposed tag
+  tag: string,
+  // release artifact
+  releaseCID: string,
+  // release metadata
+  metaCID: string,
+  // pending vote
+  pendingVote?: PendingVote
+};
+
+export type ValistCache = {
+  orgIDs: OrgID[],
+  orgNames: OrgName[],
+  orgs: Record<OrgID, Organization>,
+  // repos: Record<OrgID, Record<string, Repository>>,
 };
