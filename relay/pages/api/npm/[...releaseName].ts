@@ -23,7 +23,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
 
   if (orgName && repoName) {
     try {
-      const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
+      const releases = await valist.getReleases(orgName.toString(), repoName.toString());
       if (Array.isArray(releases) && releases.length >= 1) {
         const latestTag = releases[releases.length - 1].tag;
         const versions: any = {};

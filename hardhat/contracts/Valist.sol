@@ -429,7 +429,7 @@ contract Valist is BaseRelayRecipient {
   }
 
   function clearPendingKey(bytes32 _orgID, string memory _repoName, bytes32 _operation, address _key, uint _requestIndex) public repoDev(_orgID, _repoName) {
-    require(_operation == ADD_KEY || _operation == REVOKE_KEY || _operation == ROTATE_KEY, "Invalid op");
+    require(_operation == ADD_KEY || _operation == REVOKE_KEY, "Invalid op");
     bytes32 voteSelector;
     bytes32 requestSelector;
     bytes32 timestampSelector = keccak256(abi.encodePacked(_orgID, _repoName, _key));
@@ -447,7 +447,7 @@ contract Valist is BaseRelayRecipient {
     );
     require(pendingRoleRequests[requestSelector][_requestIndex] == _key, "Wrong key");
     // remove all pending votes
-    for (uint i = 0; i < pendingVotes[voteSelector].signers.length(); ++i) {
+    while(pendingVotes[voteSelector].signers.length() > 0) {
       pendingVotes[voteSelector].signers.remove(pendingVotes[voteSelector].signers.at(0));
     }
     pendingVotes[voteSelector].expiration = 0;
@@ -473,7 +473,7 @@ contract Valist is BaseRelayRecipient {
       "Not expired"
     );
     // remove all pending votes
-    for (uint i = 0; i < pendingVotes[voteSelector].signers.length(); ++i) {
+    while (pendingVotes[voteSelector].signers.length() > 0) {
       pendingVotes[voteSelector].signers.remove(pendingVotes[voteSelector].signers.at(0));
     }
     pendingVotes[voteSelector].expiration = 0;

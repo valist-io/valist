@@ -13,7 +13,7 @@ export default function useRepoDev(orgName: string, repoName: string) {
 
   useEffect(() => {
     (async () => {
-      if (valist && valist.defaultAccount !== '0x0') {
+      if (valist && valist.defaultAccount !== '0x0' && orgName && repoName) {
         try {
           setIsRepoDev(await valist.isRepoDev(orgName, repoName, valist.defaultAccount));
         } catch (e) {

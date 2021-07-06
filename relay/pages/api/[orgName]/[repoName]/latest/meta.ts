@@ -18,7 +18,7 @@ export default async function getLatestReleaseMeta(req: NextApiRequest, res: Nex
       query: { orgName, repoName },
     } = req;
 
-    const latestRelease = await valist.getLatestReleaseFromRepo(orgName.toString(), repoName.toString());
+    const latestRelease = await valist.getLatestRelease(orgName.toString(), repoName.toString());
 
     if (latestRelease) {
       // return res.status(200).json({releaseMeta});
