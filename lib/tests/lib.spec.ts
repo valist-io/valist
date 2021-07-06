@@ -2,6 +2,7 @@ import Web3 from 'web3';
 import { expect } from 'chai';
 import { describe, before, it } from 'mocha';
 import Valist from '../dist/';
+import { ADD_KEY } from '../dist/constants';
 import { getContractInstance } from '../src/utils';
 
 import ValistABI from '../src/abis/contracts/Valist.sol/Valist.json';
@@ -192,6 +193,125 @@ describe('Test Valist Lib', async () => {
       expect(resp.releaseCID).to.equal(release.releaseCID);
       expect(resp.metaCID).to.equal(release.metaCID);
       expect(resp.tag).to.equal(release.tag);
+    });
+  });
+
+  describe('Multi-Factor Setup', async () => {
+    it('Should add key2 as repoDev', async () => {
+      await valist.voteRepoDev(orgShortName, repoName, accounts[1]);
+    });
+
+    it('Should add key3 as repoDev', async () => {
+      await valist.voteRepoDev(orgShortName, repoName, accounts[2]);
+    });
+
+    it('Should vote for repo threshold', async () => {
+      await valist.voteRepoThreshold(orgShortName, repoName, 2);
+    });
+
+    it('Should fail to vote for repo threshold twice with same key', async () => {
+      try {
+        await valist.voteRepoThreshold(orgShortName, repoName, 2);
+      } catch (e) {
+        expect(e.message).to.contain('User voted');
+      }
+    });
+
+    it('Should fetch pending repo threshold requests', async () => {
+      const requests = await valist.getPendingRepoThresholds(orgShortName, repoName);
+      expect(requests[0]).to.equal(2);
+    });
+
+    it('Should vote for repo threshold with key2', async () => {
+      valist.defaultAccount = accounts[1];
+      await valist.voteRepoThreshold(orgShortName, repoName, 2);
+      valist.defaultAccount = accounts[0];
+    });
+
+    it('Vote should pass and repo threshold set', async () => {
+      const repo = await valist.getRepository(orgShortName, repoName);
+      expect(repo.threshold).to.equal(2);
+    });
+
+    it('Should clear pending repo threshold', async () => {
+      await valist.clearPendingRepoThreshold(orgShortName, repoName, 2, 0);
+      const requests = await valist.getPendingRepoThresholds(orgShortName, repoName);
+      const pendingVote = await valist.getPendingRepoThresholdVotes(orgShortName, repoName, 2);
+      expect(requests.length).to.equal(0);
+      expect(Number(pendingVote.expiration)).to.equal(0);
+      expect(pendingVote.signers.length).to.equal(0);
+    });
+
+    it('Should vote to add key4 as a repoDev from key1', async () => {
+      await valist.voteRepoDev(orgShortName, repoName, accounts[3]);
+    });
+
+    it('Should fetch pending repo dev key', async () => {
+      const pendingRepoDevs = await valist.getPendingRepoDevs(orgShortName, repoName);
+      expect(pendingRepoDevs[0]).to.equal(accounts[3]);
+    });
+
+    it('Should fetch pending repo dev votes for key4', async () => {
+      const pendingVote = await valist.getPendingRepoDevVotes(orgShortName, repoName, ADD_KEY, accounts[3]);
+      expect(pendingVote.signers[0]).to.equal(accounts[0]);
+    });
+
+    it('Should vote to add key4 as a repoDev from key2', async () => {
+      valist.defaultAccount = accounts[1];
+      await valist.voteRepoDev(orgShortName, repoName, accounts[3]);
+      valist.defaultAccount = accounts[0];
+    });
+
+    it('Vote should pass and key4 should be repoDev', async () => {
+      const isRepoDev = await valist.isRepoDev(orgShortName, repoName, accounts[3]);
+      expect(isRepoDev).to.be.true;
+    });
+
+    it('Should clear pending repoDev key', async () => {
+      await valist.clearPendingRepoKey(orgShortName, repoName, ADD_KEY, accounts[3], 0);
+      const pendingVote = await valist.getPendingRepoDevVotes(orgShortName, repoName, ADD_KEY, accounts[3]);
+      const pendingRepoDevs = await valist.getPendingRepoDevs(orgShortName, repoName);
+      expect(pendingRepoDevs.length).to.equal(0);
+      expect(Number(pendingVote.expiration)).to.equal(0);
+      expect(pendingVote.signers.length).to.equal(0);
+    });
+  });
+
+  describe('Multi-Factor Release', async () => {
+    it('Should propose new release', async () => {
+      release.tag = '0.0.2';
+      const transactionResponse = await valist.publishRelease(orgShortName, repoName, release);
+      expect(transactionResponse).to.have.property('transactionHash');
+      expect(transactionResponse).to.have.property('blockHash');
+      expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should fetch pending release requests', async () => {
+      const pendingReleases = await valist.getPendingReleases(orgShortName, repoName);
+      expect(pendingReleases[0].tag).to.equal(release.tag);
+      expect(pendingReleases[0].releaseCID).to.equal(release.releaseCID);
+      expect(pendingReleases[0].metaCID).to.equal(release.metaCID);
+    });
+
+    it('Should fetch pending release votes', async () => {
+      const pendingVote = await valist.getPendingReleaseVotes(orgShortName, repoName, release);
+      expect(Number(pendingVote.expiration)).to.be.greaterThan(0);
+      expect(pendingVote.signers[0]).to.equal(accounts[0]);
+    });
+
+    it('Should finalize vote on new release', async () => {
+      valist.defaultAccount = accounts[1];
+      const transactionResponse = await valist.publishRelease(orgShortName, repoName, release);
+      valist.defaultAccount = accounts[0];
+      expect(transactionResponse).to.have.property('transactionHash');
+      expect(transactionResponse).to.have.property('blockHash');
+      expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should clear pending release', async () => {
+      await valist.clearPendingRelease(orgShortName, repoName, release, 0);
+      const pendingReleases = await valist.getPendingReleases(orgShortName, repoName);
+      expect(pendingReleases.length).to.equal(0);
     });
   });
 
