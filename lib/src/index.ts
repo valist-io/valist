@@ -1,24 +1,40 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
 import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
-// @ts-ignore mexa doesn't support typescript yet
-import Biconomy from '@biconomy/mexa';
 
 import { provider } from 'web3-core/types';
 
 import * as sigUtil from 'eth-sig-util';
 
-import { OrgMeta, Release, RepoMeta } from './types';
+// @ts-ignore mexa doesn't support typescript yet
+import { Biconomy } from '@biconomy/mexa';
+
 import {
-  domainData,
-  domainType,
-  getSignatureParameters,
+  Organization,
+  OrgID,
+  OrgMeta,
+  Release,
+  RepoMeta,
+  Repository,
+  ValistCache,
+} from './types';
+
+import {
+  ADD_KEY,
+  REVOKE_KEY,
+  ROTATE_KEY,
+  ORG_ADMIN,
+  REPO_DEV,
+} from './constants';
+
+import {
   getValistContract,
-  metaTransactionType,
   shortnameFilterRegex,
 } from './utils';
 
 // node-fetch polyfill
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require('node-fetch');
 
 if (!globalThis.fetch) {
@@ -27,7 +43,7 @@ if (!globalThis.fetch) {
 class Valist {
   web3: Web3;
 
-  valist: any;
+  contract: any;
 
   ipfs: any;
 
@@ -37,11 +53,13 @@ class Valist {
 
   defaultAccount: string;
 
-  metaTxEnabled: boolean = false;
+  metaTxEnabled = false;
 
-  metaTxReady: boolean = false;
+  metaTxReady = false;
 
   contractAddress: string | undefined;
+
+  cache: ValistCache;
 
   constructor({
     web3Provider,
@@ -76,12 +94,19 @@ class Valist {
     this.defaultAccount = '0x0';
     this.ipfs = ipfsClient(ipfsHost);
     this.contractAddress = contractAddress;
+    this.cache = {
+      orgIDs: [],
+      orgNames: [],
+      orgs: {},
+    };
   }
 
   // initialize main valist contract instance for future calls
-  async connect(waitForMetaTx?: boolean) {
+  async connect(waitForMetaTx?: boolean): Promise<void> {
     try {
-      this.valist = await getValistContract(this.web3, this.contractAddress);
+      this.contract = await getValistContract(this.web3, this.contractAddress);
+      // eslint-disable-next-line no-underscore-dangle
+      this.contractAddress = this.contract._address;
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -107,18 +132,48 @@ class Valist {
     }
   }
 
-  // returns organization meta and release tags
-  async getOrganization(orgName: string) {
+  async getOrgIDFromName(orgName: string): Promise<OrgID> {
     try {
-      const org = await this.valist.methods.getOrganization(orgName).call();
+      if (!this.cache.orgs[orgName]) {
+        this.cache.orgs[orgName] = {
+          orgID: await this.contract.methods.orgIDByName(orgName).call(),
+          threshold: 0,
+          thresholdDate: 0,
+          meta: {
+            name: '',
+            description: '',
+          },
+          metaCID: '',
+          repoNames: [],
+        };
+      }
+      return this.cache.orgs[orgName].orgID;
+    } catch (e) {
+      const msg = 'Could not get organization ID';
+      console.error(msg, e);
+      throw e;
+    }
+  }
 
-      let json: any = {};
+  // returns organization meta and release tags
+  async getOrganization(orgName: string, page = 1, resultsPerPage = 10): Promise<Organization> {
+    try {
+      const orgID: OrgID = await this.getOrgIDFromName(orgName);
+      // @TODO add cache expiration on org metadata
+      if (!this.cache.orgs[orgName].metaCID) {
+        this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
+        this.cache.orgs[orgName].orgID = orgID;
+      }
 
-      try { json = await this.fetchJSONfromIPFS(org[0]); } catch (e) {
+      this.cache.orgs[orgName].repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
+
+      try {
+        this.cache.orgs[orgName].meta = await this.fetchJSONfromIPFS(this.cache.orgs[orgName].metaCID);
+      } catch (e) {
         // noop, just return empty object if failed
       }
 
-      return { meta: json, repoNames: org[1] };
+      return this.cache.orgs[orgName];
     } catch (e) {
       const msg = 'Could not get organization';
       console.error(msg, e);
@@ -126,28 +181,10 @@ class Valist {
     }
   }
 
-  async getOrganizationMeta(orgName: string) {
+  async getOrganizationNames(page = 1, resultsPerPage = 10): Promise<string[]> {
     try {
-      const orgMeta = await this.valist.methods.getOrgMeta(orgName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(orgMeta); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return json;
-    } catch (e) {
-      const msg = 'Could not get organization metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrganizationNames() {
-    try {
-      const orgs = await this.valist.methods.getOrgNames().call();
-      return orgs;
+      const orgs = await this.contract.methods.getOrgNames(page, resultsPerPage).call();
+      return orgs.filter(Boolean);
     } catch (e) {
       const msg = 'Could not get organization names';
       console.error(msg, e);
@@ -155,10 +192,23 @@ class Valist {
     }
   }
 
-  async setOrgMeta(orgName: string, orgMeta: any, account: string) {
+  async getRepoNames(orgName: string, page = 1, resultsPerPage = 10): Promise<string[]> {
     try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoNames = await this.contract.methods.getRepoNames(orgID, page, resultsPerPage).call();
+      return repoNames.filter(Boolean);
+    } catch (e) {
+      const msg = 'Could not get organization names';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async setOrgMeta(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
       const hash = await this.addJSONtoIPFS(orgMeta);
-      return await this.sendTransaction(this.valist.methods.setOrgMeta(orgName, hash), account);
+      return await this.sendTransaction(this.contract.methods.setOrgMeta(orgID, hash), account);
     } catch (e) {
       const msg = 'Could not set organization metadata';
       console.error(msg, e);
@@ -167,57 +217,49 @@ class Valist {
   }
 
   // returns repository
-  async getRepository(orgName: string, repoName: string) {
+  async getRepository(orgName: string, repoName: string): Promise<Repository> {
     try {
-      const repo = await this.valist.methods.getRepository(orgName, repoName).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const repo = await this.contract.methods.repos(repoSelector).call();
 
-      let json: any = {};
+      let json: RepoMeta = {
+        name: '',
+        description: '',
+        projectType: 'binary',
+        homepage: '',
+        repository: '',
+      };
 
-      try { json = await this.fetchJSONfromIPFS(repo[0]); } catch (e) {
+      try { json = await this.fetchJSONfromIPFS(repo.metaCID); } catch (e) {
         // noop, just return empty object if failed
       }
 
-      return { meta: json, tags: repo[1] };
+      return {
+        orgID,
+        meta: json,
+        metaCID: repo.metaCID,
+        tags: repo.tags,
+        threshold: repo.threshold,
+        thresholdDate: repo.thresholdDate,
+      };
     } catch (e) {
-      const msg = 'Could not get repository contract';
+      const msg = 'Could not get repository';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async getReposFromOrganization(orgName: string) {
+  async setRepoMeta(
+    orgName: string,
+    repoName: string,
+    repoMeta: RepoMeta,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
     try {
-      const repos = await this.valist.methods.getRepoNames(orgName).call();
-      return repos;
-    } catch (e) {
-      const msg = 'Could not get repositories from organization';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getRepoMeta(orgName: string, repoName: string) {
-    try {
-      const repoMeta = await this.valist.methods.getRepoMeta(orgName, repoName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(repoMeta); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return json;
-    } catch (e) {
-      const msg = 'Could not get repository metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string) {
-    try {
+      const orgID = await this.getOrgIDFromName(orgName);
       const hash = await this.addJSONtoIPFS(repoMeta);
-      return await this.sendTransaction(this.valist.methods.setRepoMeta(orgName, repoName, hash), account);
+      return await this.sendTransaction(this.contract.methods.setRepoMeta(orgID, repoName, hash), account);
     } catch (e) {
       const msg = 'Could not set repository metadata';
       console.error(msg, e);
@@ -225,10 +267,16 @@ class Valist {
     }
   }
 
-  async getLatestReleaseFromRepo(orgName: string, repoName: string) {
+  async getLatestRelease(orgName: string, repoName: string): Promise<Release> {
     try {
-      const release = await this.valist.methods.getLatestRelease(orgName, repoName).call();
-      return release;
+      const orgID = await this.getOrgIDFromName(orgName);
+      const release = await this.contract.methods.getLatestRelease(orgID, repoName).call();
+      return {
+        tag: release[0],
+        releaseCID: release[1],
+        metaCID: release[2],
+        signers: release[3],
+      };
     } catch (e) {
       const msg = 'Could not get latest release from repo';
       console.error(msg, e);
@@ -236,21 +284,12 @@ class Valist {
     }
   }
 
-  async getLatestTagFromRepo(orgName: string, repoName: string) {
+  async getReleaseTags(orgName: string, repoName: string, page = 1, resultsPerPage = 10): Promise<string[]> {
     try {
-      const tag = await this.valist.methods.getLatestTag(orgName, repoName).call();
-      return tag;
-    } catch (e) {
-      const msg = 'Could not get latest tag from repo';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getReleaseTagsFromRepo(orgName: string, repoName: string) {
-    try {
-      const tags = await this.valist.methods.getReleaseTags(orgName, repoName).call();
-      return tags;
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const tags = await this.contract.methods.getReleaseTags(repoSelector, page, resultsPerPage).call();
+      return tags.filter(Boolean);
     } catch (e) {
       const msg = 'Could not get release tags from repo';
       console.error(msg, e);
@@ -258,15 +297,23 @@ class Valist {
     }
   }
 
-  async getReleasesFromRepo(orgName: string, repoName: string): Promise<Release[]> {
+  async getReleases(orgName: string, repoName: string, page = 1, resultsPerPage = 10): Promise<Release[]> {
     try {
-      const tags = await this.valist.methods.getReleaseTags(orgName, repoName).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tags = await this.getReleaseTags(orgName, repoName, page, resultsPerPage);
       const releases: Release[] = [];
 
-      for (let i = 0; i < tags.length; i++) {
+      for (let i = 0; i < tags.length; ++i) {
+        const releaseSelector = this.web3.utils.keccak256(
+          this.web3.eth.abi.encodeParameters(['bytes32', 'string', 'string'], [orgID, repoName, tags[i]]),
+        );
         // eslint-disable-next-line no-await-in-loop
-        const release = await this.valist.methods.getRelease(orgName, repoName, tags[i]).call();
-        releases.push({ ...release, tag: tags[i] });
+        const release = await this.contract.methods.releases(releaseSelector).call();
+        releases.push({
+          tag: tags[i],
+          releaseCID: release.releaseCID,
+          metaCID: release.metaCID,
+        });
       }
 
       return releases;
@@ -277,11 +324,19 @@ class Valist {
     }
   }
 
-  async getReleaseByTag(orgName: string, repoName: string, tag: string) {
+  async getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<Release> {
     try {
-      const release = await this.valist.methods.getRelease(orgName, repoName, tag).call();
-
-      return release;
+      const orgID = await this.getOrgIDFromName(orgName);
+      const releaseSelector = this.web3.utils.keccak256(
+        this.web3.eth.abi.encodeParameters(['bytes32', 'string', 'string'], [orgID, repoName, tag]),
+      );
+      const release = await this.contract.methods.releases(releaseSelector).call();
+      return {
+        tag,
+        releaseCID: release.releaseCID,
+        metaCID: release.metaCID,
+        signers: release.signers,
+      };
     } catch (e) {
       const msg = 'Could not get release by tag';
       console.error(msg, e);
@@ -289,20 +344,10 @@ class Valist {
     }
   }
 
-  async isOrgOwner(orgName: string, account: string) {
+  async isOrgAdmin(orgName: string, account: string = this.defaultAccount): Promise<boolean> {
     try {
-      const isOrgOwner = await this.valist.methods.isOrgOwner(orgName, account).call();
-      return isOrgOwner;
-    } catch (e) {
-      const msg = 'Could not check if user has ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isOrgAdmin(orgName: string, account: string) {
-    try {
-      const isOrgAdmin = await this.valist.methods.isOrgAdmin(orgName, account).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const isOrgAdmin = await this.contract.methods.isOrgAdmin(orgID, account).call();
       return isOrgAdmin;
     } catch (e) {
       const msg = 'Could not check if user has ORG_ADMIN_ROLE';
@@ -311,20 +356,10 @@ class Valist {
     }
   }
 
-  async isRepoAdmin(orgName: string, repoName: string, account: string) {
+  async isRepoDev(orgName: string, repoName: string, account: string = this.defaultAccount): Promise<boolean> {
     try {
-      const isRepoAdmin = await this.valist.methods.isRepoAdmin(orgName, repoName, account).call();
-      return isRepoAdmin;
-    } catch (e) {
-      const msg = 'Could not check if user has REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isRepoDev(orgName: string, repoName: string, account: string) {
-    try {
-      const isRepoDev = await this.valist.methods.isRepoDev(orgName, repoName, account).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
       return isRepoDev;
     } catch (e) {
       const msg = 'Could not check if user has REPO_DEV_ROLE';
@@ -333,86 +368,101 @@ class Valist {
     }
   }
 
-  async grantOrgAdmin(orgName: string, granter: string, grantee: string) {
+  async voteOrgAdmin(orgName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.grantOrgAdmin(orgName, grantee), granter);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', ADD_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not grant ORG_ADMIN_ROLE';
+      const msg = 'Could not vote to grant ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async revokeOrgAdmin(orgName: string, revoker: string, revokee: string) {
+  async revokeOrgAdmin(orgName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeOrgAdmin(orgName, revokee), revoker);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', REVOKE_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not revoke ORG_ADMIN_ROLE';
+      const msg = 'Could not vote to revoke ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string) {
+  async rotateOrgAdmin(orgName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.grantRepoAdmin(orgName, repoName, grantee), granter);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', ROTATE_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not grant REPO_ADMIN_ROLE';
+      const msg = 'Could not vote to revoke ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string) {
+  async voteRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeRepoAdmin(orgName, repoName, revokee), revoker);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, ADD_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not revoke REPO_ADMIN_ROLE';
+      const msg = 'Could not vote to grant REPO_DEV_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string) {
+  async revokeRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.grantRepoDev(orgName, repoName, grantee), granter);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, REVOKE_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not grant REPO_DEV_ROLE';
+      const msg = 'Could not vote to revoke REPO_DEV_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string) {
+  async rotateRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeRepoDev(orgName, repoName, revokee), revoker);
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, ROTATE_KEY, key),
+        this.defaultAccount,
+      );
       return tx;
     } catch (e) {
-      const msg = 'Could not revoke REPO_DEV_ROLE';
+      const msg = 'Could not vote to revoke REPO_DEV_ROLE';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async getOrgOwners(orgName: string) {
+  async getOrgAdmins(orgName: string): Promise<string[]> {
     try {
-      const members = await this.valist.methods.getOrgOwners(orgName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have ORG_OWNER_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrgAdmins(orgName: string) {
-    try {
-      const members = await this.valist.methods.getOrgAdmins(orgName).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const roleSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, ORG_ADMIN) || '');
+      const members = await this.contract.methods.getRoleMembers(roleSelector).call();
       return members;
     } catch (e) {
       const msg = 'Could not get users that have ORG_ADMIN_ROLE';
@@ -421,20 +471,11 @@ class Valist {
     }
   }
 
-  async getRepoAdmins(orgName: string, repoName: string) {
+  async getRepoDevs(orgName: string, repoName: string): Promise<string[]> {
     try {
-      const members = await this.valist.methods.getRepoAdmins(orgName, repoName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getRepoDevs(orgName: string, repoName: string) {
-    try {
-      const members = await this.valist.methods.getRepoDevs(orgName, repoName).call();
+      const orgID = await this.getOrgIDFromName(orgName);
+      const roleSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName, REPO_DEV) || '');
+      const members = await this.contract.methods.getRoleMembers(roleSelector).call();
       return members;
     } catch (e) {
       const msg = 'Could not get users that have REPO_DEV_ROLE';
@@ -443,12 +484,13 @@ class Valist {
     }
   }
 
-  async createOrganization(orgName: string, orgMeta: OrgMeta, account?: string) {
+  async createOrganization(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
       const tx = await this.sendTransaction(
-        this.valist.methods.createOrganization(
-          orgName.toLowerCase().replace(shortnameFilterRegex, ''), metaFile,
+        this.contract.methods.createOrganization(
+          orgName.toLowerCase().replace(shortnameFilterRegex, ''),
+          metaFile,
         ),
         account,
       );
@@ -460,12 +502,19 @@ class Valist {
     }
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: RepoMeta, account?: string) {
+  async createRepository(
+    orgName: string,
+    repoName: string,
+    repoMeta: RepoMeta,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
     try {
       const metaFile = await this.addJSONtoIPFS(repoMeta);
+      const orgID = await this.getOrgIDFromName(orgName);
       const tx = await this.sendTransaction(
-        this.valist.methods.createRepository(
-          orgName, repoName.toLowerCase().replace(shortnameFilterRegex, ''), metaFile,
+        this.contract.methods.createRepository(
+          orgID, repoName.toLowerCase().replace(shortnameFilterRegex, ''),
+          metaFile,
         ),
         account,
       );
@@ -477,7 +526,7 @@ class Valist {
     }
   }
 
-  async prepareRelease(tag: string, releaseFile: any, metaFile: any) {
+  async prepareRelease(tag: string, releaseFile: any, metaFile: any): Promise<Release> {
     try {
       const releaseCID: string = await this.addFileToIPFS(releaseFile);
       const metaCID: string = await this.addFileToIPFS(metaFile);
@@ -489,25 +538,20 @@ class Valist {
     }
   }
 
-  async canRelease(orgName: string, repoName: string, account: string = this.defaultAccount) {
+  async publishRelease(
+    orgName: string,
+    repoName: string,
+    release: Release,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
     try {
-      const isRepoDev = await this.isRepoDev(orgName, repoName, account);
-      return isRepoDev;
-    } catch (e) {
-      const msg = 'Could not check if user can release';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async publishRelease(orgName: string, repoName: string, release: Release, account?: string) {
-    try {
-      const canRelease = await this.canRelease(orgName, repoName, account);
-      if (!canRelease) throw new Error('User does not have permission to publish release');
+      const orgID = await this.getOrgIDFromName(orgName);
+      const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
+      if (!isRepoDev) throw new Error('User does not have permission to publish release');
 
       const tx = await this.sendTransaction(
-        this.valist.methods.publishRelease(
-          orgName, repoName, release.tag, release.releaseCID, release.metaCID,
+        this.contract.methods.voteRelease(
+          orgID, repoName, release.tag, release.releaseCID, release.metaCID,
         ),
         account,
       );
@@ -520,7 +564,7 @@ class Valist {
   }
 
   // eslint-disable-next-line class-methods-use-this
-  async fetchJSONfromIPFS(ipfsHash: string) {
+  async fetchJSONfromIPFS(ipfsHash: string): Promise<any> {
     try {
       const response = await fetch(`https://gateway.valist.io/ipfs/${ipfsHash}`);
       const json = await response.json();
@@ -532,7 +576,7 @@ class Valist {
     }
   }
 
-  async addJSONtoIPFS(data: any, onlyHash?: boolean) {
+  async addJSONtoIPFS(data: any, onlyHash?: boolean): Promise<string> {
     try {
       const file = Buffer.from(JSON.stringify(data));
       const result = await this.ipfs.add(file, { onlyHash, cidVersion: 1 });
@@ -544,7 +588,7 @@ class Valist {
     }
   }
 
-  async addFileToIPFS(data: any, onlyHash?: boolean) {
+  async addFileToIPFS(data: any, onlyHash?: boolean): Promise<string> {
     try {
       const result = await this.ipfs.add(data, { onlyHash, cidVersion: 1 });
       return result.cid.string;
@@ -555,69 +599,41 @@ class Valist {
     }
   }
 
-  async sendTransaction(functionCall: any, account: string = this.defaultAccount) {
+  async sendTransaction(functionCall: any, account: string = this.defaultAccount): Promise<any> {
     if (this.metaTxEnabled) {
       if (!this.metaTxReady) throw new Error('MetaTransactions not ready!');
 
-      const sendAsync = (params: any): any => new Promise((resolve, reject) => {
-        // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
-        this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
-          if (e) reject(e);
-          resolve(signed);
-        });
-      });
-
       try {
-        const nonce = await this.valist.methods.getNonce(account).call();
-        const functionSignature = functionCall.encodeABI();
-
-        const message = {
-          nonce: Number(nonce),
-          from: account,
-          functionSignature,
-        };
-
-        const dataToSign = JSON.stringify({
-          types: {
-            EIP712Domain: domainType,
-            MetaTransaction: metaTransactionType,
-          },
-          domain: domainData,
-          primaryType: 'MetaTransaction',
-          message,
-        });
-
-        let signed;
+        let tx;
 
         if (this.signer) {
-          signed = sigUtil.signTypedData_v4(Buffer.from(this.signer, 'hex'), { data: JSON.parse(dataToSign) });
+          const txParams = {
+            from: account,
+            data: functionCall.encodeABI(),
+            gasLimit: this.web3.utils.toHex(await functionCall.estimateGas({ from: account })),
+          };
+          const signedTx = await this.web3.eth.accounts.signTransaction(txParams, `0x${this.signer}`);
+          const forwardData = await this.biconomy.getForwardRequestAndMessageToSign(signedTx.rawTransaction);
+          const signature = sigUtil.signTypedData_v4(
+            Buffer.from(this.signer, 'hex'),
+            { data: forwardData.eip712Format },
+          );
+          const { rawTransaction } = signedTx;
+          const data = {
+            signature,
+            forwardRequest: forwardData.request,
+            rawTransaction,
+            signatureType: this.biconomy.EIP712_SIGN,
+          };
+          // @ts-ignore
+          tx = await this.web3.eth.sendSignedTransaction(data);
         } else {
-          const sig = await sendAsync({
-            jsonrpc: '2.0',
-            id: new Date().getTime(),
-            method: 'eth_signTypedData_v4',
-            params: [account, dataToSign],
+          tx = await functionCall.send({
+            from: account,
+            signatureType: this.biconomy.EIP712_SIGN,
           });
-          signed = sig.result;
         }
 
-        const { r, s, v } = getSignatureParameters(this.web3, signed);
-
-        // console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
-
-        const gasLimit = await this.valist.methods
-          .executeMetaTransaction(account, functionSignature, r, s, v)
-          .estimateGas({ from: account });
-
-        const gasPrice = await this.web3.eth.getGasPrice();
-
-        const tx = await this.valist.methods
-          .executeMetaTransaction(account, functionSignature, r, s, v)
-          .send({
-            from: account,
-            gasPrice,
-            gasLimit,
-          });
         return tx;
       } catch (e) {
         const msg = 'Could not send meta transaction';
