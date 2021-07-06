@@ -21,6 +21,8 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 
   const [renderLoading, setRenderLoading] = useState(false);
 
+  const [canRelease, setCanRelease] = useState(false);
+
   const handleUpload = async (_files: any, repoType: string) => {
     try {
       if (repoType !== 'generic-folder') {
@@ -91,6 +93,9 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
           const metaResp = await valist.getRepoMeta(orgName, repoName);
           console.log(metaResp);
           setRepoMeta(metaResp);
+
+          const userCanRelease = await valist.canRelease(orgName, repoName);
+          setCanRelease(userCanRelease);
         } catch (e) { console.log(e); }
       }
     })();
@@ -165,7 +170,7 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
                               setRenderLoading(true);
                               await createRelease();
                               setRenderLoading(false);
-                            }} value="Submit" type="button" className="w-full inline-flex
+                            }} disabled={!canRelease} value="Submit" type="button" className="w-full inline-flex
                             items-center justify-center px-6 py-3 border border-transparent
                             text-base leading-6 font-medium rounded-md text-white bg-indigo-600
                             hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo

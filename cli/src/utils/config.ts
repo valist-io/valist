@@ -1,6 +1,6 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
-import Valist from 'valist';
+import Valist from '@valist/sdk';
 import { getWeb3Provider, getSignerKey } from './crypto';
 
 export type ValistConfig = {

@@ -37,21 +37,21 @@ static: frontend
 
 # compile contracts
 contracts:
-	cd eth && npm run compile
+	cd hardhat && npm run compile
 
 # migrates/deploys Solidity contracts via Truffle
 migrate:
-	cd eth && npm run migrate
+	cd hardhat && npm run migrate
 
 deploy: migrate
 
 # launches truffle console
 console:
-	cd eth && npm run console
+	cd hardhat && npm run console
 
 # runs local ganache cli
 blockchain:
-	cd eth && npm run develop
+	cd hardhat && npm run develop
 
 # build all artifacts
 all: contracts lib relay
@@ -60,8 +60,8 @@ compile: all
 
 build: all
 
-install-eth:
-	cd eth && npm i
+install-hardhat:
+	cd hardhat && npm i
 
 install-lib:
 	cd lib && npm i
@@ -74,12 +74,12 @@ install-relay:
 
 install-frontend: install-lib install-relay
 
-install-all: install-eth install-lib install-cli install-relay
+install-all: install-hardhat install-lib install-cli install-relay
 
 install: install-all
 
 update-all:
-	cd eth && npm update
+	cd hardhat && npm update
 	cd lib && npm update
 	cd cli && npm update
 	cd relay && npm update
@@ -88,13 +88,13 @@ update-all:
 update: update-all
 
 audit-fix:
-	cd eth && npm audit fix
+	cd hardhat && npm audit fix
 	cd lib && npm audit fix
 	cd cli && npm audit fix
 	cd relay && npm audit fix
 
 audit-contracts:
-	slither eth --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
+	slither hardhat --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
 
 docs:
 	mkdocs build

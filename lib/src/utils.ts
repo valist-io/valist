@@ -1,5 +1,5 @@
 import Web3 from 'web3';
-import ValistABI from './abis/Valist.json';
+import ValistABI from './abis/contracts/Valist.sol/Valist.json';
 
 import { InvalidNetworkError } from './errors';
 
@@ -8,15 +8,17 @@ export const shortnameFilterRegex = /[^A-z0-9-]/;
 export const getContractInstance = (web3: Web3, abi: any, address: string) => new web3.eth.Contract(abi, address);
 
 export const getValistContract = async (web3: Web3, address?: string) => {
-  // get network ID and the deployed address
+  const networkContractMap = {
+    80001: '0x0FEfa3F1373Beaffc271D5C69ADe51aB5E89ed04',
+  };
+  // get network ID to fetch deployed address
   const networkId: number = await web3.eth.net.getId();
 
-  if (networkId !== 80001) {
-    throw new InvalidNetworkError('Incorrect network ID must be Matic (80001)');
+  if (!address && !Object.keys(networkContractMap).includes(networkId.toString())) {
+    throw new InvalidNetworkError('Valist not found on network');
   }
 
-  const deployedAddress: string = address || ValistABI.networks[networkId].address;
-
+  const deployedAddress: string = address || networkContractMap[80001];
   return getContractInstance(web3, ValistABI.abi, deployedAddress);
 };
 
@@ -49,7 +51,7 @@ export const domainData = {
   name: 'Valist',
   version: '0',
   chainId: 80001,
-  verifyingContract: ValistABI.networks[80001].address,
+  verifyingContract: '0x9eDF3e00C554FF01B864fC3FDeF2B5cEA658C5BA',
 };
 
 export const Web3Providers = Web3.providers;

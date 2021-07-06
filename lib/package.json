@@ -1,6 +1,6 @@
 {
   "name": "valist",
-  "version": "0.3.4",
+  "version": "0.3.5",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
   "author": "Valist, Inc.",
   "contributors": [
@@ -24,7 +24,7 @@
     "build": "tsc",
     "dev": "tsc -w",
     "docs": "typedoc ./src --theme minimal --out ../site/lib --readme none",
-    "test": "mocha -r ts-node/register 'tests/**/*.ts'",
+    "test": "npm run build && mocha -r ts-node/register 'tests/**/*.ts'",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
@@ -35,16 +35,17 @@
     "chai": "^4.3.4",
     "ganache-core": "^2.13.2",
     "mocha": "^8.4.0",
+    "ts-node": "^10.0.0",
     "typedoc": "^0.20.36",
-    "typescript": "^4.2.4"
-  },
-  "dependencies": {
-    "@biconomy/mexa": "^1.5.15",
-    "@typescript-eslint/eslint-plugin": "^4.25.0",
-    "encoding": "^0.1.13",
+    "typescript": "^4.2.4",
     "eslint": "^7.27.0",
     "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-plugin-import": "^2.23.3",
+    "@typescript-eslint/eslint-plugin": "^4.25.0"
+  },
+  "dependencies": {
+    "@biconomy/mexa": "^2.0.10",
+    "encoding": "^0.1.13",
     "eth-sig-util": "^3.0.1",
     "ipfs-http-client": "47.0.1",
     "node-fetch": "^2.6.1",
