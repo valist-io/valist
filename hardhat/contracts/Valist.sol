@@ -503,6 +503,34 @@ contract Valist is BaseRelayRecipient {
     return _orgNames;
   }
 
+  // get paginated list of repo names
+  function getRepoNames(bytes32 _orgID, uint _page, uint _resultsPerPage) public view returns (string[] memory) {
+    uint i = _resultsPerPage * _page - _resultsPerPage;
+    uint limit = _page * _resultsPerPage;
+    if (limit > orgs[_orgID].repoNames.length) {
+      limit = orgs[_orgID].repoNames.length;
+    }
+    string[] memory _repoNames = new string[](_resultsPerPage);
+    for (i; i < limit; ++i) {
+      _repoNames[i] = orgs[_orgID].repoNames[i];
+    }
+    return _repoNames;
+  }
+
+  // get paginated list of release tags from repo
+  function getReleaseTags(bytes32 _selector, uint _page, uint _resultsPerPage) public view returns (string[] memory) {
+    uint i = _resultsPerPage * _page - _resultsPerPage;
+    uint limit = _page * _resultsPerPage;
+    if (limit > repos[_selector].tags.length) {
+      limit = repos[_selector].tags.length;
+    }
+    string[] memory _tags = new string[](_resultsPerPage);
+    for (i; i < limit; ++i) {
+      _tags[i] = repos[_selector].tags[i];
+    }
+    return _tags;
+  }
+
   function getPendingVotes(bytes32 _selector) public view returns (uint, address[] memory) {
     address[] memory signers = new address[](pendingVotes[_selector].signers.length());
     for (uint i = 0; i < pendingVotes[_selector].signers.length(); ++i) {

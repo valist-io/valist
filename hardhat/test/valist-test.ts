@@ -39,7 +39,7 @@ describe('Valist Contract', () => {
       orgID = await valist.orgIDByName(orgName);
     });
 
-    it('Org ID should be generated using keccak256(++orgCount)', async () => {
+    it('Org ID should be generated using keccak256(++orgCount, chainID)', async () => {
       const expectedOrgID = ethers.utils.keccak256(ethers.utils.solidityPack(['uint', 'uint'], [await valist.orgCount(), 31337]));
       expect(orgID).to.equal(expectedOrgID);
     });
