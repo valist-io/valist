@@ -6,3 +6,5 @@ artifacts
 
 #VScode
 settings.json
+
+.secret
