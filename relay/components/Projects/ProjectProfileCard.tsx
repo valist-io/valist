@@ -2,7 +2,7 @@ import React, { useState, useEffect, useContext } from 'react';
 import Link from 'next/link';
 import ValistContext from '../Valist/ValistContext';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
-import IsRepoAdmin from '../AccessControl/IsRepoAdmin';
+import IsOrgAdmin from '../AccessControl/IsOrgAdmin';
 import IsRepoDev from '../AccessControl/IsRepoDev';
 
 const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, projectName: string }) => {
@@ -11,10 +11,10 @@ const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, project
 
   useEffect(() => {
     (async () => {
-      if (valist) {
+      if (valist && orgName && projectName) {
         try {
-          const orgMeta = await valist.getRepoMeta(orgName, projectName);
-          setProjectMeta(orgMeta);
+          const repo = await valist.getRepository(orgName, projectName);
+          setProjectMeta(repo.meta);
         } catch (e) {
           console.log(e);
         }
@@ -39,14 +39,14 @@ const ProjectProfileCard = ({ orgName, projectName }: { orgName: string, project
               </div>
             </div>
             <div className="mt-5 flex justify-center sm:mt-0">
-              <IsRepoAdmin orgName={orgName} repoName={projectName}>
+              <IsOrgAdmin orgName={orgName}>
                 <Link href={`/v/${orgName}/${projectName}/edit`}>
                   <a className="flex justify-center items-center px-4 py-2 border
                   border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
                     Edit Project
                   </a>
                 </Link>
-              </IsRepoAdmin>
+              </IsOrgAdmin>
               <IsRepoDev orgName={orgName} repoName={projectName}>
                 <Link href={`/v/${orgName}/${projectName}/publish`}>
                   <a className="ml-2 flex justify-center items-center px-4 py-2 border

@@ -18,10 +18,10 @@ export default async function getLatestReleaseTag(req: NextApiRequest, res: Next
       query: { orgName, repoName },
     } = req;
 
-    const latestTag = await valist.getLatestTagFromRepo(orgName.toString(), repoName.toString());
+    const release = await valist.getLatestRelease(orgName.toString(), repoName.toString());
 
-    if (latestTag) {
-      return res.status(200).json({ latestTag });
+    if (release) {
+      return res.status(200).json({ latestTag: release.tag });
     }
     return res.status(404).json({ statusCode: 404, message: 'No release found!' });
   }

@@ -18,7 +18,7 @@ export default async function getReleasesFromRepo(req: NextApiRequest, res: Next
       query: { orgName, repoName },
     } = req;
 
-    const releases = await valist.getReleasesFromRepo(orgName.toString(), repoName.toString());
+    const releases = await valist.getReleases(orgName.toString(), repoName.toString());
 
     if (releases) {
       return res.status(200).json(releases.reverse());
