@@ -1,4 +1,4 @@
-import keytar from 'keytar';
+import * as keytar from 'keytar';
 import { randomBytes } from 'crypto';
 
 const HDWalletProvider = require('@truffle/hdwallet-provider');
