@@ -26,6 +26,9 @@ module.exports = {
       }
     }
   },
+  paths: {
+    artifacts: '../lib/src/abis'
+  },
   gasReporter: {
     currency: 'USD',
     gasPrice: 21
