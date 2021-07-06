@@ -12,8 +12,8 @@ const OrgProfileCard = ({ orgName }: any) => {
     (async () => {
       if (valist) {
         try {
-          const orgMetaResponse = await valist.getOrganizationMeta(orgName);
-          setOrgMeta(orgMetaResponse);
+          const org = await valist.getOrganization(orgName);
+          setOrgMeta(org.meta);
         } catch (e) { console.log(e); }
       }
     })();

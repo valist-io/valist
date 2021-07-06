@@ -16,7 +16,7 @@ export const ReleaseList = ({ orgName, repoName }: { orgName: string, repoName: 
     (async () => {
       if (valist) {
         try {
-          setReleases(await valist.getReleaseTagsFromRepo(orgName, repoName));
+          setReleases(await valist.getReleaseTags(orgName, repoName));
         } catch (e) {
           console.error('Could not fetch releases', e);
         }

@@ -1,5 +1,6 @@
 import { useRouter } from 'next/router';
 import React, { useState, useEffect, useContext } from 'react';
+import { ProjectType, RepoMeta } from '../../../lib/dist/types';
 import ValistContext from '../Valist/ValistContext';
 
 const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string }) => {
@@ -9,27 +10,36 @@ const EditRepoForm = ({ orgName, repoName }: { orgName: string, repoName: string
   const [projectHomepage, setProjectHomepage] = useState('');
   const [projectRepository, setProjectRepository] = useState('');
   const [projectDescription, setProjectDescription] = useState('');
+  const [projectType, setProjectType] = useState<ProjectType>();
 
   const getCurrentMeta = async () => {
     if (valist) {
       try {
-        const repoMeta = await valist.getRepoMeta(orgName, repoName);
-        setProjectHomepage(repoMeta.homepage);
-        setProjectRepository(repoMeta.repository);
-        setProjectDescription(repoMeta.description);
+        const repo = await valist.getRepository(orgName, repoName);
+        setProjectHomepage(repo.meta.homepage);
+        setProjectRepository(repo.meta.repository);
+        setProjectDescription(repo.meta.description);
+        setProjectType(repo.meta.projectType);
       } catch (e) { console.log(e); }
     }
   };
 
   const updateRepoMeta = async () => {
+    if (!repoName && !projectType && !projectHomepage && !projectRepository && !projectDescription) {
+      alert('Missing metadata');
+      return;
+    }
+
     const meta = {
+      name: repoName,
+      projectType,
       homepage: projectHomepage,
       repository: projectRepository,
       description: projectDescription,
     };
 
     try {
-      await valist.setRepoMeta(orgName, repoName, meta, valist.defaultAccount);
+      await valist.setRepoMeta(orgName, repoName, meta as RepoMeta, valist.defaultAccount);
     } catch (e) { console.log(e); }
 
     router.push(`/${orgName}/${repoName}`);
