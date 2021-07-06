@@ -13,9 +13,12 @@ async function main() {
   // manually to make sure everything is compiled
   // await hre.run('compile');
 
-  // We get the contract to deploy
+  const trustedForwarders = {
+    80001: '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b',
+    137: '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8'
+  }
   const Valist = await hre.ethers.getContractFactory("Valist");
-  const valist = await Valist.deploy();
+  const valist = await Valist.deploy(trustedForwarders[80001]);
 
   await valist.deployed();
 

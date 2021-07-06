@@ -2,12 +2,13 @@
 import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
-// @ts-ignore mexa doesn't support typescript yet
-import Biconomy from '@biconomy/mexa';
 
 import { provider } from 'web3-core/types';
 
 import * as sigUtil from 'eth-sig-util';
+
+// @ts-ignore mexa doesn't support typescript yet
+import { Biconomy } from '@biconomy/mexa';
 
 import {
   Organization,
@@ -28,11 +29,7 @@ import {
 } from './constants';
 
 import {
-  domainData,
-  domainType,
-  getSignatureParameters,
   getValistContract,
-  metaTransactionType,
   shortnameFilterRegex,
 } from './utils';
 

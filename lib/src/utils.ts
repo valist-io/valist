@@ -9,12 +9,12 @@ export const getContractInstance = (web3: Web3, abi: any, address: string) => ne
 
 export const getValistContract = async (web3: Web3, address?: string) => {
   const networkContractMap = {
-    80001: '0x9eDF3e00C554FF01B864fC3FDeF2B5cEA658C5BA',
+    80001: '0x0FEfa3F1373Beaffc271D5C69ADe51aB5E89ed04',
   };
   // get network ID to fetch deployed address
   const networkId: number = await web3.eth.net.getId();
 
-  if (!address && !Object.keys(networkId).includes(networkId.toString())) {
+  if (!address && !Object.keys(networkContractMap).includes(networkId.toString())) {
     throw new InvalidNetworkError('Valist not found on network');
   }
 
