@@ -79,6 +79,6 @@ export type PendingRelease = {
 export type ValistCache = {
   orgIDs: OrgID[],
   orgNames: OrgName[],
-  orgs: Record<OrgID, Organization>,
+  orgs: Record<OrgName, Organization>,
   // repos: Record<OrgID, Record<string, Repository>>,
 };
