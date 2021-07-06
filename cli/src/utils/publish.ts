@@ -1,6 +1,6 @@
 import * as fs from 'fs';
 import * as path from 'path';
-import Valist from 'valist';
+import Valist from '@valist/sdk';
 import { buildRelease } from './builds';
 import { initValist, parseValistConfig } from './config';
 

@@ -24,7 +24,7 @@ export const initValist = async (): Promise<Valist> => {
     valist.signer = signer;
     signer = null;
 
-    const waitForMetaTx: boolean = true;
+    const waitForMetaTx = true;
 
     await valist.connect(waitForMetaTx);
 
