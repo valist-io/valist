@@ -12,9 +12,9 @@ const EditOrganization = ({ orgName }: { orgName: string }) => {
   const getCurrentMeta = async () => {
     if (valist) {
       try {
-        const orgMeta = await valist.getOrganizationMeta(orgName);
-        setOrgFullName(orgMeta.name);
-        setOrgDescription(orgMeta.description);
+        const org = await valist.getOrganization(orgName);
+        setOrgFullName(org.meta.name);
+        setOrgDescription(org.meta.description);
       } catch (e) { console.log(e); }
     }
   };

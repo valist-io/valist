@@ -8,8 +8,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
   const valist = useContext(ValistContext);
 
   const [orgAdmins, setOrgAdmins] = useState(['0x0']);
-  const [orgOwners, setOrgOwners] = useState(['0x0']);
-  const [grantee, setGrantee] = useState('');
+  const [key, setKey] = useState('');
 
   const [renderLoading, setRenderLoading] = useState(false);
 
@@ -17,7 +16,6 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
     if (valist) {
       try {
         setOrgAdmins(await valist.getOrgAdmins(orgName) || ['0x0']);
-        setOrgOwners(await valist.getOrgOwners(orgName) || ['0x0']);
       } catch (e) {
         console.error('Could not fetch ACL data', e);
       }
@@ -26,10 +24,10 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
 
   const grantRole = async () => {
     try {
-      if (valist.web3.utils.isAddress(grantee)) {
-        await valist.grantOrgAdmin(orgName, valist.defaultAccount, grantee);
+      if (valist.web3.utils.isAddress(key)) {
+        await valist.voteOrgAdmin(orgName, key);
         await updateData();
-        setGrantee('');
+        setKey('');
       } else {
         alert('Please enter a valid Ethereum address');
       }
@@ -40,7 +38,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
 
   const revokeRole = async (address: string) => {
     try {
-      await valist.revokeOrgAdmin(orgName, valist.defaultAccount, address);
+      await valist.revokeOrgAdmin(orgName, address);
       await updateData();
     } catch (e) {
       console.error('Could not revoke role', e);
@@ -56,7 +54,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
           <IsOrgAdmin orgName={orgName}>
             <div className="col-span-3 sm:col-span-2 pb-8">
                 <div className="mt-1 flex shadow-sm">
-                    <input onChange={(e) => setGrantee(e.target.value)} type="text" value={grantee}
+                    <input onChange={(e) => setKey(e.target.value)} type="text" value={key}
                     className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150
                     ease-in-out sm:text-sm sm:leading-5 shadow-sm"
                     placeholder="0x0123456789012345678901234567890123456789" />
@@ -77,16 +75,6 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
               </div>
             </IsOrgAdmin>
             <ul className="grid grid-cols-1 gap-6 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
-                {orgOwners[0] !== '0x0' && orgOwners.map((address) => (
-                  <UserAccessCard
-                    key={address}
-                    address={address}
-                    orgName={orgName}
-                    setRenderLoading={setRenderLoading}
-                    revokeRole={revokeRole}
-                    roleType={'orgOwner'}
-                  />
-                ))}
                 {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
                   <UserAccessCard
                     key={address}
