@@ -1,4 +1,4 @@
-// SPDX-License-Identifier: MPL
+// SPDX-License-Identifier: MPL-2.0
 pragma solidity >=0.8.4;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
 import "./BaseRelayRecipient.sol";

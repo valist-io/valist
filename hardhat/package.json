@@ -5,8 +5,12 @@
   "scripts": {
     "test": "hardhat test"
   },
-  "author": "Zachary Pelkey, Alec Wantoch",
-  "license": "MPL",
+  "author": "Valist, Inc.",
+  "contributors": [
+    "Alec M. Wantoch <alec@valist.io> (valist.io)",
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)"
+  ],
+  "license": "MPL-2.0",
   "devDependencies": {
     "@nomiclabs/hardhat-ethers": "^2.0.2",
     "@nomiclabs/hardhat-waffle": "^2.0.1",
