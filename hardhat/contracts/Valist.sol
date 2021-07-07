@@ -134,13 +134,11 @@ contract Valist is BaseRelayRecipient {
 
   event MetaUpdate(bytes32 _orgID, string _repoName, address _signer, string _metaCID);
 
-  event VoteReleaseEvent(bytes32 _orgID, string _repoName, address _signer, string _tag, string _releaseCID, string _metaCID);
+  event VoteThresholdEvent(bytes32 _orgID, string _repoName, address _signer, uint _pendingThreshold, uint _sigCount, uint _threshold);
 
-  event VoteThresholdEvent(bytes32 _orgID, string _repoName, address _signer, uint _threshold);
+  event VoteKeyEvent(bytes32 _orgID, string _repoName, address _signer, bytes32 _operation, address _key, uint _sigCount, uint _threshold);
 
-  event VoteKeyEvent(bytes32 _orgID, string _repoName, address _signer, bytes32 _operation, address _key);
-
-  event ReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string _releaseCID, string _metaCID);
+  event VoteReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string _releaseCID, string _metaCID, address _signer, uint _sigCount, uint _threshold);
 
   // check if user has orgAdmin role
   function isOrgAdmin(bytes32 _orgID, address _address) public view returns (bool) {
@@ -208,7 +206,7 @@ contract Valist is BaseRelayRecipient {
       // push tag to repo
       repos[repoSelector].tags.push(_tag);
       // fire ReleaseEvent to notify live clients
-      emit ReleaseEvent(_orgID, _repoName, _tag, _releaseCID, _metaCID);
+      emit VoteReleaseEvent(_orgID, _repoName, _tag, _releaseCID, _metaCID, _msgSender(), 1, repos[repoSelector].threshold);
     } else {
       // propose release if this combination of tag, releaseCID, and metaCID has not been used
       if (pendingVotes[pendingReleaseSelector].expiration == 0) {
@@ -218,15 +216,11 @@ contract Valist is BaseRelayRecipient {
         pendingVotes[pendingReleaseSelector].signers.add(_msgSender());
         // push PendingRelease to pendingReleaseRequests for clients to see
         pendingReleaseRequests[repoSelector].push(PendingRelease(_tag, _releaseCID, _metaCID));
-        // fire VoteReleaseEvent to notify live clients
-        emit VoteReleaseEvent(_orgID, _repoName, _msgSender(), _tag, _releaseCID, _metaCID);
       } else {
         require(block.timestamp <= pendingVotes[pendingReleaseSelector].expiration, "Expired");
         require(!pendingVotes[pendingReleaseSelector].signers.contains(_msgSender()), "User voted");
         // add user to list of signers
         pendingVotes[pendingReleaseSelector].signers.add(_msgSender());
-        // fire VoteReleaseEvent to notify live clients
-        emit VoteReleaseEvent(_orgID, _repoName, _msgSender(), _tag, _releaseCID, _metaCID);
         // clean up any revoked keys
         for (uint i = 0; i < pendingVotes[pendingReleaseSelector].signers.length(); ++i) {
           if (!isRepoDev(_orgID, _repoName, pendingVotes[pendingReleaseSelector].signers.at(i))) {
@@ -245,10 +239,19 @@ contract Valist is BaseRelayRecipient {
           }
           // push tag to repo
           repos[repoSelector].tags.push(_tag);
-          // fire ReleaseEvent to notify live clients
-          emit ReleaseEvent(_orgID, _repoName, _tag, _releaseCID, _metaCID);
         }
       }
+      // fire VoteReleaseEvent to notify live clients
+      emit VoteReleaseEvent(
+        _orgID,
+        _repoName,
+        _tag,
+        _releaseCID,
+        _metaCID,
+        _msgSender(),
+        pendingVotes[pendingReleaseSelector].signers.length(),
+        repos[repoSelector].threshold
+      );
     }
   }
 
@@ -269,13 +272,16 @@ contract Valist is BaseRelayRecipient {
     bytes32 roleSelector;
     bytes32 repoSelector;
     bytes32 timestampSelector = keccak256(abi.encodePacked(_orgID, _repoName, _key));
+    uint currentThreshold;
     if (isRepoOperation) {
       voteSelector = keccak256(abi.encodePacked(_orgID, _repoName, REPO_DEV, _operation, _key));
       roleSelector = keccak256(abi.encodePacked(_orgID, _repoName, REPO_DEV));
       repoSelector = keccak256(abi.encodePacked(_orgID, _repoName));
+      currentThreshold = repos[repoSelector].threshold;
     } else {
       voteSelector = keccak256(abi.encodePacked(_orgID, ORG_ADMIN, _operation, _key));
       roleSelector = keccak256(abi.encodePacked(_orgID, ORG_ADMIN));
+      currentThreshold = orgs[_orgID].threshold;
     }
     // when revoking key, ensure key is in role
     if (_operation == REVOKE_KEY) {
@@ -291,10 +297,7 @@ contract Valist is BaseRelayRecipient {
       require(roles[roleSelector].contains(_msgSender()), "Denied");
       roles[roleSelector].remove(_msgSender());
       roles[roleSelector].add(_key);
-    } else if (
-      isRepoOperation && repos[repoSelector].threshold <=1 ||
-      !isRepoOperation && orgs[_orgID].threshold <= 1
-    ) {
+    } else if (currentThreshold <= 1) {
       // if threshold is 1 or 0, skip straight to role modification
       if (_operation == ADD_KEY) {
         roles[roleSelector].add(_key);
@@ -330,32 +333,40 @@ contract Valist is BaseRelayRecipient {
         }
       }
       // if threshold met, finalize vote
-      if (
-        isRepoOperation && pendingVotes[voteSelector].signers.length() >= repos[repoSelector].threshold ||
-        !isRepoOperation && pendingVotes[voteSelector].signers.length() == orgs[_orgID].threshold
-      ) {
+      if (pendingVotes[voteSelector].signers.length() >= currentThreshold) {
         if (_operation == ADD_KEY) {
           roles[roleSelector].add(_key);
         } else {
           roles[roleSelector].remove(_key);
-          // ensure that threshold does not lock existing members
-          repos[repoSelector].threshold--;
+          if (roles[roleSelector].length() - 1 <= currentThreshold) {
+            if (isRepoOperation) {
+              // ensure that threshold does not lock existing members
+              repos[repoSelector].threshold--;
+            } else {
+              orgs[_orgID].threshold--;
+            }
+          }
         }
         roleModifiedTimestamps[timestampSelector] = block.timestamp;
         // client needs to now call clearPendingRepoKey
       }
     }
-    emit VoteKeyEvent(_orgID, _repoName, _msgSender(), _operation, _key);
+    emit VoteKeyEvent(_orgID, _repoName, _msgSender(), _operation, _key, pendingVotes[voteSelector].signers.length(), currentThreshold);
   }
 
   function voteThreshold(bytes32 _orgID, string memory _repoName, uint _threshold) public repoDev(_orgID, _repoName) {
     bool isRepoOperation = bytes(_repoName).length > 0;
     bytes32 repoSelector = keccak256(abi.encodePacked(_orgID, _repoName));
-    require(
-      (isRepoOperation && _threshold != repos[repoSelector].threshold) ||
-      (!isRepoOperation && _threshold != orgs[_orgID].threshold),
-      "Threshold set"
-    );
+    bytes32 requestSelector;
+    uint currentThreshold;
+    if (isRepoOperation) {
+      currentThreshold = repos[repoSelector].threshold;
+      requestSelector = repoSelector;
+    } else {
+      currentThreshold = orgs[_orgID].threshold;
+      requestSelector = _orgID;
+    }
+    require(_threshold != currentThreshold, "Threshold set");
     bytes32 voteSelector = keccak256(abi.encodePacked(_orgID, _repoName, _threshold));
     require(!pendingVotes[voteSelector].signers.contains(_msgSender()), "User voted");
     require(
@@ -370,11 +381,7 @@ contract Valist is BaseRelayRecipient {
     // if threshold not requested yet, set expiration and add to pendingThresholdRequests[]
     if (pendingVotes[voteSelector].expiration == 0) {
       pendingVotes[voteSelector].expiration = block.timestamp + 7 days;
-      if (isRepoOperation) {
-        pendingThresholdRequests[repoSelector].push(_threshold);
-      } else {
-        pendingThresholdRequests[_orgID].push(_threshold);
-      }
+      pendingThresholdRequests[requestSelector].push(_threshold);
     } else {
       require(
         block.timestamp <= pendingVotes[voteSelector].expiration ||
@@ -397,16 +404,26 @@ contract Valist is BaseRelayRecipient {
     }
     // if threshold met, finalize vote
     if (
-      (
-        isRepoOperation && pendingVotes[voteSelector].signers.length() >= orgs[_orgID].threshold ||
-        !isRepoOperation && pendingVotes[voteSelector].signers.length() >= repos[repoSelector].threshold
-      ) && pendingVotes[voteSelector].signers.length() == _threshold
+      pendingVotes[voteSelector].signers.length() >= currentThreshold &&
+      pendingVotes[voteSelector].signers.length() >= _threshold
     ) {
-      repos[repoSelector].threshold = _threshold;
-      repos[repoSelector].thresholdDate = block.timestamp;
+      if (isRepoOperation) {
+        repos[repoSelector].threshold = _threshold;
+        repos[repoSelector].thresholdDate = block.timestamp;
+      } else {
+        orgs[_orgID].threshold = _threshold;
+        orgs[_orgID].thresholdDate = block.timestamp;
+      }
       // client needs to now call clearPendingRepoThreshold
     }
-    emit VoteThresholdEvent(_orgID, _repoName, _msgSender(), _threshold);
+    emit VoteThresholdEvent(
+      _orgID,
+      _repoName,
+      _msgSender(),
+      _threshold,
+      pendingVotes[voteSelector].signers.length(),
+      currentThreshold
+    );
   }
 
   function clearPendingRelease(

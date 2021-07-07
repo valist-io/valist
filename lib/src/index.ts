@@ -278,11 +278,8 @@ class Valist {
   async getOrganization(orgName: string, page = 1, resultsPerPage = 10): Promise<Organization> {
     try {
       const orgID: OrgID = await this.getOrgIDFromName(orgName);
-      // @TODO add cache expiration on org metadata
-      if (!this.cache.orgs[orgName].metaCID) {
-        this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
-        this.cache.orgs[orgName].orgID = orgID;
-      }
+      this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
+      this.cache.orgs[orgName].orgID = orgID;
 
       this.cache.orgs[orgName].repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
 
