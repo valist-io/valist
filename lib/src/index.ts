@@ -620,8 +620,7 @@ class Valist {
     const orgID = await this.getOrgIDFromName(orgName);
     const pending = await this.getPendingOrgAdmins(orgName);
 
-    // TODO what is the empty value for _repoName
-    const eventFilter = { _key: pending, _orgID: orgID };
+    const eventFilter = { _key: pending, _orgID: orgID, _repoName: '' };
     const eventLogs = await this.getEvents('VoteKeyEvent', eventFilter);
 
     // get unique votes by key and operation
@@ -640,8 +639,7 @@ class Valist {
     const orgID = await this.getOrgIDFromName(orgName);
     const pending = await this.getPendingOrgThresholds(orgName);
 
-    // TODO what is the empty value for _repoName
-    const eventFilter = { _pendingThreshold: pending, _orgID: orgID };
+    const eventFilter = { _pendingThreshold: pending, _orgID: orgID, _repoName: '' };
     const eventLogs = await this.getEvents('VoteThresholdEvent', eventFilter);
 
     // get unique votes by pending threshold
