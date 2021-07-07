@@ -7,7 +7,7 @@
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
     "Zachary J. Pelkey <zach@valist.io> (valist.io)"
   ],
-  "license": "MPL",
+  "license": "MPL-2.0",
   "main": "dist/index.js",
   "bin": {
     "valist": "dist/index.js"
@@ -15,12 +15,15 @@
   "scripts": {
     "build": "tsc",
     "start": "npm run build && node dist/index.js",
+    "testpublish": "dist/index.js createOrg google meta/orgMeta.json",
     "lint": "eslint . --ext .ts",
     "lint:fix": "eslint . --ext .ts --fix"
   },
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.4.0",
-    "@valist/sdk": "^0.3.5",
+    "@valist/sdk": "file:../lib",
+    "ethereumjs-abi": "^0.6.8",
+    "ethers": "^5.4.1",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
     "reproducible": "0.0.3-rc.4",

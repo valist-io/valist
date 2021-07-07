@@ -17,12 +17,11 @@ export type ValistConfig = {
 export const initValist = async (): Promise<Valist> => {
   console.log('📡 Connecting to Valist...');
   try {
-    let signer: string | null = await getSignerKey();
+    const signer: string = await getSignerKey();
 
     const valist = new Valist({ web3Provider: await getWeb3Provider(signer) });
 
     valist.signer = signer;
-    signer = null;
 
     const waitForMetaTx = true;
 
