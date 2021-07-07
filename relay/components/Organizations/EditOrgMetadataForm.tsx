@@ -1,23 +1,20 @@
-import React, { useState, useEffect, useContext } from 'react';
-import ValistContext from '../Valist/ValistContext';
-import { OrgMeta } from '../../../lib/dist/types';
+import React, { useState, useEffect } from 'react';
+import { OrgMeta } from 'valist/dist/types';
 
-const EditOrgMetadataForm = ({ orgName, orgMeta }: { orgName: string, orgMeta: OrgMeta }) => {
-  const valist = useContext(ValistContext);
-
+const EditOrgMetadataForm = ({
+  orgMeta,
+  updateOrgMeta,
+}: {
+  orgMeta: OrgMeta,
+  updateOrgMeta: (meta: OrgMeta) => Promise<void>
+}) => {
   const [name, setName] = useState('');
   const [description, setDescription] = useState('');
-
-  const updateOrgMeta = async () => {
-    try {
-      await valist.setOrgMeta(orgName, { name, description }, valist.defaultAccount);
-    } catch (e) { console.log(e); }
-  };
 
   useEffect(() => {
     setName(orgMeta.name);
     setDescription(orgMeta.description);
-  }, [valist, orgName]);
+  }, [orgMeta]);
 
   return (
     <div className="px-4 py-5 sm:rounded-lg sm:p-6">
@@ -52,7 +49,8 @@ const EditOrgMetadataForm = ({ orgName, orgMeta }: { orgName: string, orgMeta: O
                     </div>
                     <div className="sm:col-span-2">
                     <span className="w-full inline-flex rounded-md shadow-sm">
-                        <button onClick={updateOrgMeta} value="Submit" type="button" className="w-full inline-flex
+                        <button onClick={() => updateOrgMeta({ name, description })}
+                        value="Submit" type="button" className="w-full inline-flex
                         items-center justify-center px-6 py-3 border border-transparent text-base leading-6
                         font-medium rounded-md text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none
                         focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700 transition

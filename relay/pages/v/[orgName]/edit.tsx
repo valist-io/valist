@@ -1,5 +1,8 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useContext } from 'react';
+import {
+  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
+} from 'valist/dist/types';
 import ValistContext from '../../../components/Valist/ValistContext';
 import DashboardLayout from '../../../components/Layouts/DashboardLayout';
 import EditOrgMetadataForm from '../../../components/Organizations/EditOrgMetadataForm';
@@ -7,7 +10,6 @@ import EditOrgThresholdForm from '../../../components/Organizations/EditOrgThres
 import OrgPermissions from '../../../components/AccessControl/OrgPermissions';
 import OrgVotes from '../../../components/AccessControl/OrgVotes';
 import LoadingDialog from '../../../components/LoadingDialog/LoadingDialog';
-import { Organization } from 'valist/dist/types';
 
 export const EditOrgPage = () => {
   const valist = useContext(ValistContext);
@@ -17,17 +19,70 @@ export const EditOrgPage = () => {
   const [loading, setLoading] = useState(false);
   const [org, setOrg] = useState<Organization>();
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
-  const [orgVotes, setOrgVotes] = useState<any[]>([]);
+  const [orgKeyVotes, setOrgKeyVotes] = useState<VoteKeyEvent[]>([]);
+  const [orgThresholdVotes, setOrgThresholdVotes] = useState<VoteThresholdEvent[]>([]);
 
-  const fetchData = async () => {
+  const fetchData = async () => Promise.all([
+    valist.getOrganization(orgName).then(setOrg),
+    valist.getOrgAdmins(orgName).then(setOrgAdmins),
+    valist.getOrgVoteKeyEvents(orgName).then(setOrgKeyVotes),
+    valist.getOrgVoteThresholdEvent(orgName).then(setOrgThresholdVotes),
+  ]);
+
+  const updateMeta = async (meta: OrgMeta) => {
     try {
-      setOrg(await valist.getOrganization(orgName));
-      setOrgAdmins(await valist.getOrgAdmins(orgName));
-      setOrgVotes(await valist.getOrgVoteKeyEvents(orgName));
-    } catch(e) {
+      setLoading(true);
+      await valist.setOrgMeta(orgName, meta, valist.defaultAccount);
+    } catch (e) {
       console.log(e);
+    } finally {
+      setLoading(false);
     }
-  }
+  };
+
+  const voteThreshold = async (threshold: number) => {
+    try {
+      setLoading(true);
+      await valist.voteOrgThreshold(orgName, threshold);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const voteAdmin = async (key: string) => {
+    try {
+      setLoading(true);
+      await valist.voteOrgAdmin(orgName, key);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const revokeAdmin = async (key: string) => {
+    try {
+      setLoading(true);
+      await valist.revokeOrgAdmin(orgName, key);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const rotateAdmin = async (key: string) => {
+    try {
+      setLoading(true);
+      await valist.rotateOrgAdmin(orgName, key);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -47,22 +102,26 @@ export const EditOrgPage = () => {
                       <h2 className="text-3xl">Manage Organization</h2>
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                        { org && <EditOrgMetadataForm orgName={orgName} orgMeta={org.meta} /> }
+                        { org && <EditOrgMetadataForm orgMeta={org.meta} updateOrgMeta={updateMeta} /> }
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                        { org && <EditOrgThresholdForm orgName={orgName} orgThreshold={org.threshold} /> }
+                        { org && <EditOrgThresholdForm orgThreshold={org.threshold}
+                        voteThreshold={voteThreshold} /> }
                     </div>
                     <div className="text-center pt-8">
                       <h2 className="text-3xl">Multi-factor Votes</h2>
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                        <OrgVotes orgName={orgName} orgVotes={orgVotes} />
+                        <OrgVotes orgKeyVotes={orgKeyVotes} orgThresholdVotes={orgThresholdVotes}
+                        voteAdmin={voteAdmin} revokeAdmin={revokeAdmin} rotateAdmin={rotateAdmin}
+                        voteThreshold={voteThreshold} />
                     </div>
                     <div className="text-center pt-8">
                       <h2 className="text-3xl">Manage Access & Permissions</h2>
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                        <OrgPermissions orgName={orgName} orgAdmins={orgAdmins} />
+                        <OrgPermissions orgName={orgName} orgAdmins={orgAdmins}
+                        voteAdmin={voteAdmin} revokeAdmin={revokeAdmin} />
                     </div>
                 </div>
               </div>

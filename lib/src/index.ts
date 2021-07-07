@@ -21,6 +21,7 @@ import {
   Repository,
   ValistCache,
   VoteKeyEvent,
+  VoteThresholdEvent,
 } from './types';
 
 import {
@@ -526,7 +527,7 @@ class Valist {
       );
       return tx;
     } catch (e) {
-      const msg = 'Could not vote to revoke ORG_ADMIN_ROLE';
+      const msg = 'Could not vote to rotate ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
     }
@@ -591,12 +592,12 @@ class Valist {
     }
   }
 
-  private async getEvents(event: string, filter?: object): Promise<EventLog[]> {
+  private async getEvents(event: string, filter?: any): Promise<EventLog[]> {
     try {
       const events = this.contract.getPastEvents(event, {
         fromBlock: await this.web3.eth.getBlockNumber() - 99999,
         toBlock: 'latest',
-        filter
+        filter,
       });
       return events;
     } catch (e) {
@@ -608,27 +609,42 @@ class Valist {
 
   async getOrgVoteKeyEvents(orgName: string): Promise<VoteKeyEvent[]> {
     const orgID = await this.getOrgIDFromName(orgName);
-    const pendingAdmins = await this.getPendingOrgAdmins(orgName);
+    const pending = await this.getPendingOrgAdmins(orgName);
+
     // TODO what is the empty value for _repoName
-    const eventFilter = {_key: pendingAdmins, _orgID: orgID};
-    const voteEvents = await this.getEvents('VoteKeyEvent', eventFilter);
+    const eventFilter = { _key: pending, _orgID: orgID };
+    const eventLogs = await this.getEvents('VoteKeyEvent', eventFilter);
 
-    //let set = {};
-    //let unique: VoteKeyEvent[] = [];
+    // get unique votes by key and operation
+    const unique = new Map<string, VoteKeyEvent>();
+    for (let i = 0; i < eventLogs.length; i++) {
+      const voteEvent: VoteKeyEvent = eventLogs[i].returnValues;
+      // eslint-disable-next-line no-underscore-dangle
+      const voteID = `${voteEvent._key}${voteEvent._operation}`;
+      unique.set(voteID, voteEvent);
+    }
 
-    return [];
+    return Array.from(unique.values());
   }
 
-  async getVoteReleaseEvents(): Promise<any> {
-    return this.getEvents('VoteReleaseEvent');
-  }
+  async getOrgVoteThresholdEvent(orgName: string): Promise<VoteThresholdEvent[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    const pending = await this.getPendingOrgThresholds(orgName);
 
-  async getVoteKeyEvents(): Promise<any> {
-     return this.getEvents('VoteKeyEvent');
-  }
+    // TODO what is the empty value for _repoName
+    const eventFilter = { _pendingThreshold: pending, _orgID: orgID };
+    const eventLogs = await this.getEvents('VoteThresholdEvent', eventFilter);
 
-  async getVoteThresholdEvents(): Promise<any> {
-    return this.getEvents('VoteThresholdEvent');
+    // get unique votes by pending threshold
+    const unique = new Map<string, VoteThresholdEvent>();
+    for (let i = 0; i < eventLogs.length; i++) {
+      const voteEvent: VoteThresholdEvent = eventLogs[i].returnValues;
+      // eslint-disable-next-line no-underscore-dangle
+      const voteID = `${voteEvent._pendingThreshold}`;
+      unique.set(voteID, voteEvent);
+    }
+
+    return Array.from(unique.values());
   }
 
   async getOrgAdmins(orgName: string): Promise<string[]> {

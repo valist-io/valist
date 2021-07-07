@@ -1,30 +1,27 @@
-import React, { useContext, useState } from 'react';
+import React, { useState, useContext } from 'react';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
 import IsOrgAdmin from './IsOrgAdmin';
 
-const OrganizationPermissions = ({ orgName, orgAdmins }: { orgName: string, orgAdmins: string[] }) => {
+const OrganizationPermissions = ({
+  orgName,
+  orgAdmins,
+  voteAdmin,
+  revokeAdmin,
+}: {
+  orgName: string,
+  orgAdmins: string[],
+  voteAdmin: (key: string) => Promise<void>,
+  revokeAdmin: (key: string) => Promise<void>
+}) => {
   const valist = useContext(ValistContext);
   const [key, setKey] = useState('');
 
-  const grantRole = async () => {
-    try {
-      if (valist.web3.utils.isAddress(key)) {
-        await valist.voteOrgAdmin(orgName, key);
-        setKey('');
-      } else {
-        alert('Please enter a valid Ethereum address');
-      }
-    } catch (e) {
-      console.error('Could not grant role', e);
-    }
-  };
-
-  const revokeRole = async (address: string) => {
-    try {
-      await valist.revokeOrgAdmin(orgName, address);
-    } catch (e) {
-      console.error('Could not revoke role', e);
+  const submit = () => {
+    if (valist.web3.utils.isAddress(key)) {
+      voteAdmin(key).then(() => setKey(''));
+    } else {
+      alert('Please enter a valid Ethereum address');
     }
   };
 
@@ -41,7 +38,7 @@ const OrganizationPermissions = ({ orgName, orgAdmins }: { orgName: string, orgA
               px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600
               hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo
               active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md"
-              onClick={async () => { await grantRole(); }}>
+              onClick={submit}>
                 Add Key
               </button>
           </div>
@@ -91,7 +88,7 @@ const OrganizationPermissions = ({ orgName, orgAdmins }: { orgName: string, orgA
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                      onClick={async () => revokeRole(address)}>Revoke Role</a>
+                      onClick={async () => revokeAdmin(address)}>Revoke Role</a>
                     </td>
                   </tr>
                 ))}
