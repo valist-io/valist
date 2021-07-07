@@ -31,6 +31,19 @@ helperAttributes.forwardRequestType = [
   { name: 'data', type: 'bytes' },
 ];
 
+const functionIDMap: Record<string, string> = {
+  createOrganization: 'c30ad06b-4253-4da8-ae08-423f55bfbf6e',
+  createRepository: '5fc2649d-8c7e-4fd4-b276-0866b0320a7c',
+  voteRelease: '745cab42-527f-4505-b0ae-609e452b1d50',
+  voteKey: '82a34363-1551-4a0a-8231-69d895a9d50a',
+  voteThreshold: '9e7df632-7775-44d4-9722-1ae90eee0cbd',
+  setOrgMeta: '3d8d7345-9cd6-4fee-a229-0211125e64cc',
+  setRepoMeta: 'c9a59cce-b7fd-462e-9e8a-ce0368cd4012',
+  clearPendingRelease: '573f49ab-779b-4937-9bc4-1ae5ab7830de',
+  clearPendingKey: 'ab24536b-2312-4994-be6c-2ea9b239dad1',
+  clearPendingThreshold: '4f53949d-fbbc-45ea-960a-cf892719b6ed',
+};
+
 // pass the networkId to get contract addresses
 const getContractAddresses = async (networkId: number) => {
   const addressMap: Record<number, string> = {
@@ -140,6 +153,7 @@ const getDomainSeperator = async (web3: any, networkId: number) => {
 };
 
 export {
+  functionIDMap,
   getDomainSeperator,
   getDataToSignForEIP712,
   buildForwardTxRequest,
