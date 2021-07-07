@@ -338,13 +338,18 @@ contract Valist is BaseRelayRecipient {
           roles[roleSelector].add(_key);
         } else {
           roles[roleSelector].remove(_key);
-          if (roles[roleSelector].length() - 1 <= currentThreshold) {
-            if (isRepoOperation) {
-              // ensure that threshold does not lock existing members
-              repos[repoSelector].threshold--;
-            } else {
-              orgs[_orgID].threshold--;
-            }
+          uint totalOrgAdmins = roles[keccak256(abi.encodePacked(_orgID, ORG_ADMIN))].length();
+          if (
+            isRepoOperation
+            && (totalOrgAdmins + roles[roleSelector].length() - 1)
+            <= currentThreshold
+          ) {
+            // ensure that threshold does not lock existing members
+            repos[repoSelector].threshold--;
+          } else if (
+            !isRepoOperation && roles[roleSelector].length() - 1 <= currentThreshold
+          ) {
+            orgs[_orgID].threshold--;
           }
         }
         roleModifiedTimestamps[timestampSelector] = block.timestamp;
