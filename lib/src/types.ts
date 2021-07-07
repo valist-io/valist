@@ -76,6 +76,36 @@ export type PendingRelease = {
   pendingVote?: PendingVote
 };
 
+export type VoteThresholdEvent = {
+  _orgID: string,
+  _repoName: string,
+  _signer: string,
+  _pendingThreshold: string,
+  _sigCount: string,
+  _threshold: string
+};
+
+export type VoteKeyEvent = {
+  _orgID: string,
+  _repoName: string,
+  _signer: string,
+  _operation: string,
+  _key: string,
+  _sigCount: string,
+  _threshold: string
+};
+
+export type VoteReleaseEvent = {
+  _orgID: string,
+  _repoName: string,
+  _tag: string,
+  _releaseCID: string,
+  _metaCID: string,
+  _signer: string,
+  _sigCount: string,
+  _threshold: string
+};
+
 export type ValistCache = {
   orgIDs: OrgID[],
   orgNames: OrgName[],

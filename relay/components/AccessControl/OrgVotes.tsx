@@ -1,17 +1,9 @@
-import React, { useContext, useEffect } from 'react';
+import React, { useContext } from 'react';
 import ValistContext from '../Valist/ValistContext';
+import { ADD_KEY, REVOKE_KEY, ROTATE_KEY } from 'valist/dist/constants';
 
-const OrgVotes = ({ orgName, pendingOrgAdmins }: { orgName: string, pendingOrgAdmins: string[] }) => {
+const OrgVotes = ({ orgName, orgVotes }: { orgName: string, orgVotes: any[] }) => {
   const valist = useContext(ValistContext);
-
-  const fetchEvents = async () => {
-    const events = await valist.getVoteKeyEvents();
-    console.log(events);
-  };
-
-  useEffect(() => {
-    fetchEvents();
-  }, [valist, orgName, pendingOrgAdmins]);
 
   return (
       <div className="flex flex-col w-full">
@@ -35,10 +27,6 @@ const OrgVotes = ({ orgName, pendingOrgAdmins }: { orgName: string, pendingOrgAd
                     </th>
                     <th scope="col"
                     className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
-                      Status
-                    </th>
-                    <th scope="col"
-                    className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">
                       Votes
                     </th>
                     <th scope="col" className="relative px-6 py-3">
@@ -47,22 +35,21 @@ const OrgVotes = ({ orgName, pendingOrgAdmins }: { orgName: string, pendingOrgAd
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  { pendingOrgAdmins[0] !== '0x0' && pendingOrgAdmins.map((address, index) => (
+                  { orgVotes && orgVotes.map((vote, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        Add Org Admin
+                        { vote.returnValues._operation === ADD_KEY && 'Add Key' }
+                        { vote.returnValues._operation === REVOKE_KEY && 'Revoke Key' }
+                        { vote.returnValues._operation === ROTATE_KEY && 'Rotate Key' }
+                      </td>
+                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+                        { vote.returnValues._key }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        {address}
+                        TODO!!!
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        24 Hours
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        Pending
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        0 / 4
+                        { vote.returnValues._sigCount } / { vote.returnValues._threshold }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                         <a href="#" className="text-indigo-600 hover:text-indigo-900">Approve</a>

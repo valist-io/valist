@@ -3,7 +3,7 @@ import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
 
-import { provider } from 'web3-core/types';
+import { provider, EventLog } from 'web3-core/types';
 
 import * as sigUtil from 'eth-sig-util';
 
@@ -20,6 +20,7 @@ import {
   RepoMeta,
   Repository,
   ValistCache,
+  VoteKeyEvent,
 } from './types';
 
 import {
@@ -590,11 +591,12 @@ class Valist {
     }
   }
 
-  private async getEvents(event: string): Promise<any> {
+  private async getEvents(event: string, filter?: object): Promise<EventLog[]> {
     try {
       const events = this.contract.getPastEvents(event, {
         fromBlock: await this.web3.eth.getBlockNumber() - 99999,
-        toBlock: 'latest'
+        toBlock: 'latest',
+        filter
       });
       return events;
     } catch (e) {
@@ -604,12 +606,25 @@ class Valist {
     }
   }
 
+  async getOrgVoteKeyEvents(orgName: string): Promise<VoteKeyEvent[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    const pendingAdmins = await this.getPendingOrgAdmins(orgName);
+    // TODO what is the empty value for _repoName
+    const eventFilter = {_key: pendingAdmins, _orgID: orgID};
+    const voteEvents = await this.getEvents('VoteKeyEvent', eventFilter);
+
+    //let set = {};
+    //let unique: VoteKeyEvent[] = [];
+
+    return [];
+  }
+
   async getVoteReleaseEvents(): Promise<any> {
     return this.getEvents('VoteReleaseEvent');
   }
 
   async getVoteKeyEvents(): Promise<any> {
-    return this.getEvents('VoteKeyEvent');
+     return this.getEvents('VoteKeyEvent');
   }
 
   async getVoteThresholdEvents(): Promise<any> {
