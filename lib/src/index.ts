@@ -7,8 +7,17 @@ import { provider } from 'web3-core/types';
 
 import * as sigUtil from 'eth-sig-util';
 
-// @ts-ignore mexa doesn't support typescript yet
-import { Biconomy } from '@biconomy/mexa';
+import {
+  Biconomy,
+  // @ts-ignore mexa doesn't support typescript yet
+} from '@biconomy/mexa';
+
+import {
+  getDomainSeperator,
+  getDataToSignForEIP712,
+  buildForwardTxRequest,
+  getBiconomyForwarderConfig,
+} from './helpers/biconomy';
 
 import {
   Organization,
@@ -921,33 +930,103 @@ class Valist {
   }
 
   async sendTransaction(functionCall: any, account: string = this.defaultAccount): Promise<any> {
+    const gasLimit = await functionCall.estimateGas({ from: account });
+    const functionSignature = functionCall.encodeABI();
     if (this.metaTxEnabled) {
       if (!this.metaTxReady) throw new Error('MetaTransactions not ready!');
 
+      const sendAsync = (params: any): any => new Promise((resolve, reject) => {
+        // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
+        this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
+          if (e) reject(e);
+          resolve(signed);
+        });
+      });
+
       try {
         let tx;
-
         if (this.signer) {
-          const txParams = {
-            from: account,
-            data: functionCall.encodeABI(),
-            gasLimit: this.web3.utils.toHex(await functionCall.estimateGas({ from: account })),
+          const networkID = await this.web3.eth.net.getId();
+          const forwarder = await getBiconomyForwarderConfig(networkID);
+          const forwarderContract = new this.web3.eth.Contract(forwarder.abi, forwarder.address);
+          const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
+          const to = this.contractAddress;
+
+          const request = await buildForwardTxRequest({
+            account,
+            to,
+            gasLimitNum: gasLimit,
+            batchId: 0,
+            batchNonce,
+            data: functionSignature,
+            deadline: '',
+          });
+
+          const domainSeparator = await getDomainSeperator(networkID);
+          const dataToSign = await getDataToSignForEIP712(request, networkID);
+          let signed;
+
+          if (this.signer) {
+            signed = sigUtil.signTypedData_v4(Buffer.from(this.signer, 'hex'), { data: JSON.parse(dataToSign) });
+          } else {
+            const sig = await sendAsync({
+              jsonrpc: '2.0',
+              id: new Date().getTime(),
+              method: 'eth_signTypedData_v4',
+              params: [account, dataToSign],
+            });
+            signed = sig.result;
+          }
+
+          // eslint-disable-next-line no-underscore-dangle
+          const functionName: string = functionCall._method.name;
+          const functionIDMap = {
+            createOrganization: '27bad85d-6821-43dd-aa64-924a327ef6bc',
+            createRepository: 'f09f84a4-0364-4a1e-8011-deea92527823',
+            voteRelease: '2b11f0d2-9eee-48cd-ba92-ad4083930142',
+            voteKey: '838a8e89-3a92-481d-a708-87f62459f02e',
+            voteThreshold: '8e930fd0-d781-4c2a-a7da-db961348dda3',
+            setOrgMeta: 'f8b42e31-cf5c-4e16-be73-f2f94467641f',
+            setRepoMeta: 'ec68cb11-e7a6-4bbf-966d-065c2a0a233c',
+            clearPendingRelease: '24d70971-c3b5-4728-ad2c-310a9c717b31',
+            clearPendingKey: '8e6b6d8d-123a-42ef-8751-5aea5a5d6e04',
+            clearPendingThreshold: 'd98d4649-c5d6-4aab-978b-6af29afcbc5a',
           };
-          const signedTx = await this.web3.eth.accounts.signTransaction(txParams, `0x${this.signer}`);
-          const forwardData = await this.biconomy.getForwardRequestAndMessageToSign(signedTx.rawTransaction);
-          const signature = sigUtil.signTypedData_v4(
-            Buffer.from(this.signer, 'hex'),
-            { data: forwardData.eip712Format },
-          );
-          const { rawTransaction } = signedTx;
-          const data = {
-            signature,
-            forwardRequest: forwardData.request,
-            rawTransaction,
-            signatureType: this.biconomy.EIP712_SIGN,
+
+          const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
+            method: 'POST',
+            headers: {
+              'x-api-key': this.biconomy.apiKey,
+              'Content-Type': 'application/json;charset=utf-8',
+            },
+            body: JSON.stringify({
+              to: this.contractAddress,
+              // @ts-ignore
+              apiId: functionIDMap[functionName],
+              params: [request, domainSeparator, signed],
+              from: account,
+              signatureType: this.biconomy.EIP712_SIGN,
+            }),
+          });
+
+          let txHash = await resp.json();
+          txHash = txHash.txHash;
+
+          const getTransactionReceiptMined = async () => {
+            const transactionReceiptAsync = async (resolve: any, reject: any) => {
+              const receipt = await this.web3.eth.getTransactionReceipt(txHash);
+              if (receipt == null) {
+                setTimeout(() => transactionReceiptAsync(resolve, reject), 500);
+              } else {
+                resolve(receipt);
+              }
+            };
+
+            await new Promise(transactionReceiptAsync);
+            return txHash;
           };
-          // @ts-ignore
-          tx = await this.web3.eth.sendSignedTransaction(data);
+
+          tx = await getTransactionReceiptMined();
         } else {
           tx = await functionCall.send({
             from: account,
@@ -962,7 +1041,6 @@ class Valist {
         throw e;
       }
     } else {
-      const gasLimit = await functionCall.estimateGas({ from: account });
       const tx = await functionCall.send({ from: account, gasLimit });
       return tx;
     }
