@@ -1,5 +1,8 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useContext } from 'react';
+import {
+  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
+} from 'valist/dist/types';
 import ValistContext from '../../../components/Valist/ValistContext';
 import DashboardLayout from '../../../components/Layouts/DashboardLayout';
 import EditOrgMetadataForm from '../../../components/Organizations/EditOrgMetadataForm';
@@ -7,9 +10,6 @@ import EditOrgThresholdForm from '../../../components/Organizations/EditOrgThres
 import OrgPermissions from '../../../components/AccessControl/OrgPermissions';
 import OrgVotes from '../../../components/AccessControl/OrgVotes';
 import LoadingDialog from '../../../components/LoadingDialog/LoadingDialog';
-import {
-  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
-} from 'valist/dist/types';
 
 export const EditOrgPage = () => {
   const valist = useContext(ValistContext);
