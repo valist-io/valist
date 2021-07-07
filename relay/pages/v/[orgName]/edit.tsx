@@ -73,16 +73,16 @@ export const EditOrgPage = () => {
     }
   };
 
-  // const rotateAdmin = async (key: string) => {
-  //   try {
-  //     setLoading(true);
-  //     await valist.rotateOrgAdmin(orgName, key);
-  //   } catch (e) {
-  //     console.log(e);
-  //   } finally {
-  //     setLoading(false);
-  //   }
-  // };
+  const rotateAdmin = async (key: string) => {
+    try {
+      setLoading(true);
+      await valist.rotateOrgAdmin(orgName, key);
+    } catch (e) {
+      console.log(e);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   useEffect(() => {
     setLoading(true);
@@ -119,7 +119,7 @@ export const EditOrgPage = () => {
                       <h2 className="text-3xl">Manage Access & Permissions</h2>
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                        <OrgPermissions orgName={orgName} orgAdmins={orgAdmins}
+                        <OrgPermissions orgAdmins={orgAdmins} rotateAdmin={rotateAdmin}
                         voteAdmin={voteAdmin} revokeAdmin={revokeAdmin} />
                     </div>
                 </div>

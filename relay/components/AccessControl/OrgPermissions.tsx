@@ -1,25 +1,33 @@
 import React, { useState, useContext } from 'react';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
-import IsOrgAdmin from './IsOrgAdmin';
 
 const OrganizationPermissions = ({
-  orgName,
   orgAdmins,
   voteAdmin,
   revokeAdmin,
+  rotateAdmin,
 }: {
-  orgName: string,
   orgAdmins: string[],
   voteAdmin: (key: string) => Promise<void>,
-  revokeAdmin: (key: string) => Promise<void>
+  revokeAdmin: (key: string) => Promise<void>,
+  rotateAdmin: (key: string) => Promise<void>
 }) => {
   const valist = useContext(ValistContext);
-  const [key, setKey] = useState('');
+  const [addKey, setAddKey] = useState('');
+  const [rotateKey, setRotateKey] = useState('');
 
-  const submit = () => {
-    if (valist.web3.utils.isAddress(key)) {
-      voteAdmin(key).then(() => setKey(''));
+  const submitRotateKey = () => {
+    if (valist.web3.utils.isAddress(rotateKey)) {
+      rotateAdmin(rotateKey).then(() => setRotateKey(''));
+    } else {
+      alert('Please enter a valid Ethereum address');
+    }
+  };
+
+  const submitAddKey = () => {
+    if (valist.web3.utils.isAddress(addKey)) {
+      voteAdmin(addKey).then(() => setAddKey(''));
     } else {
       alert('Please enter a valid Ethereum address');
     }
@@ -27,23 +35,39 @@ const OrganizationPermissions = ({
 
   return (
     <div className="flex flex-col w-full">
-      <IsOrgAdmin orgName={orgName}>
-        <div className="col-span-3 sm:col-span-2 pb-8">
-          <div className="mt-1 flex shadow-sm">
-              <input onChange={(e) => setKey(e.target.value)} type="text" value={key}
-              className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150
-              ease-in-out sm:text-sm sm:leading-5 shadow-sm"
-              placeholder="0x0123456789012345678901234567890123456789" />
-              <button value="Submit" type="button" className="inline-flex items-center justify-center
-              px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600
-              hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo
-              active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md"
-              onClick={submit}>
-                Add Key
-              </button>
-          </div>
+      <div className="col-span-3 sm:col-span-2 pb-8">
+        <label htmlFor="rotate-key">Revoke current key and grant access to a new key</label>
+        <div className="mt-1 flex shadow-sm">
+            <input id="rotate-key" name="rotate-key"
+            onChange={(e) => setRotateKey(e.target.value)} type="text" value={rotateKey}
+            className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150
+            ease-in-out sm:text-sm sm:leading-5 shadow-sm"
+            placeholder="0x0123456789012345678901234567890123456789" />
+            <button value="Submit" type="button" className="inline-flex items-center justify-center
+            px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600
+            hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo
+            active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md"
+            onClick={submitRotateKey}>
+              Rotate Key
+            </button>
         </div>
-      </IsOrgAdmin>
+      </div>
+      <div className="col-span-3 sm:col-span-2 pb-8">
+        <label htmlFor="rotate-key">Grant access to a new key</label>
+        <div className="mt-1 flex shadow-sm">
+            <input onChange={(e) => setAddKey(e.target.value)} type="text" value={addKey}
+            className="form-input flex-1 block rounded-l-md w-full rounded-none transition duration-150
+            ease-in-out sm:text-sm sm:leading-5 shadow-sm"
+            placeholder="0x0123456789012345678901234567890123456789" />
+            <button value="Submit" type="button" className="inline-flex items-center justify-center
+            px-6 py-3 border border-transparent text-base leading-6 font-medium text-white bg-indigo-600
+            hover:bg-indigo-500 focus:outline-none focus:border-indigo-700 focus:shadow-outline-indigo
+            active:bg-indigo-700 transition ease-in-out duration-150 rounded-r-md"
+            onClick={submitAddKey}>
+              Add Key
+            </button>
+        </div>
+      </div>
       <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
         <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
           <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
