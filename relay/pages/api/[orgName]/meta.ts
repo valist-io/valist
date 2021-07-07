@@ -18,10 +18,10 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
       query: { orgName },
     } = req;
 
-    const orgMeta = await valist.getOrganizationMeta(orgName.toString());
+    const org = await valist.getOrganization(orgName.toString());
 
-    if (orgMeta) {
-      return res.status(200).json({ orgMeta });
+    if (org.meta) {
+      return res.status(200).json({ orgMeta: org.meta });
     }
     return res.status(404).json({ statusCode: 404, message: 'No organization found!' });
   }
