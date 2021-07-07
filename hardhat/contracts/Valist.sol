@@ -338,10 +338,17 @@ contract Valist is BaseRelayRecipient {
           roles[roleSelector].add(_key);
         } else {
           roles[roleSelector].remove(_key);
-          if (isRepoOperation) {
+          uint totalOrgAdmins = roles[keccak256(abi.encodePacked(_orgID, ORG_ADMIN))].length();
+          if (
+            isRepoOperation
+            && (totalOrgAdmins + roles[roleSelector].length() - 1)
+            <= currentThreshold
+          ) {
             // ensure that threshold does not lock existing members
             repos[repoSelector].threshold--;
-          } else {
+          } else if (
+            !isRepoOperation && roles[roleSelector].length() - 1 <= currentThreshold
+          ) {
             orgs[_orgID].threshold--;
           }
         }
@@ -405,8 +412,13 @@ contract Valist is BaseRelayRecipient {
       pendingVotes[voteSelector].signers.length() >= currentThreshold &&
       pendingVotes[voteSelector].signers.length() >= _threshold
     ) {
-      repos[repoSelector].threshold = _threshold;
-      repos[repoSelector].thresholdDate = block.timestamp;
+      if (isRepoOperation) {
+        repos[repoSelector].threshold = _threshold;
+        repos[repoSelector].thresholdDate = block.timestamp;
+      } else {
+        orgs[_orgID].threshold = _threshold;
+        orgs[_orgID].thresholdDate = block.timestamp;
+      }
       // client needs to now call clearPendingRepoThreshold
     }
     emit VoteThresholdEvent(

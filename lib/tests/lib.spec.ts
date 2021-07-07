@@ -2,7 +2,7 @@ import Web3 from 'web3';
 import { expect } from 'chai';
 import { describe, before, it } from 'mocha';
 import Valist from '../dist/';
-import { ADD_KEY } from '../dist/constants';
+import { ADD_KEY, REVOKE_KEY } from '../dist/constants';
 import { getContractInstance } from '../src/utils';
 
 import ValistABI from '../src/abis/contracts/Valist.sol/Valist.json';
@@ -196,7 +196,137 @@ describe('Test Valist Lib', async () => {
     });
   });
 
-  describe('Multi-Factor Setup', async () => {
+  describe('Multi-Factor Org Setup', async () => {
+    it('Should add key2 as orgAdmin', async () => {
+      await valist.voteOrgAdmin(orgShortName, accounts[1]);
+    });
+
+    it('Should add key3 as orgAdmin', async () => {
+      await valist.voteOrgAdmin(orgShortName, accounts[2]);
+    });
+
+    it('Should vote for org threshold', async () => {
+      await valist.voteOrgThreshold(orgShortName, 2);
+    });
+
+    it('Should fail to vote for org threshold twice with same key', async () => {
+      try {
+        await valist.voteOrgThreshold(orgShortName, 2);
+      } catch (e) {
+        expect(e.message).to.contain('User voted');
+      }
+    });
+
+    it('Should fetch pending org threshold requests', async () => {
+      const requests = await valist.getPendingOrgThresholds(orgShortName);
+      expect(requests[0]).to.equal(2);
+    });
+
+    it('Should vote for org threshold with key2', async () => {
+      valist.defaultAccount = accounts[1];
+      await valist.voteOrgThreshold(orgShortName, 2);
+      valist.defaultAccount = accounts[0];
+    });
+
+    it('Vote should pass and org threshold set', async () => {
+      const org = await valist.getOrganization(orgShortName);
+      expect(Number(org.threshold)).to.equal(2);
+    });
+
+    it('Should clear pending org threshold', async () => {
+      await valist.clearPendingOrgThreshold(orgShortName, 2, 0);
+      const requests = await valist.getPendingOrgThresholds(orgShortName);
+      const pendingVote = await valist.getPendingOrgThresholdVotes(orgShortName, 2);
+      expect(requests.length).to.equal(0);
+      expect(Number(pendingVote.expiration)).to.equal(0);
+      expect(pendingVote.signers.length).to.equal(0);
+    });
+
+    it('Should vote to add key4 as a orgAdmin from key1', async () => {
+      await valist.voteOrgAdmin(orgShortName, accounts[3]);
+    });
+
+    it('Should fetch pending orgAdmin key', async () => {
+      const pendingOrgAdmins = await valist.getPendingOrgAdmins(orgShortName);
+      expect(pendingOrgAdmins[0]).to.equal(accounts[3]);
+    });
+
+    it('Should fetch pending orgAdmin votes for key4', async () => {
+      const pendingVote = await valist.getPendingOrgAdminVotes(orgShortName, ADD_KEY, accounts[3]);
+      expect(pendingVote.signers[0]).to.equal(accounts[0]);
+    });
+
+    it('Should vote to add key4 as an orgAdmin from key2', async () => {
+      valist.defaultAccount = accounts[1];
+      await valist.voteOrgAdmin(orgShortName, accounts[3]);
+      valist.defaultAccount = accounts[0];
+    });
+
+    it('Vote should pass and key4 should be orgAdmin', async () => {
+      const isOrgAdmin = await valist.isOrgAdmin(orgShortName, accounts[3]);
+      expect(isOrgAdmin).to.be.true;
+    });
+
+    it('Should clear pending orgAdmin key', async () => {
+      await valist.clearPendingOrgKey(orgShortName, ADD_KEY, accounts[3], 0);
+      const pendingVote = await valist.getPendingOrgAdminVotes(orgShortName, ADD_KEY, accounts[3]);
+      const pendingOrgAdmins = await valist.getPendingOrgAdmins(orgShortName);
+      expect(pendingOrgAdmins.length).to.equal(0);
+      expect(Number(pendingVote.expiration)).to.equal(0);
+      expect(pendingVote.signers.length).to.equal(0);
+    });
+  });
+
+  describe('Multi-Factor Org Remove Key', async () => {
+    it('Should vote to revoke key2 as orgAdmin', async () => {
+      await valist.revokeOrgAdmin(orgShortName, accounts[1]);
+    });
+
+    it('Should fail to vote for revocation twice with same key', async () => {
+      try {
+        await valist.revokeOrgAdmin(orgShortName, accounts[1]);
+      } catch (e) {
+        expect(e.message).to.contain('User voted');
+      }
+    });
+
+    it('Should fetch pending orgAdmin key', async () => {
+      const pendingOrgAdmins = await valist.getPendingOrgAdmins(orgShortName);
+      expect(pendingOrgAdmins[0]).to.equal(accounts[1]);
+    });
+
+    it('Should fetch pending orgAdmin revocation votes for key2', async () => {
+      const pendingVote = await valist.getPendingOrgAdminVotes(orgShortName, REVOKE_KEY, accounts[1]);
+      expect(pendingVote.signers[0]).to.equal(accounts[0]);
+    });
+
+    it('Should vote from key3 to revoke key2 as orgAdmin', async () => {
+      valist.defaultAccount = accounts[2];
+      await valist.revokeOrgAdmin(orgShortName, accounts[1]);
+      valist.defaultAccount = accounts[0];
+    });
+
+    it('Vote should pass and key2 should be orgAdmin', async () => {
+      const isOrgAdmin = await valist.isOrgAdmin(orgShortName, accounts[1]);
+      expect(isOrgAdmin).to.be.false;
+    });
+
+    it('Should clear pending orgAdmin key', async () => {
+      await valist.clearPendingOrgKey(orgShortName, REVOKE_KEY, accounts[1], 0);
+      const pendingVote = await valist.getPendingOrgAdminVotes(orgShortName, REVOKE_KEY, accounts[1]);
+      const pendingOrgAdmins = await valist.getPendingOrgAdmins(orgShortName);
+      expect(pendingOrgAdmins.length).to.equal(0);
+      expect(Number(pendingVote.expiration)).to.equal(0);
+      expect(pendingVote.signers.length).to.equal(0);
+    });
+
+    it('Threshold should be one less after revocation', async () => {
+      const org = await valist.getOrganization(orgShortName);
+      expect(Number(org.threshold)).to.equal(1);
+    });
+  });
+
+  describe('Multi-Factor Repo Setup', async () => {
     it('Should add key2 as repoDev', async () => {
       await valist.voteRepoDev(orgShortName, repoName, accounts[1]);
     });
@@ -299,11 +429,11 @@ describe('Test Valist Lib', async () => {
       expect(pendingVote.signers[0]).to.equal(accounts[0]);
     });
 
-    it('Should fetch VoteReleaseEvent', async () => {
-      const events = await valist.getVoteReleaseEvents();
-      expect(events[events.length - 1].returnValues._sigCount).to.be.equal('1');
-      expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
-    });
+    // it('Should fetch VoteReleaseEvent', async () => {
+    //   const events = await valist.getVoteReleaseEvents();
+    //   expect(events[events.length - 1].returnValues._sigCount).to.be.equal('1');
+    //   expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
+    // });
 
     it('Should finalize vote on new release', async () => {
       valist.defaultAccount = accounts[1];
@@ -314,11 +444,11 @@ describe('Test Valist Lib', async () => {
       expect(transactionResponse).to.have.property('blockNumber');
     });
 
-    it('Should fetch VoteReleaseEvent', async () => {
-      const events = await valist.getVoteReleaseEvents();
-      expect(events[events.length - 1].returnValues._sigCount).to.be.equal('2');
-      expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
-    });
+    // it('Should fetch VoteReleaseEvent', async () => {
+    //   const events = await valist.getVoteReleaseEvents();
+    //   expect(events[events.length - 1].returnValues._sigCount).to.be.equal('2');
+    //   expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
+    // });
 
     it('Should clear pending release', async () => {
       await valist.clearPendingRelease(orgShortName, repoName, release, 0);

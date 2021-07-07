@@ -13,6 +13,7 @@ import {
 } from '@biconomy/mexa';
 
 import {
+  functionIDMap,
   getDomainSeperator,
   getDataToSignForEIP712,
   buildForwardTxRequest,
@@ -280,11 +281,8 @@ class Valist {
   async getOrganization(orgName: string, page = 1, resultsPerPage = 10): Promise<Organization> {
     try {
       const orgID: OrgID = await this.getOrgIDFromName(orgName);
-      // @TODO add cache expiration on org metadata
-      if (!this.cache.orgs[orgName].metaCID) {
-        this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
-        this.cache.orgs[orgName].orgID = orgID;
-      }
+      this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
+      this.cache.orgs[orgName].orgID = orgID;
 
       this.cache.orgs[orgName].repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
 
@@ -1035,19 +1033,6 @@ class Valist {
 
         // eslint-disable-next-line no-underscore-dangle
         const functionName: string = functionCall._method.name;
-        const functionIDMap: Record<string, string> = {
-          createOrganization: '27bad85d-6821-43dd-aa64-924a327ef6bc',
-          createRepository: 'f09f84a4-0364-4a1e-8011-deea92527823',
-          voteRelease: '2b11f0d2-9eee-48cd-ba92-ad4083930142',
-          voteKey: '838a8e89-3a92-481d-a708-87f62459f02e',
-          voteThreshold: '8e930fd0-d781-4c2a-a7da-db961348dda3',
-          setOrgMeta: 'f8b42e31-cf5c-4e16-be73-f2f94467641f',
-          setRepoMeta: 'ec68cb11-e7a6-4bbf-966d-065c2a0a233c',
-          clearPendingRelease: '24d70971-c3b5-4728-ad2c-310a9c717b31',
-          clearPendingKey: '8e6b6d8d-123a-42ef-8751-5aea5a5d6e04',
-          clearPendingThreshold: 'd98d4649-c5d6-4aab-978b-6af29afcbc5a',
-        };
-
         const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
           method: 'POST',
           headers: {
