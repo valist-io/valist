@@ -1,8 +1,5 @@
 import { useRouter } from 'next/router';
 import { useState, useEffect, useContext } from 'react';
-import {
-  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
-} from 'valist/dist/types';
 import ValistContext from '../../../components/Valist/ValistContext';
 import DashboardLayout from '../../../components/Layouts/DashboardLayout';
 import EditOrgMetadataForm from '../../../components/Organizations/EditOrgMetadataForm';
@@ -10,6 +7,9 @@ import EditOrgThresholdForm from '../../../components/Organizations/EditOrgThres
 import OrgPermissions from '../../../components/AccessControl/OrgPermissions';
 import OrgVotes from '../../../components/AccessControl/OrgVotes';
 import LoadingDialog from '../../../components/LoadingDialog/LoadingDialog';
+import {
+  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
+} from 'valist/dist/types';
 
 export const EditOrgPage = () => {
   const valist = useContext(ValistContext);
@@ -73,16 +73,16 @@ export const EditOrgPage = () => {
     }
   };
 
-  const rotateAdmin = async (key: string) => {
-    try {
-      setLoading(true);
-      await valist.rotateOrgAdmin(orgName, key);
-    } catch (e) {
-      console.log(e);
-    } finally {
-      setLoading(false);
-    }
-  };
+  // const rotateAdmin = async (key: string) => {
+  //   try {
+  //     setLoading(true);
+  //     await valist.rotateOrgAdmin(orgName, key);
+  //   } catch (e) {
+  //     console.log(e);
+  //   } finally {
+  //     setLoading(false);
+  //   }
+  // };
 
   useEffect(() => {
     setLoading(true);
@@ -113,8 +113,7 @@ export const EditOrgPage = () => {
                     </div>
                     <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
                         <OrgVotes orgKeyVotes={orgKeyVotes} orgThresholdVotes={orgThresholdVotes}
-                        voteAdmin={voteAdmin} revokeAdmin={revokeAdmin} rotateAdmin={rotateAdmin}
-                        voteThreshold={voteThreshold} />
+                        voteAdmin={voteAdmin} revokeAdmin={revokeAdmin} voteThreshold={voteThreshold} />
                     </div>
                     <div className="text-center pt-8">
                       <h2 className="text-3xl">Manage Access & Permissions</h2>

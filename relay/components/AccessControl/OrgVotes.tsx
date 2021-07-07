@@ -9,14 +9,12 @@ const OrgVotes = ({
   voteAdmin,
   revokeAdmin,
   voteThreshold,
-  rotateAdmin,
 }: {
   orgKeyVotes: VoteKeyEvent[],
   orgThresholdVotes: VoteThresholdEvent[],
   voteAdmin: (key: string) => Promise<void>,
   revokeAdmin: (key: string) => Promise<void>,
-  voteThreshold: (threshold: number) => Promise<void>,
-  rotateAdmin: (key: string) => Promise<void>
+  voteThreshold: (threshold: number) => Promise<void>
 }) => (
       <div className="flex flex-col w-full">
         <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
@@ -43,12 +41,11 @@ const OrgVotes = ({
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  { orgKeyVotes && orgKeyVotes.map((vote, index) => (
+                  { orgKeyVotes && orgKeyVotes.filter((vote) => vote._operation !== ROTATE_KEY).map((vote, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                         { vote._operation === ADD_KEY && 'Add Key' }
                         { vote._operation === REVOKE_KEY && 'Revoke Key' }
-                        { vote._operation === ROTATE_KEY && 'Rotate Key' }
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
                         { vote._key }
@@ -63,8 +60,6 @@ const OrgVotes = ({
                             voteAdmin(vote._key);
                           } else if (vote._operation === REVOKE_KEY) {
                             revokeAdmin(vote._key);
-                          } else if (vote._operation === ROTATE_KEY) {
-                            rotateAdmin(vote._key);
                           }
                         }}>
                           Approve
