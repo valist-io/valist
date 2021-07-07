@@ -299,6 +299,12 @@ describe('Test Valist Lib', async () => {
       expect(pendingVote.signers[0]).to.equal(accounts[0]);
     });
 
+    it('Should fetch VoteReleaseEvent', async () => {
+      const events = await valist.getVoteReleaseEvents();
+      expect(events[events.length - 1].returnValues._sigCount).to.be.equal('1');
+      expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
+    });
+
     it('Should finalize vote on new release', async () => {
       valist.defaultAccount = accounts[1];
       const transactionResponse = await valist.publishRelease(orgShortName, repoName, release);
@@ -306,6 +312,12 @@ describe('Test Valist Lib', async () => {
       expect(transactionResponse).to.have.property('transactionHash');
       expect(transactionResponse).to.have.property('blockHash');
       expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should fetch VoteReleaseEvent', async () => {
+      const events = await valist.getVoteReleaseEvents();
+      expect(events[events.length - 1].returnValues._sigCount).to.be.equal('2');
+      expect(events[events.length - 1].returnValues._threshold).to.be.equal('2');
     });
 
     it('Should clear pending release', async () => {

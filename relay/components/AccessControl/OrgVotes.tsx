@@ -1,17 +1,17 @@
-import React, { useContext, useEffect, useState } from 'react';
+import React, { useContext, useEffect } from 'react';
 import ValistContext from '../Valist/ValistContext';
 
-const OrgVotes = ({ orgName }: { orgName: string }) => {
+const OrgVotes = ({ orgName, pendingOrgAdmins }: { orgName: string, pendingOrgAdmins: string[] }) => {
   const valist = useContext(ValistContext);
-  const [votes, setVotes] = useState(['']);
 
-  const loadVotes = async () => {
-    setVotes(['Added Key', 'Revoked Key']);
+  const fetchEvents = async () => {
+    const events = await valist.getVoteKeyEvents();
+    console.log(events);
   };
 
   useEffect(() => {
-    loadVotes();
-  }, [valist, orgName]);
+    fetchEvents();
+  }, [valist, orgName, pendingOrgAdmins]);
 
   return (
       <div className="flex flex-col w-full">
@@ -47,13 +47,13 @@ const OrgVotes = ({ orgName }: { orgName: string }) => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  { votes[0] !== '' && votes.map((vote, index) => (
+                  { pendingOrgAdmins[0] !== '0x0' && pendingOrgAdmins.map((address, index) => (
                     <tr key={index}>
                       <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        {vote}
+                        Add Org Admin
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        0xAB..01
+                        {address}
                       </td>
                       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
                         24 Hours

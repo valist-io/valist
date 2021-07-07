@@ -1,33 +1,16 @@
-import React, { useContext, useEffect, useState } from 'react';
-import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import React, { useContext, useState } from 'react';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
 import IsOrgAdmin from './IsOrgAdmin';
 
-const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
+const OrganizationPermissions = ({ orgName, orgAdmins }: { orgName: string, orgAdmins: string[] }) => {
   const valist = useContext(ValistContext);
-
-  const [orgAdmins, setOrgAdmins] = useState(['0x0']);
   const [key, setKey] = useState('');
 
-  const [renderLoading, setRenderLoading] = useState(false);
-
-  const updateData = async () => {
-    if (valist) {
-      try {
-        setOrgAdmins(await valist.getOrgAdmins(orgName) || ['0x0']);
-      } catch (e) {
-        console.error('Could not fetch ACL data', e);
-      }
-    }
-  };
-
   const grantRole = async () => {
-    setRenderLoading(true);
     try {
       if (valist.web3.utils.isAddress(key)) {
         await valist.voteOrgAdmin(orgName, key);
-        await updateData();
         setKey('');
       } else {
         alert('Please enter a valid Ethereum address');
@@ -35,23 +18,15 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
     } catch (e) {
       console.error('Could not grant role', e);
     }
-    setRenderLoading(false);
   };
 
   const revokeRole = async (address: string) => {
-    setRenderLoading(true);
     try {
       await valist.revokeOrgAdmin(orgName, address);
-      await updateData();
     } catch (e) {
       console.error('Could not revoke role', e);
     }
-    setRenderLoading(false);
   };
-
-  useEffect(() => {
-    updateData();
-  }, [valist, orgName]);
 
   return (
     <div className="flex flex-col w-full">
@@ -96,31 +71,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
                 </tr>
               </thead>
               <tbody>
-                {orgOwners[0] !== '0x0' && orgOwners.map((address) => (
-                  <tr className="bg-white" key={address}>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                      <div className="flex items-center">
-                        <div>
-                          <AddressIdenticon address={address} height={8}/>
-                        </div>
-                        <div className="ml-8 font-mono">
-                          {address}
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      Org Owner
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      Pending
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                      onClick={async () => revokeRole(address)}>Revoke Role</a>
-                    </td>
-                  </tr>
-                ))}
-                {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
+                {orgAdmins && orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
                   <tr className="bg-white" key={address}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center">
@@ -136,7 +87,7 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
                       Org Admin
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                      Pending
+                      Active
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <a href="#" className="text-indigo-600 hover:text-indigo-900"
@@ -149,7 +100,6 @@ const OrganizationPermissions = ({ orgName }: { orgName: string }) => {
           </div>
         </div>
       </div>
-      { renderLoading && <LoadingDialog>Updating Access Control List...</LoadingDialog> }
     </div>
   );
 };

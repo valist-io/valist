@@ -492,6 +492,7 @@ class Valist {
         this.contract.methods.voteKey(orgID, '', ADD_KEY, key),
         this.defaultAccount,
       );
+      console.log(orgID, tx);
       return tx;
     } catch (e) {
       const msg = 'Could not vote to grant ORG_ADMIN_ROLE';
@@ -587,6 +588,32 @@ class Valist {
       console.error(msg, e);
       throw e;
     }
+  }
+
+  private async getEvents(event: string): Promise<any> {
+    try {
+      const events = this.contract.getPastEvents(event, {
+        fromBlock: await this.web3.eth.getBlockNumber() - 99999,
+        toBlock: 'latest'
+      });
+      return events;
+    } catch (e) {
+      const msg = `Could not get ${event}`;
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getVoteReleaseEvents(): Promise<any> {
+    return this.getEvents('VoteReleaseEvent');
+  }
+
+  async getVoteKeyEvents(): Promise<any> {
+    return this.getEvents('VoteKeyEvent');
+  }
+
+  async getVoteThresholdEvents(): Promise<any> {
+    return this.getEvents('VoteThresholdEvent');
   }
 
   async getOrgAdmins(orgName: string): Promise<string[]> {

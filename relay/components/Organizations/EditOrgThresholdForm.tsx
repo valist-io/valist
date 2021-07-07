@@ -1,22 +1,19 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useContext, useEffect } from 'react';
 import ValistContext from '../Valist/ValistContext';
 
-const EditOrgMultifactorForm = ({ orgName }: { orgName: string }) => {
+const EditOrgThresholdForm = ({ orgName, orgThreshold }: { orgName: string, orgThreshold: number }) => {
   const valist = useContext(ValistContext);
+  const [threshold, setThreshold] = useState(0);
 
-  const [voteThreshold, setVoteThreshold] = useState('0');
-
-  const getCurrentVoteThreshold = async () => {
-    // TODO
-  };
-
-  const updateVoteThreshold = async () => {
-    // TODO
-  };
+  const updateOrgThreshold = async () => {
+    try {
+      await valist.voteOrgThreshold(orgName, orgThreshold);
+    } catch (e) { console.log(e); }
+  }
 
   useEffect(() => {
-    getCurrentVoteThreshold();
-  }, [valist, orgName]);
+    setThreshold(orgThreshold);
+  }, [orgName, orgThreshold]);
 
   return (
       <div className="px-4 py-5 sm:rounded-lg sm:p-6">
@@ -33,21 +30,20 @@ const EditOrgMultifactorForm = ({ orgName }: { orgName: string }) => {
                           <label htmlFor="VoteThreshold" className="block text-sm font-medium
                           leading-5 text-gray-700">Voting Threshold</label>
                           <div className="mt-1 relative rounded-md shadow-sm">
-                              <input value={voteThreshold} type="number" onChange={
-                                (e) => setVoteThreshold(e.target.value)
-                              }
+                              <input value={threshold} type="number" 
+                              onChange={ (e) => setThreshold(parseInt(e.target.value)) }
                               required id="VoteThreshold" className="form-input block w-full sm:text-sm
                               sm:leading-5 transition ease-in-out duration-150" />
                           </div>
                       </div>
                       <div className="sm:col-span-2">
                       <span className="w-full inline-flex rounded-md shadow-sm">
-                          <button onClick={updateVoteThreshold} value="Submit" type="button"
+                          <button onClick={updateOrgThreshold} value="Submit" type="button"
                           className="w-full inline-flex items-center justify-center px-6 py-3 border
                           border-transparent text-base leading-6 font-medium rounded-md text-white
                           bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
                           focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                              Update Multi-factor
+                              Update Threshold
                           </button>
                       </span>
                       </div>
@@ -58,4 +54,4 @@ const EditOrgMultifactorForm = ({ orgName }: { orgName: string }) => {
   );
 };
 
-export default EditOrgMultifactorForm;
+export default EditOrgThresholdForm;
