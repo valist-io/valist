@@ -33,12 +33,12 @@ export default class OrgKey extends Command {
       this.exit(1);
     }
     const operations: Record<string, any> = {
-      grant: valist.voteOrgAdmin(args.orgName, args.key),
-      revoke: valist.revokeOrgAdmin(args.orgName, args.key),
-      rotate: valist.rotateOrgAdmin(args.orgName, args.key),
+      grant: valist.voteOrgAdmin,
+      revoke: valist.revokeOrgAdmin,
+      rotate: valist.rotateOrgAdmin,
     };
 
-    const { transactionHash } = await operations[args.operation]();
+    const { transactionHash } = await operations[args.operation]((args.orgName, args.key));
 
     this.log(`✅ Successfully voted to ${args.operation} Admin key on ${args.orgName}!`);
     this.log('🔗 Transaction Hash:', transactionHash);
