@@ -4,22 +4,22 @@ import { Command } from '@oclif/command';
 import { initValist } from '../../utils/config';
 
 export default class OrgNew extends Command {
-  static description = 'Create a Valist organization'
+  static description = 'Create a Valist organization';
 
   static examples = [
-    `$ valist org:new valist meta/metOrg.json`,
-  ]
+    '$ valist org:new valist meta/metOrg.json',
+  ];
 
   static args = [
     {
       name: 'orgName',
-      required: true
+      required: true,
     },
     {
       name: 'orgMeta',
-      required: true
-    }
-  ]
+      required: true,
+    },
+  ];
 
   async run() {
     const { args } = this.parse(OrgNew);
