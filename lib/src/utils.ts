@@ -9,7 +9,7 @@ export const getContractInstance = (web3: Web3, abi: any, address: string) => ne
 
 export const getValistContract = async (web3: Web3, address?: string) => {
   const networkContractMap = {
-    80001: '0xB068CB8e72186Af3D7Be8ba97B16DC5E4Ce4C538',
+    80001: '0x092039fCdc6a18Cd4e76261F30Fc88FAeC035E40',
   };
   // get network ID to fetch deployed address
   const networkId: number = await web3.eth.net.getId();
