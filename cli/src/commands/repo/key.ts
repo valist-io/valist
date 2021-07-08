@@ -1,11 +1,13 @@
 import { Command } from '@oclif/command';
 import { initValist } from '../../utils/config';
 
-export default class RepoGrantKey extends Command {
-  static description = 'Propose a new developer key for repo';
+export default class RepoKey extends Command {
+  static description = 'Add, remove, or rotate repository key';
 
   static examples = [
-    '$ valist repo:key exampleOrg exampleRepo add <key>',
+    '$ valist repo:key exampleOrg exampleRepo grant <key>',
+    '$ valist repo:key exampleOrg exampleRepo revoke <key>',
+    '$ valist repo:key exampleOrg exampleRepo rotate <key>',
   ];
 
   static args = [
@@ -28,14 +30,21 @@ export default class RepoGrantKey extends Command {
   ];
 
   async run() {
-    const { args } = this.parse(RepoGrantKey);
-
-    // Create a new valist instance and connect
+    const { args } = this.parse(RepoKey);
     const valist = await initValist();
+    if (!['grant', 'revoke', 'rotate'].includes(args.operation)) {
+      this.log('Invalid operation', args.operation);
+      this.exit(1);
+    }
+    const operations: Record<string, any> = {
+      grant: valist.voteRepoDev(args.orgName, args.repoName, args.key),
+      revoke: valist.revokeRepoDev(args.orgName, args.repoName, args.key),
+      rotate: valist.rotateRepoDev(args.orgName, args.repoName, args.key),
+    };
 
-    const { transactionHash } = await valist.voteRepoDev(args.orgName, args.repoName, args.key);
+    const { transactionHash } = await operations[args.operation]();
 
-    this.log(`✅ Successfully voted to add Developer key to ${args.orgShortName}/${args.repoName}!`);
+    this.log(`✅ Successfully voted to ${args.operation} Developer key on ${args.orgName}/${args.repoName}!`);
     this.log('🔗 Transaction Hash:', transactionHash);
 
     this.exit(0);

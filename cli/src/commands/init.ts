@@ -18,13 +18,13 @@ export default class ValistInit extends Command {
     const tag = await cli.prompt('release tag (0.0.1)', { required: false }) || '0.0.1';
     const meta = await cli.prompt('release meta file (README.md)', { required: false }) || 'README.md';
 
-    const defaultImages: { [string: string]: string } = {
+    const defaultImages: Record<string, any> = {
       npm: 'node:buster',
       binary: 'golang:buster',
     };
 
     const image = await cli.prompt('docker image',
-      { required: !(projectType === 'npm' || 'binary') }) || defaultImages[projectType];
+      { required: (!['binary', 'npm'].includes(projectType)) }) || defaultImages[projectType];
 
     const valistFile = yaml.dump({
       type: projectType,
