@@ -1,6 +1,6 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
-import * as Valist from '@valist/sdk';
+import Valist from '@valist/sdk';
 import { getWeb3Provider, getSignerKey } from './crypto';
 import { MissingKeyError } from './errors';
 
@@ -10,7 +10,9 @@ export type ValistConfig = {
   tag: string,
   meta: string,
   type: 'binary' | 'npm',
-  artifact?: string,
+  image: string,
+  build: string,
+  out: string,
 };
 
 export const initValist = async (): Promise<Valist> => {
