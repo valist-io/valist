@@ -35,6 +35,8 @@ contract Valist is BaseRelayRecipient {
   }
 
   struct Repository {
+    // check if repo exists
+    bool exists;
     // multi-party threshold
     uint threshold;
     // date threshold was set
@@ -132,13 +134,13 @@ contract Valist is BaseRelayRecipient {
     _;
   }
 
-  event MetaUpdate(bytes32 _orgID, string _repoName, address _signer, string _metaCID);
+  event MetaUpdate(bytes32 indexed _orgID, string indexed _repoName, address indexed _signer, string _metaCID);
 
-  event VoteThresholdEvent(bytes32 _orgID, string _repoName, address _signer, uint _pendingThreshold, uint _sigCount, uint _threshold);
+  event VoteThresholdEvent(bytes32 indexed _orgID, string indexed _repoName, address _signer, uint indexed _pendingThreshold, uint _sigCount, uint _threshold);
 
-  event VoteKeyEvent(bytes32 _orgID, string _repoName, address _signer, bytes32 _operation, address _key, uint _sigCount, uint _threshold);
+  event VoteKeyEvent(bytes32 indexed _orgID, string indexed _repoName, address _signer, bytes32 _operation, address indexed _key, uint _sigCount, uint _threshold);
 
-  event VoteReleaseEvent(bytes32 _orgID, string _repoName, string _tag, string _releaseCID, string _metaCID, address _signer, uint _sigCount, uint _threshold);
+  event VoteReleaseEvent(bytes32 indexed _orgID, string indexed _repoName, string indexed _tag, string _releaseCID, string _metaCID, address _signer, uint _sigCount, uint _threshold);
 
   // check if user has orgAdmin role
   function isOrgAdmin(bytes32 _orgID, address _address) public view returns (bool) {
@@ -148,8 +150,13 @@ contract Valist is BaseRelayRecipient {
 
   // check if user has at least repoDev role
   function isRepoDev(bytes32 _orgID, string memory _repoName, address _address) public view returns (bool) {
-    bytes32 selector = keccak256(abi.encodePacked(_orgID, _repoName, REPO_DEV));
-    return roles[selector].contains(_address) || isOrgAdmin(_orgID, _address);
+    if (bytes(_repoName).length > 0) {
+      require(repos[keccak256(abi.encodePacked(_orgID, _repoName))].exists, "No repo");
+      bytes32 selector = keccak256(abi.encodePacked(_orgID, _repoName, REPO_DEV));
+      return roles[selector].contains(_address) || isOrgAdmin(_orgID, _address);
+    } else {
+      return isOrgAdmin(_orgID, _address);
+    }
   }
 
   // create an organization and claim an orgName and orgID
@@ -173,11 +180,13 @@ contract Valist is BaseRelayRecipient {
 
   function createRepository(bytes32 _orgID, string memory _repoName, string memory _repoMeta) public orgAdmin(_orgID) {
     bytes32 repoSelector = keccak256(abi.encodePacked(_orgID, _repoName));
-    require(bytes(repos[repoSelector].metaCID).length == 0 && repos[repoSelector].tags.length == 0, "Repo exists");
+    require(!repos[repoSelector].exists, "Repo exists");
     require(bytes(_repoName).length > 0, "No repoName");
     require(bytes(_repoMeta).length > 0, "No repoMeta");
     // add repoName to org
     orgs[_orgID].repoNames.push(_repoName);
+    // set repo exists
+    repos[repoSelector].exists = true;
     // set metadata for repo
     repos[repoSelector].metaCID = _repoMeta;
   }

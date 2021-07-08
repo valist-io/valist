@@ -130,12 +130,18 @@ describe('Test Valist Lib', async () => {
       expect(repoNames).to.include(repoName);
     });
 
+    it('Should get repository', async () => {
+      const repo = await valist.getRepository(orgShortName, repoName);
+      expect(repo.orgID).to.equal('0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f');
+      expect(repo.meta).to.deep.equal(repoMeta);
+    });
+
     it('Should fail when trying to create the same organization twice', async () => {
       try {
-        await valist.createOrganization(orgShortName, meta);
+        await valist.createRepository(orgShortName, repoName, repoMeta);
       } catch (e) {
         expect(e.name).to.equal('RuntimeError');
-        expect(e.toString()).to.contain('Org exists');
+        expect(e.toString()).to.contain('Repo exists');
       }
     });
   });

@@ -14,7 +14,7 @@ export const getWeb3Provider = async (signer?: string): Promise<any> => {
 
   const web3Provider = new HDWalletProvider({
     privateKeys: [key],
-    providerOrUrl: process.env.WEB3_PROVIDER || 'https://matic-mumbai.chainstacklabs.com',
+    providerOrUrl: process.env.WEB3_PROVIDER || 'https://rpc.valist.io',
   });
 
   return web3Provider;
