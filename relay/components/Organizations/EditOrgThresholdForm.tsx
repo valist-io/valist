@@ -19,7 +19,8 @@ const EditOrgThresholdForm = ({
               <div className="md:col-span-1">
                   <h3 className="text-lg font-medium leading-6 text-gray-900">Multi-factor</h3>
                   <p className="mt-1 text-sm leading-5 text-gray-500">
-                      This threshold sets the amount of votes required to add and remove keys.
+                      This sets the amount of votes required to add and remove keys.
+                      Three or more members are required to enable multi-factor voting.
                   </p>
               </div>
               <div className="mt-5 md:mt-0 md:col-span-2">
