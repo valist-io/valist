@@ -38,7 +38,7 @@ export default class OrgKey extends Command {
       rotate: valist.rotateOrgAdmin,
     };
 
-    const { transactionHash } = await operations[args.operation]((args.orgName, args.key));
+    const { transactionHash } = await operations[args.operation](args.orgName, args.key);
 
     this.log(`✅ Successfully voted to ${args.operation} Admin key on ${args.orgName}!`);
     this.log('🔗 Transaction Hash:', transactionHash);
