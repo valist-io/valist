@@ -22,8 +22,6 @@
   "dependencies": {
     "@truffle/hdwallet-provider": "^1.4.0",
     "@valist/sdk": "file:../lib",
-    "ethereumjs-abi": "^0.6.8",
-    "ethers": "^5.4.1",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
     "reproducible": "0.0.3-rc.4",
