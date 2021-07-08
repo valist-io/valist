@@ -1,6 +1,6 @@
 {
   "solidity.packageDefaultDependenciesContractsDirectory": "",
-  "solidity.packageDefaultDependenciesDirectory": "eth/node_modules",
+  "solidity.packageDefaultDependenciesDirectory": "hardhat/node_modules",
   "editor.tabSize": 2,
   "editor.detectIndentation": false,
   "eslint.workingDirectories": [

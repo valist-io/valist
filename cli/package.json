@@ -43,7 +43,9 @@
     "posttest": "eslint . --ext .ts --config .eslintrc",
     "prepack": "rm -rf lib && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
-    "version": "oclif-dev readme && git add README.md"
+    "version": "oclif-dev readme && git add README.md",
+    "lint": "eslint . --ext .ts",
+    "lint:fix": "eslint . --ext .ts --fix"
   },
   "types": "lib/index.d.ts",
   "dependencies": {
@@ -51,7 +53,7 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@truffle/hdwallet-provider": "^1.4.0",
-    "@valist/sdk": "^0.3.5",
+    "@valist/sdk": "file:../lib",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
     "tslib": "^1.14.1"
@@ -63,10 +65,13 @@
     "@types/js-yaml": "^4.0.1",
     "@types/mocha": "^5.2.7",
     "@types/node": "^10.17.60",
+    "@typescript-eslint/eslint-plugin": "^4.28.2",
     "chai": "^4.3.4",
-    "eslint": "^5.16.0",
+    "eslint": "^7.27.0",
+    "eslint-config-airbnb-typescript": "^12.3.1",
     "eslint-config-oclif": "^3.1.0",
     "eslint-config-oclif-typescript": "^0.1.0",
+    "eslint-plugin-import": "^2.23.4",
     "globby": "^10.0.2",
     "mocha": "^5.2.0",
     "nyc": "^14.1.1",
