@@ -29,10 +29,12 @@ USAGE
 * [`valist org:get ORGNAME`](#valist-orgget-orgname)
 * [`valist org:key ORGNAME OPERATION KEY`](#valist-orgkey-orgname-operation-key)
 * [`valist org:new ORGNAME ORGMETA`](#valist-orgnew-orgname-orgmeta)
+* [`valist org:update ORGNAME ORGMETA`](#valist-orgupdate-orgname-orgmeta)
 * [`valist publish`](#valist-publish)
 * [`valist repo:get ORGNAME REPONAME`](#valist-repoget-orgname-reponame)
 * [`valist repo:key ORGNAME REPONAME OPERATION KEY`](#valist-repokey-orgname-reponame-operation-key)
 * [`valist repo:new ORGNAME REPONAME REPOMETA`](#valist-reponew-orgname-reponame-repometa)
+* [`valist repo:update ORGNAME REPONAME REPOMETA`](#valist-repoupdate-orgname-reponame-repometa)
 
 ## `valist account:get`
 
@@ -125,6 +127,18 @@ EXAMPLE
   $ valist org:new valist meta/metOrg.json
 ```
 
+## `valist org:update ORGNAME ORGMETA`
+
+Update organization metadata
+
+```
+USAGE
+  $ valist org:update ORGNAME ORGMETA
+
+EXAMPLE
+  $ valist org:update exampleOrg meta/orgMeta.json
+```
+
 ## `valist publish`
 
 Publish a package to Valist
@@ -173,5 +187,17 @@ USAGE
 
 EXAMPLE
   $ valist repo:new exampleOrg exampleRepo meta/repoMeta.json
+```
+
+## `valist repo:update ORGNAME REPONAME REPOMETA`
+
+Update repository metadata
+
+```
+USAGE
+  $ valist repo:update ORGNAME REPONAME REPOMETA
+
+EXAMPLE
+  $ valist repo:update exampleOrg exampleRepo meta/repoMeta.json
 ```
 <!-- commandsstop -->
