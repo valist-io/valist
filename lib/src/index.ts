@@ -6,21 +6,6 @@ import ipfsClient from 'ipfs-http-client';
 
 import { provider, EventLog } from 'web3-core/types';
 
-import * as sigUtil from 'eth-sig-util';
-
-import {
-  Biconomy,
-  // @ts-ignore mexa doesn't support typescript yet
-} from '@biconomy/mexa';
-
-import {
-  functionIDMap,
-  getDomainSeperator,
-  getDataToSignForEIP712,
-  buildForwardTxRequest,
-  getBiconomyForwarderConfig,
-} from './helpers/biconomy';
-
 import {
   Organization,
   OrgID,
@@ -44,6 +29,7 @@ import {
 import {
   getValistContract,
   shortnameFilterRegex,
+  sendMetaTransaction,
 } from './utils';
 
 // node-fetch polyfill
@@ -60,15 +46,11 @@ class Valist {
 
   ipfs: any;
 
-  biconomy: any;
-
   signer?: string;
 
   defaultAccount: string;
 
   metaTxEnabled = false;
-
-  metaTxReady = false;
 
   contractAddress: string | undefined;
 
@@ -81,29 +63,12 @@ class Valist {
     contractAddress,
   }: {
     web3Provider: provider,
-    metaTx?: boolean | string,
+    metaTx?: boolean,
     ipfsHost?: string,
     contractAddress?: string,
   }) {
-    if (metaTx === true || metaTx === 'true') {
-      this.metaTxEnabled = true;
-
-      // setup biconomy instance with public api key
-      this.biconomy = new Biconomy(
-        web3Provider,
-        { apiKey: 'qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878', strictMode: true },
-      );
-
-      this.web3 = new Web3(this.biconomy);
-
-      this.biconomy.onEvent(this.biconomy.READY, () => {
-        this.metaTxReady = true;
-        console.log('👻 MetaTransactions Enabled');
-      });
-    } else {
-      this.web3 = new Web3(web3Provider);
-    }
-
+    this.web3 = new Web3(web3Provider);
+    this.metaTxEnabled = metaTx;
     this.defaultAccount = '0x0';
     this.ipfs = ipfsClient(ipfsHost);
     this.contractAddress = contractAddress;
@@ -115,10 +80,11 @@ class Valist {
   }
 
   // initialize main valist contract instance for future calls
-  async connect(waitForMetaTx?: boolean): Promise<void> {
+  async connect(): Promise<void> {
     try {
       this.contract = await getValistContract(this.web3, this.contractAddress);
       this.contractAddress = this.contract._address;
+      if (!this.contractAddress) throw new Error('Could not get Valist contract address');
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -134,14 +100,7 @@ class Valist {
       throw e;
     }
 
-    if (waitForMetaTx && this.biconomy) {
-      await new Promise((resolve) => {
-        this.biconomy.onEvent(this.biconomy.READY, () => {
-          this.metaTxReady = true;
-          resolve(true);
-        });
-      });
-    }
+    if (this.metaTxEnabled) console.log('👻 MetaTransactions Enabled');
   }
 
   async createOrganization(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
@@ -963,85 +922,16 @@ class Valist {
     const gasLimit = await functionCall.estimateGas({ from: account });
 
     if (this.metaTxEnabled) {
-      if (!this.metaTxReady) throw new Error('MetaTransactions not ready!');
-
-      const sendAsync = (params: any): any => new Promise((resolve, reject) => {
-        // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
-        this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
-          if (e) reject(e);
-          resolve(signed);
-        });
-      });
-
       try {
-        const networkID = await this.web3.eth.net.getId();
-        const forwarder = await getBiconomyForwarderConfig(networkID);
-        const forwarderContract = new this.web3.eth.Contract(forwarder.abi, forwarder.address);
-        const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
-        const to = this.contractAddress;
-        const functionSignature = functionCall.encodeABI();
-
-        const request = await buildForwardTxRequest({
+        const tx = await sendMetaTransaction(
+          this.web3,
+          this.contractAddress,
+          functionCall,
           account,
-          to,
-          gasLimitNum: gasLimit,
-          batchId: 0,
-          batchNonce,
-          data: functionSignature,
-          deadline: '',
-        });
-
-        const domainSeparator = await getDomainSeperator(this.web3, networkID);
-        const dataToSign = await getDataToSignForEIP712(this.web3, request, networkID);
-        let signed;
-
-        if (this.signer) {
-          signed = sigUtil.signTypedData_v4(Buffer.from(this.signer, 'hex'), { data: JSON.parse(dataToSign) });
-        } else {
-          const sig = await sendAsync({
-            jsonrpc: '2.0',
-            id: new Date().getTime(),
-            method: 'eth_signTypedData_v4',
-            params: [account, dataToSign],
-          });
-          signed = sig.result;
-        }
-
-        const functionName: string = functionCall._method.name;
-        const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
-          method: 'POST',
-          headers: {
-            'x-api-key': this.biconomy.apiKey,
-            'Content-Type': 'application/json;charset=utf-8',
-          },
-          body: JSON.stringify({
-            to: this.contractAddress,
-            apiId: functionIDMap[functionName],
-            params: [request, domainSeparator, signed],
-            from: account,
-            signatureType: this.biconomy.EIP712_SIGN,
-          }),
-        });
-
-        let txHash = await resp.json();
-        txHash = txHash.txHash;
-
-        const getTransactionReceiptMined = async () => {
-          const transactionReceiptAsync = async (resolve: any, reject: any) => {
-            const receipt = await this.web3.eth.getTransactionReceipt(txHash);
-            if (receipt == null) {
-              setTimeout(() => transactionReceiptAsync(resolve, reject), 500);
-            } else {
-              resolve(receipt);
-            }
-          };
-
-          await new Promise(transactionReceiptAsync);
-          return txHash;
-        };
-
-        await getTransactionReceiptMined();
-        return { transactionHash: txHash };
+          gasLimit,
+          this.signer,
+        );
+        return tx;
       } catch (e) {
         const msg = 'Could not send meta transaction';
         console.error(msg, e);
