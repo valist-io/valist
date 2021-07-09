@@ -17,7 +17,6 @@ export default class OrgGet extends Command {
 
   async run() {
     const { args } = this.parse(OrgGet);
-    this.log('Org Name:', args.orgName);
     const valist = await initValist();
     const orgData = await valist.getOrganization(args.orgName);
     this.log(`Name: ${orgData.meta.name}, Description: ${orgData.meta.description}`);
