@@ -2,24 +2,21 @@ import React, { useState, useContext } from 'react';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
 
-const OrganizationPermissions = ({
-  orgAdmins,
-  voteAdmin,
-  revokeAdmin,
-  rotateAdmin,
-}: {
-  orgAdmins: string[],
-  voteAdmin: (key: string) => Promise<void>,
-  revokeAdmin: (key: string) => Promise<void>,
-  rotateAdmin: (key: string) => Promise<void>
-}) => {
+interface PermissionsProps {
+  keys: string[],
+  grantKey: (key: string) => Promise<void>,
+  revokeKey: (key: string) => Promise<void>,
+  rotateKey: (key: string) => Promise<void>
+}
+
+const Permissions: React.FC<PermissionsProps> = (props: PermissionsProps): JSX.Element => {
   const valist = useContext(ValistContext);
   const [addKey, setAddKey] = useState('');
   const [rotateKey, setRotateKey] = useState('');
 
   const submitRotateKey = () => {
     if (valist.web3.utils.isAddress(rotateKey)) {
-      rotateAdmin(rotateKey).then(() => setRotateKey(''));
+      props.rotateKey(rotateKey).then(() => setRotateKey(''));
     } else {
       alert('Please enter a valid Ethereum address');
     }
@@ -27,7 +24,7 @@ const OrganizationPermissions = ({
 
   const submitAddKey = () => {
     if (valist.web3.utils.isAddress(addKey)) {
-      voteAdmin(addKey).then(() => setAddKey(''));
+      props.grantKey(addKey).then(() => setAddKey(''));
     } else {
       alert('Please enter a valid Ethereum address');
     }
@@ -92,7 +89,7 @@ const OrganizationPermissions = ({
                 </tr>
               </thead>
               <tbody>
-                {orgAdmins && orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
+                {props.keys && props.keys.map((address) => (
                   <tr className="bg-white" key={address}>
                     <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
                       <div className="flex items-center">
@@ -112,7 +109,7 @@ const OrganizationPermissions = ({
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                      onClick={async () => revokeAdmin(address)}>Revoke Role</a>
+                      onClick={async () => props.revokeKey(address)}>Revoke Role</a>
                     </td>
                   </tr>
                 ))}
@@ -125,4 +122,4 @@ const OrganizationPermissions = ({
   );
 };
 
-export default OrganizationPermissions;
+export default Permissions;

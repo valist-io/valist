@@ -1,4 +1,5 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-underscore-dangle */
 import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
@@ -31,6 +32,7 @@ import {
   Repository,
   ValistCache,
   VoteKeyEvent,
+  VoteReleaseEvent,
   VoteThresholdEvent,
 } from './types';
 
@@ -119,7 +121,6 @@ class Valist {
   async connect(waitForMetaTx?: boolean): Promise<void> {
     try {
       this.contract = await getValistContract(this.web3, this.contractAddress);
-      // eslint-disable-next-line no-underscore-dangle
       this.contractAddress = this.contract._address;
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
@@ -601,8 +602,9 @@ class Valist {
 
   private async getEvents(event: string, filter?: any): Promise<EventLog[]> {
     try {
-      const events = this.contract.getPastEvents(event, {
-        fromBlock: await this.web3.eth.getBlockNumber() - 99999,
+      const fromBlock = await this.web3.eth.getBlockNumber() - 99990;
+      const events = await this.contract.getPastEvents(event, {
+        fromBlock,
         toBlock: 'latest',
         filter,
       });
@@ -614,39 +616,61 @@ class Valist {
     }
   }
 
-  async getOrgVoteKeyEvents(orgName: string): Promise<VoteKeyEvent[]> {
+  async getVoteKeyEvents(orgName: string, repoName = ''): Promise<VoteKeyEvent[]> {
     const orgID = await this.getOrgIDFromName(orgName);
-    const pending = await this.getPendingOrgAdmins(orgName);
+    const pending = repoName === ''
+      ? await this.getPendingOrgAdmins(orgName)
+      : await this.getPendingRepoDevs(orgName, repoName);
 
-    const eventFilter = { _key: pending, _orgID: orgID, _repoName: '' };
+    const eventFilter = { _key: pending, _orgID: orgID, _repoName: repoName };
     const eventLogs = await this.getEvents('VoteKeyEvent', eventFilter);
 
     // get unique votes by key and operation
     const unique = new Map<string, VoteKeyEvent>();
     for (let i = 0; i < eventLogs.length; i++) {
       const voteEvent: VoteKeyEvent = eventLogs[i].returnValues;
-      // eslint-disable-next-line no-underscore-dangle
-      const voteID = `${voteEvent._key}${voteEvent._operation}`;
-      unique.set(voteID, voteEvent);
+      voteEvent.index = pending.indexOf(voteEvent._key);
+      unique.set(voteEvent._key, voteEvent);
     }
 
     return Array.from(unique.values());
   }
 
-  async getOrgVoteThresholdEvent(orgName: string): Promise<VoteThresholdEvent[]> {
+  async getVoteThresholdEvents(orgName: string, repoName = ''): Promise<VoteThresholdEvent[]> {
     const orgID = await this.getOrgIDFromName(orgName);
-    const pending = await this.getPendingOrgThresholds(orgName);
+    const pending = repoName === ''
+      ? await this.getPendingOrgThresholds(orgName)
+      : await this.getPendingRepoThresholds(orgName, repoName);
 
-    const eventFilter = { _pendingThreshold: pending, _orgID: orgID, _repoName: '' };
+    const eventFilter = { _pendingThreshold: pending, _orgID: orgID, _repoName: repoName };
     const eventLogs = await this.getEvents('VoteThresholdEvent', eventFilter);
 
     // get unique votes by pending threshold
     const unique = new Map<string, VoteThresholdEvent>();
     for (let i = 0; i < eventLogs.length; i++) {
       const voteEvent: VoteThresholdEvent = eventLogs[i].returnValues;
-      // eslint-disable-next-line no-underscore-dangle
-      const voteID = `${voteEvent._pendingThreshold}`;
-      unique.set(voteID, voteEvent);
+      voteEvent.index = pending.indexOf(voteEvent._pendingThreshold);
+      unique.set(voteEvent._pendingThreshold, voteEvent);
+    }
+
+    return Array.from(unique.values());
+  }
+
+  async getVoteReleaseEvents(orgName: string, repoName: string): Promise<VoteReleaseEvent[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    const pending = await this.getPendingReleases(orgName, repoName);
+    const tags = pending.map((release) => release.tag);
+
+    const eventFilter = { _orgID: orgID, _repoName: repoName, _tag: tags };
+    const eventLogs = await this.getEvents('VoteReleaseEvent', eventFilter);
+
+    // get unique votes by tag
+    const unique = new Map<string, VoteReleaseEvent>();
+    for (let i = 0; i < eventLogs.length; i++) {
+      const voteEvent: VoteReleaseEvent = eventLogs[i].returnValues;
+      voteEvent.index = tags.indexOf(voteEvent._tag);
+      voteEvent.release = pending.find((release) => release.tag === voteEvent._tag) as Release;
+      unique.set(voteEvent._tag, voteEvent);
     }
 
     return Array.from(unique.values());
@@ -771,14 +795,14 @@ class Valist {
     }
   }
 
-  async getPendingOrgThresholds(orgName: string): Promise<number[]> {
+  async getPendingOrgThresholds(orgName: string): Promise<string[]> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const pendingCount = await this.contract.methods.getThresholdRequestCount(orgID).call();
       const requests = [];
       for (let i = 0; i < pendingCount; ++i) {
         // eslint-disable-next-line no-await-in-loop
-        requests.push(Number(await this.contract.methods.pendingThresholdRequests(orgID, i).call()));
+        requests.push(await this.contract.methods.pendingThresholdRequests(orgID, i).call());
       }
       return requests;
     } catch (e) {
@@ -819,7 +843,7 @@ class Valist {
     }
   }
 
-  async getPendingRepoThresholds(orgName: string, repoName: string): Promise<number[]> {
+  async getPendingRepoThresholds(orgName: string, repoName: string): Promise<string[]> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
@@ -827,7 +851,7 @@ class Valist {
       const requests = [];
       for (let i = 0; i < pendingCount; ++i) {
         // eslint-disable-next-line no-await-in-loop
-        requests.push(Number(await this.contract.methods.pendingThresholdRequests(repoSelector, i).call()));
+        requests.push(await this.contract.methods.pendingThresholdRequests(repoSelector, i).call());
       }
       return requests;
     } catch (e) {
@@ -1031,7 +1055,6 @@ class Valist {
           signed = sig.result;
         }
 
-        // eslint-disable-next-line no-underscore-dangle
         const functionName: string = functionCall._method.name;
         const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
           method: 'POST',

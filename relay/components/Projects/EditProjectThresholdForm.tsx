@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from 'react';
 
-interface EditOrgThresholdFormProps {
-  orgThreshold: number,
+interface Props {
+  threshold: number,
   voteThreshold: (threshold: string) => Promise<void>
 }
 
-const EditOrgThresholdForm: React.FC<EditOrgThresholdFormProps> = (props: EditOrgThresholdFormProps): JSX.Element => {
+const EditProjectThresholdForm: React.FC<Props> = (props: Props): JSX.Element => {
   const [threshold, setThreshold] = useState('0');
 
   useEffect(() => {
-    setThreshold(`${props.orgThreshold}`);
-  }, [props.orgThreshold]);
+    setThreshold(`${props.threshold}`);
+  }, [props.threshold]);
 
   return (
       <div className="px-4 py-5 sm:rounded-lg sm:p-6">
@@ -18,7 +18,7 @@ const EditOrgThresholdForm: React.FC<EditOrgThresholdFormProps> = (props: EditOr
               <div className="md:col-span-1">
                   <h3 className="text-lg font-medium leading-6 text-gray-900">Multi-factor</h3>
                   <p className="mt-1 text-sm leading-5 text-gray-500">
-                      This sets the amount of votes required to add and remove keys.
+                      This sets the amount of votes required to add / remove keys and publish new releases.
                       Three or more members are required to enable multi-factor voting.
                   </p>
               </div>
@@ -53,4 +53,4 @@ const EditOrgThresholdForm: React.FC<EditOrgThresholdFormProps> = (props: EditOr
   );
 };
 
-export default EditOrgThresholdForm;
+export default EditProjectThresholdForm;
