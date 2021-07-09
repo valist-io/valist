@@ -33,9 +33,9 @@ export default class OrgKey extends Command {
       this.exit(1);
     }
     const operations: Record<string, any> = {
-      grant: valist.voteOrgAdmin,
-      revoke: valist.revokeOrgAdmin,
-      rotate: valist.rotateOrgAdmin,
+      grant: async (orgName: string, key: string) => valist.voteOrgAdmin(orgName, key),
+      revoke: async (orgName: string, key: string) => valist.revokeOrgAdmin(orgName, key),
+      rotate: async (orgName: string, key: string) => valist.rotateOrgAdmin(orgName, key),
     };
 
     const { transactionHash } = await operations[args.operation](args.orgName, args.key);

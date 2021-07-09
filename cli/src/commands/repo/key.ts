@@ -37,9 +37,9 @@ export default class RepoKey extends Command {
       this.exit(1);
     }
     const operations: Record<string, any> = {
-      grant: valist.voteRepoDev,
-      revoke: valist.revokeRepoDev,
-      rotate: valist.rotateRepoDev,
+      grant: (orgName: string, repoName:string, key: string) => valist.voteRepoDev(orgName, repoName, key),
+      revoke: (orgName: string, repoName:string, key: string) => valist.revokeRepoDev(orgName, repoName, key),
+      rotate: (orgName: string, repoName:string, key: string) => valist.rotateRepoDev(orgName, repoName, key),
     };
 
     const { transactionHash } = await operations[args.operation](args.orgName, args.repoName, args.key);
