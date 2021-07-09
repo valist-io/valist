@@ -1,3 +1,4 @@
+import * as sigUtil from 'eth-sig-util';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
 const helperAttributes: any = {};
@@ -45,7 +46,7 @@ const functionIDMap: Record<string, string> = {
 };
 
 // pass the networkId to get contract addresses
-const getContractAddresses = async (networkId: number) => {
+const getContractAddresses = (networkId: number) => {
   const addressMap: Record<number, string> = {
     80001: '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b',
     137: '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8',
@@ -61,9 +62,9 @@ const getContractAddresses = async (networkId: number) => {
  * You can build biconomy forwarder contract object using above values and calculate the nonce
  * @param {*} networkId
  */
-const getBiconomyForwarderConfig = async (networkId: number) => {
+const getBiconomyForwarderConfig = (networkId: number) => {
   // get trusted forwarder contract address from network id
-  const contractAddresses = await getContractAddresses(networkId);
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   return { abi: helperAttributes.biconomyForwarderAbi, address: forwarderAddress };
 };
@@ -78,7 +79,7 @@ const getBiconomyForwarderConfig = async (networkId: number) => {
  * @param {*}  data - functionSignature of target method
  * @param {*}  deadline - optional deadline for this forward request
  */
-const buildForwardTxRequest = async ({
+const buildForwardTxRequest = ({
   account, to, gasLimitNum, batchId, batchNonce, data, deadline,
 }: any) => {
   const req = {
@@ -103,8 +104,8 @@ const buildForwardTxRequest = async ({
  * @param {*} request - forward request object
  * @param {*} networkId
  */
-const getDataToSignForEIP712 = async (web3: any, request: any, networkId: number) => {
-  const contractAddresses = await getContractAddresses(networkId);
+const getDataToSignForEIP712 = (web3: any, request: any, networkId: number) => {
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   const domainData = helperAttributes.biconomyForwarderDomainData;
   domainData.salt = web3.utils.padLeft(web3.utils.toHex(web3.utils.toBN(networkId)), 64);
@@ -126,9 +127,8 @@ const getDataToSignForEIP712 = async (web3: any, request: any, networkId: number
  * get the domain seperator that needs to be passed while using EIP712 signature type
  * @param {*} networkId
  */
-// eslint-disable-next-line
-const getDomainSeperator = async (web3: any, networkId: number) => {
-  const contractAddresses = await getContractAddresses(networkId);
+const getDomainSeperator = (web3: any, networkId: number) => {
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   const domainData = helperAttributes.biconomyForwarderDomainData;
   domainData.salt = web3.utils.padLeft(web3.utils.toHex(web3.utils.toBN(networkId)), 64);
@@ -152,10 +152,93 @@ const getDomainSeperator = async (web3: any, networkId: number) => {
   return domainSeparator;
 };
 
+const sendAsync = (web3: any, params: any): any => new Promise((resolve, reject) => {
+  // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+  // @ts-ignore sendAsync is conflicting with the RPCProvider type
+  web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
+    if (e) reject(e);
+    resolve(signed);
+  });
+});
+
+const sendMetaTx = async (
+  web3: any,
+  contractAddress: string | undefined,
+  functionCall: any,
+  account: string,
+  gasLimit: string | number,
+  signer?: string,
+) => {
+  const networkID = await web3.eth.net.getId();
+  const forwarder = getBiconomyForwarderConfig(networkID);
+  const forwarderContract = new web3.eth.Contract(forwarder.abi, forwarder.address);
+  const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
+  const functionSignature = functionCall.encodeABI();
+
+  const request = buildForwardTxRequest({
+    account,
+    to: contractAddress,
+    gasLimitNum: gasLimit,
+    batchId: 0,
+    batchNonce,
+    data: functionSignature,
+    deadline: '',
+  });
+
+  const domainSeparator = getDomainSeperator(web3, networkID);
+  const dataToSign = getDataToSignForEIP712(web3, request, networkID);
+  let signed;
+
+  if (signer) {
+    signed = sigUtil.signTypedData_v4(Buffer.from(signer, 'hex'), { data: JSON.parse(dataToSign) });
+  } else {
+    const sig = await sendAsync(web3, {
+      jsonrpc: '2.0',
+      id: new Date().getTime(),
+      method: 'eth_signTypedData_v4',
+      params: [account, dataToSign],
+    });
+    signed = sig.result;
+  }
+
+  // eslint-disable-next-line no-underscore-dangle
+  const functionName: string = functionCall._method.name;
+  const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
+    method: 'POST',
+    headers: {
+      // public biconomy key
+      'x-api-key': 'qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878',
+      'Content-Type': 'application/json;charset=utf-8',
+    },
+    body: JSON.stringify({
+      to: contractAddress,
+      apiId: functionIDMap[functionName],
+      params: [request, domainSeparator, signed],
+      from: account,
+      signatureType: 'EIP712_SIGN',
+    }),
+  });
+
+  let txHash = await resp.json();
+  txHash = txHash.txHash;
+
+  const getTransactionReceiptMined = async () => {
+    const transactionReceiptAsync = async (resolve: any, reject: any) => {
+      const receipt = await web3.eth.getTransactionReceipt(txHash);
+      if (receipt == null) {
+        setTimeout(() => transactionReceiptAsync(resolve, reject), 500);
+      } else {
+        resolve(receipt);
+      }
+    };
+
+    await new Promise(transactionReceiptAsync);
+    return txHash;
+  };
+  await getTransactionReceiptMined();
+  return { transactionHash: txHash };
+};
+
 export {
-  functionIDMap,
-  getDomainSeperator,
-  getDataToSignForEIP712,
-  buildForwardTxRequest,
-  getBiconomyForwarderConfig,
+  sendMetaTx,
 };
