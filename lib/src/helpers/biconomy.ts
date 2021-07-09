@@ -32,16 +32,16 @@ helperAttributes.forwardRequestType = [
 ];
 
 const functionIDMap: Record<string, string> = {
-  createOrganization: 'c30ad06b-4253-4da8-ae08-423f55bfbf6e',
-  createRepository: '5fc2649d-8c7e-4fd4-b276-0866b0320a7c',
-  voteRelease: '745cab42-527f-4505-b0ae-609e452b1d50',
-  voteKey: '82a34363-1551-4a0a-8231-69d895a9d50a',
-  voteThreshold: '9e7df632-7775-44d4-9722-1ae90eee0cbd',
-  setOrgMeta: '3d8d7345-9cd6-4fee-a229-0211125e64cc',
-  setRepoMeta: 'c9a59cce-b7fd-462e-9e8a-ce0368cd4012',
-  clearPendingRelease: '573f49ab-779b-4937-9bc4-1ae5ab7830de',
-  clearPendingKey: 'ab24536b-2312-4994-be6c-2ea9b239dad1',
-  clearPendingThreshold: '4f53949d-fbbc-45ea-960a-cf892719b6ed',
+  createOrganization: '6adea8ac-c764-45ed-a62c-e399adf7dd47',
+  createRepository: '1dd94ae2-fcd1-4951-896d-a28e1445f1ae',
+  voteRelease: 'db8b1576-478b-45ba-a7bf-e6cb9c2b93a4',
+  voteKey: '3d2f99cf-02c7-44b6-9db7-4e672daa248b',
+  voteThreshold: '9d163d2f-d1d7-4958-af5f-e2859cdad3f8',
+  setOrgMeta: '152a40ff-a730-4549-8657-745bc6121e27',
+  setRepoMeta: '5e460491-1d76-4bfb-9a2c-6f00f0be5ada',
+  clearPendingRelease: '33c9cc4d-d17b-4c4f-a833-ead141de83ee',
+  clearPendingKey: '7b0750fa-a4fc-4874-841a-274287027063',
+  clearPendingThreshold: '4b3d868b-f759-4c48-904b-f49938157edc',
 };
 
 // pass the networkId to get contract addresses
