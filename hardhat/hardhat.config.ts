@@ -34,7 +34,7 @@ module.exports = {
   },
   networks: {
     mumbai: {
-      url: 'https://matic-mumbai.chainstacklabs.com',
+      url: 'https://rpc.valist.io',
       accounts: [`0x${deployKey}`]
     }
   },

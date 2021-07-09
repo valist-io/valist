@@ -206,7 +206,7 @@ class Valist {
   ): Promise<any> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
-      const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
+      const isRepoDev = await this.isRepoDev(orgName, repoName, account);
       if (!isRepoDev) throw new Error('User does not have permission to publish release');
 
       const tx = await this.sendTransaction(
@@ -486,6 +486,9 @@ class Valist {
       const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
       return isRepoDev;
     } catch (e) {
+      if (e.message.includes('No repo')) {
+        return false;
+      }
       const msg = 'Could not check if user has REPO_DEV_ROLE';
       console.error(msg, e);
       throw e;
