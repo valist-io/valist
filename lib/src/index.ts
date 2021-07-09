@@ -8,11 +8,6 @@ import { provider } from 'web3-core/types';
 import * as sigUtil from 'eth-sig-util';
 
 import {
-  Biconomy,
-  // @ts-ignore mexa doesn't support typescript yet
-} from '@biconomy/mexa';
-
-import {
   functionIDMap,
   getDomainSeperator,
   getDataToSignForEIP712,
@@ -59,15 +54,11 @@ class Valist {
 
   ipfs: any;
 
-  biconomy: any;
-
   signer?: string;
 
   defaultAccount: string;
 
   metaTxEnabled = false;
-
-  metaTxReady = false;
 
   contractAddress: string | undefined;
 
@@ -80,29 +71,12 @@ class Valist {
     contractAddress,
   }: {
     web3Provider: provider,
-    metaTx?: boolean | string,
+    metaTx?: boolean,
     ipfsHost?: string,
     contractAddress?: string,
   }) {
-    if (metaTx === true || metaTx === 'true') {
-      this.metaTxEnabled = true;
-
-      // setup biconomy instance with public api key
-      this.biconomy = new Biconomy(
-        web3Provider,
-        { apiKey: 'qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878', strictMode: true },
-      );
-
-      this.web3 = new Web3(this.biconomy);
-
-      this.biconomy.onEvent(this.biconomy.READY, () => {
-        this.metaTxReady = true;
-        console.log('👻 MetaTransactions Enabled');
-      });
-    } else {
-      this.web3 = new Web3(web3Provider);
-    }
-
+    this.web3 = new Web3(web3Provider);
+    this.metaTxEnabled = metaTx;
     this.defaultAccount = '0x0';
     this.ipfs = ipfsClient(ipfsHost);
     this.contractAddress = contractAddress;
@@ -114,7 +88,7 @@ class Valist {
   }
 
   // initialize main valist contract instance for future calls
-  async connect(waitForMetaTx?: boolean): Promise<void> {
+  async connect(): Promise<void> {
     try {
       this.contract = await getValistContract(this.web3, this.contractAddress);
       // eslint-disable-next-line no-underscore-dangle
@@ -134,14 +108,7 @@ class Valist {
       throw e;
     }
 
-    if (waitForMetaTx && this.biconomy) {
-      await new Promise((resolve) => {
-        this.biconomy.onEvent(this.biconomy.READY, () => {
-          this.metaTxReady = true;
-          resolve(true);
-        });
-      });
-    }
+    if (this.metaTxEnabled) console.log('👻 MetaTransactions Enabled');
   }
 
   async createOrganization(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
@@ -934,10 +901,8 @@ class Valist {
     const gasLimit = await functionCall.estimateGas({ from: account });
 
     if (this.metaTxEnabled) {
-      if (!this.metaTxReady) throw new Error('MetaTransactions not ready!');
-
       const sendAsync = (params: any): any => new Promise((resolve, reject) => {
-        // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
+        // @ts-ignore sendAsync is conflicting with the RPCProvider type
         this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
           if (e) reject(e);
           resolve(signed);
@@ -946,15 +911,14 @@ class Valist {
 
       try {
         const networkID = await this.web3.eth.net.getId();
-        const forwarder = await getBiconomyForwarderConfig(networkID);
+        const forwarder = getBiconomyForwarderConfig(networkID);
         const forwarderContract = new this.web3.eth.Contract(forwarder.abi, forwarder.address);
         const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
-        const to = this.contractAddress;
         const functionSignature = functionCall.encodeABI();
 
-        const request = await buildForwardTxRequest({
+        const request = buildForwardTxRequest({
           account,
-          to,
+          to: this.contractAddress,
           gasLimitNum: gasLimit,
           batchId: 0,
           batchNonce,
@@ -962,8 +926,8 @@ class Valist {
           deadline: '',
         });
 
-        const domainSeparator = await getDomainSeperator(this.web3, networkID);
-        const dataToSign = await getDataToSignForEIP712(this.web3, request, networkID);
+        const domainSeparator = getDomainSeperator(this.web3, networkID);
+        const dataToSign = getDataToSignForEIP712(this.web3, request, networkID);
         let signed;
 
         if (this.signer) {
@@ -983,7 +947,8 @@ class Valist {
         const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
           method: 'POST',
           headers: {
-            'x-api-key': this.biconomy.apiKey,
+            // public biconomy key
+            'x-api-key': 'qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878',
             'Content-Type': 'application/json;charset=utf-8',
           },
           body: JSON.stringify({
@@ -991,7 +956,7 @@ class Valist {
             apiId: functionIDMap[functionName],
             params: [request, domainSeparator, signed],
             from: account,
-            signatureType: this.biconomy.EIP712_SIGN,
+            signatureType: 'EIP712_SIGN',
           }),
         });
 

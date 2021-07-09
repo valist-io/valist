@@ -82,7 +82,6 @@ describe('Test Valist Lib', async () => {
       expect(valist).to.have.property('ipfs');
       expect(valist).to.have.property('defaultAccount');
       expect(valist).to.have.property('metaTxEnabled');
-      expect(valist).to.have.property('metaTxReady');
       expect(valist).to.have.property('contractAddress');
     });
 

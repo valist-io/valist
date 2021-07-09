@@ -45,7 +45,7 @@ const functionIDMap: Record<string, string> = {
 };
 
 // pass the networkId to get contract addresses
-const getContractAddresses = async (networkId: number) => {
+const getContractAddresses = (networkId: number) => {
   const addressMap: Record<number, string> = {
     80001: '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b',
     137: '0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8',
@@ -61,9 +61,9 @@ const getContractAddresses = async (networkId: number) => {
  * You can build biconomy forwarder contract object using above values and calculate the nonce
  * @param {*} networkId
  */
-const getBiconomyForwarderConfig = async (networkId: number) => {
+const getBiconomyForwarderConfig = (networkId: number) => {
   // get trusted forwarder contract address from network id
-  const contractAddresses = await getContractAddresses(networkId);
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   return { abi: helperAttributes.biconomyForwarderAbi, address: forwarderAddress };
 };
@@ -78,7 +78,7 @@ const getBiconomyForwarderConfig = async (networkId: number) => {
  * @param {*}  data - functionSignature of target method
  * @param {*}  deadline - optional deadline for this forward request
  */
-const buildForwardTxRequest = async ({
+const buildForwardTxRequest = ({
   account, to, gasLimitNum, batchId, batchNonce, data, deadline,
 }: any) => {
   const req = {
@@ -103,8 +103,8 @@ const buildForwardTxRequest = async ({
  * @param {*} request - forward request object
  * @param {*} networkId
  */
-const getDataToSignForEIP712 = async (web3: any, request: any, networkId: number) => {
-  const contractAddresses = await getContractAddresses(networkId);
+const getDataToSignForEIP712 = (web3: any, request: any, networkId: number) => {
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   const domainData = helperAttributes.biconomyForwarderDomainData;
   domainData.salt = web3.utils.padLeft(web3.utils.toHex(web3.utils.toBN(networkId)), 64);
@@ -127,8 +127,8 @@ const getDataToSignForEIP712 = async (web3: any, request: any, networkId: number
  * @param {*} networkId
  */
 // eslint-disable-next-line
-const getDomainSeperator = async (web3: any, networkId: number) => {
-  const contractAddresses = await getContractAddresses(networkId);
+const getDomainSeperator = (web3: any, networkId: number) => {
+  const contractAddresses = getContractAddresses(networkId);
   const forwarderAddress = contractAddresses.biconomyForwarderAddress;
   const domainData = helperAttributes.biconomyForwarderDomainData;
   domainData.salt = web3.utils.padLeft(web3.utils.toHex(web3.utils.toBN(networkId)), 64);
