@@ -1,8 +1,7 @@
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
-import {
-  Organization, OrgMeta, VoteKeyEvent, VoteThresholdEvent,
-} from 'valist/dist/types';
+import Link from 'next/link';
+import { Organization, OrgMeta } from 'valist/dist/types';
 import ValistContext from '../../../components/Valist/ValistContext';
 import DashboardLayout from '../../../components/Layouts/DashboardLayout';
 import EditOrgMetadataForm from '../../../components/Organizations/EditOrgMetadataForm';
@@ -21,14 +20,16 @@ export const EditOrgPage: React.FC = (): JSX.Element => {
   const [error, setError] = useState<Error>();
   const [org, setOrg] = useState<Organization>();
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
-  const [orgKeyVotes, setOrgKeyVotes] = useState<VoteKeyEvent[]>([]);
-  const [orgThresholdVotes, setOrgThresholdVotes] = useState<VoteThresholdEvent[]>([]);
+  const [orgEvents, setOrgEvents] = useState<any[]>([]);
+  const [pendingKeys, setPendingKeys] = useState<string[]>([]);
+  const [pendingThresholds, setPendingThresholds] = useState<string[]>([]);
 
   const fetchData = async () => Promise.all([
     valist.getOrganization(orgName).then(setOrg),
     valist.getOrgAdmins(orgName).then(setOrgAdmins),
-    valist.getVoteKeyEvents(orgName).then(setOrgKeyVotes),
-    valist.getVoteThresholdEvents(orgName).then(setOrgThresholdVotes),
+    valist.getOrgEvents(orgName).then(setOrgEvents),
+    valist.getPendingOrgAdmins(orgName).then(setPendingKeys),
+    valist.getPendingOrgThresholds(orgName).then(setPendingThresholds),
   ]);
 
   const getOrgData = async () => {
@@ -136,8 +137,8 @@ export const EditOrgPage: React.FC = (): JSX.Element => {
             <div className="grid grid-cols-1 gap-4 lg:col-span-2">
               <section aria-labelledby="profile-overview-title"></section>
               <div style={{ minHeight: '500px' }} className="rounded-lg bg-white p-10 overflow-hidden shadow">
-                  <div className="text-center">
-                    <h2 className="text-3xl">Manage Organization</h2>
+                  <div className="text-center text-3xl">
+                    <Link href={`/${orgName}`}>{ orgName }</Link>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
                       { org && <EditOrgMetadataForm orgMeta={org.meta} updateOrgMeta={updateMeta} /> }
@@ -150,8 +151,8 @@ export const EditOrgPage: React.FC = (): JSX.Element => {
                     <h2 className="text-3xl">Multi-factor Votes</h2>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                      <Votes keyVotes={orgKeyVotes} thresholdVotes={orgThresholdVotes}
-                      grantKey={grantKey} revokeKey={revokeKey} voteThreshold={voteThreshold}
+                      <Votes pendingKeys={pendingKeys} pendingThresholds={pendingThresholds}
+                      votes={orgEvents} grantKey={grantKey} revokeKey={revokeKey} voteThreshold={voteThreshold}
                       clearPendingKey={clearPendingKey} clearPendingThreshold={clearPendingThreshold} />
                   </div>
                   <div className="text-center pt-8">

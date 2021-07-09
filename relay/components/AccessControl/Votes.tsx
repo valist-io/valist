@@ -1,29 +1,150 @@
 /* eslint-disable no-underscore-dangle */
 import React from 'react';
 import {
-  VoteKeyEvent, VoteThresholdEvent, VoteReleaseEvent, Release,
+  VoteThresholdEvent, VoteKeyEvent, VoteReleaseEvent, Release, PendingRelease,
 } from 'valist/dist/types';
 import { ADD_KEY, REVOKE_KEY } from 'valist/dist/constants';
 
 interface VotesProps {
-  keyVotes: VoteKeyEvent[],
-  thresholdVotes: VoteThresholdEvent[],
-  releaseVotes?: VoteReleaseEvent[],
+  votes: any[],
+  pendingKeys: string[],
+  pendingThresholds: string[],
+  pendingReleases?: PendingRelease[],
   grantKey: (key: string) => Promise<void>,
   revokeKey: (key: string) => Promise<void>,
   voteThreshold: (threshold: string) => Promise<void>,
   voteRelease?: (release: Release) => Promise<void>,
   clearPendingKey: (key: string, operation: string, index: number) => Promise<void>,
   clearPendingThreshold: (threshold: string, index: number) => Promise<void>,
-  clearPendingRelease?: (release: Release, index: number) => Promise<void>
+  clearPendingRelease?: (release: Release, index: number) => Promise<void>,
 }
 
+interface VoteThresholdProps {
+  event: VoteThresholdEvent,
+  index: number,
+  pending: string,
+  clear: (threshold: string, index: number) => Promise<void>,
+  vote: (threshold: string) => Promise<void>
+}
+
+interface VoteKeyProps {
+  event: VoteKeyEvent,
+  index: number,
+  pending: string,
+  clear: (key: string, operation: string, index: number) => Promise<void>,
+  vote: (key: string) => Promise<void>
+}
+
+interface VoteReleaseProps {
+  event: VoteReleaseEvent,
+  index: number,
+  pending: PendingRelease,
+  clear: (release: Release, index: number) => Promise<void>,
+  vote: (release: Release) => Promise<void>
+}
+
+const VoteThreshold: React.FC<VoteThresholdProps> = (props: VoteThresholdProps): JSX.Element => {
+  const threshold = props.event._pendingThreshold > props.event._threshold
+    ? props.event._pendingThreshold
+    : props.event._threshold;
+  const completed = props.event._sigCount >= threshold;
+
+  return (
+    <tr>
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        Set Threshold
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+        { props.event._pendingThreshold }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        { props.event._sigCount } / { threshold }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <a href="#" className="text-indigo-600 hover:text-indigo-900"
+        onClick={() => (completed
+          ? props.clear(props.event._pendingThreshold, props.index)
+          : props.vote(props.event._pendingThreshold))}>
+          { completed ? 'Clear' : 'Approve' }
+        </a>
+      </td>
+    </tr>
+  );
+};
+
+const VoteKey: React.FC<VoteKeyProps> = (props: VoteKeyProps): JSX.Element => {
+  const completed = props.event._sigCount >= props.event._threshold;
+
+  return (
+    <tr>
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        { props.event._operation === ADD_KEY && 'Add Key' }
+        { props.event._operation === REVOKE_KEY && 'Revoke Key' }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+        { props.event._key }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        { props.event._sigCount } / { props.event._threshold }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <a href="#" className="text-indigo-600 hover:text-indigo-900"
+        onClick={() => (completed
+          ? props.clear(props.event._key, props.event._operation, props.index)
+          : props.vote(props.event._key)) }>
+          { completed ? 'Clear' : 'Approve' }
+        </a>
+      </td>
+    </tr>
+  );
+};
+
+const VoteRelease: React.FC<VoteReleaseProps> = (props: VoteReleaseProps): JSX.Element => {
+  const completed = props.event._sigCount >= props.event._threshold;
+
+  return (
+    <tr>
+      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+        Publish Release
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
+        tag={ props.event._tag }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
+        { props.event._sigCount } / { props.event._threshold }
+      </td>
+      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+        <a href="#" className="text-indigo-600 hover:text-indigo-900"
+        onClick={() => (completed
+          ? props.clear(props.pending, props.index)
+          : props.vote(props.pending))}>
+          { completed ? 'Clear' : 'Approve' }
+        </a>
+      </td>
+    </tr>
+  );
+};
+
 const Votes: React.FC<VotesProps> = (props: VotesProps): JSX.Element => {
-  const getVoteThreshold = (vote: VoteThresholdEvent) => {
-    if (vote._pendingThreshold > vote._threshold) {
-      return vote._pendingThreshold;
-    }
-    return vote._threshold;
+  const getKeyVote = (pending: string, index: number): JSX.Element => {
+    const vote = props.votes.find((v) => v.returnValues._key === pending);
+    if (!vote) return <React.Fragment key={index} />;
+    return <VoteKey key={index} index={index} pending={pending}
+      event={vote.returnValues} clear={props.clearPendingKey} vote={props.grantKey} />;
+  };
+
+  const getThresholdVote = (pending: string, index: number): JSX.Element => {
+    const vote = props.votes.find((v) => v.returnValues._pendingThreshold === pending);
+    if (!vote) return <React.Fragment key={index} />;
+    return <VoteThreshold key={index} index={index} pending={pending}
+      event={vote.returnValues} clear={props.clearPendingThreshold} vote={props.voteThreshold} />;
+  };
+
+  const getReleaseVote = (pending: PendingRelease, index: number): JSX.Element => {
+    const vote = props.votes.find((v) => v.returnValues._tag === pending.tag);
+    if (!vote || !props.clearPendingRelease || !props.voteRelease) return <React.Fragment key={index} />;
+    return <VoteRelease key={index} index={index} pending={pending}
+      event={vote.returnValues} clear={props.clearPendingRelease} vote={props.voteRelease} />;
   };
 
   return (
@@ -52,84 +173,9 @@ const Votes: React.FC<VotesProps> = (props: VotesProps): JSX.Element => {
                   </tr>
                 </thead>
                 <tbody className="bg-white divide-y divide-gray-200">
-                  { props.keyVotes && props.keyVotes.map((vote, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        { vote._operation === ADD_KEY && 'Add Key' }
-                        { vote._operation === REVOKE_KEY && 'Revoke Key' }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                        { vote._key }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        { vote._sigCount } / { vote._threshold }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                        onClick={() => {
-                          if (vote._sigCount >= vote._threshold) {
-                            props.clearPendingKey(vote._key, vote._operation, vote.index);
-                          } else if (vote._operation === ADD_KEY) {
-                            props.grantKey(vote._key);
-                          } else if (vote._operation === REVOKE_KEY) {
-                            props.revokeKey(vote._key);
-                          }
-                        }}>
-                          { vote._sigCount >= vote._threshold ? 'Clear' : 'Approve' }
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                  { props.thresholdVotes && props.thresholdVotes.map((vote, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        Set Threshold
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                        { vote._pendingThreshold }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        { vote._sigCount } / { getVoteThreshold(vote) }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                        onClick={() => {
-                          if (vote._sigCount >= getVoteThreshold(vote)) {
-                            props.clearPendingThreshold(vote._pendingThreshold, vote.index);
-                          } else {
-                            props.voteThreshold(vote._pendingThreshold);
-                          }
-                        }}>
-                          { vote._sigCount >= getVoteThreshold(vote) ? 'Clear' : 'Approve' }
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
-                  { props.releaseVotes && props.releaseVotes.map((vote, index) => (
-                    <tr key={index}>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                        Publish Release
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-                        tag={ vote._tag }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
-                        { vote._sigCount } / { vote._threshold }
-                      </td>
-                      <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                        <a href="#" className="text-indigo-600 hover:text-indigo-900"
-                        onClick={() => {
-                          if (vote._sigCount >= vote._threshold && props.clearPendingRelease) {
-                            props.clearPendingRelease(vote.release, vote.index);
-                          } else if (vote._sigCount < vote._threshold && props.voteRelease) {
-                            props.voteRelease(vote.release);
-                          }
-                        }}>
-                          { vote._sigCount >= vote._threshold ? 'Clear' : 'Approve' }
-                        </a>
-                      </td>
-                    </tr>
-                  ))}
+                  { props.pendingKeys.map(getKeyVote) }
+                  { props.pendingThresholds.map(getThresholdVote) }
+                  { props.pendingReleases && props.pendingReleases.map(getReleaseVote) }
                 </tbody>
               </table>
             </div>

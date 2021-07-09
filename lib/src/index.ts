@@ -31,9 +31,6 @@ import {
   RepoMeta,
   Repository,
   ValistCache,
-  VoteKeyEvent,
-  VoteReleaseEvent,
-  VoteThresholdEvent,
 } from './types';
 
 import {
@@ -603,80 +600,32 @@ class Valist {
     }
   }
 
-  private async getEvents(event: string, filter?: any): Promise<EventLog[]> {
+  private async getEvents(topics?: any[]): Promise<EventLog[]> {
     try {
       const fromBlock = await this.web3.eth.getBlockNumber() - 99990;
-      const events = await this.contract.getPastEvents(event, {
-        fromBlock,
-        toBlock: 'latest',
-        filter,
-      });
+      const options = { fromBlock, toBlock: 'latest', topics };
+      const events = await this.contract.getPastEvents('allEvents', options);
       return events;
     } catch (e) {
-      const msg = `Could not get ${event}`;
+      const msg = 'Could not get allEvents';
       console.error(msg, e);
       throw e;
     }
   }
 
-  async getVoteKeyEvents(orgName: string, repoName = ''): Promise<VoteKeyEvent[]> {
+  async getOrgEvents(orgName: string): Promise<EventLog[]> {
     const orgID = await this.getOrgIDFromName(orgName);
-    const pending = repoName === ''
-      ? await this.getPendingOrgAdmins(orgName)
-      : await this.getPendingRepoDevs(orgName, repoName);
-
-    const eventFilter = { _key: pending, _orgID: orgID, _repoName: repoName };
-    const eventLogs = await this.getEvents('VoteKeyEvent', eventFilter);
-
-    // get unique votes by key and operation
-    const unique = new Map<string, VoteKeyEvent>();
-    for (let i = 0; i < eventLogs.length; i++) {
-      const voteEvent: VoteKeyEvent = eventLogs[i].returnValues;
-      voteEvent.index = pending.indexOf(voteEvent._key);
-      unique.set(voteEvent._key, voteEvent);
-    }
-
-    return Array.from(unique.values());
+    // this should be the empty repo keccak256
+    const repoTopic = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
   }
 
-  async getVoteThresholdEvents(orgName: string, repoName = ''): Promise<VoteThresholdEvent[]> {
+  async getRepoEvents(orgName: string, repoName: string): Promise<EventLog[]> {
     const orgID = await this.getOrgIDFromName(orgName);
-    const pending = repoName === ''
-      ? await this.getPendingOrgThresholds(orgName)
-      : await this.getPendingRepoThresholds(orgName, repoName);
-
-    const eventFilter = { _pendingThreshold: pending, _orgID: orgID, _repoName: repoName };
-    const eventLogs = await this.getEvents('VoteThresholdEvent', eventFilter);
-
-    // get unique votes by pending threshold
-    const unique = new Map<string, VoteThresholdEvent>();
-    for (let i = 0; i < eventLogs.length; i++) {
-      const voteEvent: VoteThresholdEvent = eventLogs[i].returnValues;
-      voteEvent.index = pending.indexOf(voteEvent._pendingThreshold);
-      unique.set(voteEvent._pendingThreshold, voteEvent);
-    }
-
-    return Array.from(unique.values());
-  }
-
-  async getVoteReleaseEvents(orgName: string, repoName: string): Promise<VoteReleaseEvent[]> {
-    const orgID = await this.getOrgIDFromName(orgName);
-    const pending = await this.getPendingReleases(orgName, repoName);
-    const tags = pending.map((release) => release.tag);
-
-    const eventFilter = { _orgID: orgID, _repoName: repoName, _tag: tags };
-    const eventLogs = await this.getEvents('VoteReleaseEvent', eventFilter);
-
-    // get unique votes by tag
-    const unique = new Map<string, VoteReleaseEvent>();
-    for (let i = 0; i < eventLogs.length; i++) {
-      const voteEvent: VoteReleaseEvent = eventLogs[i].returnValues;
-      voteEvent.index = tags.indexOf(voteEvent._tag);
-      voteEvent.release = pending.find((release) => release.tag === voteEvent._tag) as Release;
-      unique.set(voteEvent._tag, voteEvent);
-    }
-
-    return Array.from(unique.values());
+    const repoTopic = this.web3.utils.keccak256(repoName);
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
   }
 
   async getOrgAdmins(orgName: string): Promise<string[]> {

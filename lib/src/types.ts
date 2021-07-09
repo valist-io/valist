@@ -77,7 +77,6 @@ export type PendingRelease = {
 };
 
 export type VoteThresholdEvent = {
-  index: number,
   _orgID: string,
   _repoName: string,
   _signer: string,
@@ -87,7 +86,6 @@ export type VoteThresholdEvent = {
 };
 
 export type VoteKeyEvent = {
-  index: number,
   _orgID: string,
   _repoName: string,
   _signer: string,
@@ -98,8 +96,6 @@ export type VoteKeyEvent = {
 };
 
 export type VoteReleaseEvent = {
-  index: number,
-  release: Release,
   _orgID: string,
   _repoName: string,
   _tag: string,

@@ -1,7 +1,8 @@
 import { useState, useEffect, useContext } from 'react';
 import { useRouter } from 'next/router';
+import Link from 'next/link';
 import {
-  Repository, RepoMeta, VoteKeyEvent, VoteThresholdEvent, VoteReleaseEvent, Release,
+  Repository, RepoMeta, Release, PendingRelease,
 } from 'valist/dist/types';
 import ValistContext from '../../../../components/Valist/ValistContext';
 import DashboardLayout from '../../../../components/Layouts/DashboardLayout';
@@ -22,16 +23,18 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
   const [error, setError] = useState<Error>();
   const [repo, setRepo] = useState<Repository>();
   const [repoDevs, setRepoDevs] = useState<string[]>([]);
-  const [keyVotes, setKeyVotes] = useState<VoteKeyEvent[]>([]);
-  const [thresholdVotes, setThresholdVotes] = useState<VoteThresholdEvent[]>([]);
-  const [releaseVotes, setReleaseVotes] = useState<VoteReleaseEvent[]>([]);
+  const [repoEvents, setRepoEvents] = useState<any[]>([]);
+  const [pendingKeys, setPendingKeys] = useState<string[]>([]);
+  const [pendingThresholds, setPendingThresholds] = useState<string[]>([]);
+  const [pendingReleases, setPendingReleases] = useState<PendingRelease[]>([]);
 
   const fetchData = async () => Promise.all([
     valist.getRepository(orgName, repoName).then(setRepo),
     valist.getRepoDevs(orgName, repoName).then(setRepoDevs),
-    valist.getVoteKeyEvents(orgName, repoName).then(setKeyVotes),
-    valist.getVoteThresholdEvents(orgName, repoName).then(setThresholdVotes),
-    valist.getVoteReleaseEvents(orgName, repoName).then(setReleaseVotes),
+    valist.getRepoEvents(orgName, repoName).then(setRepoEvents),
+    valist.getPendingRepoDevs(orgName, repoName).then(setPendingKeys),
+    valist.getPendingRepoThresholds(orgName, repoName).then(setPendingThresholds),
+    valist.getPendingReleases(orgName, repoName).then(setPendingReleases),
   ]);
 
   const getRepoData = async () => {
@@ -163,8 +166,10 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
             <div className="grid grid-cols-1 gap-4 lg:col-span-2">
               <section aria-labelledby="profile-overview-title"></section>
               <div style={{ minHeight: '500px' }} className="rounded-lg bg-white p-10 overflow-hidden shadow">
-                  <div className="text-center">
-                    <h2 className="text-3xl">Manage Project</h2>
+                  <div className="text-center text-3xl">
+                    <Link href={`/${orgName}`}>{orgName}</Link>
+                    <span className="mx-8">/</span>
+                    <Link href={`/${orgName}/${repoName}`}>{repoName}</Link>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
                       {repo && <EditProjectMetaForm meta={repo.meta} repoName={repoName}
@@ -178,11 +183,11 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
                     <h2 className="text-3xl">Multi-factor Votes</h2>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                      <Votes keyVotes={keyVotes} thresholdVotes={thresholdVotes}
-                      grantKey={grantKey} revokeKey={revokeKey} voteThreshold={voteThreshold}
-                      clearPendingKey={clearPendingKey} clearPendingThreshold={clearPendingThreshold}
-                      releaseVotes={releaseVotes} voteRelease={voteRelease}
-                      clearPendingRelease={clearPendingRelease} />
+                    <Votes pendingKeys={pendingKeys} pendingThresholds={pendingThresholds}
+                      pendingReleases={pendingReleases} votes={repoEvents} grantKey={grantKey}
+                      revokeKey={revokeKey} voteThreshold={voteThreshold} clearPendingKey={clearPendingKey}
+                      clearPendingThreshold={clearPendingThreshold} clearPendingRelease={clearPendingRelease}
+                      voteRelease={voteRelease} />
                   </div>
                   <div className="text-center pt-8">
                     <h2 className="text-3xl">Manage Access & Permissions</h2>
