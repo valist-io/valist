@@ -13,7 +13,7 @@ $ npm install -g valist-cli
 $ valist COMMAND
 running command...
 $ valist (-v|--version|version)
-valist-cli/0.0.4 darwin-arm64 node-v14.17.1
+valist-cli/0.0.4 darwin-x64 node-v14.17.2
 $ valist --help [COMMAND]
 USAGE
   $ valist COMMAND
@@ -22,23 +22,41 @@ USAGE
 <!-- usagestop -->
 # Commands
 <!-- commands -->
-* [`valist address`](#valist-address)
+* [`valist account:get`](#valist-accountget)
+* [`valist account:new`](#valist-accountnew)
 * [`valist help [COMMAND]`](#valist-help-command)
+* [`valist init`](#valist-init)
+* [`valist org:get ORGNAME`](#valist-orgget-orgname)
+* [`valist org:key ORGNAME OPERATION KEY`](#valist-orgkey-orgname-operation-key)
+* [`valist org:new ORGNAME ORGMETA`](#valist-orgnew-orgname-orgmeta)
 * [`valist publish`](#valist-publish)
+* [`valist repo:get ORGNAME REPONAME`](#valist-repoget-orgname-reponame)
+* [`valist repo:key ORGNAME REPONAME OPERATION KEY`](#valist-repokey-orgname-reponame-operation-key)
+* [`valist repo:new ORGNAME REPONAME REPOMETA`](#valist-reponew-orgname-reponame-repometa)
 
-## `valist address`
+## `valist account:get`
 
-print current signer address
+print account info
 
 ```
 USAGE
-  $ valist address
+  $ valist account:get
 
 EXAMPLE
-  $ valist address
+  $ valist account:get
 ```
 
-_See code: [src/commands/address.ts](https://github.com/valist-io/valist/blob/v0.0.4/src/commands/address.ts)_
+## `valist account:new`
+
+create a new account
+
+```
+USAGE
+  $ valist account:new
+
+EXAMPLE
+  $ valist account:new
+```
 
 ## `valist help [COMMAND]`
 
@@ -57,9 +75,59 @@ OPTIONS
 
 _See code: [@oclif/plugin-help](https://github.com/oclif/plugin-help/blob/v3.2.2/src/commands/help.ts)_
 
+## `valist init`
+
+Generate a new valist project
+
+```
+USAGE
+  $ valist init
+
+EXAMPLE
+  $ valist init
+```
+
+## `valist org:get ORGNAME`
+
+print organization info
+
+```
+USAGE
+  $ valist org:get ORGNAME
+
+EXAMPLE
+  $ valist org:get valist
+```
+
+## `valist org:key ORGNAME OPERATION KEY`
+
+Add, remove, or rotate organization key
+
+```
+USAGE
+  $ valist org:key ORGNAME OPERATION KEY
+
+EXAMPLES
+  $ valist org:key exampleOrg grant <key>
+  $ valist org:key exampleOrg revoke <key>
+  $ valist org:key exampleOrg rotate <key>
+```
+
+## `valist org:new ORGNAME ORGMETA`
+
+Create a Valist organization
+
+```
+USAGE
+  $ valist org:new ORGNAME ORGMETA
+
+EXAMPLE
+  $ valist org:new valist meta/metOrg.json
+```
+
 ## `valist publish`
 
-publish a package to valist
+Publish a package to Valist
 
 ```
 USAGE
@@ -69,5 +137,41 @@ EXAMPLE
   $ valist publish
 ```
 
-_See code: [src/commands/publish.ts](https://github.com/valist-io/valist/blob/v0.0.4/src/commands/publish.ts)_
+## `valist repo:get ORGNAME REPONAME`
+
+print organization info
+
+```
+USAGE
+  $ valist repo:get ORGNAME REPONAME
+
+EXAMPLE
+  $ valist repo:get exampleOrg exampleRepo
+```
+
+## `valist repo:key ORGNAME REPONAME OPERATION KEY`
+
+Add, remove, or rotate repository key
+
+```
+USAGE
+  $ valist repo:key ORGNAME REPONAME OPERATION KEY
+
+EXAMPLES
+  $ valist repo:key exampleOrg exampleRepo grant <key>
+  $ valist repo:key exampleOrg exampleRepo revoke <key>
+  $ valist repo:key exampleOrg exampleRepo rotate <key>
+```
+
+## `valist repo:new ORGNAME REPONAME REPOMETA`
+
+Create a Valist repository
+
+```
+USAGE
+  $ valist repo:new ORGNAME REPONAME REPOMETA
+
+EXAMPLE
+  $ valist repo:new exampleOrg exampleRepo meta/repoMeta.json
+```
 <!-- commandsstop -->
