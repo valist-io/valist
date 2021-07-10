@@ -12,19 +12,13 @@ export const buildRelease = async ({
   out,
   type,
 }: ValistConfig): Promise<fs.ReadStream> => {
-  let outPath = out;
   let releaseFile;
 
   // Generate Dockerfile (uses current directory as source)
   generateDockerfile(image || defaultImages[type], './', build, install);
 
-  if (type !== 'node') {
-    // if out path is a file, cut file from mount path/get parent directory
-    outPath = path.basename(path.dirname(out));
-  }
-
   await createBuild('valist-build-image');
-  await exportBuild('valist-build-image', outPath);
+  await exportBuild('valist-build-image', out);
 
   // if package type is npm run npm pack
   if (type === 'node') {

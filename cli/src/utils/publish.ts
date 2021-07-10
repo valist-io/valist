@@ -6,7 +6,7 @@ import { initValist, parseValistConfig } from './config';
 
 const releaseExists = async (valist: Valist, org: string, project: string, tag: string) => {
   const { releaseCID } = await valist.getReleaseByTag(org, project, tag);
-  if (releaseCID && releaseCID.length > 0) {
+  if (releaseCID) {
     return true;
   }
   return false;
