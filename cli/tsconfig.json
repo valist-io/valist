@@ -10,7 +10,7 @@
     "target": "es2017"
   },
   "include": [
-    "src/**/*"
+    "src"
   ],
   "exclude": [
     "node_modules",
