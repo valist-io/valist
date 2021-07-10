@@ -87,6 +87,8 @@ export const parseValistConfig = (): ValistConfig => {
       process.exit(1);
     }
 
+    // @TODO enforce all parameters are not null by this point
+
     return config;
   } catch (e) {
     const msg = 'Could not load valist.yml';
