@@ -23,6 +23,7 @@ export default class OrgGet extends Command {
     this.log(`Org ID: ${orgData.orgID}`);
     this.log(`Name: ${orgData.meta.name}`);
     this.log(`Description: ${orgData.meta.description}`);
+    this.log(`Repo Names: ${orgData.repoNames}`);
     this.log();
     this.exit(0);
   }
