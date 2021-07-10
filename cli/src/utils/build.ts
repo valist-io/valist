@@ -1,19 +1,24 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import { createBuild, exportBuild, generateDockerfile } from 'reproducible';
-import type { ValistConfig } from './config';
+import { ValistConfig } from '@valist/sdk/dist/types';
+import { defaultImages } from './config';
 import { npmPack } from './npm';
 
 export const buildRelease = async ({
-  image, build, out, type,
-}: ValistConfig) => {
+  image,
+  install,
+  build,
+  out,
+  type,
+}: ValistConfig): Promise<fs.ReadStream> => {
   let outPath = out;
   let releaseFile;
 
   // Generate Dockerfile (uses current directory as source)
-  generateDockerfile(image, './', build);
+  generateDockerfile(image || defaultImages[type], './', build, install);
 
-  if (type !== 'npm') {
+  if (type !== 'node') {
     // if out path is a file, cut file from mount path/get parent directory
     outPath = path.basename(path.dirname(out));
   }
@@ -22,7 +27,7 @@ export const buildRelease = async ({
   await exportBuild('valist-build-image', outPath);
 
   // if package type is npm run npm pack
-  if (type === 'npm') {
+  if (type === 'node') {
     const packagePath = await npmPack();
     releaseFile = fs.createReadStream(packagePath);
   } else {

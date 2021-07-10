@@ -8,7 +8,7 @@ export default class Publish extends Command {
     '$ valist publish',
   ];
 
-  async run() {
+  async run(): Promise<void> {
     await publish();
     this.exit(0);
   }

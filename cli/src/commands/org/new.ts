@@ -21,7 +21,7 @@ export default class OrgNew extends Command {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const { args } = this.parse(OrgNew);
 
     // Create a new valist instance and connect

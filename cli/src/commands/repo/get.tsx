@@ -23,12 +23,13 @@ export default class OrgGet extends Command {
     const { args } = this.parse(OrgGet);
     const valist = await initValist();
     const repoData = await valist.getRepository(args.orgName, args.repoName);
-    this.log('\n');
+    this.log();
+    this.log(`Org ID: ${repoData.orgID}`);
+    this.log(`Repo: ${args.orgName}/${args.repoName}`);
     this.log(`Name: ${repoData.meta.name}`);
-    this.log(`ID: ${repoData.orgID}`);
     this.log(`Description: ${repoData.meta.description}`);
-    this.log(`Threshold: ${repoData.threshold}`);
-    this.log('\n');
+    this.log(`Signature Threshold: ${repoData.threshold}`);
+    this.log();
     this.exit(0);
   }
 }

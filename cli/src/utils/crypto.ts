@@ -1,6 +1,8 @@
 import { randomBytes } from 'crypto';
-import HDWalletProvider from '@truffle/hdwallet-provider';
 import { MissingKeyError } from './errors';
+
+// eslint-disable-next-line @typescript-eslint/no-var-requires
+const HDWalletProvider = require('@truffle/hdwallet-provider');
 
 let keytar: any;
 if (process.env.CI) {
@@ -12,14 +14,14 @@ if (process.env.CI) {
   keytar = require('keytar');
 }
 
-export const getSignerKey = async (): Promise<string | null> => {
+export const getSignerKey = async (): Promise<string> => {
   const key = process.env.VALIST_SIGNER_KEY || await keytar.getPassword('VALIST', 'SIGNER');
+  if (!key) throw new MissingKeyError();
   return key;
 };
 
 export const getWeb3Provider = async (signer?: string): Promise<any> => {
   const key = signer || await getSignerKey();
-  if (!key) throw new MissingKeyError();
 
   const web3Provider = new HDWalletProvider({
     privateKeys: [key],
