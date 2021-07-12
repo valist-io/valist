@@ -53,13 +53,13 @@ export default class OrgKey extends Command {
     }
 
     const { threshold } = await valist.getOrganization(args.orgName);
-    const { transactionHash } = await opFunc(args.OrgName, args.key);
+    const { transactionHash } = await opFunc(args.orgName, args.key);
     const { signers } = await valist.getPendingOrgAdminVotes(args.orgName, opName, args.key);
 
     if (signers.length < threshold) {
-      this.log(`🗳 Voted to ${args.operation} ${args.key} on ${args.orgName}: ${signers.length}/${threshold}`);
+      this.log(`🗳 Voted to ${args.operation} key ${args.key} on ${args.orgName}: ${signers.length}/${threshold}`);
     } else {
-      this.log(`✅ Approved ${args.operation} ${args.key} on ${args.orgName}!`);
+      this.log(`✅ Approved ${args.operation} key ${args.key} on ${args.orgName}!`);
     }
     
     this.log('🔗 Transaction Hash:', transactionHash);
