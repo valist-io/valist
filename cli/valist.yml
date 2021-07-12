@@ -1,5 +1,7 @@
-type: npm
-org: valist
-project: cli
-tag: 0.0.4
-meta: CHANGELOG.md
+type: node
+org: test4
+repo: cli
+tag: 0.0.1
+install: npm install
+build: npm run prepack
+out: dist

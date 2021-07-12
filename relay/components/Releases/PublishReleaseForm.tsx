@@ -5,7 +5,7 @@ import React, {
 import { useRouter } from 'next/router';
 
 import ValistContext from '../Valist/ValistContext';
-import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import LoadingDialog from '../Dialog/LoadingDialog';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 { orgName: string, repoName: string }) => {
@@ -90,11 +90,10 @@ export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
     (async () => {
       if (valist) {
         try {
-          const metaResp = await valist.getRepoMeta(orgName, repoName);
-          console.log(metaResp);
-          setRepoMeta(metaResp);
+          const repo = await valist.getRepository(orgName, repoName);
+          setRepoMeta(repo.meta);
 
-          const userCanRelease = await valist.canRelease(orgName, repoName);
+          const userCanRelease = await valist.isRepoDev(orgName, repoName);
           setCanRelease(userCanRelease);
         } catch (e) { console.log(e); }
       }

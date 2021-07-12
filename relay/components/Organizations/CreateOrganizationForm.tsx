@@ -4,7 +4,7 @@ import { shortnameFilterRegex } from 'valist/dist/utils';
 import { useRouter } from 'next/router';
 import ValistContext from '../Valist/ValistContext';
 
-import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import LoadingDialog from '../Dialog/LoadingDialog';
 
 const CreateOrganizationForm:FunctionComponent<any> = () => {
   const valist = useContext(ValistContext);

@@ -5,7 +5,7 @@ import { shortnameFilterRegex } from 'valist/dist/utils';
 import { ProjectType } from 'valist/dist/types';
 
 import ValistContext from '../Valist/ValistContext';
-import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import LoadingDialog from '../Dialog/LoadingDialog';
 
 export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: { orgName: string }) => {
   const valist = useContext(ValistContext);

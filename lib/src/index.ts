@@ -1,24 +1,39 @@
+/* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-underscore-dangle */
 import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
-// @ts-ignore mexa doesn't support typescript yet
-import Biconomy from '@biconomy/mexa';
 
-import { provider } from 'web3-core/types';
+import { provider, EventLog } from 'web3-core/types';
 
-import * as sigUtil from 'eth-sig-util';
-
-import { OrgMeta, Release, RepoMeta } from './types';
 import {
-  domainData,
-  domainType,
-  getSignatureParameters,
+  Organization,
+  OrgID,
+  OrgMeta,
+  PendingRelease,
+  PendingVote,
+  Release,
+  RepoMeta,
+  Repository,
+  ValistCache,
+} from './types';
+
+import {
+  ADD_KEY,
+  REVOKE_KEY,
+  ROTATE_KEY,
+  ORG_ADMIN,
+  REPO_DEV,
+} from './constants';
+
+import {
   getValistContract,
-  metaTransactionType,
   shortnameFilterRegex,
+  sendMetaTransaction,
 } from './utils';
 
 // node-fetch polyfill
+// eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require('node-fetch');
 
 if (!globalThis.fetch) {
@@ -27,21 +42,19 @@ if (!globalThis.fetch) {
 class Valist {
   web3: Web3;
 
-  valist: any;
+  contract: any;
 
   ipfs: any;
-
-  biconomy: any;
 
   signer?: string;
 
   defaultAccount: string;
 
-  metaTxEnabled: boolean = false;
-
-  metaTxReady: boolean = false;
+  metaTxEnabled = false;
 
   contractAddress: string | undefined;
+
+  cache: ValistCache;
 
   constructor({
     web3Provider,
@@ -50,38 +63,28 @@ class Valist {
     contractAddress,
   }: {
     web3Provider: provider,
-    metaTx?: boolean | string,
+    metaTx?: boolean,
     ipfsHost?: string,
     contractAddress?: string,
   }) {
-    if (metaTx === true || metaTx === 'true') {
-      this.metaTxEnabled = true;
-
-      // setup biconomy instance with public api key
-      this.biconomy = new Biconomy(
-        web3Provider,
-        { apiKey: 'qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878', strictMode: true },
-      );
-
-      this.web3 = new Web3(this.biconomy);
-
-      this.biconomy.onEvent(this.biconomy.READY, () => {
-        this.metaTxReady = true;
-        console.log('👻 MetaTransactions Enabled');
-      });
-    } else {
-      this.web3 = new Web3(web3Provider);
-    }
-
+    this.web3 = new Web3(web3Provider);
+    this.metaTxEnabled = metaTx;
     this.defaultAccount = '0x0';
     this.ipfs = ipfsClient(ipfsHost);
     this.contractAddress = contractAddress;
+    this.cache = {
+      orgIDs: [],
+      orgNames: [],
+      orgs: {},
+    };
   }
 
   // initialize main valist contract instance for future calls
-  async connect(waitForMetaTx?: boolean) {
+  async connect(): Promise<void> {
     try {
-      this.valist = await getValistContract(this.web3, this.contractAddress);
+      this.contract = await getValistContract(this.web3, this.contractAddress);
+      this.contractAddress = this.contract._address;
+      if (!this.contractAddress) throw new Error('Could not get Valist contract address');
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -97,358 +100,16 @@ class Valist {
       throw e;
     }
 
-    if (waitForMetaTx && this.biconomy) {
-      await new Promise((resolve) => {
-        this.biconomy.onEvent(this.biconomy.READY, () => {
-          this.metaTxReady = true;
-          resolve(true);
-        });
-      });
-    }
+    if (this.metaTxEnabled) console.log('👻 MetaTransactions Enabled');
   }
 
-  // returns organization meta and release tags
-  async getOrganization(orgName: string) {
-    try {
-      const org = await this.valist.methods.getOrganization(orgName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(org[0]); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return { meta: json, repoNames: org[1] };
-    } catch (e) {
-      const msg = 'Could not get organization';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrganizationMeta(orgName: string) {
-    try {
-      const orgMeta = await this.valist.methods.getOrgMeta(orgName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(orgMeta); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return json;
-    } catch (e) {
-      const msg = 'Could not get organization metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrganizationNames() {
-    try {
-      const orgs = await this.valist.methods.getOrgNames().call();
-      return orgs;
-    } catch (e) {
-      const msg = 'Could not get organization names';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async setOrgMeta(orgName: string, orgMeta: any, account: string) {
-    try {
-      const hash = await this.addJSONtoIPFS(orgMeta);
-      return await this.sendTransaction(this.valist.methods.setOrgMeta(orgName, hash), account);
-    } catch (e) {
-      const msg = 'Could not set organization metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  // returns repository
-  async getRepository(orgName: string, repoName: string) {
-    try {
-      const repo = await this.valist.methods.getRepository(orgName, repoName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(repo[0]); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return { meta: json, tags: repo[1] };
-    } catch (e) {
-      const msg = 'Could not get repository contract';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getReposFromOrganization(orgName: string) {
-    try {
-      const repos = await this.valist.methods.getRepoNames(orgName).call();
-      return repos;
-    } catch (e) {
-      const msg = 'Could not get repositories from organization';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getRepoMeta(orgName: string, repoName: string) {
-    try {
-      const repoMeta = await this.valist.methods.getRepoMeta(orgName, repoName).call();
-
-      let json: any = {};
-
-      try { json = await this.fetchJSONfromIPFS(repoMeta); } catch (e) {
-        // noop, just return empty object if failed
-      }
-
-      return json;
-    } catch (e) {
-      const msg = 'Could not get repository metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async setRepoMeta(orgName: string, repoName: string, repoMeta: any, account: string) {
-    try {
-      const hash = await this.addJSONtoIPFS(repoMeta);
-      return await this.sendTransaction(this.valist.methods.setRepoMeta(orgName, repoName, hash), account);
-    } catch (e) {
-      const msg = 'Could not set repository metadata';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getLatestReleaseFromRepo(orgName: string, repoName: string) {
-    try {
-      const release = await this.valist.methods.getLatestRelease(orgName, repoName).call();
-      return release;
-    } catch (e) {
-      const msg = 'Could not get latest release from repo';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getLatestTagFromRepo(orgName: string, repoName: string) {
-    try {
-      const tag = await this.valist.methods.getLatestTag(orgName, repoName).call();
-      return tag;
-    } catch (e) {
-      const msg = 'Could not get latest tag from repo';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getReleaseTagsFromRepo(orgName: string, repoName: string) {
-    try {
-      const tags = await this.valist.methods.getReleaseTags(orgName, repoName).call();
-      return tags;
-    } catch (e) {
-      const msg = 'Could not get release tags from repo';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getReleasesFromRepo(orgName: string, repoName: string): Promise<Release[]> {
-    try {
-      const tags = await this.valist.methods.getReleaseTags(orgName, repoName).call();
-      const releases: Release[] = [];
-
-      for (let i = 0; i < tags.length; i++) {
-        // eslint-disable-next-line no-await-in-loop
-        const release = await this.valist.methods.getRelease(orgName, repoName, tags[i]).call();
-        releases.push({ ...release, tag: tags[i] });
-      }
-
-      return releases;
-    } catch (e) {
-      const msg = 'Could not get releases from repo';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getReleaseByTag(orgName: string, repoName: string, tag: string) {
-    try {
-      const release = await this.valist.methods.getRelease(orgName, repoName, tag).call();
-
-      return release;
-    } catch (e) {
-      const msg = 'Could not get release by tag';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isOrgOwner(orgName: string, account: string) {
-    try {
-      const isOrgOwner = await this.valist.methods.isOrgOwner(orgName, account).call();
-      return isOrgOwner;
-    } catch (e) {
-      const msg = 'Could not check if user has ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isOrgAdmin(orgName: string, account: string) {
-    try {
-      const isOrgAdmin = await this.valist.methods.isOrgAdmin(orgName, account).call();
-      return isOrgAdmin;
-    } catch (e) {
-      const msg = 'Could not check if user has ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isRepoAdmin(orgName: string, repoName: string, account: string) {
-    try {
-      const isRepoAdmin = await this.valist.methods.isRepoAdmin(orgName, repoName, account).call();
-      return isRepoAdmin;
-    } catch (e) {
-      const msg = 'Could not check if user has REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async isRepoDev(orgName: string, repoName: string, account: string) {
-    try {
-      const isRepoDev = await this.valist.methods.isRepoDev(orgName, repoName, account).call();
-      return isRepoDev;
-    } catch (e) {
-      const msg = 'Could not check if user has REPO_DEV_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async grantOrgAdmin(orgName: string, granter: string, grantee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.grantOrgAdmin(orgName, grantee), granter);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not grant ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeOrgAdmin(orgName: string, revoker: string, revokee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeOrgAdmin(orgName, revokee), revoker);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not revoke ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async grantRepoAdmin(orgName: string, repoName: string, granter: string, grantee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.grantRepoAdmin(orgName, repoName, grantee), granter);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not grant REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeRepoAdmin(orgName: string, repoName: string, revoker: string, revokee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeRepoAdmin(orgName, repoName, revokee), revoker);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not revoke REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async grantRepoDev(orgName: string, repoName: string, granter: string, grantee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.grantRepoDev(orgName, repoName, grantee), granter);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not grant REPO_DEV_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async revokeRepoDev(orgName: string, repoName: string, revoker: string, revokee: string) {
-    try {
-      const tx = await this.sendTransaction(this.valist.methods.revokeRepoDev(orgName, repoName, revokee), revoker);
-      return tx;
-    } catch (e) {
-      const msg = 'Could not revoke REPO_DEV_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrgOwners(orgName: string) {
-    try {
-      const members = await this.valist.methods.getOrgOwners(orgName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have ORG_OWNER_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getOrgAdmins(orgName: string) {
-    try {
-      const members = await this.valist.methods.getOrgAdmins(orgName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have ORG_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getRepoAdmins(orgName: string, repoName: string) {
-    try {
-      const members = await this.valist.methods.getRepoAdmins(orgName, repoName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have REPO_ADMIN_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async getRepoDevs(orgName: string, repoName: string) {
-    try {
-      const members = await this.valist.methods.getRepoDevs(orgName, repoName).call();
-      return members;
-    } catch (e) {
-      const msg = 'Could not get users that have REPO_DEV_ROLE';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async createOrganization(orgName: string, orgMeta: OrgMeta, account?: string) {
+  async createOrganization(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
       const tx = await this.sendTransaction(
-        this.valist.methods.createOrganization(
-          orgName.toLowerCase().replace(shortnameFilterRegex, ''), metaFile,
+        this.contract.methods.createOrganization(
+          orgName.toLowerCase().replace(shortnameFilterRegex, ''),
+          metaFile,
         ),
         account,
       );
@@ -460,12 +121,19 @@ class Valist {
     }
   }
 
-  async createRepository(orgName: string, repoName: string, repoMeta: RepoMeta, account?: string) {
+  async createRepository(
+    orgName: string,
+    repoName: string,
+    repoMeta: RepoMeta,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
     try {
       const metaFile = await this.addJSONtoIPFS(repoMeta);
+      const orgID = await this.getOrgIDFromName(orgName);
       const tx = await this.sendTransaction(
-        this.valist.methods.createRepository(
-          orgName, repoName.toLowerCase().replace(shortnameFilterRegex, ''), metaFile,
+        this.contract.methods.createRepository(
+          orgID, repoName.toLowerCase().replace(shortnameFilterRegex, ''),
+          metaFile,
         ),
         account,
       );
@@ -477,7 +145,7 @@ class Valist {
     }
   }
 
-  async prepareRelease(tag: string, releaseFile: any, metaFile: any) {
+  async prepareRelease(tag: string, releaseFile: any, metaFile: any): Promise<Release> {
     try {
       const releaseCID: string = await this.addFileToIPFS(releaseFile);
       const metaCID: string = await this.addFileToIPFS(metaFile);
@@ -489,25 +157,20 @@ class Valist {
     }
   }
 
-  async canRelease(orgName: string, repoName: string, account: string = this.defaultAccount) {
+  async publishRelease(
+    orgName: string,
+    repoName: string,
+    release: Release,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
     try {
+      const orgID = await this.getOrgIDFromName(orgName);
       const isRepoDev = await this.isRepoDev(orgName, repoName, account);
-      return isRepoDev;
-    } catch (e) {
-      const msg = 'Could not check if user can release';
-      console.error(msg, e);
-      throw e;
-    }
-  }
-
-  async publishRelease(orgName: string, repoName: string, release: Release, account?: string) {
-    try {
-      const canRelease = await this.canRelease(orgName, repoName, account);
-      if (!canRelease) throw new Error('User does not have permission to publish release');
+      if (!isRepoDev) throw new Error('User does not have permission to publish release');
 
       const tx = await this.sendTransaction(
-        this.valist.methods.publishRelease(
-          orgName, repoName, release.tag, release.releaseCID, release.metaCID,
+        this.contract.methods.voteRelease(
+          orgID, repoName, release.tag, release.releaseCID, release.metaCID,
         ),
         account,
       );
@@ -519,8 +182,708 @@ class Valist {
     }
   }
 
+  async setOrgMeta(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const hash = await this.addJSONtoIPFS(orgMeta);
+      return await this.sendTransaction(this.contract.methods.setOrgMeta(orgID, hash), account);
+    } catch (e) {
+      const msg = 'Could not set organization metadata';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async setRepoMeta(
+    orgName: string,
+    repoName: string,
+    repoMeta: RepoMeta,
+    account: string = this.defaultAccount,
+  ): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const hash = await this.addJSONtoIPFS(repoMeta);
+      return await this.sendTransaction(this.contract.methods.setRepoMeta(orgID, repoName, hash), account);
+    } catch (e) {
+      const msg = 'Could not set repository metadata';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrgIDFromName(orgName: string): Promise<OrgID> {
+    try {
+      if (!this.cache.orgs[orgName]) {
+        this.cache.orgs[orgName] = {
+          orgID: await this.contract.methods.orgIDByName(orgName).call(),
+          threshold: 0,
+          thresholdDate: 0,
+          meta: {
+            name: '',
+            description: '',
+          },
+          metaCID: '',
+          repoNames: [],
+        };
+      }
+      return this.cache.orgs[orgName].orgID;
+    } catch (e) {
+      const msg = 'Could not get organization ID';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  // returns organization meta and release tags
+  async getOrganization(orgName: string, page = 1, resultsPerPage = 10): Promise<Organization> {
+    try {
+      const orgID: OrgID = await this.getOrgIDFromName(orgName);
+      this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
+      this.cache.orgs[orgName].orgID = orgID;
+
+      this.cache.orgs[orgName].repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
+
+      try {
+        this.cache.orgs[orgName].meta = await this.fetchJSONfromIPFS(this.cache.orgs[orgName].metaCID);
+      } catch (e) {
+        // noop, just return empty object if failed
+      }
+
+      return this.cache.orgs[orgName];
+    } catch (e) {
+      const msg = 'Could not get organization';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrganizationNames(page = 1, resultsPerPage = 10): Promise<string[]> {
+    try {
+      const orgs = await this.contract.methods.getOrgNames(page, resultsPerPage).call();
+      return orgs.filter(Boolean);
+    } catch (e) {
+      const msg = 'Could not get organization names';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getRepoNames(orgName: string, page = 1, resultsPerPage = 10): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoNames = await this.contract.methods.getRepoNames(orgID, page, resultsPerPage).call();
+      return repoNames.filter(Boolean);
+    } catch (e) {
+      const msg = 'Could not get organization names';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  // returns repository
+  async getRepository(orgName: string, repoName: string): Promise<Repository> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const repo = await this.contract.methods.repos(repoSelector).call();
+
+      let json: RepoMeta = {
+        name: '',
+        description: '',
+        projectType: 'binary',
+        homepage: '',
+        repository: '',
+      };
+
+      try { json = await this.fetchJSONfromIPFS(repo.metaCID); } catch (e) {
+        // noop, just return empty object if failed
+      }
+
+      return {
+        orgID,
+        meta: json,
+        metaCID: repo.metaCID,
+        tags: repo.tags,
+        threshold: Number(repo.threshold),
+        thresholdDate: repo.thresholdDate,
+      };
+    } catch (e) {
+      const msg = 'Could not get repository';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getLatestRelease(orgName: string, repoName: string): Promise<Release> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const release = await this.contract.methods.getLatestRelease(orgID, repoName).call();
+      return {
+        tag: release[0],
+        releaseCID: release[1],
+        metaCID: release[2],
+        signers: release[3],
+      };
+    } catch (e) {
+      const msg = 'Could not get latest release from repo';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getReleaseTags(orgName: string, repoName: string, page = 1, resultsPerPage = 10): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const tags = await this.contract.methods.getReleaseTags(repoSelector, page, resultsPerPage).call();
+      return tags.filter(Boolean);
+    } catch (e) {
+      const msg = 'Could not get release tags from repo';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getReleases(orgName: string, repoName: string, page = 1, resultsPerPage = 10): Promise<Release[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tags = await this.getReleaseTags(orgName, repoName, page, resultsPerPage);
+      const releases: Release[] = [];
+
+      for (let i = 0; i < tags.length; ++i) {
+        const releaseSelector = this.web3.utils.keccak256(
+          this.web3.eth.abi.encodeParameters(['bytes32', 'string', 'string'], [orgID, repoName, tags[i]]),
+        );
+        // eslint-disable-next-line no-await-in-loop
+        const release = await this.contract.methods.releases(releaseSelector).call();
+        releases.push({
+          tag: tags[i],
+          releaseCID: release.releaseCID,
+          metaCID: release.metaCID,
+        });
+      }
+
+      return releases;
+    } catch (e) {
+      const msg = 'Could not get releases from repo';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getReleaseByTag(orgName: string, repoName: string, tag: string): Promise<Release> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const releaseSelector = this.web3.utils.keccak256(
+        this.web3.eth.abi.encodeParameters(['bytes32', 'string', 'string'], [orgID, repoName, tag]),
+      );
+      const release = await this.contract.methods.releases(releaseSelector).call();
+      return {
+        tag,
+        releaseCID: release.releaseCID,
+        metaCID: release.metaCID,
+        signers: release.signers,
+      };
+    } catch (e) {
+      const msg = 'Could not get release by tag';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingReleases(orgName: string, repoName: string): Promise<PendingRelease[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const pendingCount = await this.contract.methods.getPendingReleaseCount(repoSelector).call();
+      const requests: PendingRelease[] = [];
+      for (let i = 0; i < pendingCount; ++i) {
+        // eslint-disable-next-line no-await-in-loop
+        requests.push(await this.contract.methods.pendingReleaseRequests(repoSelector, i).call());
+      }
+      return requests;
+    } catch (e) {
+      const msg = 'Could not get pending releases';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingReleaseVotes(orgName: string, repoName: string, release: Release): Promise<PendingVote> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const voteSelector = this.web3.utils.keccak256(
+        this.web3.eth.abi.encodeParameters(
+          ['bytes32', 'string', 'string', 'string', 'string'],
+          [orgID, repoName, release.tag, release.releaseCID, release.metaCID],
+        ),
+      );
+      const votes = await this.getPendingVotes(voteSelector);
+      return votes;
+    } catch (e) {
+      const msg = 'Could not get pending release votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async isOrgAdmin(orgName: string, account: string = this.defaultAccount): Promise<boolean> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const isOrgAdmin = await this.contract.methods.isOrgAdmin(orgID, account).call();
+      return isOrgAdmin;
+    } catch (e) {
+      const msg = 'Could not check if user has ORG_ADMIN_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async isRepoDev(orgName: string, repoName: string, account: string = this.defaultAccount): Promise<boolean> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
+      return isRepoDev;
+    } catch (e) {
+      if (e.message.includes('No repo')) {
+        return false;
+      }
+      const msg = 'Could not check if user has REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async voteOrgAdmin(orgName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', ADD_KEY, key),
+        this.defaultAccount,
+      );
+      console.log(orgID, tx);
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to grant ORG_ADMIN_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async revokeOrgAdmin(orgName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', REVOKE_KEY, key),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to revoke ORG_ADMIN_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async rotateOrgAdmin(orgName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, '', ROTATE_KEY, key),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to rotate ORG_ADMIN_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async voteRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, ADD_KEY, key),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to grant REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async revokeRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, REVOKE_KEY, key),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to revoke REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async rotateRepoDev(orgName: string, repoName: string, key: string): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteKey(orgID, repoName, ROTATE_KEY, key),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote to revoke REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  private async getPendingVotes(voteSelector: string): Promise<PendingVote> {
+    try {
+      const votes = await this.contract.methods.getPendingVotes(voteSelector).call();
+      return {
+        expiration: votes[0],
+        signers: votes[1],
+      };
+    } catch (e) {
+      const msg = 'Could not get pending votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  private async getEvents(topics?: any[]): Promise<EventLog[]> {
+    try {
+      const fromBlock = await this.web3.eth.getBlockNumber() - 99990;
+      const options = { fromBlock, toBlock: 'latest', topics };
+      const events = await this.contract.getPastEvents('allEvents', options);
+      return events;
+    } catch (e) {
+      const msg = 'Could not get allEvents';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrgEvents(orgName: string): Promise<EventLog[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    // this should be the empty repo keccak256
+    const repoTopic = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
+  }
+
+  async getRepoEvents(orgName: string, repoName: string): Promise<EventLog[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    const repoTopic = this.web3.utils.keccak256(repoName);
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
+  }
+
+  async getOrgAdmins(orgName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const roleSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, ORG_ADMIN) || '');
+      const members = await this.contract.methods.getRoleMembers(roleSelector).call();
+      return members;
+    } catch (e) {
+      const msg = 'Could not get users that have ORG_ADMIN_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingOrgAdmins(orgName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const pendingCount = await this.contract.methods.getRoleRequestCount(orgID).call();
+      const requests = [];
+      for (let i = 0; i < pendingCount; ++i) {
+        // eslint-disable-next-line no-await-in-loop
+        requests.push(await this.contract.methods.pendingRoleRequests(orgID, i).call());
+      }
+      return requests;
+    } catch (e) {
+      const msg = 'Could not get pending orgAdmin requests';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingOrgAdminVotes(orgName: string, operation: string, address: string): Promise<PendingVote> {
+    if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
+      throw new Error(`Invalid key operation ${operation}`);
+    }
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      // keccak256(abi.encodePacked(orgID, ORG_ADMIN, OPERATION, pendingOrgAdminAddress))
+      const voteSelector = this.web3.utils.keccak256(
+        this.web3.utils.encodePacked(orgID, ORG_ADMIN, operation, address) || '',
+      );
+      const votes = await this.getPendingVotes(voteSelector);
+      return votes;
+    } catch (e) {
+      const msg = 'Could not get pending orgAdmin votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getRepoDevs(orgName: string, repoName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const roleSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName, REPO_DEV) || '');
+      const members = await this.contract.methods.getRoleMembers(roleSelector).call();
+      return members;
+    } catch (e) {
+      const msg = 'Could not get users that have REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingRepoDevs(orgName: string, repoName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const roleSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const pendingCount = await this.contract.methods.getRoleRequestCount(roleSelector).call();
+      const requests = [];
+      for (let i = 0; i < pendingCount; ++i) {
+        // eslint-disable-next-line no-await-in-loop
+        requests.push(await this.contract.methods.pendingRoleRequests(roleSelector, i).call());
+      }
+      return requests;
+    } catch (e) {
+      const msg = 'Could not get users that have REPO_DEV_ROLE';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingRepoDevVotes(
+    orgName: string,
+    repoName: string,
+    operation: string,
+    address: string,
+  ): Promise<PendingVote> {
+    if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
+      throw new Error(`Invalid key operation ${operation}`);
+    }
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      // keccak256(abi.encodePacked(orgID, repoName, REPO_DEV, OPERATION, pendingRepoDevAddress))
+      const voteSelector = this.web3.utils.keccak256(
+        this.web3.utils.encodePacked(orgID, repoName, REPO_DEV, operation, address) || '',
+      );
+      const votes = await this.getPendingVotes(voteSelector);
+      return votes;
+    } catch (e) {
+      const msg = 'Could not get pending repoDev votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async voteOrgThreshold(orgName: string, threshold: number): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteThreshold(orgID, '', threshold),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote for org threshold';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingOrgThresholds(orgName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const pendingCount = await this.contract.methods.getThresholdRequestCount(orgID).call();
+      const requests = [];
+      for (let i = 0; i < pendingCount; ++i) {
+        // eslint-disable-next-line no-await-in-loop
+        requests.push(await this.contract.methods.pendingThresholdRequests(orgID, i).call());
+      }
+      return requests;
+    } catch (e) {
+      const msg = 'Could not get pending org thresholds';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingOrgThresholdVotes(orgName: string, threshold: number): Promise<PendingVote> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      // keccak256(abi.encodePacked(orgID, repoName, pendingRepoThreshold))
+      const voteSelector = this.web3.utils.keccak256(
+        this.web3.utils.encodePacked(orgID, '', threshold) || '',
+      );
+      const votes = await this.getPendingVotes(voteSelector);
+      return votes;
+    } catch (e) {
+      const msg = 'Could not get pending repo threshold votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async voteRepoThreshold(orgName: string, repoName: string, threshold: number): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.voteThreshold(orgID, repoName, threshold),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not vote for repo threshold';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingRepoThresholds(orgName: string, repoName: string): Promise<string[]> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
+      const pendingCount = await this.contract.methods.getThresholdRequestCount(repoSelector).call();
+      const requests = [];
+      for (let i = 0; i < pendingCount; ++i) {
+        // eslint-disable-next-line no-await-in-loop
+        requests.push(await this.contract.methods.pendingThresholdRequests(repoSelector, i).call());
+      }
+      return requests;
+    } catch (e) {
+      const msg = 'Could not get pending repo thresholds';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getPendingRepoThresholdVotes(orgName: string, repoName: string, threshold: number): Promise<PendingVote> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      // keccak256(abi.encodePacked(orgID, repoName, pendingRepoThreshold))
+      const voteSelector = this.web3.utils.keccak256(
+        this.web3.utils.encodePacked(orgID, repoName, threshold) || '',
+      );
+      const votes = await this.getPendingVotes(voteSelector);
+      return votes;
+    } catch (e) {
+      const msg = 'Could not get pending repo threshold votes';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async clearPendingOrgKey(orgName: string, operation: string, key: string, index: number): Promise<any> {
+    if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
+      throw new Error(`Invalid key operation ${operation}`);
+    }
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.clearPendingKey(orgID, '', operation, key, index),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not clear pending role request';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async clearPendingRepoKey(
+    orgName: string,
+    repoName: string,
+    operation: string,
+    key: string,
+    index: number,
+  ): Promise<any> {
+    if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
+      throw new Error(`Invalid key operation ${operation}`);
+    }
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.clearPendingKey(orgID, repoName, operation, key, index),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not clear pending role request';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async clearPendingOrgThreshold(orgName: string, threshold: number, index: number): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.clearPendingThreshold(orgID, '', threshold, index),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not clear pending org threshold';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async clearPendingRepoThreshold(orgName: string, repoName: string, threshold: number, index: number): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.clearPendingThreshold(orgID, repoName, threshold, index),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not clear pending repo threshold';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async clearPendingRelease(orgName: string, repoName: string, release: Release, index: number): Promise<any> {
+    try {
+      const orgID = await this.getOrgIDFromName(orgName);
+      const tx = await this.sendTransaction(
+        this.contract.methods.clearPendingRelease(
+          orgID,
+          repoName,
+          release.tag,
+          release.releaseCID,
+          release.metaCID,
+          index,
+        ),
+        this.defaultAccount,
+      );
+      return tx;
+    } catch (e) {
+      const msg = 'Could not clear pending release';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
   // eslint-disable-next-line class-methods-use-this
-  async fetchJSONfromIPFS(ipfsHash: string) {
+  async fetchJSONfromIPFS(ipfsHash: string): Promise<any> {
     try {
       const response = await fetch(`https://gateway.valist.io/ipfs/${ipfsHash}`);
       const json = await response.json();
@@ -532,7 +895,7 @@ class Valist {
     }
   }
 
-  async addJSONtoIPFS(data: any, onlyHash?: boolean) {
+  async addJSONtoIPFS(data: any, onlyHash?: boolean): Promise<string> {
     try {
       const file = Buffer.from(JSON.stringify(data));
       const result = await this.ipfs.add(file, { onlyHash, cidVersion: 1 });
@@ -544,7 +907,7 @@ class Valist {
     }
   }
 
-  async addFileToIPFS(data: any, onlyHash?: boolean) {
+  async addFileToIPFS(data: any, onlyHash?: boolean): Promise<string> {
     try {
       const result = await this.ipfs.add(data, { onlyHash, cidVersion: 1 });
       return result.cid.string;
@@ -555,69 +918,19 @@ class Valist {
     }
   }
 
-  async sendTransaction(functionCall: any, account: string = this.defaultAccount) {
+  async sendTransaction(functionCall: any, account: string = this.defaultAccount): Promise<any> {
+    const gasLimit = await functionCall.estimateGas({ from: account });
+
     if (this.metaTxEnabled) {
-      if (!this.metaTxReady) throw new Error('MetaTransactions not ready!');
-
-      const sendAsync = (params: any): any => new Promise((resolve, reject) => {
-        // @ts-ignore sendAsync is conflicting with the Magic RPCProvider type
-        this.web3.currentProvider.sendAsync(params, async (e: any, signed: any) => {
-          if (e) reject(e);
-          resolve(signed);
-        });
-      });
-
       try {
-        const nonce = await this.valist.methods.getNonce(account).call();
-        const functionSignature = functionCall.encodeABI();
-
-        const message = {
-          nonce: Number(nonce),
-          from: account,
-          functionSignature,
-        };
-
-        const dataToSign = JSON.stringify({
-          types: {
-            EIP712Domain: domainType,
-            MetaTransaction: metaTransactionType,
-          },
-          domain: domainData,
-          primaryType: 'MetaTransaction',
-          message,
-        });
-
-        let signed;
-
-        if (this.signer) {
-          signed = sigUtil.signTypedData_v4(Buffer.from(this.signer, 'hex'), { data: JSON.parse(dataToSign) });
-        } else {
-          const sig = await sendAsync({
-            jsonrpc: '2.0',
-            id: new Date().getTime(),
-            method: 'eth_signTypedData_v4',
-            params: [account, dataToSign],
-          });
-          signed = sig.result;
-        }
-
-        const { r, s, v } = getSignatureParameters(this.web3, signed);
-
-        // console.log("R", r, "S", s, "V", v, "Function signature", functionSignature, account);
-
-        const gasLimit = await this.valist.methods
-          .executeMetaTransaction(account, functionSignature, r, s, v)
-          .estimateGas({ from: account });
-
-        const gasPrice = await this.web3.eth.getGasPrice();
-
-        const tx = await this.valist.methods
-          .executeMetaTransaction(account, functionSignature, r, s, v)
-          .send({
-            from: account,
-            gasPrice,
-            gasLimit,
-          });
+        const tx = await sendMetaTransaction(
+          this.web3,
+          this.contractAddress,
+          functionCall,
+          account,
+          gasLimit,
+          this.signer,
+        );
         return tx;
       } catch (e) {
         const msg = 'Could not send meta transaction';
@@ -625,7 +938,6 @@ class Valist {
         throw e;
       }
     } else {
-      const gasLimit = await functionCall.estimateGas({ from: account });
       const tx = await functionCall.send({ from: account, gasLimit });
       return tx;
     }

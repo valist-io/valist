@@ -18,10 +18,10 @@ export default async function getRepoMeta(req: NextApiRequest, res: NextApiRespo
       query: { orgName, repoName },
     } = req;
 
-    const repoMeta = await valist.getRepoMeta(orgName.toString(), repoName.toString());
+    const repo = await valist.getRepository(orgName.toString(), repoName.toString());
 
-    if (repoMeta) {
-      return res.status(200).json({ repoMeta });
+    if (repo) {
+      return res.status(200).json({ repoMeta: repo.meta });
     }
     return res.status(404).json({ statusCode: 404, message: 'No repository found!' });
   }

@@ -1,76 +1,66 @@
 import * as fs from 'fs';
 import * as path from 'path';
 import Valist from '@valist/sdk';
-import { initValist, parseValistConfig, ValistConfig } from './config';
-import { npmPack } from './npm';
-
-const getBinary = async ({ artifact, meta }: ValistConfig) => {
-  if (!artifact) {
-    console.error('👻 No build artifact found!');
-    process.exit(1);
-  }
-
-  const releaseFile = fs.createReadStream(path.join(process.cwd(), artifact));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), meta));
-
-  return { releaseFile, metaFile };
-};
-
-const getNpmPackage = async () => {
-  console.log('🛠  Packing NPM Package...');
-  const tarballName = await npmPack();
-  console.log('💼 Packed:', tarballName);
-
-  const releaseFile = fs.createReadStream(path.join(process.cwd(), tarballName));
-  const metaFile = fs.createReadStream(path.join(process.cwd(), 'package.json'));
-
-  return { releaseFile, metaFile };
-};
-
-const getRelease = {
-  binary: getBinary,
-  npm: getNpmPackage,
-};
+import { buildRelease } from './build';
+import { initValist, parseValistConfig } from './config';
 
 const releaseExists = async (valist: Valist, org: string, project: string, tag: string) => {
   const { releaseCID } = await valist.getReleaseByTag(org, project, tag);
-  if (releaseCID && releaseCID.length > 0) {
+  if (releaseCID) {
     return true;
   }
   return false;
 };
 
-export const publish = async () => {
+export const publish = async (): Promise<void> => {
+  // Placeholder for release file path
+  // let releaseFile;
+
+  // Create a new valist instance and connect
   const valist = await initValist();
 
+  // Get current config from valist.yml
   const config = parseValistConfig();
 
-  const { org, project, tag } = config;
+  // Get org, project, tag, artifact, meta from config
+  const {
+    org, repo, tag, meta,
+  } = config;
 
-  if (await releaseExists(valist, org, project, tag)) {
+  // Check if release exists
+  if (await releaseExists(valist, org, repo, tag)) {
     console.log('✅ Release already exists, skipping publish');
     process.exit(0);
   }
 
-  const { releaseFile, metaFile } = await getRelease[config.type](config);
+  // // Check if environment is CI/CD and artifact exists
+  // if (process.env.CI && out) {
+  //   // Read artifact and metadata from disk
+  //   releaseFile = fs.createReadStream(path.join(process.cwd(), out));
+  // } else {
+  // Call buildRelease with project type (npm, binary, etc) to return artifact path
+  const releaseFile = await buildRelease(config);
+  // }
+
+  const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
 
   console.log('🪐 Preparing release on IPFS...');
   const releaseObject = await valist.prepareRelease(tag, releaseFile, metaFile);
   console.log('📦 Release Object:', releaseObject);
 
+  // cleanup generated tarball/build artifact
+  if (config.type === 'node') {
+    fs.unlinkSync(releaseFile.path);
+  }
+
   try {
     console.log('⚡️ Publishing Release to Valist...');
-    const { transactionHash } = await valist.publishRelease(org, project, releaseObject);
+    const { transactionHash } = await valist.publishRelease(org, repo, releaseObject);
 
-    console.log(`✅ Successfully Released ${project} ${tag}!`);
+    console.log(`✅ Successfully Released ${org}/${repo}/${tag}!`);
     console.log('📖 IPFS address of release:', `ipfs://${releaseObject.releaseCID}`);
     console.log('🔗 Transaction Hash:', transactionHash);
   } catch (e) {
     // noop, error already handled/logged within, move on to cleanup
-  }
-
-  // cleanup generated tarball/build artifact
-  if (config.type === 'npm') {
-    fs.unlinkSync(releaseFile.path);
   }
 };

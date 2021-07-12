@@ -22,7 +22,6 @@ const OrgAccessCardListItem = ({ address }: { address: string }) => (
 const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
   const valist = useContext(ValistContext);
   const [orgAdmins, setOrgAdmins] = useState(['0x0']);
-  const [orgOwners, setOrgOwners] = useState(['0x0']);
   const isOrgAdmin = useOrgAdmin(orgName);
 
   const updateData = async () => {
@@ -31,12 +30,6 @@ const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
         setOrgAdmins(await valist.getOrgAdmins(orgName) || ['0x0']);
       } catch (e) {
         console.error('Could not fetch ACL data for Org Admins', e);
-      }
-
-      try {
-        setOrgOwners(await valist.getOrgOwners(orgName) || ['0x0']);
-      } catch (e) {
-        console.error('Could not fetch ACL data for Org Owners', e);
       }
     }
   };
@@ -55,14 +48,10 @@ const ManageAccessCard = ({ orgName }: { orgName: string }): JSX.Element => {
               {orgAdmins[0] !== '0x0' && orgAdmins.map((address) => (
                 <OrgAccessCardListItem key={address} address={address} />
               ))}
-
-              {orgOwners[0] !== '0x0' && orgOwners.map((address) => (
-                <OrgAccessCardListItem key={address} address={address} />
-              ))}
             </ul>
           </div>
           <div className="mt-6">
-            <Link href={`/v/${orgName}/permissions`}>
+            <Link href={`/v/${orgName}/edit`}>
               <a className="w-full flex justify-center items-center px-4 py-2 border
               border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
               bg-white hover:bg-gray-50">

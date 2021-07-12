@@ -12,7 +12,7 @@ export const ProjectsList = ({ orgName }: { orgName: string }) => {
     (async () => {
       if (valist) {
         try {
-          setProjects(await valist.getReposFromOrganization(orgName));
+          setProjects(await valist.getRepoNames(orgName));
         } catch (e) {
           console.error('Could not fetch projects', e);
         }
