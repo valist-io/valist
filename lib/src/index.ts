@@ -1,9 +1,10 @@
 /* eslint-disable @typescript-eslint/ban-ts-comment */
+/* eslint-disable no-underscore-dangle */
 import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
 
-import { provider } from 'web3-core/types';
+import { provider, EventLog } from 'web3-core/types';
 
 import {
   Organization,
@@ -82,7 +83,6 @@ class Valist {
   async connect(): Promise<void> {
     try {
       this.contract = await getValistContract(this.web3, this.contractAddress);
-      // eslint-disable-next-line no-underscore-dangle
       this.contractAddress = this.contract._address;
       if (!this.contractAddress) throw new Error('Could not get Valist contract address');
     } catch (e) {
@@ -461,6 +461,7 @@ class Valist {
         this.contract.methods.voteKey(orgID, '', ADD_KEY, key),
         this.defaultAccount,
       );
+      console.log(orgID, tx);
       return tx;
     } catch (e) {
       const msg = 'Could not vote to grant ORG_ADMIN_ROLE';
@@ -493,7 +494,7 @@ class Valist {
       );
       return tx;
     } catch (e) {
-      const msg = 'Could not vote to revoke ORG_ADMIN_ROLE';
+      const msg = 'Could not vote to rotate ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
     }
@@ -556,6 +557,34 @@ class Valist {
       console.error(msg, e);
       throw e;
     }
+  }
+
+  private async getEvents(topics?: any[]): Promise<EventLog[]> {
+    try {
+      const fromBlock = await this.web3.eth.getBlockNumber() - 99990;
+      const options = { fromBlock, toBlock: 'latest', topics };
+      const events = await this.contract.getPastEvents('allEvents', options);
+      return events;
+    } catch (e) {
+      const msg = 'Could not get allEvents';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async getOrgEvents(orgName: string): Promise<EventLog[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    // this should be the empty repo keccak256
+    const repoTopic = '0xc5d2460186f7233c927e7db2dcc703c0e500b653ca82273b7bfad8045d85a470';
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
+  }
+
+  async getRepoEvents(orgName: string, repoName: string): Promise<EventLog[]> {
+    const orgID = await this.getOrgIDFromName(orgName);
+    const repoTopic = this.web3.utils.keccak256(repoName);
+    const eventLogs = await this.getEvents([null, orgID, repoTopic]);
+    return eventLogs.reverse();
   }
 
   async getOrgAdmins(orgName: string): Promise<string[]> {
@@ -677,14 +706,14 @@ class Valist {
     }
   }
 
-  async getPendingOrgThresholds(orgName: string): Promise<number[]> {
+  async getPendingOrgThresholds(orgName: string): Promise<string[]> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const pendingCount = await this.contract.methods.getThresholdRequestCount(orgID).call();
       const requests = [];
       for (let i = 0; i < pendingCount; ++i) {
         // eslint-disable-next-line no-await-in-loop
-        requests.push(Number(await this.contract.methods.pendingThresholdRequests(orgID, i).call()));
+        requests.push(await this.contract.methods.pendingThresholdRequests(orgID, i).call());
       }
       return requests;
     } catch (e) {
@@ -725,7 +754,7 @@ class Valist {
     }
   }
 
-  async getPendingRepoThresholds(orgName: string, repoName: string): Promise<number[]> {
+  async getPendingRepoThresholds(orgName: string, repoName: string): Promise<string[]> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const repoSelector = this.web3.utils.keccak256(this.web3.utils.encodePacked(orgID, repoName) || '');
@@ -733,7 +762,7 @@ class Valist {
       const requests = [];
       for (let i = 0; i < pendingCount; ++i) {
         // eslint-disable-next-line no-await-in-loop
-        requests.push(Number(await this.contract.methods.pendingThresholdRequests(repoSelector, i).call()));
+        requests.push(await this.contract.methods.pendingThresholdRequests(repoSelector, i).call());
       }
       return requests;
     } catch (e) {

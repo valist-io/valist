@@ -5,7 +5,7 @@ import React, {
 import { useRouter } from 'next/router';
 
 import ValistContext from '../Valist/ValistContext';
-import LoadingDialog from '../LoadingDialog/LoadingDialog';
+import LoadingDialog from '../Dialog/LoadingDialog';
 
 export const PublishReleaseForm:FunctionComponent<any> = ({ orgName, repoName }:
 { orgName: string, repoName: string }) => {
