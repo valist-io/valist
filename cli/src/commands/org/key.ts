@@ -1,5 +1,6 @@
 import { Command } from '@oclif/command';
 import { initValist } from '../../utils/config';
+import { ADD_KEY, REVOKE_KEY, ROTATE_KEY } from '@valist/sdk/dist/constants';
 
 export default class OrgKey extends Command {
   static description = 'Add, remove, or rotate organization key';
@@ -18,6 +19,7 @@ export default class OrgKey extends Command {
     {
       name: 'operation',
       required: true,
+      options: ['grant', 'revoke', 'rotate'],
     },
     {
       name: 'key',
@@ -28,21 +30,39 @@ export default class OrgKey extends Command {
   async run() {
     const { args } = this.parse(OrgKey);
     const valist = await initValist();
-    if (!['grant', 'revoke', 'rotate'].includes(args.operation)) {
-      this.log('Invalid operation', args.operation);
-      this.exit(1);
+
+    let opFunc: (orgName: string, key: string) => Promise<any>;
+    let opName: string;
+
+    switch(args.operation) {
+      case 'grant':
+        opFunc = (orgName: string, key: string) => valist.voteOrgAdmin(orgName, key);
+        opName = ADD_KEY;
+        break;
+      case 'revoke':
+        opFunc = (orgName: string, key: string) => valist.revokeOrgAdmin(orgName, key);
+        opName = REVOKE_KEY;
+        break;
+      case 'rotate':
+        opFunc = (orgName: string, key: string) => valist.rotateOrgAdmin(orgName, key);
+        opName = ROTATE_KEY;
+        break;
+      default:
+        this.log('invalid operation');
+        this.exit(0);
     }
-    const operations: Record<string, any> = {
-      grant: async (orgName: string, key: string) => valist.voteOrgAdmin(orgName, key),
-      revoke: async (orgName: string, key: string) => valist.revokeOrgAdmin(orgName, key),
-      rotate: async (orgName: string, key: string) => valist.rotateOrgAdmin(orgName, key),
-    };
 
-    const { transactionHash } = await operations[args.operation](args.orgName, args.key);
+    const { threshold } = await valist.getOrganization(args.orgName);
+    const { transactionHash } = await opFunc(args.OrgName, args.key);
+    const { signers } = await valist.getPendingOrgAdminVotes(args.orgName, opName, args.key);
 
-    this.log(`✅ Successfully voted to ${args.operation} Admin key on ${args.orgName}!`);
+    if (signers.length < threshold) {
+      this.log(`🗳 Voted to ${args.operation} ${args.key} on ${args.orgName}: ${signers.length}/${threshold}`);
+    } else {
+      this.log(`✅ Approved ${args.operation} ${args.key} on ${args.orgName}!`);
+    }
+    
     this.log('🔗 Transaction Hash:', transactionHash);
-
     this.exit(0);
   }
 }
