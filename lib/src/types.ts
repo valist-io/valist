@@ -7,7 +7,9 @@ export type OrgMeta = {
   description: string
 };
 
-export type ProjectType = 'binary' | 'npm' | 'pip' | 'docker';
+export type BinaryTypes = 'binary' | 'go' | 'rust' | 'c++';
+
+export type ProjectType = BinaryTypes | 'node' | 'python' | 'docker';
 
 export type RepoMeta = {
   name: string,
@@ -81,4 +83,16 @@ export type ValistCache = {
   orgNames: OrgName[],
   orgs: Record<OrgName, Organization>,
   // repos: Record<OrgID, Record<string, Repository>>,
+};
+
+export type ValistConfig = {
+  type: ProjectType,
+  org: string,
+  repo: string,
+  tag: string,
+  meta: string,
+  image: string,
+  build: string,
+  install: string,
+  out: string,
 };

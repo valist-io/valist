@@ -9,10 +9,13 @@ module.exports = {
   ],
   extends: [
     'plugin:@typescript-eslint/recommended',
-    'airbnb-typescript/base'
+    'airbnb-typescript/base',
+    // 'oclif',
+    // 'oclif-typescript',
   ],
   rules: {
     'no-console': 'off',
+    'no-plusplus': 'off',
     'import/prefer-default-export': 'off',
     'max-len': ['error', { 'code': 120 }],
   }
