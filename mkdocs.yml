@@ -11,4 +11,8 @@ nav:
     - multi-factor-everything.md
     - publishing-software.md
     - fetching-and-installing-software.md
+markdown_extensions:
+  - attr_list
+  - pymdownx.highlight
+  - pymdownx.superfences
 
