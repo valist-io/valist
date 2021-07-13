@@ -2,7 +2,7 @@ import React, { useContext, useEffect, useState } from 'react';
 import Link from 'next/link';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
-import useOrgAdmin from '../../hooks/useOrgAdmin';
+import useRepoDev from '../../hooks/useRepoDev';
 
 const User = ({ address }: { address: string }) => (
   <li className="py-4" key={address}>
@@ -23,7 +23,7 @@ const ManageProjectAccessCard = ({ orgName, projectName }: { orgName: string, pr
   const valist = useContext(ValistContext);
   const [repoDevs, setRepoDevs] = useState(['0x0']);
   const [orgAdmins, setOrgAdmins] = useState(['0x0']);
-  const isOrgAdmin = useOrgAdmin(orgName);
+  const isRepoDev = useRepoDev(orgName, projectName);
 
   const updateData = async () => {
     if (valist) {
@@ -56,14 +56,14 @@ const ManageProjectAccessCard = ({ orgName, projectName }: { orgName: string, pr
               { orgAdmins[0] !== '0x0' && orgAdmins.map((address) => <User key={address} address={address} />)}
             </ul>
           </div>
-          <div className="mt-6">
+          { isRepoDev && <div className="mt-6">
             <Link href={`/v/${orgName}/${projectName}/edit`}>
               <a className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm
               font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                { isOrgAdmin ? 'Manage access' : 'View all' }
+                Manage Access
               </a>
             </Link>
-          </div>
+          </div>}
         </div>
       </div>
     </section>
