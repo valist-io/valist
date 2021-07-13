@@ -13,6 +13,6 @@ nav:
     - fetching-and-installing-software.md
 markdown_extensions:
   - attr_list
+  - pymdownx.superfences
   - pymdownx.highlight
-  - pymdownx.inlinehilite
 
