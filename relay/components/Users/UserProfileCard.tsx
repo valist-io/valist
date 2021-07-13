@@ -23,12 +23,12 @@ const ProfileBox = () => {
         <div className="rounded-lg bg-white overflow-hidden shadow">
           <h2 className="sr-only" id="profile-overview-title">Profile Overview</h2>
           <div className="bg-white p-6">
-            <div className="sm:flex sm:items-center sm:justify-between">
-              <div className="sm:flex sm:space-x-5">
-                <div className="flex-shrink-0">
+            <div className="sm:flex sm:flex-wrap sm:items-center sm:justify-between">
+              <div className="sm:flex sm:items-center">
+                <div className="pr-4">
                   <AddressIdenticon address={profile.address} height={20}/>
                 </div>
-                <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+                <div>
                   <p className="text-md font-medium text-gray-600">Welcome back! Your current account is:</p>
                   <p className="text-sm font-medium text-gray-900 sm:text-sm pt-2 font-mono">
                     {profile.address}

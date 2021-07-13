@@ -45,7 +45,7 @@ export const Nav = () => {
               {/* @TODO figure out a way to right align login button without dynamic js below, and without breaking
                 the width of the identicon + address div when logged in
               */}
-              <div className={`hidden lg:flex ${!login.loggedIn && 'justify-self-end'}`}>
+              <div className={`hidden lg:block ${!login.loggedIn ? 'justify-self-end' : ''}`}>
                 <div className="flex-grow">
                   {login.loggedIn
                     ? (<div onClick={() => setMenuVisible(!menuVisible)}
