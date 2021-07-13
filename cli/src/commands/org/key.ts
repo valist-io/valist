@@ -27,7 +27,7 @@ export default class OrgKey extends Command {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const { args } = this.parse(OrgKey);
     const valist = await initValist();
 
