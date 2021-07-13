@@ -1,5 +1,7 @@
 import { useState, useContext } from 'react';
 import Link from 'next/link';
+// import Image from 'next/image';
+// import Logo from '../../public/images/ValistLogo128.png';
 import LoginContext from '../Login/LoginContext';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
@@ -13,45 +15,8 @@ export const Nav = () => {
     <header className="pb-24 bg-gradient-to-r from-light-blue-800 to-violet-600">
       <div className="max-w-3xl mx-auto px-4 sm:px-6 lg:max-w-7xl lg:px-8">
         <div className="relative flex flex-wrap items-center justify-center lg:justify-between">
-          <div className="absolute left-0 py-5 flex-shrink-0 lg:static">
-            <a href="https://valist.io">
-              <span className="sr-only">Workflow</span>
-              {/* @TODO: Logo goes here */}
-            </a>
-          </div>
-          <div className="hidden lg:ml-4 lg:flex lg:items-center lg:py-5 lg:pr-0.5">
-            <div className="ml-4 relative flex-shrink-0">
-              <div>
-              {login.loggedIn
-                ? (<div onClick={() => setMenuVisible(!menuVisible)}
-                    className="bg-white rounded-full flex text-sm ring-2 ring-white
-                    ring-opacity-20 focus:outline-none focus:ring-opacity-100"
-                    id="user-menu" aria-expanded="false" aria-haspopup="true">
-                      <span className="sr-only">Open user menu</span>
-                      <AddressIdenticon address={valist.defaultAccount} height={8}/>
-                  </div>)
-                : (<button onClick={() => login.setShowLogin(true)} type="button"
-                className="inline-flex ml-2 items-center px-6 py-1.5 border border-transparent
-                text-xs font-medium rounded-full shadow-sm text-indigo-700 bg-white hover:bg-gray-50
-                focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500">
-                      Login
-                  </button>)}
-              </div>
-              {menuVisible && <div className="origin-top-right z-40 absolute -right-2 mt-2 w-48 rounded-md
-                                      shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
-                                    role="menu" aria-orientation="vertical"
-                                    aria-labelledby="user-menu">
-                {/* <Link href="/settings">
-                  <a className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100" role="menuitem">Settings</a>
-                </Link> */}
-                <a onClick={() => { login.logOut(); setMenuVisible(!menuVisible); }}
-                className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100"
-                role="menuitem">Sign out</a>
-              </div>}
-            </div>
-          </div>
 
-          <div className="w-full py-5 lg:border-t lg:border-white lg:border-opacity-20">
+          <div className="w-full py-5">
             <div className="lg:grid lg:grid-cols-3 lg:gap-8 lg:items-center">
               <div className="hidden lg:block lg:col-span-2">
                 <nav className="flex space-x-4">
@@ -77,9 +42,35 @@ export const Nav = () => {
                   </a>
                 </nav>
               </div>
-              <div className="px-12 lg:px-0">
-
-                <div className="max-w-xs mx-auto w-full lg:max-w-md">
+              {/* @TODO figure out a way to right align login button without dynamic js below, and without breaking
+                the width of the identicon + address div when logged in
+              */}
+              <div className={`hidden lg:flex ${!login.loggedIn && 'justify-self-end'}`}>
+                <div className="flex-grow">
+                  {login.loggedIn
+                    ? (<div onClick={() => setMenuVisible(!menuVisible)}
+                        className="bg-white rounded-md flex items-center text-sm p-3 cursor-pointer"
+                        id="user-menu" aria-expanded="false" aria-haspopup="true">
+                          <span className="sr-only">Open user menu</span>
+                            <AddressIdenticon address={valist.defaultAccount} height={8}/>
+                            <span className="p-2 text-xs font-mono truncate">{valist.defaultAccount}</span>
+                      </div>)
+                    : (<button onClick={() => login.setShowLogin(true)} type="button"
+                    className="inline-flex items-center px-6 py-1.5 border border-transparent
+                    text-xs font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-gray-50
+                    focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer p-3 m-3">
+                          Login
+                      </button>)}
+                  {menuVisible && <div className="origin-top-right z-40 absolute right-0 mt-2 w-48 rounded-md
+                                          shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
+                                        role="menu" aria-orientation="vertical"
+                                        aria-labelledby="user-menu">
+                    <a onClick={() => { login.logOut(); setMenuVisible(!menuVisible); }}
+                    className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
+                    role="menuitem">Sign out</a>
+                  </div>}
+                </div>
+                {/* <div className="max-w-xs mx-auto w-full lg:max-w-md">
                   <label htmlFor="search" className="sr-only">Search</label>
                   <div className="relative text-white focus-within:text-gray-600">
                     <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
@@ -97,7 +88,7 @@ export const Nav = () => {
                       focus:bg-opacity-100 focus:border-transparent focus:placeholder-gray-500
                       focus:ring-0 sm:text-sm" placeholder="Search" type="search" name="search" />
                   </div>
-                </div>
+                </div> */}
               </div>
             </div>
           </div>
@@ -170,7 +161,7 @@ export const Nav = () => {
                   <AddressIdenticon address={valist.defaultAccount} height={8}/>
                 </div>
                 <div className="ml-3 min-w-0 flex-1">
-                  <div className="text-base font-medium text-gray-800 truncate">{ valist.defaultAccount }</div>
+                  <div className="text-base font-xs text-gray-800 font-mono">{valist.defaultAccount}</div>
                 </div>
               </div>
               <div className="mt-3 px-2 space-y-1">
