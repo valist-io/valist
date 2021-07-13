@@ -8,7 +8,7 @@ export default class AccountGet extends Command {
     '$ valist account:get',
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const address = await getSignerAddress();
     this.log(`📇 Your signer address is: ${address}`);
     this.exit(0);

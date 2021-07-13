@@ -29,7 +29,7 @@ export default class RepoKey extends Command {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const { args } = this.parse(RepoKey);
     const valist = await initValist();
     if (!['grant', 'revoke', 'rotate'].includes(args.operation)) {
