@@ -29,11 +29,10 @@ const ProfileBox = () => {
                   <AddressIdenticon address={profile.address} height={20}/>
                 </div>
                 <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
-                  <p className="text-sm font-medium text-gray-600">Welcome back,</p>
-                  <p className="text-xl font-bold text-gray-900 sm:text-2xl">
-                    {profile.address.replace(profile.address.substring(8, 36), '...')}
+                  <p className="text-md font-medium text-gray-600">Welcome back! Your current account is:</p>
+                  <p className="text-sm font-medium text-gray-900 sm:text-sm pt-2 font-mono">
+                    {profile.address}
                   </p>
-                  <p className="text-sm font-medium text-gray-600">Software Developer</p>
                 </div>
               </div>
               <div className="mt-5 flex justify-center sm:mt-0">
@@ -78,7 +77,7 @@ const ProfileBox = () => {
           <div className="sm:flex sm:items-center sm:justify-between">
           <div className="sm:flex sm:space-x-5">
             <div className="flex-shrink-0">
-              <img className='h-15' src="/images/ValistLogo128.png" />
+              <img className="h-15" src="/images/ValistLogo128.png" />
             </div>
             <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
               <p className="text-3xl font-bold text-gray-900 sm:text-2xl">
