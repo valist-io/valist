@@ -1,2 +1,14 @@
 site_name: Valist Documentation
-theme: 'material'
+theme: 
+  name: material
+  features:
+    - toc.integrate
+nav:
+    - index.md
+    - creating-an-organization.md
+    - creating-a-repository.md
+    - access-control.md
+    - multi-factor-everything.md
+    - publishing-software.md
+    - fetching-and-installing-software.md
+
