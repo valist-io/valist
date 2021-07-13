@@ -4,26 +4,25 @@
 
 ### CLI
 
+```bash
+valist publish
+```
+
 ### Web
 
 ### SDK
 
-```bash
-const Valist = require('@valist/sdk');
+```javascript
 
-(async () => {
-  const valist = new Valist({ web3Provider: YOUR_WEB3_PROVIDER, metaTx: false });
-  await valist.connect();
-
-  const releases = await valist.getReleasesFromRepo('valist', 'sdk');
-
-  console.log(releases);
-})();
 ```
 
 ## NPM Packages
 
 ### CLI
+
+```bash
+valist publish
+```
 
 ### Web
 
@@ -32,6 +31,10 @@ const Valist = require('@valist/sdk');
 ## Python Packages
 
 ### CLI
+
+```bash
+valist publish
+```
 
 ### Web
 
