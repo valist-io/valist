@@ -63,10 +63,10 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                           </div>
                       </div>
 
-                      {props.hasReleased && <div className="sm:col-span-2">
+                      {!props.hasReleased && <div className="sm:col-span-2">
                         <label className="block">
-                          <span className="text-gray-700">Select</span>
-                          <select onChange={(e) => setProjectType(e.target.value)}
+                          <span className="text-gray-700">Project Type</span>
+                          <select value={projectType} onChange={(e) => setProjectType(e.target.value)}
                             className="form-select block w-full mt-1">
                             <option value="node">node</option>
                             <option value="go">go</option>
