@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from 'next';
-import { getMemoizedValist } from '../../../utils/providers/memoize';
 import { withSentry } from '@sentry/nextjs';
+import { getMemoizedValist } from '../../../utils/providers/memoize';
 
 const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) => {
   const valist = await getMemoizedValist();
@@ -51,7 +51,7 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
           };
         }
 
-        return res.status(200).json({
+        res.status(200).json({
           _id: cleanReleaseName,
           name: cleanReleaseName,
           'dist-tags': {
@@ -63,9 +63,10 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
     } catch (e) {
       console.error('Could not find', cleanReleaseName, 'on Valist', e);
     }
+  } else {
+    console.log(`Fetching Package ${cleanReleaseName} from https://registry.npmjs.org`);
+    res.redirect(`https://registry.npmjs.org/${cleanReleaseName}`);
   }
-  console.log(`Fetching Package ${cleanReleaseName} from https://registry.npmjs.org`);
-  res.redirect(`https://registry.npmjs.org/${cleanReleaseName}`);
-}
+};
 
 export default withSentry(getReleasesFromRepo);

@@ -31,6 +31,6 @@ const addOrgMetaIPFS = async (req: NextApiRequest, res: NextApiResponse) => {
   } else {
     res.status(500).json({ statusCode: 500, message: 'This endpoint only supports POST' });
   }
-}
+};
 
 export default withSentry(addOrgMetaIPFS);

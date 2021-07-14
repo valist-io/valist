@@ -30,6 +30,6 @@ const getLatestReleaseFromRepo = async (req: NextApiRequest, res: NextApiRespons
   } else {
     res.status(500).json({ statusCode: 500, message: 'No Web3 Provider!' });
   }
-}
+};
 
 export default withSentry(getLatestReleaseFromRepo);
