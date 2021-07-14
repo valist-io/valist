@@ -27,6 +27,11 @@ let moduleExports = {
     config.plugins.push(new options.webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }));
     return config;
   },
+  // disable sentry source maps upload when building locally
+  // sentry: {
+  //   disableServerWebpackPlugin: true,
+  //   disableClientWebpackPlugin: true,
+  // },
 }
 
 if (process.env.IPFS_BUILD == true) {
@@ -55,4 +60,4 @@ const SentryWebpackPluginOptions = {
 
 // Make sure adding Sentry options is the last code to run before exporting, to
 // ensure that your source maps include changes from all other Webpack plugins
-exports.default = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
+module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);
