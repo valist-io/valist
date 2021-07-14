@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 import Valist from 'valist';
 import { Web3Providers } from 'valist/dist/utils';
+import { withSentry } from '@sentry/nextjs';
 
-export default async function getOrganizationMeta(req: NextApiRequest, res: NextApiResponse) {
+const getOrganizationMeta = async (req: NextApiRequest, res: NextApiResponse) => {
   const { publicRuntimeConfig } = getConfig();
 
   // set .env.local to your local chain or set in production deployment
@@ -21,9 +22,13 @@ export default async function getOrganizationMeta(req: NextApiRequest, res: Next
     const org = await valist.getOrganization(orgName.toString());
 
     if (org.meta) {
-      return res.status(200).json({ orgMeta: org.meta });
+      res.status(200).json({ orgMeta: org.meta });
+    } else {
+      res.status(404).json({ statusCode: 404, message: 'No organization found!' });
     }
-    return res.status(404).json({ statusCode: 404, message: 'No organization found!' });
+  } else {
+    res.status(500).json({ statusCode: 500, message: 'No Web3 Provider!' });
   }
-  return res.status(500).json({ statusCode: 500, message: 'No Web3 Provider!' });
 }
+
+export default withSentry(getOrganizationMeta);

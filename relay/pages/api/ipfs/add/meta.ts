@@ -2,8 +2,9 @@ import { NextApiRequest, NextApiResponse } from 'next';
 import getConfig from 'next/config';
 import Valist from 'valist';
 import { Web3Providers } from 'valist/dist/utils';
+import { withSentry } from '@sentry/nextjs';
 
-export default async function addOrgMetaIPFS(req: NextApiRequest, res: NextApiResponse) {
+const addOrgMetaIPFS = async (req: NextApiRequest, res: NextApiResponse) => {
   const { publicRuntimeConfig } = getConfig();
 
   if (publicRuntimeConfig.WEB3_PROVIDER && req.method === 'POST') {
@@ -21,13 +22,15 @@ export default async function addOrgMetaIPFS(req: NextApiRequest, res: NextApiRe
       const ipfsResponse = await valist.addJSONtoIPFS(metaJSON);
 
       res.setHeader('Content-Type', 'application/json');
-      return res.status(200).json({ ipfsResponse });
+      res.status(200).json({ ipfsResponse });
     } catch (err) {
       // If error
       res.setHeader('Content-Type', 'application/json');
-      return res.status(500).json({ statusCode: 500, message: err.message });
+      res.status(500).json({ statusCode: 500, message: err.message });
     }
   } else {
-    return res.status(500).json({ statusCode: 500, message: 'This endpoint only supports POST' });
+    res.status(500).json({ statusCode: 500, message: 'This endpoint only supports POST' });
   }
 }
+
+export default withSentry(addOrgMetaIPFS);
