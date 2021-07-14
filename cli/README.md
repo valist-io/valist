@@ -24,6 +24,7 @@ USAGE
 <!-- commands -->
 * [`valist account:get`](#valist-accountget)
 * [`valist account:new`](#valist-accountnew)
+* [`valist build`](#valist-build)
 * [`valist help [COMMAND]`](#valist-help-command)
 * [`valist init`](#valist-init)
 * [`valist org:get ORGNAME`](#valist-orgget-orgname)
@@ -63,6 +64,20 @@ EXAMPLE
 ```
 
 _See code: [dist/commands/account/new.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/account/new.ts)_
+
+## `valist build`
+
+Build the target valist project
+
+```
+USAGE
+  $ valist build
+
+EXAMPLE
+  $ valist build
+```
+
+_See code: [dist/commands/build.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/build.ts)_
 
 ## `valist help [COMMAND]`
 
