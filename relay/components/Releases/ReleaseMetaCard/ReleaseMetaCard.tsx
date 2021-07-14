@@ -20,6 +20,7 @@ export const ProjectMetaBar = ({ orgName, repoName }: { orgName: string, repoNam
     go: BinaryMeta(orgName, repoName, projectMeta),
     rust: BinaryMeta(orgName, repoName, projectMeta),
     'c++': BinaryMeta(orgName, repoName, projectMeta),
+    static: BinaryMeta(orgName, repoName, projectMeta),
   };
 
   useEffect(() => {
