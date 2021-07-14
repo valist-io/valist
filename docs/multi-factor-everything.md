@@ -1,6 +1,6 @@
 # Multi-Factor Everything
 
-One of the coolest features of Valist is that there is a multi-factor system for everything. With multi-factor everything you can eliminate single points of failure within your software supply chain and have all actions audited and approved from members across your organization.
+One of the coolest features of Valist is that there is a multi-factor system for everything. With multi-factor everything you can eliminate single points of failure within your software supply chain and have all actions audited and approved by members across your organization.
 
 ## How it works
 
