@@ -15,13 +15,14 @@ export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
     }
   };
 
-  const parseError = (err: string) => {
+  const parseError = (err: Error) => {
     // TODO include other types here
-    if (err.startsWith(RPC_ERROR)) {
-      return parseRPCError(err.substring(RPC_ERROR.length));
+    if (err.message.startsWith(RPC_ERROR)) {
+      return parseRPCError(err.message.substring(RPC_ERROR.length));
     }
 
-    return err;
+    // rethrow error for sentry user dialog
+    throw err;
   };
 
   return (
@@ -58,7 +59,7 @@ export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
               </h3>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  { parseError(props.error.message) }
+                  { parseError(props.error) }
                 </p>
               </div>
             </div>
