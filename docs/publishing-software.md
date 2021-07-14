@@ -20,7 +20,7 @@ valist publish
 
 ### SDK
 
-To publish a binary from the Valist-SDK create and run the following javascript:
+To publish a binary from the **Valist-SDK** create and run the following javascript:
 
 ```javascript
   import Valist from '@valist/sdk';
