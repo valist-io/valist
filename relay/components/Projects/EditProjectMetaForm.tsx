@@ -1,7 +1,8 @@
 import React, { useState, useEffect } from 'react';
-import { ProjectType, RepoMeta } from 'valist/dist/types';
+import { ProjectType, Release, RepoMeta } from 'valist/dist/types';
 
 interface EditProjectMetaFormProps {
+  hasReleased: Release,
   repoName: string,
   meta: RepoMeta,
   setRepoMeta: (meta: RepoMeta) => Promise<void>
@@ -61,6 +62,18 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                                           transition ease-in-out duration-150" />
                           </div>
                       </div>
+
+                      {props.hasReleased && <div className="sm:col-span-2">
+                        <label className="block">
+                          <span className="text-gray-700">Select</span>
+                          <select onChange={(e) => setProjectType(e.target.value)}
+                            className="form-select block w-full mt-1">
+                            <option value="node">node</option>
+                            <option value="go">go</option>
+                          </select>
+                        </label>
+                      </div>}
+
                       <div className="sm:col-span-2">
                           <label htmlFor="ProjectDescription"
                             className="block text-sm font-medium leading-5 text-gray-700">Description</label>

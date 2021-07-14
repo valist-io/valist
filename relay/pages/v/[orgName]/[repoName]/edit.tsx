@@ -27,6 +27,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
   const [pendingKeys, setPendingKeys] = useState<string[]>([]);
   const [pendingThresholds, setPendingThresholds] = useState<string[]>([]);
   const [pendingReleases, setPendingReleases] = useState<PendingRelease[]>([]);
+  const [latestRelease, setLatestRelease] = useState<any>();
 
   const fetchData = async () => Promise.all([
     valist.getRepository(orgName, repoName).then(setRepo),
@@ -35,6 +36,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
     valist.getPendingRepoDevs(orgName, repoName).then(setPendingKeys),
     valist.getPendingRepoThresholds(orgName, repoName).then(setPendingThresholds),
     valist.getPendingReleases(orgName, repoName).then(setPendingReleases),
+    valist.getLatestRelease(orgName, repoName).then(setLatestRelease),
   ]);
 
   const getRepoData = async () => {
@@ -172,7 +174,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
                     <Link href={`/${orgName}/${repoName}`}>{repoName}</Link>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                      {repo && <EditProjectMetaForm meta={repo.meta} repoName={repoName}
+                      {repo && <EditProjectMetaForm hasReleased={latestRelease} meta={repo.meta} repoName={repoName}
                       setRepoMeta={updateMeta} /> }
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
