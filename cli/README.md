@@ -39,7 +39,7 @@ USAGE
 
 ## `valist account:get`
 
-print account info
+Print account info
 
 ```
 USAGE
@@ -53,7 +53,7 @@ _See code: [dist/commands/account/get.ts](https://github.com/valist-io/valist/bl
 
 ## `valist account:new`
 
-create a new account
+Create a new account
 
 ```
 USAGE

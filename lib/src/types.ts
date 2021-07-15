@@ -109,10 +109,11 @@ export type VoteReleaseEvent = {
 };
 
 export type ValistCache = {
-  orgIDs: OrgID[],
-  orgNames: OrgName[],
-  orgs: Record<OrgName, Organization>,
+  // orgIDs: OrgID[],
+  // orgNames: OrgName[],
+  // orgs: Record<OrgName, Organization>,
   // repos: Record<OrgID, Record<string, Repository>>,
+  orgIDs: Record<OrgName, OrgID>,
 };
 
 export type ValistConfig = {

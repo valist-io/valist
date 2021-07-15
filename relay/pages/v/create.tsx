@@ -12,12 +12,15 @@ export default function CreateOrgPage(): JSX.Element {
   const router = useRouter();
 
   const [loading, setLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Creating Organization...');
   const [error, setError] = useState<Error>();
 
   const createOrg = async (shortName: string, meta: OrgMeta) => {
     try {
       setLoading(true);
-      await valist.createOrganization(shortName, meta, valist.defaultAccount);
+      const { orgID } = await valist.createOrganization(shortName, meta);
+      setLoadingText(`Linking orgID ${orgID} to ${shortName}...`);
+      await valist.linkNameToID(shortName, orgID);
       router.push(`/v/${shortName}/create`);
     } catch (e) {
       setError(e);
@@ -28,8 +31,8 @@ export default function CreateOrgPage(): JSX.Element {
 
   return (
     <DashboardLayout title="Valist | Create Organization">
-      <CreateOrganizationForm createOrg={createOrg} />
-      {loading && <LoadingDialog>Loading...</LoadingDialog>}
+      <CreateOrganizationForm createOrg={createOrg}/>
+      {loading && <LoadingDialog>{ loadingText }</LoadingDialog>}
       {error && <ErrorDialog error={error} close={() => setError(undefined)} />}
     </DashboardLayout>
   );

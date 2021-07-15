@@ -48,6 +48,7 @@ export default class RepoNew extends Command {
       projectType,
     };
 
+    this.log();
     this.log('⚙️  Creating repo...');
 
     const { transactionHash } = await valist.createRepository(args.orgName,
@@ -57,6 +58,7 @@ export default class RepoNew extends Command {
     this.log('🔗 Transaction Hash:', transactionHash);
     this.log();
     this.log('ℹ️  To get started publishing, run `valist init` to create build & deploy config.');
+    this.log();
 
     this.exit(0);
   }
