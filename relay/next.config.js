@@ -1,4 +1,6 @@
-let config = {
+const { withSentryConfig } = require('@sentry/nextjs');
+
+let moduleExports = {
   async headers() {
     return [
       {
@@ -27,9 +29,20 @@ let config = {
   },
 }
 
+// disable sentry source maps when not configured properly
+if (!(process.env.SENTRY_ORG && process.env.SENTRY_PROJECT && process.env.SENTRY_AUTH_TOKEN)) {
+  moduleExports = {
+    ...moduleExports,
+    sentry: {
+      disableServerWebpackPlugin: true,
+      disableClientWebpackPlugin: true,
+    }
+  }
+}
+
 if (process.env.IPFS_BUILD == true) {
-  config = {
-    ...config,
+  moduleExports = {
+    ...moduleExports,
     trailingSlash: true,
     exportPathMap: function() {
       return {
@@ -39,4 +52,10 @@ if (process.env.IPFS_BUILD == true) {
   }
 }
 
-module.exports = config;
+// For all available options, see:
+// https://github.com/getsentry/sentry-webpack-plugin#options.
+const SentryWebpackPluginOptions = {
+  silent: true,
+};
+
+module.exports = withSentryConfig(moduleExports, SentryWebpackPluginOptions);

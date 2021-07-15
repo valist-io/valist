@@ -25,7 +25,7 @@ export default class RepoUpdate extends Command {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const { args } = this.parse(RepoUpdate);
     const valist = await initValist();
 

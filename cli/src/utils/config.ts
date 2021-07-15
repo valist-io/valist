@@ -39,6 +39,7 @@ export const defaultImages: Record<ProjectType, string> = {
   python: 'python:buster',
   docker: 'scratch',
   'c++': 'gcc:bullseye',
+  static: '',
 };
 
 export const defaultInstalls: Record<ProjectType, string> = {
@@ -49,6 +50,7 @@ export const defaultInstalls: Record<ProjectType, string> = {
   python: 'pip install -r requirements.txt',
   docker: '',
   'c++': 'make install',
+  static: '',
 };
 
 export const defaultBuilds: Record<ProjectType, string> = {
@@ -59,6 +61,7 @@ export const defaultBuilds: Record<ProjectType, string> = {
   python: 'python3 -m build',
   docker: '',
   'c++': 'make build',
+  static: '',
 };
 
 export const parseValistConfig = (): ValistConfig => {
