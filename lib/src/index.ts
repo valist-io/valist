@@ -130,7 +130,7 @@ class Valist {
   async createOrganization(orgName: string, orgMeta: OrgMeta): Promise<any> {
     try {
       await this.getOrgIDFromName(orgName);
-      throw new Error('orgName already taken, please choose another name');
+      throw new Error('Namespace already taken, please choose another name');
     } catch (e) {
       if (e.message !== 'orgID not found') {
         throw e;
@@ -141,12 +141,12 @@ class Valist {
       const tx = await this.sendTransaction(this.contract.methods.createOrganization(metaFile));
       let orgID: string;
       try {
-        orgID = tx.events.OrgCreated.returnValues._orgID;
+        // eslint-disable-next-line prefer-destructuring
+        orgID = this.metaTxEnabled ? tx.logs[0].topics[1] : tx.events.OrgCreated.returnValues._orgID;
       } catch (e) {
         throw new Error('Could not parse new orgID from transaction');
       }
-      await this.linkNameToID(orgName, orgID);
-      return tx;
+      return { ...tx, orgID };
     } catch (e) {
       const msg = 'Could not create organization';
       console.error(msg, e);
@@ -161,8 +161,8 @@ class Valist {
     account: string = this.defaultAccount,
   ): Promise<any> {
     try {
-      const metaFile = await this.addJSONtoIPFS(repoMeta);
       const orgID = await this.getOrgIDFromName(orgName);
+      const metaFile = await this.addJSONtoIPFS(repoMeta);
       const tx = await this.sendTransaction(
         this.contract.methods.createRepository(
           orgID, repoName.toLowerCase().replace(shortnameFilterRegex, ''),
@@ -217,7 +217,17 @@ class Valist {
 
   async linkNameToID(name: string, orgID: string): Promise<any> {
     try {
-      const tx = await this.sendTransaction(this.registry.methods.linkNameToID(orgID, name));
+      await this.getOrgIDFromName(name);
+      throw new Error('Namespace already taken, please choose another name');
+    } catch (e) {
+      if (e.message !== 'orgID not found') {
+        throw e;
+      }
+    }
+    try {
+      const tx = await this.sendTransaction(
+        this.registry.methods.linkNameToID(orgID, name.toLowerCase().replace(shortnameFilterRegex, '')),
+      );
       return tx;
     } catch (e) {
       const msg = 'Could not link namespace to orgID';
@@ -257,20 +267,15 @@ class Valist {
   }
 
   async getOrgIDFromName(orgName: string): Promise<OrgID> {
-    try {
-      if (!this.cache.orgIDs[orgName]) {
-        this.cache.orgIDs[orgName] = await this.registry.methods.nameToID(orgName).call();
-      }
-      if (this.cache.orgIDs[orgName] === '0x0000000000000000000000000000000000000000000000000000000000000000') {
-        this.cache.orgIDs[orgName] = '';
-        throw new Error('orgID not found');
-      }
-      return this.cache.orgIDs[orgName];
-    } catch (e) {
-      const msg = 'Could not get organization ID';
-      console.error(msg, e);
-      throw e;
+    const name = orgName.toLowerCase().replace(shortnameFilterRegex, '');
+    if (!this.cache.orgIDs[name]) {
+      this.cache.orgIDs[name] = await this.registry.methods.nameToID(name).call();
     }
+    if (this.cache.orgIDs[name] === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+      this.cache.orgIDs[name] = '';
+      throw new Error('orgID not found');
+    }
+    return this.cache.orgIDs[name];
   }
 
   // returns organization meta and release tags
@@ -974,7 +979,6 @@ class Valist {
         const tx = await sendMetaTransaction(
           this.web3,
           this.chainID as number,
-          this.contractAddress,
           functionCall,
           account,
           gasLimit,

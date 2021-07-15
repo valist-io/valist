@@ -28,14 +28,22 @@ export default class OrgNew extends Command {
 
     const orgMeta = { name, description };
 
+    this.log();
     this.log('⚙️  Creating organization...');
 
-    const { transactionHash } = await valist.createOrganization(args.orgName, orgMeta, valist.defaultAccount);
+    const { transactionHash, orgID } = await valist.createOrganization(args.orgName, orgMeta);
 
-    this.log(`✅ Successfully Created ${args.orgName}!`);
+    const { transactionHash: registryTxHash } = await valist.linkNameToID(args.orgName, orgID);
+
+    this.log(`✅ Successfully Created orgID ${orgID}!`);
     this.log('🔗 Transaction Hash:', transactionHash);
     this.log();
+    this.log(`⚙️  Linking orgID to ${args.orgName}...`);
+    this.log(`✅ Successfully Created ${args.orgName}!`);
+    this.log('🔗 Transaction Hash:', registryTxHash);
+    this.log();
     this.log(`ℹ️  To create a repo within this org, run \`valist repo:new ${args.orgName} exampleRepo\``);
+    this.log();
 
     this.exit(0);
   }

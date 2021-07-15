@@ -15,6 +15,7 @@ const CreateOrganizationForm:FunctionComponent<any> = () => {
   const [orgDescription, setOrgDescription] = useState('');
 
   const [renderLoading, setRenderLoading] = useState(false);
+  const [loadingText, setLoadingText] = useState('Creating Organization...');
 
   const createOrganization = async () => {
     const meta = {
@@ -24,7 +25,9 @@ const CreateOrganizationForm:FunctionComponent<any> = () => {
 
     if (orgShortName && orgFullName && orgDescription) {
       try {
-        await valist.createOrganization(orgShortName, meta);
+        const { orgID } = await valist.createOrganization(orgShortName, meta);
+        setLoadingText(`Linking orgID ${orgID} to ${orgShortName}...`);
+        await valist.linkNameToID(orgShortName, orgID);
         router.push(`/v/${orgShortName.toLowerCase().replace(shortnameFilterRegex, '')}/create`);
       } catch (e) {
         console.error('Could not create organization', e);
@@ -129,7 +132,7 @@ const CreateOrganizationForm:FunctionComponent<any> = () => {
                 </form>
                 </div>
             </div>
-            { renderLoading && <LoadingDialog>Creating Organization...</LoadingDialog> }
+            { renderLoading && <LoadingDialog>{ loadingText }</LoadingDialog> }
         </div>
   );
 };

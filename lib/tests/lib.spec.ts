@@ -112,10 +112,17 @@ describe('Test Valist Lib', async () => {
       }
     });
 
-    it('Should return transaction response', async () => {
+    it('Should create organization', async () => {
       const transactionResponse = await valist.createOrganization(orgShortName, meta);
-      orgID = transactionResponse.events.OrgCreated.returnValues._orgID;
+      orgID = transactionResponse.orgID;
       expect(orgID).to.equal('0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f')
+      expect(transactionResponse).to.have.property('transactionHash');
+      expect(transactionResponse).to.have.property('blockHash');
+      expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should link orgID to namespace', async () => {
+      const transactionResponse = await valist.linkNameToID(orgShortName, orgID);
       expect(transactionResponse).to.have.property('transactionHash');
       expect(transactionResponse).to.have.property('blockHash');
       expect(transactionResponse).to.have.property('blockNumber');
@@ -144,7 +151,7 @@ describe('Test Valist Lib', async () => {
   });
 
   describe('Create a Repository', async () => {
-    it('Should return transaction response', async () => {
+    it('Should create repository', async () => {
       const transactionResponse = await valist.createRepository(orgShortName, repoName, repoMeta);
       expect(transactionResponse).to.have.property('transactionHash');
       expect(transactionResponse).to.have.property('blockHash');
