@@ -20,12 +20,32 @@ Documentation for how to get started with Valist can be found at [https://docs.v
 
 ## Packages
 
-| Directory        | Description                   |
-| ---------------- | ----------------------------- |
-| [cli](./cli)     | Valist command line interface |
-| [eth](./eth)     | Ethereum smart contracts      |
-| [lib](./lib)     | Valist core library           |
-| [relay](./relay) | Valist relay application      |
+| Directory            | Description                   |
+| -------------------- | ----------------------------- |
+| [cli](./cli)         | Valist command line interface |
+| [hardhat](./hardhat) | Ethereum smart contracts      |
+| [lib](./lib)         | Valist core library           |
+| [relay](./relay)     | Valist relay web application  |
+| [test](./test)       | Acceptance tests              |
+
+## Building
+
+Install the following requirements:
+
+- node `14.17`
+- npm `6.14`
+
+To start the development server:
+
+```bash
+make dev
+```
+
+To build the contracts, lib, and relay:
+
+```bash
+make all
+```
 
 ## Contributing
 
