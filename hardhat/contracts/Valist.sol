@@ -1,16 +1,14 @@
 // SPDX-License-Identifier: MPL-2.0
 pragma solidity >=0.8.4;
 import "@openzeppelin/contracts/utils/structs/EnumerableSet.sol";
-import "./BaseRelayRecipient.sol";
+import "@openzeppelin/contracts/metatx/ERC2771Context.sol";
 // import "hardhat/console.sol";
 
-contract Valist is BaseRelayRecipient {
+contract Valist is ERC2771Context {
 
-  constructor(address metaTxForwarder) {
-    trustedForwarder = metaTxForwarder;
-  }
+  constructor(address metaTxForwarder) ERC2771Context(metaTxForwarder) {}
 
-  string public override versionRecipient = "2.2.0";
+  string public versionRecipient = "2.2.0";
 
   using EnumerableSet for EnumerableSet.AddressSet;
 
@@ -80,12 +78,6 @@ contract Valist is BaseRelayRecipient {
   // keccak256(abi.encodePacked(++orgCount, block.chainid))[]
   bytes32[] public orgIDs;
 
-  // list of unique orgNames
-  string[] public orgNames;
-
-  // orgName => orgID (can be governed by a DAO in the future)
-  mapping(string => bytes32) public orgIDByName;
-
   // orgID => Organization
   mapping(bytes32 => Organization) public orgs;
 
@@ -134,6 +126,10 @@ contract Valist is BaseRelayRecipient {
     _;
   }
 
+  event OrgCreated(bytes32 indexed _orgID, string indexed _metaCIDHash, string _metaCID);
+
+  event RepoCreated(bytes32 indexed _orgID, string indexed _repoNameHash, string _repoName, string indexed _metaCIDHash, string _metaCID);
+
   event MetaUpdate(bytes32 indexed _orgID, string indexed _repoName, address indexed _signer, string _metaCID);
 
   event VoteThresholdEvent(bytes32 indexed _orgID, string indexed _repoName, address _signer, uint indexed _pendingThreshold, uint _sigCount, uint _threshold);
@@ -159,23 +155,21 @@ contract Valist is BaseRelayRecipient {
     }
   }
 
-  // create an organization and claim an orgName and orgID
-  function createOrganization(string memory _orgName, string memory _orgMeta) public {
-    require(orgIDByName[_orgName] == 0, "Org exists");
-    require(bytes(_orgName).length > 0, "No orgName");
+  // create an organization and claim an orgID
+  function createOrganization(string memory _orgMeta) public {
     require(bytes(_orgMeta).length > 0, "No orgMeta");
     // generate new orgID by incrementing and hashing orgCount
     bytes32 orgID = keccak256(abi.encodePacked(++orgCount, block.chainid));
-    // map orgName to orgID
-    orgIDByName[_orgName] = orgID;
     // set Organization ID and metadata
     orgs[orgID].metaCID = _orgMeta;
     // add to list of orgIDs
     orgIDs.push(orgID);
-    // add to list of orgNames
-    orgNames.push(_orgName);
     // add creator of org to orgAdmin role
     roles[keccak256(abi.encodePacked(orgID, ORG_ADMIN))].add(_msgSender());
+    // log new orgID
+    emit OrgCreated(orgID, _orgMeta, _orgMeta);
+    // log new key to help filter client side orgIDs that a key is associated with
+    emit VoteKeyEvent(orgID, "", _msgSender(), ADD_KEY, _msgSender(), 0, 0);
   }
 
   function createRepository(bytes32 _orgID, string memory _repoName, string memory _repoMeta) public orgAdmin(_orgID) {
@@ -189,6 +183,8 @@ contract Valist is BaseRelayRecipient {
     repos[repoSelector].exists = true;
     // set metadata for repo
     repos[repoSelector].metaCID = _repoMeta;
+    // log new repo
+    emit RepoCreated(_orgID, _repoName, _repoName, _repoMeta, _repoMeta);
   }
 
   function voteRelease(
@@ -518,20 +514,6 @@ contract Valist is BaseRelayRecipient {
     Repository storage repo = repos[keccak256(abi.encodePacked(_orgID, _repoName))];
     Release storage release = releases[keccak256(abi.encode(_orgID, _repoName, repo.tags[repo.tags.length - 1]))];
     return (repo.tags[repo.tags.length - 1], release.releaseCID, release.metaCID, release.signers);
-  }
-
-  // get paginated list of organization names
-  function getOrgNames(uint _page, uint _resultsPerPage) public view returns (string[] memory) {
-    uint i = _resultsPerPage * _page - _resultsPerPage;
-    uint limit = _page * _resultsPerPage;
-    if (limit > orgNames.length) {
-      limit = orgNames.length;
-    }
-    string[] memory _orgNames = new string[](_resultsPerPage);
-    for (i; i < limit; ++i) {
-      _orgNames[i] = orgNames[i];
-    }
-    return _orgNames;
   }
 
   // get paginated list of repo names
