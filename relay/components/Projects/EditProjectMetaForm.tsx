@@ -1,7 +1,9 @@
 import React, { useState, useEffect } from 'react';
 import { ProjectType, RepoMeta } from 'valist/dist/types';
+import useOrgAdmin from '../../hooks/useOrgAdmin';
 
 interface EditProjectMetaFormProps {
+  orgName: string,
   repoName: string,
   meta: RepoMeta,
   setRepoMeta: (meta: RepoMeta) => Promise<void>
@@ -12,6 +14,7 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
   const [repository, setRepository] = useState('');
   const [description, setDescription] = useState('');
   const [projectType, setProjectType] = useState<ProjectType>();
+  const isOrgAdmin = useOrgAdmin(props.orgName);
 
   const submit = () => {
     if (projectType && homepage && repository && description) {
@@ -45,7 +48,7 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                           <label htmlFor="ProjectHomepage"
                             className="block text-sm font-medium leading-5 text-gray-700">Homepage</label>
                           <div className="mt-1 relative rounded-md shadow-sm">
-                              <input value={homepage} type="text"
+                              <input disabled={!isOrgAdmin} value={homepage} type="text"
                                 onChange={(e) => setHomepage(e.target.value)} id="ProjectHomepage"
                                 className="form-input block w-full sm:text-sm sm:leading-5
                                           transition ease-in-outduration-150" />
@@ -55,7 +58,7 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                           <label htmlFor="ProjectRepository"
                             className="block text-sm font-medium leading-5 text-gray-700">Repository</label>
                           <div className="mt-1 relative rounded-md shadow-sm">
-                              <input value={repository} type="text"
+                              <input disabled={!isOrgAdmin} value={repository} type="text"
                                 onChange={(e) => setRepository(e.target.value)} id="ProjectRepository"
                                 className="form-input block w-full sm:text-sm sm:leading-5
                                           transition ease-in-out duration-150" />
@@ -65,23 +68,28 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                           <label htmlFor="ProjectDescription"
                             className="block text-sm font-medium leading-5 text-gray-700">Description</label>
                           <div className="mt-1 relative rounded-md shadow-sm">
-                              <textarea value={description}
+                              <textarea disabled={!isOrgAdmin} value={description}
                                 onChange={(e) => setDescription(e.target.value)} id="ProjectDescription"
                                 className="h-20 form-input block w-full sm:text-sm sm:leading-5
                                           transition ease-in-out duration-150" />
                           </div>
                       </div>
                       <div className="sm:col-span-2">
-                      <span className="w-full inline-flex rounded-md shadow-sm">
-                          <button onClick={submit} value="Submit" type="button"
-                            className="w-full inline-flex items-center justify-center px-6 py-3
-                                      border border-transparent text-base leading-6 font-medium rounded-md
-                                      text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none
-                                      focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700
-                                      transition ease-in-out duration-150">
-                              Update Metadata
-                          </button>
-                      </span>
+                      { isOrgAdmin
+                        ? <span className="w-full inline-flex rounded-md shadow-sm">
+                            <button onClick={submit} value="Submit" type="button"
+                              className="w-full inline-flex items-center justify-center px-6 py-3
+                                        border border-transparent text-base leading-6 font-medium rounded-md
+                                        text-white bg-indigo-600 hover:bg-indigo-500 focus:outline-none
+                                        focus:border-indigo-700 focus:shadow-outline-indigo active:bg-indigo-700
+                                        transition ease-in-out duration-150">
+                                Update Metadata
+                            </button>
+                        </span>
+                        : <p className="font-medium text-sm">
+                          Cannot modify repo metadata, currently not an orgAdmin role.
+                        </p>
+                      }
                       </div>
                   </form>
               </div>

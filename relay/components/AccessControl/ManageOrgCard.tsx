@@ -40,15 +40,15 @@ export default function ManageAccessCard(props: ManageAccessCardProps): JSX.Elem
               { props.orgAdmins.map((address) => <OrgAccessCardListItem key={address} address={address} />)}
             </ul>
           </div>
-          <div className="mt-6">
+          { isOrgAdmin && <div className="mt-6">
             <Link href={`/v/${props.orgName}/edit`}>
               <a className="w-full flex justify-center items-center px-4 py-2 border
               border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
               bg-white hover:bg-gray-50">
-                { isOrgAdmin ? 'Manage access' : 'View all' }
+                Manage Access
               </a>
             </Link>
-          </div>
+          </div> }
         </div>
       </div>
     </section>

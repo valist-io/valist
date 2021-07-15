@@ -1,6 +1,6 @@
 import Link from 'next/link';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
-import useOrgAdmin from '../../hooks/useOrgAdmin';
+import useRepoDev from '../../hooks/useRepoDev';
 
 interface UserProps {
   address: string
@@ -31,7 +31,7 @@ interface ManageProjectAccessCardProps {
 }
 
 export default function ManageProjectAccessCard(props: ManageProjectAccessCardProps): JSX.Element {
-  const isOrgAdmin = useOrgAdmin(props.orgName);
+  const isRepoDev = useRepoDev(props.orgName, props.repoName);
   return (
     <section aria-labelledby="recent-hires-title">
       <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -43,14 +43,14 @@ export default function ManageProjectAccessCard(props: ManageProjectAccessCardPr
               { props.orgAdmins.map((address) => <User key={address} address={address} />)}
             </ul>
           </div>
-          <div className="mt-6">
+          { isRepoDev && <div className="mt-6">
             <Link href={`/v/${props.orgName}/${props.repoName}/edit`}>
               <a className="w-full flex justify-center items-center px-4 py-2 border border-gray-300 shadow-sm text-sm
               font-medium rounded-md text-gray-700 bg-white hover:bg-gray-50">
-                { isOrgAdmin ? 'Manage access' : 'View all' }
+                Manage Access
               </a>
             </Link>
-          </div>
+          </div> }
         </div>
       </div>
     </section>

@@ -20,7 +20,7 @@ export default function ProjectProfileCard(props: ProjectProfileCardProps): JSX.
               <div className="flex-shrink-0">
                 <AddressIdenticon address={props.repoMeta.name} height={20}/>
               </div>
-              <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left max-w-sm">
+              <div>
                 <p className="text-sm font-medium text-gray-600"></p>
                 <p className="text-xl font-bold text-gray-900 sm:text-2xl">{`${props.orgName}/${props.repoName}`}</p>
                 <p className="text-sm font-medium text-gray-600">{props.repoMeta.description}</p>

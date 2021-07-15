@@ -19,7 +19,7 @@ export default function OrgProfileCard(props: OrgProfileCardProps): JSX.Element 
               <div className="flex-shrink-0">
                 <AddressIdenticon address={props.orgMeta.name} height={20}/>
               </div>
-              <div className="mt-4 text-center sm:mt-0 sm:pt-1 sm:text-left">
+              <div>
                 <p className="text-sm font-medium text-gray-600"></p>
                 <p className="text-xl font-bold text-gray-900 sm:text-2xl">{props.orgMeta.name}</p>
                 <p className="text-sm font-medium text-gray-600">{props.orgMeta.description}</p>
