@@ -4,7 +4,7 @@ import { createSignerKey, getSignerKey } from '../../utils/crypto';
 import AccountGet from './get';
 
 export default class AccountNew extends Command {
-  static description = 'create a new account';
+  static description = 'Create a new account';
 
   static examples = [
     '$ valist account:new',
