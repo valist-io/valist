@@ -30,7 +30,7 @@ export default function CreateRepoPage(): JSX.Element {
   return (
       <Layout title={`Valist | ${orgName}`}>
         <CreateRepoForm orgName={orgName} createRepo={createRepo} />
-        {loading && <LoadingDialog>Loading...</LoadingDialog>}
+        {loading && <LoadingDialog>Creating Repository...</LoadingDialog>}
         {error && <ErrorDialog error={error} close={() => setError(undefined)} />}
       </Layout>
   );
