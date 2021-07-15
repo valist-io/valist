@@ -29,7 +29,7 @@ export const CreateRepoForm:FunctionComponent<any> = ({ orgName }: { orgName: st
     };
 
     try {
-      await valist.createRepository(orgName, projectName, repoMeta, valist.defaultAccount);
+      await valist.createRepository(orgName, projectName, repoMeta);
       router.push(`/v/${orgName}/${projectName.toLowerCase().replace(shortnameFilterRegex, '')}/publish`);
     } catch (e) {
       console.error('Could not create repository', e);

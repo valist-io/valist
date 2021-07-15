@@ -22,9 +22,9 @@ const CreateOrganizationForm:FunctionComponent<any> = () => {
       description: orgDescription,
     };
 
-    if (orgShortName && orgFullName && orgDescription && valist.defaultAccount) {
+    if (orgShortName && orgFullName && orgDescription) {
       try {
-        await valist.createOrganization(orgShortName, meta, valist.defaultAccount);
+        await valist.createOrganization(orgShortName, meta);
         router.push(`/v/${orgShortName.toLowerCase().replace(shortnameFilterRegex, '')}/create`);
       } catch (e) {
         console.error('Could not create organization', e);
