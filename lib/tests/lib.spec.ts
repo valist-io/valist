@@ -3,9 +3,9 @@ import { expect } from 'chai';
 import { describe, before, it } from 'mocha';
 import Valist from '../dist/';
 import { ADD_KEY, REVOKE_KEY } from '../dist/constants';
-import { getContractInstance } from '../src/utils';
 
 import ValistABI from '../src/abis/contracts/Valist.sol/Valist.json';
+import ValistRegistryABI from '../src/abis/contracts/ValistRegistry.sol/ValistRegistry.json';
 
 console.error = () => {}; // mute console errors
 
@@ -13,9 +13,13 @@ const ganache = require('ganache-core');
 
 const web3Provider = ganache.provider();
 let contractInstance: any;
+let registryInstance: any;
 let valist: Valist;
 let accounts: string[];
 
+const metaTxRelay = '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b';
+
+let orgID: string;
 const orgShortName = 'secureco';
 const repoName = 'firmware';
 
@@ -49,23 +53,27 @@ const deployContract = async (provider: any) => {
   accounts = await web3.eth.getAccounts();
 
   const valistContract = await new web3.eth.Contract(ValistABI.abi as any)
-    .deploy({ data: ValistABI.bytecode, arguments: ['0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b'] })
+    .deploy({ data: ValistABI.bytecode, arguments: [metaTxRelay] })
     .send({ from: accounts[0], gas: 4333333 });
 
   return valistContract;
 };
 
-describe('Test Valist Lib', async () => {
-  before('Deploy Valist Contract', async () => {
-    contractInstance = await deployContract(web3Provider);
-  });
+const deployRegistry = async (provider: any) => {
+  const web3 = new Web3(provider);
+  accounts = await web3.eth.getAccounts();
 
-  describe('Call getContractInstance', async () => {
-    it('Should be an object', async () => {
-      const web3Instance = new Web3(web3Provider);
-      const valistContract = getContractInstance(web3Instance, ValistABI.abi, contractInstance.options.address);
-      expect(valistContract).to.be.an('object');
-    });
+  const valistRegistry = await new web3.eth.Contract(ValistRegistryABI.abi as any)
+    .deploy({ data: ValistRegistryABI.bytecode, arguments: [metaTxRelay] })
+    .send({ from: accounts[0], gas: 4333333 });
+
+  return valistRegistry;
+};
+
+describe('Test Valist Lib', async () => {
+  before('Deploy Valist Contracts', async () => {
+    contractInstance = await deployContract(web3Provider);
+    registryInstance = await deployRegistry(web3Provider);
   });
 
   describe('Create new Valist Instance', async () => {
@@ -74,6 +82,7 @@ describe('Test Valist Lib', async () => {
         web3Provider,
         metaTx: false,
         contractAddress: contractInstance.options.address,
+        registryAddress: registryInstance.options.address,
       });
     });
 
@@ -83,20 +92,38 @@ describe('Test Valist Lib', async () => {
       expect(valist).to.have.property('defaultAccount');
       expect(valist).to.have.property('metaTxEnabled');
       expect(valist).to.have.property('contractAddress');
+      expect(valist).to.have.property('registryAddress');
     });
 
     it('Call Valist Connect', async () => {
       await valist.connect();
       expect(valist).to.have.property('contract');
+      expect(valist).to.have.property('registry');
     });
   });
 
   describe('Create an Organization', async () => {
+
+    it('Should get empty orgID by name', async () => {
+      try {
+        await valist.getOrgIDFromName(orgShortName);
+      } catch (e) {
+        expect(e.message).to.contain('orgID not found');
+      }
+    });
+
     it('Should return transaction response', async () => {
       const transactionResponse = await valist.createOrganization(orgShortName, meta);
+      orgID = transactionResponse.events.OrgCreated.returnValues._orgID;
+      expect(orgID).to.equal('0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f')
       expect(transactionResponse).to.have.property('transactionHash');
       expect(transactionResponse).to.have.property('blockHash');
       expect(transactionResponse).to.have.property('blockNumber');
+    });
+
+    it('Should get orgID by name', async () => {
+      const id = await valist.getOrgIDFromName(orgShortName);
+      expect(id).to.equal(orgID);
     });
 
     it('Should store orgName in list of orgNames', async () => {
@@ -106,7 +133,12 @@ describe('Test Valist Lib', async () => {
 
     it('Should fetch organization', async () => {
       const org = await valist.getOrganization(orgShortName);
-      expect(org.orgID).to.equal('0xcc69885fda6bcc1a4ace058b4a62bf5e179ea78fd58a1ccd71c22cc9b688792f');
+      expect(org.orgID).to.equal(orgID);
+      expect(org.repoNames.length).to.equal(0);
+      expect(org.meta.name).to.equal(meta.name);
+      expect(org.meta.description).to.equal(meta.description);
+      expect(org.threshold).to.equal('0');
+      expect(org.thresholdDate).to.equal('0');
       expect(org.metaCID).to.equal('bafkreiacinnkuxv46nybpqjtxizecpytoskdeukd7scunuu4aqovjbrvqy');
     });
   });
@@ -172,7 +204,7 @@ describe('Test Valist Lib', async () => {
       try {
         await valist.publishRelease('', repoName, release);
       } catch (e) {
-        expect(e.toString()).to.contain('User does not have permission to publish release');
+        expect(e.toString()).to.contain('orgID not found');
       }
     });
 
@@ -224,7 +256,7 @@ describe('Test Valist Lib', async () => {
 
     it('Should fetch pending org threshold requests', async () => {
       const requests = await valist.getPendingOrgThresholds(orgShortName);
-      expect(requests[0]).to.equal(2);
+      expect(Number(requests[0])).to.equal(2);
     });
 
     it('Should vote for org threshold with key2', async () => {
@@ -354,7 +386,7 @@ describe('Test Valist Lib', async () => {
 
     it('Should fetch pending repo threshold requests', async () => {
       const requests = await valist.getPendingRepoThresholds(orgShortName, repoName);
-      expect(requests[0]).to.equal(2);
+      expect(Number(requests[0])).to.equal(2);
     });
 
     it('Should vote for repo threshold with key2', async () => {

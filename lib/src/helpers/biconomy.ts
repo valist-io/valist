@@ -163,13 +163,13 @@ const sendAsync = (web3: any, params: any): any => new Promise((resolve, reject)
 
 const sendMetaTx = async (
   web3: any,
+  networkID: number,
   contractAddress: string | undefined,
   functionCall: any,
   account: string,
   gasLimit: string | number,
   signer?: string,
 ) => {
-  const networkID = await web3.eth.net.getId();
   const forwarder = getBiconomyForwarderConfig(networkID);
   const forwarderContract = new web3.eth.Contract(forwarder.abi, forwarder.address);
   const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
@@ -232,8 +232,8 @@ const sendMetaTx = async (
       }
     };
 
-    await new Promise(transactionReceiptAsync);
-    return txHash;
+    const receipt = await new Promise(transactionReceiptAsync);
+    return receipt;
   };
   await getTransactionReceiptMined();
   return { transactionHash: txHash };

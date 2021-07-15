@@ -30,6 +30,7 @@ import {
   getValistContract,
   shortnameFilterRegex,
   sendMetaTransaction,
+  getValistRegistry,
 } from './utils';
 
 // node-fetch polyfill
@@ -44,15 +45,23 @@ class Valist {
 
   contract: any;
 
-  ipfs: any;
+  registry: any;
 
-  signer?: string;
+  ipfs: any;
 
   defaultAccount: string;
 
   metaTxEnabled = false;
 
-  contractAddress: string | undefined;
+  gatewayHost?: string;
+
+  signer?: string;
+
+  contractAddress?: string;
+
+  registryAddress?: string;
+
+  chainID?: number;
 
   cache: ValistCache;
 
@@ -60,31 +69,46 @@ class Valist {
     web3Provider,
     metaTx = true,
     ipfsHost = 'https://pin.valist.io',
+    gatewayHost = 'https://gateway.valist.io',
     contractAddress,
+    registryAddress,
   }: {
     web3Provider: provider,
     metaTx?: boolean,
     ipfsHost?: string,
+    gatewayHost?: string,
     contractAddress?: string,
+    registryAddress?: string,
   }) {
     this.web3 = new Web3(web3Provider);
     this.metaTxEnabled = metaTx;
     this.defaultAccount = '0x0';
     this.ipfs = ipfsClient(ipfsHost);
+    this.gatewayHost = gatewayHost;
     this.contractAddress = contractAddress;
+    this.registryAddress = registryAddress;
     this.cache = {
-      orgIDs: [],
-      orgNames: [],
-      orgs: {},
+      orgIDs: {},
     };
   }
 
   // initialize main valist contract instance for future calls
   async connect(): Promise<void> {
+    this.chainID = await this.web3.eth.getChainId();
     try {
-      this.contract = await getValistContract(this.web3, this.contractAddress);
+      this.contract = await getValistContract(this.web3, this.chainID, this.contractAddress);
       this.contractAddress = this.contract._address;
       if (!this.contractAddress) throw new Error('Could not get Valist contract address');
+    } catch (e) {
+      const msg = 'Could not connect to Valist registry contract';
+      console.error(msg, e);
+      throw e;
+    }
+
+    try {
+      this.registry = await getValistRegistry(this.web3, this.chainID, this.registryAddress);
+      this.registryAddress = this.registry._address;
+      if (!this.registryAddress) throw new Error('Could not get Valist registry address');
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -103,16 +127,25 @@ class Valist {
     if (this.metaTxEnabled) console.log('👻 MetaTransactions Enabled');
   }
 
-  async createOrganization(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
+  async createOrganization(orgName: string, orgMeta: OrgMeta): Promise<any> {
+    try {
+      await this.getOrgIDFromName(orgName);
+      throw new Error('orgName already taken, please choose another name');
+    } catch (e) {
+      if (e.message !== 'orgID not found') {
+        throw e;
+      }
+    }
     try {
       const metaFile: string = await this.addJSONtoIPFS(orgMeta);
-      const tx = await this.sendTransaction(
-        this.contract.methods.createOrganization(
-          orgName.toLowerCase().replace(shortnameFilterRegex, ''),
-          metaFile,
-        ),
-        account,
-      );
+      const tx = await this.sendTransaction(this.contract.methods.createOrganization(metaFile));
+      let orgID: string;
+      try {
+        orgID = tx.events.OrgCreated.returnValues._orgID;
+      } catch (e) {
+        throw new Error('Could not parse new orgID from transaction');
+      }
+      await this.linkNameToID(orgName, orgID);
       return tx;
     } catch (e) {
       const msg = 'Could not create organization';
@@ -182,6 +215,17 @@ class Valist {
     }
   }
 
+  async linkNameToID(name: string, orgID: string): Promise<any> {
+    try {
+      const tx = await this.sendTransaction(this.registry.methods.linkNameToID(orgID, name));
+      return tx;
+    } catch (e) {
+      const msg = 'Could not link namespace to orgID';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
   async setOrgMeta(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
@@ -203,7 +247,8 @@ class Valist {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const hash = await this.addJSONtoIPFS(repoMeta);
-      return await this.sendTransaction(this.contract.methods.setRepoMeta(orgID, repoName, hash), account);
+      const tx = await this.sendTransaction(this.contract.methods.setRepoMeta(orgID, repoName, hash), account);
+      return tx;
     } catch (e) {
       const msg = 'Could not set repository metadata';
       console.error(msg, e);
@@ -213,20 +258,14 @@ class Valist {
 
   async getOrgIDFromName(orgName: string): Promise<OrgID> {
     try {
-      if (!this.cache.orgs[orgName]) {
-        this.cache.orgs[orgName] = {
-          orgID: await this.contract.methods.orgIDByName(orgName).call(),
-          threshold: 0,
-          thresholdDate: 0,
-          meta: {
-            name: '',
-            description: '',
-          },
-          metaCID: '',
-          repoNames: [],
-        };
+      if (!this.cache.orgIDs[orgName]) {
+        this.cache.orgIDs[orgName] = await this.registry.methods.nameToID(orgName).call();
       }
-      return this.cache.orgs[orgName].orgID;
+      if (this.cache.orgIDs[orgName] === '0x0000000000000000000000000000000000000000000000000000000000000000') {
+        this.cache.orgIDs[orgName] = '';
+        throw new Error('orgID not found');
+      }
+      return this.cache.orgIDs[orgName];
     } catch (e) {
       const msg = 'Could not get organization ID';
       console.error(msg, e);
@@ -238,18 +277,25 @@ class Valist {
   async getOrganization(orgName: string, page = 1, resultsPerPage = 10): Promise<Organization> {
     try {
       const orgID: OrgID = await this.getOrgIDFromName(orgName);
-      this.cache.orgs[orgName] = await this.contract.methods.orgs(orgID).call();
-      this.cache.orgs[orgName].orgID = orgID;
+      const org = await this.contract.methods.orgs(orgID).call();
 
-      this.cache.orgs[orgName].repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
+      const repoNames = await this.getRepoNames(orgName, page, resultsPerPage);
 
+      let meta = { name: '', description: '' };
       try {
-        this.cache.orgs[orgName].meta = await this.fetchJSONfromIPFS(this.cache.orgs[orgName].metaCID);
+        meta = await this.fetchJSONfromIPFS(org.metaCID);
       } catch (e) {
         // noop, just return empty object if failed
       }
 
-      return this.cache.orgs[orgName];
+      return {
+        orgID,
+        threshold: org.threshold,
+        thresholdDate: org.thresholdDate,
+        meta,
+        metaCID: org.metaCID,
+        repoNames,
+      };
     } catch (e) {
       const msg = 'Could not get organization';
       console.error(msg, e);
@@ -259,7 +305,7 @@ class Valist {
 
   async getOrganizationNames(page = 1, resultsPerPage = 10): Promise<string[]> {
     try {
-      const orgs = await this.contract.methods.getOrgNames(page, resultsPerPage).call();
+      const orgs = await this.registry.methods.getNames(page, resultsPerPage).call();
       return orgs.filter(Boolean);
     } catch (e) {
       const msg = 'Could not get organization names';
@@ -433,6 +479,9 @@ class Valist {
       const isOrgAdmin = await this.contract.methods.isOrgAdmin(orgID, account).call();
       return isOrgAdmin;
     } catch (e) {
+      if (e.message.includes('orgID not found')) {
+        return false;
+      }
       const msg = 'Could not check if user has ORG_ADMIN_ROLE';
       console.error(msg, e);
       throw e;
@@ -445,7 +494,7 @@ class Valist {
       const isRepoDev = await this.contract.methods.isRepoDev(orgID, repoName, account).call();
       return isRepoDev;
     } catch (e) {
-      if (e.message.includes('No repo')) {
+      if (e.message.includes('No repo') || e.message.includes('orgID not found')) {
         return false;
       }
       const msg = 'Could not check if user has REPO_DEV_ROLE';
@@ -461,7 +510,6 @@ class Valist {
         this.contract.methods.voteKey(orgID, '', ADD_KEY, key),
         this.defaultAccount,
       );
-      console.log(orgID, tx);
       return tx;
     } catch (e) {
       const msg = 'Could not vote to grant ORG_ADMIN_ROLE';
@@ -885,7 +933,7 @@ class Valist {
   // eslint-disable-next-line class-methods-use-this
   async fetchJSONfromIPFS(ipfsHash: string): Promise<any> {
     try {
-      const response = await fetch(`https://gateway.valist.io/ipfs/${ipfsHash}`);
+      const response = await fetch(`${this.gatewayHost}/ipfs/${ipfsHash}`);
       const json = await response.json();
       return json;
     } catch (e) {
@@ -925,6 +973,7 @@ class Valist {
       try {
         const tx = await sendMetaTransaction(
           this.web3,
+          this.chainID as number,
           this.contractAddress,
           functionCall,
           account,
