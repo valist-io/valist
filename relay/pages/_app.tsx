@@ -6,6 +6,7 @@ import Valist from 'valist';
 import { InvalidNetworkError } from 'valist/dist/errors';
 
 import { Magic } from 'magic-sdk';
+import * as Sentry from '@sentry/nextjs';
 
 import ValistContext from '../components/Valist/ValistContext';
 import LoginContext from '../components/Login/LoginContext';
@@ -110,14 +111,16 @@ function App({ Component, pageProps }: AppProps) {
   }, []);
 
   return (
-    <LoginContext.Provider value={loginObject}>
-      { valist
-        ? <ValistContext.Provider value={valist}>
-          <Component loggedIn={loggedIn} setShowLogin={setShowLogin} {...pageProps} />
-          { showLogin && <LoginForm setShowLogin={setShowLogin} handleLogin={handleLogin} setEmail={setEmail} /> }
-        </ValistContext.Provider>
-        : <LoadingDialog>Loading...</LoadingDialog>}
-    </LoginContext.Provider>
+    <Sentry.ErrorBoundary fallback={'An error has occurred'} showDialog={true}>
+      <LoginContext.Provider value={loginObject}>
+        { valist
+          ? <ValistContext.Provider value={valist}>
+            <Component loggedIn={loggedIn} setShowLogin={setShowLogin} {...pageProps} />
+            { showLogin && <LoginForm setShowLogin={setShowLogin} handleLogin={handleLogin} setEmail={setEmail} /> }
+          </ValistContext.Provider>
+          : <LoadingDialog>Loading...</LoadingDialog>}
+      </LoginContext.Provider>
+    </Sentry.ErrorBoundary>
   );
 }
 

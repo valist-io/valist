@@ -1,6 +1,8 @@
+import { ValistSDKError } from 'valist/dist/errors';
+
 interface ErrorDialogProps {
   error: Error,
-  close?: () => void
+  close: () => void
 }
 
 const RPC_ERROR = 'Internal JSON-RPC error.\n';
@@ -16,12 +18,11 @@ export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
   };
 
   const parseError = (err: Error) => {
-    // TODO include other types here
     if (err.message.startsWith(RPC_ERROR)) {
       return parseRPCError(err.message.substring(RPC_ERROR.length));
+    } if (err instanceof ValistSDKError) {
+      return err.message;
     }
-
-    // rethrow error for sentry user dialog
     throw err;
   };
 
