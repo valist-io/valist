@@ -3,7 +3,28 @@ interface ErrorDialogProps {
   close?: () => void
 }
 
+const RPC_ERROR = 'Internal JSON-RPC error.\n';
+
 export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
+  const parseRPCError = (err: string) => {
+    try {
+      const { message } = JSON.parse(err);
+      return message;
+    } catch (e) {
+      return err;
+    }
+  };
+
+  const parseError = (err: Error) => {
+    // TODO include other types here
+    if (err.message.startsWith(RPC_ERROR)) {
+      return parseRPCError(err.message.substring(RPC_ERROR.length));
+    }
+
+    // rethrow error for sentry user dialog
+    throw err;
+  };
+
   return (
     <div className="fixed z-10 inset-0 overflow-y-auto" aria-labelledby="modal-title" role="dialog" aria-modal="true">
       <div className="flex items-end justify-center min-h-screen pt-4 px-4 pb-20 text-center sm:block sm:p-0">
@@ -38,7 +59,7 @@ export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
               </h3>
               <div className="mt-2">
                 <p className="text-sm text-gray-500">
-                  { props.error.message }
+                  { parseError(props.error) }
                 </p>
               </div>
             </div>

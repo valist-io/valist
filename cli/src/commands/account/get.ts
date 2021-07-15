@@ -2,7 +2,7 @@ import { Command } from '@oclif/command';
 import { getSignerAddress } from '../../utils/crypto';
 
 export default class AccountGet extends Command {
-  static description = 'print account info';
+  static description = 'Print account info';
 
   static examples = [
     '$ valist account:get',
