@@ -172,7 +172,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
                     <Link href={`/${orgName}/${repoName}`}>{repoName}</Link>
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
-                      {repo && <EditProjectMetaForm meta={repo.meta} repoName={repoName}
+                      {repo && <EditProjectMetaForm meta={repo.meta} orgName={orgName} repoName={repoName}
                       setRepoMeta={updateMeta} /> }
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">

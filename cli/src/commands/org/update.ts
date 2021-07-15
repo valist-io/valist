@@ -21,7 +21,7 @@ export default class OrgUpdate extends Command {
     },
   ];
 
-  async run() {
+  async run(): Promise<void> {
     const { args } = this.parse(OrgUpdate);
     const valist = await initValist();
 

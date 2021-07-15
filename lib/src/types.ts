@@ -9,7 +9,7 @@ export type OrgMeta = {
 
 export type BinaryTypes = 'binary' | 'go' | 'rust' | 'c++';
 
-export type ProjectType = BinaryTypes | 'node' | 'python' | 'docker';
+export type ProjectType = BinaryTypes | 'node' | 'python' | 'docker' | 'static';
 
 export type RepoMeta = {
   name: string,
@@ -109,10 +109,11 @@ export type VoteReleaseEvent = {
 };
 
 export type ValistCache = {
-  orgIDs: OrgID[],
-  orgNames: OrgName[],
-  orgs: Record<OrgName, Organization>,
+  // orgIDs: OrgID[],
+  // orgNames: OrgName[],
+  // orgs: Record<OrgName, Organization>,
   // repos: Record<OrgID, Record<string, Repository>>,
+  orgIDs: Record<OrgName, OrgID>,
 };
 
 export type ValistConfig = {

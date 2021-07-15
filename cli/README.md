@@ -24,21 +24,22 @@ USAGE
 <!-- commands -->
 * [`valist account:get`](#valist-accountget)
 * [`valist account:new`](#valist-accountnew)
+* [`valist build`](#valist-build)
 * [`valist help [COMMAND]`](#valist-help-command)
 * [`valist init`](#valist-init)
 * [`valist org:get ORGNAME`](#valist-orgget-orgname)
 * [`valist org:key ORGNAME OPERATION KEY`](#valist-orgkey-orgname-operation-key)
-* [`valist org:new ORGNAME ORGMETA`](#valist-orgnew-orgname-orgmeta)
+* [`valist org:new ORGNAME`](#valist-orgnew-orgname)
 * [`valist org:update ORGNAME ORGMETA`](#valist-orgupdate-orgname-orgmeta)
 * [`valist publish`](#valist-publish)
 * [`valist repo:get ORGNAME REPONAME`](#valist-repoget-orgname-reponame)
 * [`valist repo:key ORGNAME REPONAME OPERATION KEY`](#valist-repokey-orgname-reponame-operation-key)
-* [`valist repo:new ORGNAME REPONAME REPOMETA`](#valist-reponew-orgname-reponame-repometa)
+* [`valist repo:new ORGNAME REPONAME`](#valist-reponew-orgname-reponame)
 * [`valist repo:update ORGNAME REPONAME REPOMETA`](#valist-repoupdate-orgname-reponame-repometa)
 
 ## `valist account:get`
 
-print account info
+Print account info
 
 ```
 USAGE
@@ -52,7 +53,7 @@ _See code: [dist/commands/account/get.ts](https://github.com/valist-io/valist/bl
 
 ## `valist account:new`
 
-create a new account
+Create a new account
 
 ```
 USAGE
@@ -63,6 +64,20 @@ EXAMPLE
 ```
 
 _See code: [dist/commands/account/new.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/account/new.ts)_
+
+## `valist build`
+
+Build the target valist project
+
+```
+USAGE
+  $ valist build
+
+EXAMPLE
+  $ valist build
+```
+
+_See code: [dist/commands/build.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/build.ts)_
 
 ## `valist help [COMMAND]`
 
@@ -125,16 +140,16 @@ EXAMPLES
 
 _See code: [dist/commands/org/key.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/org/key.ts)_
 
-## `valist org:new ORGNAME ORGMETA`
+## `valist org:new ORGNAME`
 
 Create a Valist organization
 
 ```
 USAGE
-  $ valist org:new ORGNAME ORGMETA
+  $ valist org:new ORGNAME
 
 EXAMPLE
-  $ valist org:new valist meta/metOrg.json
+  $ valist org:new exampleOrg
 ```
 
 _See code: [dist/commands/org/new.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/org/new.ts)_
@@ -197,16 +212,16 @@ EXAMPLES
 
 _See code: [dist/commands/repo/key.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/repo/key.ts)_
 
-## `valist repo:new ORGNAME REPONAME REPOMETA`
+## `valist repo:new ORGNAME REPONAME`
 
 Create a Valist repository
 
 ```
 USAGE
-  $ valist repo:new ORGNAME REPONAME REPOMETA
+  $ valist repo:new ORGNAME REPONAME
 
 EXAMPLE
-  $ valist repo:new exampleOrg exampleRepo meta/repoMeta.json
+  $ valist repo:new exampleOrg exampleRepo
 ```
 
 _See code: [dist/commands/repo/new.ts](https://github.com/valist-io/valist/blob/v0.0.4/dist/commands/repo/new.ts)_
