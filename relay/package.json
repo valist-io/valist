@@ -24,6 +24,7 @@
     "lint:fix": "eslint . --ext .ts,.tsx --fix"
   },
   "dependencies": {
+    "@sentry/nextjs": "^6.9.0",
     "@tailwindcss/forms": "^0.2.1",
     "@tailwindcss/line-clamp": "^0.2.1",
     "@walletconnect/web3-provider": "^1.4.1",
