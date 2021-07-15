@@ -22,7 +22,11 @@ async function main() {
 
   await valist.deployed();
 
+  const ValistRegistry = await hre.ethers.getContractFactory("ValistRegistry");
+  const registry = await ValistRegistry.deploy(trustedForwarders[80001]);
+
   console.log("Valist deployed to:", valist.address);
+  console.log("ValistRegistry deployed to:", registry.address);
 }
 
 // We recommend this pattern to be able to use async/await everywhere

@@ -4,7 +4,8 @@
   "description": "",
   "scripts": {
     "compile": "hardhat compile",
-    "test": "hardhat test"
+    "test": "hardhat test",
+    "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai"
   },
   "author": "Valist, Inc.",
   "contributors": [
