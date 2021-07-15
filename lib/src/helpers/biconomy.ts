@@ -1,6 +1,7 @@
 import * as sigUtil from 'eth-sig-util';
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable @typescript-eslint/explicit-module-boundary-types */
+/* eslint-disable no-underscore-dangle */
 const helperAttributes: any = {};
 helperAttributes.ZERO_ADDRESS = '0x0000000000000000000000000000000000000000';
 helperAttributes.baseURL = 'https://api.biconomy.io';
@@ -32,20 +33,35 @@ helperAttributes.forwardRequestType = [
   { name: 'data', type: 'bytes' },
 ];
 
+/* on dashboard page, this script helps scrape these values quickly:
+
+const table = document.getElementsByTagName('table')[0]
+let functionIDMap = {}
+for (let i = 1; i < table.rows.length; ++i) {
+    functionIDMap[table.rows[i].children[1].textContent] = table.rows[i].children[2].textContent
+}
+
+*/
 const functionIDMap: Record<string, string> = {
-  createOrganization: '6adea8ac-c764-45ed-a62c-e399adf7dd47',
-  createRepository: '1dd94ae2-fcd1-4951-896d-a28e1445f1ae',
-  voteRelease: 'db8b1576-478b-45ba-a7bf-e6cb9c2b93a4',
-  voteKey: '3d2f99cf-02c7-44b6-9db7-4e672daa248b',
-  voteThreshold: '9d163d2f-d1d7-4958-af5f-e2859cdad3f8',
-  setOrgMeta: '152a40ff-a730-4549-8657-745bc6121e27',
-  setRepoMeta: '5e460491-1d76-4bfb-9a2c-6f00f0be5ada',
-  clearPendingRelease: '33c9cc4d-d17b-4c4f-a833-ead141de83ee',
-  clearPendingKey: '7b0750fa-a4fc-4874-841a-274287027063',
-  clearPendingThreshold: '4b3d868b-f759-4c48-904b-f49938157edc',
+  clearPendingKey: 'a0dfd7b2-fb2b-46da-a662-3cbb87c7b83e',
+  clearPendingRelease: 'b95d7f2d-6d40-4690-b7df-ec36928aaf77',
+  clearPendingThreshold: 'f154fe5a-cd81-4a31-8536-6ea999795f56',
+  createOrganization: '7cb293ac-5ed6-4dd8-9956-eb5a9a236403',
+  createRepository: '3b40c07a-d9dd-401a-913b-ef395648ba4d',
+  setOrgMeta: '1292cba4-8b4e-4828-8989-e2583017cda7',
+  setRepoMeta: '1857aa6a-b334-4b6a-bf7c-959d5581e8d4',
+  voteKey: '82d84700-7a9a-44f5-865d-f34badb00852',
+  voteRelease: 'c8fc037a-dc5c-4fe3-b2fd-f8c602986d72',
+  voteThreshold: 'f0b640b6-4280-4cf0-afca-0d62046cee09',
+  grantRole: '17ec42d7-9f19-407c-8131-3033f7dcc142',
+  init: '5336e4c2-fc5c-49bd-b41d-9990dde03982',
+  linkNameToID: '8fc893ff-08e1-4cda-9264-62f6467d91a8',
+  overrideNameToID: '0455fbcd-4d1e-45ec-b0ce-5eaf73169b3e',
+  renounceRole: '08c8a75f-e9d2-4e9d-82e9-8f6c5b2bf8a0',
+  revokeRole: 'd4040355-b755-4a1a-9f16-0f0462bd56d1',
 };
 
-// pass the networkId to get contract addresses
+// pass the networkId to get GSN forwarder contract addresses
 const getContractAddresses = (networkId: number) => {
   const addressMap: Record<number, string> = {
     80001: '0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b',
@@ -164,7 +180,6 @@ const sendAsync = (web3: any, params: any): any => new Promise((resolve, reject)
 const sendMetaTx = async (
   web3: any,
   networkID: number,
-  contractAddress: string | undefined,
   functionCall: any,
   account: string,
   gasLimit: string | number,
@@ -174,6 +189,9 @@ const sendMetaTx = async (
   const forwarderContract = new web3.eth.Contract(forwarder.abi, forwarder.address);
   const batchNonce = await forwarderContract.methods.getNonce(account, 0).call();
   const functionSignature = functionCall.encodeABI();
+
+  const functionName: string = functionCall._method.name;
+  const contractAddress: string = functionCall._parent._address;
 
   const request = buildForwardTxRequest({
     account,
@@ -201,8 +219,6 @@ const sendMetaTx = async (
     signed = sig.result;
   }
 
-  // eslint-disable-next-line no-underscore-dangle
-  const functionName: string = functionCall._method.name;
   const resp = await fetch('https://api.biconomy.io/api/v2/meta-tx/native', {
     method: 'POST',
     headers: {
@@ -235,8 +251,8 @@ const sendMetaTx = async (
     const receipt = await new Promise(transactionReceiptAsync);
     return receipt;
   };
-  await getTransactionReceiptMined();
-  return { transactionHash: txHash };
+  const receipt = await getTransactionReceiptMined();
+  return receipt;
 };
 
 export {
