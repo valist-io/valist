@@ -1,5 +1,5 @@
 site_name: Valist Documentation
-theme: 
+theme:
   name: material
   features:
     - toc.integrate
@@ -15,4 +15,3 @@ markdown_extensions:
   - attr_list
   - pymdownx.superfences
   - pymdownx.highlight
-

@@ -1,6 +1,5 @@
 # Getting Started
 
-
 ## Installation
 
 ### CLI
@@ -8,7 +7,7 @@
 The Valist-CLI can be globally installed by running the following command:
 
 ```bash
-npm install -g @valist/valist-cli --registry=https://app.valist.io/api/npm
+npm install -g @valist/cli --registry=https://app.valist.io/api/npm
 ```
 
 ### Relay (Webapp + API)
@@ -16,7 +15,7 @@ npm install -g @valist/valist-cli --registry=https://app.valist.io/api/npm
 The Valist-relay can be installed using the following command:
 
 ```bash
-npm install @valist/valist-relay --registry=https://app.valist.io/api/npm
+npm install @valist/relay --registry=https://app.valist.io/api/npm
 ```
 
 ### SDK
@@ -24,8 +23,9 @@ npm install @valist/valist-relay --registry=https://app.valist.io/api/npm
 The Valist-sdk can be installed by running the following command:
 
 ```bash
-npm install @valist/valist-sdk --registry=https://app.valist.io/api/npm
+npm install @valist/sdk --registry=https://app.valist.io/api/npm
 ```
+
 ## Why Valist
 
 Valist is a software/firmware/binary data notary system, similar to the concept that Apple uses to digitally sign and secure applications, but open to developers to extend and integrate into almost any system, traditional or decentralized. No need for expensive and centralized PKIs or manual code signing processes!
@@ -36,13 +36,13 @@ You can think of Valist as a trustless [Artifactory](https://jfrog.com/artifacto
 
 Valist is designed to be highly extensible and interoperable with many package managers that developers are familiar with, such as NPM, Pip, Docker, APT, and Cargo.
 
-Currently, the Valist API supports:
+Currently, Valist supports:
 
-* Arbitrary Binaries, with automatic code-signing
+* Executable Binaries, with automatic code-signing
 
 * NPM packages
 
-* Pip packages
+* Python packages
 
 * Docker images
 
@@ -54,4 +54,4 @@ The Valist-SDK reference implementation is currently written in TypeScript, usin
 
 The following diagram is a visualization of the current implementation:
 
-![Valist Architecture](img/current-implementation.png){width=300px}
+![Valist Architecture](img/current-implementation.png){width=600px}

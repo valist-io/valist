@@ -3,6 +3,11 @@
   "description": "Valist CLI",
   "version": "0.0.4",
   "author": "Valist, Inc.",
+  "contributors": [
+    "Alec M. Wantoch <alec@valist.io> (valist.io)",
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)",
+    "Keenan Nemetz <keenan@valist.io> (valist.io)"
+  ],
   "bin": {
     "valist": "./bin/run"
   },
