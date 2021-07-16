@@ -39,19 +39,13 @@ static: frontend
 contracts:
 	cd hardhat && npm run compile
 
-# migrates/deploys Solidity contracts via Truffle
-migrate:
-	cd hardhat && npm run migrate
+# deploys Solidity contracts via Hardhat
+deploy-%:
+	cd hardhat && npm run deploy:$*
 
-deploy: migrate
-
-# launches truffle console
-console:
-	cd hardhat && npm run console
-
-# runs local ganache cli
+# runs local hardhat chain
 blockchain:
-	cd hardhat && npm run develop
+	cd hardhat && npm run blockchain
 
 # build all artifacts
 all: contracts lib relay
