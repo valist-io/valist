@@ -18,33 +18,38 @@ Upon successful login, you will be greeted by the following welcome message disp
 
 ![create-organization-button](img/valist-create-org-button.png){ width=600px }
 
-After clicking `create organization` you will be navigated to the create organization page.
+After clicking `Create Organization` you will be navigated to the create organization page.
 
 ![create-org-page](img/valist-create-org-form.png){ width=600px }
 
-Fill out your organizations `Shortname`, `Full Name`, and `Description` and click `Create Organization`, keep in mind if you are logged in with `meta-mask` you will be prompted for a signature confirmation.
+Fill out your organization's `Shortname`, `Full Name`, and `Description` and click `Create Organization`.
+
+Keep in mind if you are logged in with `MetaMask`, you will be prompted for two signature confirmations -- one to create the ID, and another to link it to your shortname.
 
 ## SDK
 
-To create a new organization using the Valist-SDK, create a new javascript file containing the following:
+To create a new organization using the Valist SDK, create a new javascript file containing the following:
 
 ```javascript
   import Valist from '@valist/sdk';
   const HDWalletProvider = require('@truffle/hdwallet-provider');
 
-  const key = "<key>";
-  const orgName = "<orgName";
-  const metaData = "<orgMeta>";
+  const key = "<key>"; // securely store this!
+  const orgName = "<orgName>";
+  const metaData = {
+    name: 'Awesome Developer',
+    description: 'Much talent',
+  };
 
   const web3Provider = new HDWalletProvider({
     privateKeys: [key],
     providerOrUrl: 'https://rpc.valist.io',
   });
 
-  const valist = new Valist({web3Provider});
+  const valist = new Valist({ web3Provider });
 
   (async () => {
-    const { transactionHash } = await valist.createOrganization(orgName, metaData, valist.defaultAccount);
+    const { transactionHash } = await valist.createOrganization(orgName, metaData);
 
     console.log(transactionHash);
   })();

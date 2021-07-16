@@ -4,13 +4,13 @@
 
 ### Web
 
-To download a binary release artifact from the web-UI navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and then choose your desired release from the release list.
+To download a binary release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and then choose your desired release from the release list.
 
 ![valist-release-page](img/valist-release-page.png){width="600px"}
 
 ### SDK
 
-Binary artifacts can be downloaded using the **Valist-SDK**  by filling in a web3 provider and running the following code:
+Binary artifacts can be downloaded using the Valist SDK by filling in a web3 provider and running the following code:
 
 ```javascript
 const Valist = require('@valist/sdk');
@@ -20,6 +20,8 @@ const Valist = require('@valist/sdk');
   await valist.connect();
 
   const releases = await valist.getReleasesFromRepo('valist', 'sdk');
+
+  const latest = await valist.getLatestRelease('valist', 'sdk');
 
   console.log(releases);
 })();

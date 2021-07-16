@@ -18,5 +18,4 @@ The valist CLI leverages the [keytar library](https://www.npmjs.com/package/keyt
 
 ### Web
 
-In browser, the valist relay frontend interacts with `Meta-mask` for key management.
-
+In browser, the valist relay frontend interacts with `MetaMask` for key management.
