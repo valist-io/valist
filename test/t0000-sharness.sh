@@ -2,9 +2,7 @@
 
 test_description="Show basic features of Sharness"
 
-: "${SHARNESS_TEST_SRCDIR:=lib/sharness}"
-
-. "$SHARNESS_TEST_SRCDIR/sharness.sh"
+. "lib/test-lib.sh"
 
 test_expect_success "Success is reported like this" "
     echo hello world | grep hello
