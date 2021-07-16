@@ -5,28 +5,24 @@ import { ValistConfig } from '@valist/sdk/dist/types';
 import { defaultImages } from './config';
 import { npmPack } from './npm';
 
-export const buildRelease = async ({
-  image,
-  install,
-  build,
-  out,
-  type,
-}: ValistConfig): Promise<fs.ReadStream> => {
-  let releaseFile;
+export const buildRelease = async (config : ValistConfig): Promise<fs.ReadStream[]> => {
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const releaseFiles: fs.ReadStream[] = [];
 
   // Generate Dockerfile (uses current directory as source)
-  generateDockerfile(image || defaultImages[type], './', build, install);
+  generateDockerfile(config.image || defaultImages[config.type], './', config.build, config.install);
 
   await createBuild('valist-build-image');
-  await exportBuild('valist-build-image', out);
+  await exportBuild('valist-build-image', config.out);
 
   // if package type is npm run npm pack
-  if (type === 'node') {
+  if (config.type === 'node') {
     const packagePath = await npmPack();
-    releaseFile = fs.createReadStream(packagePath);
+    releaseFiles.push(fs.createReadStream(packagePath));
   } else {
-    releaseFile = fs.createReadStream(path.join(process.cwd(), out));
+    config.artifacts.forEach((artifact) => {
+      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), '/dist/', artifact)));
+    });
   }
-
-  return releaseFile;
+  return releaseFiles;
 };

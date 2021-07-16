@@ -178,9 +178,15 @@ class Valist {
     }
   }
 
-  async prepareRelease(tag: string, releaseFile: any, metaFile: any): Promise<Release> {
+  async prepareRelease(tag: string, releaseFiles: any, metaFile: any): Promise<Release> {
     try {
-      const releaseCID: string = await this.addFileToIPFS(releaseFile);
+      let releaseCID:string;
+      if (releaseFiles.length > 1) {
+        releaseCID = await this.addFolderToIPFS(releaseFiles);
+      } else {
+        releaseCID = await this.addFileToIPFS(releaseFiles[0]);
+      }
+
       const metaCID: string = await this.addFileToIPFS(metaFile);
       return { tag, releaseCID, metaCID };
     } catch (e) {
@@ -964,6 +970,31 @@ class Valist {
     try {
       const result = await this.ipfs.add(data, { onlyHash, cidVersion: 1 });
       return result.cid.string;
+    } catch (e) {
+      const msg = 'Could not add file to IPFS';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async addFolderToIPFS(files: any): Promise<string> {
+    try {
+      const results: string[] = [];
+      const filePaths: any[] = [];
+
+      files.forEach((file: any) => {
+        filePaths.push({
+          path: './',
+          content: file,
+        });
+      });
+
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const result of this.ipfs.addAll(files)) {
+        results.push(result);
+      }
+      // @ts-ignore
+      return results[results.length - 1].cid.string;
     } catch (e) {
       const msg = 'Could not add file to IPFS';
       console.error(msg, e);
