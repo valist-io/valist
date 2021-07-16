@@ -74,6 +74,9 @@ install-relay:
 
 install-frontend: install-lib install-relay
 
+install-docs:
+	pip install mkdocs mkdocs-material
+
 install-all: install-hardhat install-lib install-cli install-relay
 
 install: install-all
