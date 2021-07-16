@@ -47,7 +47,7 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
           versions[tag].name = cleanReleaseName;
           versions[tag].version = tag;
           versions[tag].dist = {
-            tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
+            tarball: `https://ipfs.io/ipfs/${releaseCID}`,
           };
         }
 
