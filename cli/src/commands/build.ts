@@ -13,8 +13,8 @@ export default class Build extends Command {
     // Get current config from valist.yml
     const config = parseValistConfig();
 
-    const releaseFile = await buildRelease(config);
-    this.log('🔨 Project built to path:', releaseFile);
+    const releaseFiles = await buildRelease(config);
+    this.log('🔨 Project built to path:', releaseFiles[releaseFiles.length - 1].path);
     this.exit(0);
   }
 }
