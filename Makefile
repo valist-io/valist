@@ -20,6 +20,10 @@ dev-lib:
 dev-relay:
 	cd relay && npm run dev
 
+# hot reload docs
+dev-docs:
+	mkdocs serve
+
 # runs both dev servers in parallel, piping output to same shell
 dev:
 	@make -j 2 dev-lib dev-relay

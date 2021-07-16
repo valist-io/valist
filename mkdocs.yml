@@ -1,4 +1,5 @@
 site_name: Valist Documentation
+site_url: https://docs.valist.io
 theme:
   name: material
   features:
