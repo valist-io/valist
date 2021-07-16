@@ -4,6 +4,8 @@ import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
 
+import path from 'path';
+
 import { provider, EventLog } from 'web3-core/types';
 
 import {
@@ -984,7 +986,7 @@ class Valist {
 
       files.forEach((file: any) => {
         filePaths.push({
-          path: './',
+          path: path.join(path.basename(file.path)),
           content: file,
         });
       });
