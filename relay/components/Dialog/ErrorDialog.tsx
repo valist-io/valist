@@ -1,5 +1,3 @@
-import { ValistSDKError } from 'valist/dist/errors';
-
 interface ErrorDialogProps {
   error: Error,
   close: () => void
@@ -20,10 +18,9 @@ export default function ErrorDialog(props: ErrorDialogProps): JSX.Element {
   const parseError = (err: Error) => {
     if (err.message.startsWith(RPC_ERROR)) {
       return parseRPCError(err.message.substring(RPC_ERROR.length));
-    } if (err instanceof ValistSDKError) {
-      return err.message;
     }
-    throw err;
+
+    return err.message;
   };
 
   return (
