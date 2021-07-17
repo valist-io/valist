@@ -20,6 +20,10 @@ dev-lib:
 dev-relay:
 	cd relay && npm run dev
 
+# hot reload docs
+dev-docs:
+	mkdocs serve
+
 # runs both dev servers in parallel, piping output to same shell
 dev:
 	@make -j 2 dev-lib dev-relay
@@ -67,6 +71,9 @@ install-relay:
 	cd relay && npm i
 
 install-frontend: install-lib install-relay
+
+install-docs:
+	pip install mkdocs mkdocs-material
 
 install-all: install-hardhat install-lib install-cli install-relay
 

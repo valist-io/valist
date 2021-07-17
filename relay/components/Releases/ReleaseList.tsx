@@ -9,7 +9,7 @@ interface ReleaseListProps {
 
 export default function ReleaseList(props: ReleaseListProps): JSX.Element {
   const example = `# Install the Valist CLI
-npm i -g @valist/cli --registry=https://app.valist.io/api/npm
+npm i -g @valist/cli --registry=https://valist.io/api/npm
 
 # Initialize your project
 valist init

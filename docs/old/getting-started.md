@@ -33,7 +33,7 @@ This will install the NPM release from an IPFS relay through the valist.io API.
 A basic implementation of the NPM registry API is available. You can use it by setting your registry to:
 
 ```bash
-npm config set registry https://app.valist.io/api/npm
+npm config set registry https://valist.io/api/npm
 ```
 
 Then, you can install your package by using the NPM `@organization`/`package` format:
