@@ -4,7 +4,7 @@
 
 ### CLI
 
-To publish a binary from the Valist-CLI create a new `valist.yml` within your project folder containing one of supported binary project types `binary` or `go`. Or run a `valist init` to generate a new `valist.yaml`.
+To publish a binary from the Valist CLI create a new `valist.yml` within your project folder containing one of supported binary project types `binary` or `go`. Or, run `valist init` to generate a new `valist.yaml`.
 
 ```yaml
 type: go
@@ -20,7 +20,7 @@ valist publish
 
 ### SDK
 
-To publish a binary from the **Valist-SDK** create and run the following javascript:
+To publish a binary from the Valist SDK, create and run the following javascript:
 
 ```javascript
   import Valist from '@valist/sdk';
@@ -49,13 +49,15 @@ To publish a binary from the **Valist-SDK** create and run the following javascr
 
 ### CLI
 
-To publish an NPM package from the Valist-CLI create a new `valist.yml` within your project with a project type of `node`. Or run a `valist init` to generate a new `valist.yaml`.
+To publish an NPM package from the Valist CLI create a new `valist.yml` within your project with a project type of `node`. Or run a `valist init` to generate a new `valist.yaml`.
 
 ```yaml
 type: node
-org: test
-repo: testProject
+org: playground
+repo: node-project
 tag: 0.0.1
+install: npm install
+build: npm run build
 out: dist
 ```
 
@@ -65,7 +67,7 @@ valist publish
 
 ### SDK
 
-To publish a binary from the Valist-SDK create and run the following javascript:
+To publish a binary from the Valist SDK create and run the following javascript:
 
 ```javascript
   import Valist from '@valist/sdk';
@@ -89,7 +91,7 @@ To publish a binary from the Valist-SDK create and run the following javascript:
     console.log(transactionHash);
   })();
 ```
-
+<!--
 ## Python Packages
 
 ### CLI
@@ -178,4 +180,4 @@ To publish a binary from the Valist-SDK create and run the following javascript:
 
     console.log(transactionHash);
   })();
-```
+``` -->

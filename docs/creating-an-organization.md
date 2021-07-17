@@ -1,6 +1,6 @@
 # Creating an Organization
 
-Creating an organization is the first step to publishing software on valist! Organizations are how users are able to manage their various software repositories and admin credentials on valist. Each organization receives a unique `valist-ID` which is then linked to a namespace that is governed by the members (keys) of the organization.
+Creating an organization is the first step to publishing software on Valist! Organizations are how users are able to manage their various software repositories and admin credentials on Valist. Each organization receives a unique `valist-ID` which is then linked to a namespace that is governed by the members (keys) of the organization.
 
 ## CLI
 
@@ -12,7 +12,7 @@ To create an organization from the CLI it's as simple as running `valist org:new
 
 ## Web
 
-To create a new organization from the web interface navigate to the [valist dashboard](https://app.valist.io) and login.
+To create a new organization from the web interface navigate to the [Valist dashboard](https://app.valist.io) and login.
 
 Upon successful login, you will be greeted by the following welcome message displaying your current address and a new button, `Create Organization`.
 

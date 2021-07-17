@@ -14,7 +14,7 @@ valist repo:new orgName repoName
 
 To create a new repository from the web interface navigate to the [Valist dashboard](https://app.valist.io) and login.
 
-Next from your dashboard, select the organization that you would like to create a repository under.
+Next, from your dashboard, select the organization that you would like to create a repository under.
 
 ![select-repository](img/valist-select-org.png){ width=600px }
 
@@ -22,7 +22,7 @@ On the repository page, click `Create Project`.
 
 ![create-repository-button](img/valist-create-project-button.png){ width=600px }
 
-Fill out your repositories `Shortname`, `Type`, and `Description` and click `Create Project`. Keep in mind if you are logged in with `MetaMask` you will be prompted for a signature confirmation.
+Fill out your repositories `Shortname`, `Type`, and `Description` and click `Create Project`. Keep in mind if you are logged in with `MetaMask`, you will be prompted for a signature confirmation.
 
 ![create-repository-form](img/valist-create-repo-form.png){ width=600px }
 

@@ -4,7 +4,7 @@
 
 ### Organization Admin
 
-An organization admin is the default role for managing an organization on valist. They are responsible for adding new developers to a repository as well as keeping the repository metadata up to date.
+An organization admin is the default role for managing an organization on Valist. They are responsible for adding new developers to a repository as well as keeping the repository metadata up to date.
 
 ### Repository Developer
 
@@ -14,8 +14,8 @@ A repository developer is the default role for managing the releases under a rep
 
 ### CLI
 
-The valist CLI leverages the [keytar library](https://www.npmjs.com/package/keytar) for secure storage of keys in the devices keystore.
+The Valist CLI leverages the [keytar](https://www.npmjs.com/package/keytar) library for secure, cross-platform storage of keys in the device's keystore.
 
 ### Web
 
-In browser, the valist relay frontend interacts with `MetaMask` for key management.
+In browser, the Valist relay frontend interacts with `MetaMask`, `WalletConnect` and/or `Magic` for key management.

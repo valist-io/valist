@@ -4,17 +4,17 @@ One of the coolest features of Valist is that there is a multi-factor system for
 
 ## How it works
 
-You may have heard of the [two man rule](https://en.wikipedia.org/wiki/Two-man_rule) an authentication mechanism designed to prevent accidental or malicious launch of nuclear weapons by a single individual. This mechanism requires the presence of two authorized individuals, **with special keys**, to perform a nuclear strike. Valist applies this same concept to software distribution. When enabled multi-party verification requires operations be verified and digitally signed by multiple members within your organization before being finalized.
+You may have heard of the [two man rule](https://en.wikipedia.org/wiki/Two-man_rule) -- an authentication mechanism designed to prevent accidental or malicious launch of nuclear weapons by a single individual. This mechanism requires the presence of two authorized individuals, **with special keys**, to perform a nuclear strike. Valist applies this same concept to software distribution. When enabled multi-party verification requires operations be verified and digitally signed by multiple members within your organization before being finalized.
 
 ![two-man-rule](img/two-man-rule.jpeg)
 
 ## Organization vs Repo Level
 
-On the **organization** level organization admins are able to vote on:
+On the **organization** level, organization admins are able to vote on:
 
-* Adding new organization admins to the organization
+* Adding new organization admins to the organization.
 
-On the **repository** level members are able to vote on:
+On the **repository** level, members are able to vote on:
 
 * Approving a new repository threshold for votes.
 
@@ -58,7 +58,7 @@ On the organization edit page, you can then scroll to the `Multi-factor` section
 
 #### Repository Level Threshold
 
-Using the web dashboard a `Repo developer`, is able to click one of their `repositories` and propose a new threshold by clicking the `Edit Project` button on the repository's profile page.
+Using the web dashboard, a `Repo Developer` is able to click one of their `repositories` and propose a new threshold by clicking the `Edit Project` button on the repository's profile page.
 
 ![valist-org-edit-button](img/valist-repo-edit-button.png){ width=600px }
 
@@ -68,7 +68,7 @@ On the repository edit page, you can then scroll to the `Multi-factor` section w
 
 ## Voting on Access Control & Releases
 
-After a repository or organization's threshold it set to a number greater then **1** all operations will require the target number of votes before they are finalized. Operations pending approval can be found in the `Web Interface` by navigating to the corresponding `edit` page for a repository or organization and scrolling the `Multi-factor Votes` section.
+After a repository or organization's threshold it set to a number greater than **1**, all operations will require the target number of votes before they are finalized. Operations pending approval can be found in the `Web Interface` by navigating to the corresponding `edit` page for a repository or organization and scrolling the `Multi-factor Votes` section.
 
 ![multi-factor-votes](img/valist-multi-factor-votes.png)
 
