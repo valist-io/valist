@@ -14,7 +14,7 @@ export default class Build extends Command {
     const config = parseValistConfig();
 
     const releaseFile = await buildRelease(config);
-    this.log('🔨 Project built to path:', releaseFile);
+    this.log('🔨 Project built to path:', releaseFile.path);
     this.exit(0);
   }
 }

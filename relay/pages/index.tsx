@@ -17,7 +17,7 @@ export default function Dashboard() {
   const getData = async () => {
     try {
       setLoading(true);
-      setOrgNames(await valist.getOrganizationNames());
+      setOrgNames(await valist.getOrganizationNames(1, 100));
     } catch (e) {
       setError(e);
     } finally {

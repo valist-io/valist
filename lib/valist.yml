@@ -1,5 +1,7 @@
-type: npm
+type: node
 org: valist
-project: sdk
+repo: sdk
 tag: 0.3.5
-meta: README.md
+install: npm install
+build: npm run build
+out: dist
