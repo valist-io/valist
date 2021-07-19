@@ -36,7 +36,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
     valist.getPendingRepoDevs(orgName, repoName).then(setPendingKeys),
     valist.getPendingRepoThresholds(orgName, repoName).then(setPendingThresholds),
     valist.getPendingReleases(orgName, repoName).then(setPendingReleases),
-    valist.getLatestRelease(orgName, repoName).then(setLatestRelease),
+    valist.getLatestRelease(orgName, repoName).catch(console.log).then(setLatestRelease),
   ]);
 
   const getRepoData = async () => {
