@@ -1,7 +1,7 @@
 type: node
-org: test4
+org: valist
 repo: cli
-tag: 0.0.1
+tag: 0.4.0
 install: npm install
 build: npm run prepack
 out: dist
