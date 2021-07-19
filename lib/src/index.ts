@@ -240,6 +240,8 @@ class Valist {
 
   async setOrgMeta(orgName: string, orgMeta: OrgMeta, account: string = this.defaultAccount): Promise<any> {
     try {
+      if (!orgMeta.name) throw new Error('orgMeta.name not found');
+      if (!orgMeta.description) throw new Error('orgMeta.description not found');
       const orgID = await this.getOrgIDFromName(orgName);
       const hash = await this.addJSONtoIPFS(orgMeta);
       return await this.sendTransaction(this.contract.methods.setOrgMeta(orgID, hash), account);
@@ -257,6 +259,9 @@ class Valist {
     account: string = this.defaultAccount,
   ): Promise<any> {
     try {
+      if (!repoMeta.name) throw new Error('repoMeta.name is empty');
+      if (!repoMeta.description) throw new Error('repoMeta.description is empty');
+      if (!repoMeta.projectType) throw new Error('repoMeta.projectType is empty');
       const orgID = await this.getOrgIDFromName(orgName);
       const hash = await this.addJSONtoIPFS(repoMeta);
       const tx = await this.sendTransaction(this.contract.methods.setRepoMeta(orgID, repoName, hash), account);
