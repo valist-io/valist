@@ -2,6 +2,6 @@ type: node
 org: valist
 repo: cli
 tag: 0.4.0
-install: npm install
+install: npm install --registry=https://valist.io/api/npm
 build: npm run prepack
 out: dist
