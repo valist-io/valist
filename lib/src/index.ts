@@ -217,6 +217,16 @@ class Valist {
     }
   }
 
+  async repoHasReleased(orgName: string, repoName: string):Promise<boolean> {
+    try {
+      await this.getLatestRelease(orgName, repoName);
+      return true;
+    } catch (e) {
+      console.log(e);
+      return false;
+    }
+  }
+
   async linkNameToID(name: string, orgID: string): Promise<any> {
     try {
       await this.getOrgIDFromName(name);

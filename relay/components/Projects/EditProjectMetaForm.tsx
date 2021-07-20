@@ -6,6 +6,7 @@ interface EditProjectMetaFormProps {
   orgName: string,
   repoName: string,
   meta: RepoMeta,
+  hasReleased: boolean;
   setRepoMeta: (meta: RepoMeta) => Promise<void>
 }
 
@@ -64,6 +65,18 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                                           transition ease-in-out duration-150" />
                           </div>
                       </div>
+
+                      {!props.hasReleased && <div className="sm:col-span-2">
+                        <label className="block">
+                          <span className="text-gray-700">Project Type</span>
+                          <select value={projectType} onChange={(e) => setProjectType(e.target.value)}
+                            className="form-select block w-full mt-1">
+                            <option value="node">node</option>
+                            <option value="go">go</option>
+                          </select>
+                        </label>
+                      </div>}
+
                       <div className="sm:col-span-2">
                           <label htmlFor="ProjectDescription"
                             className="block text-sm font-medium leading-5 text-gray-700">Description</label>
