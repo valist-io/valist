@@ -5,12 +5,15 @@
   "scripts": {
     "compile": "hardhat compile",
     "test": "hardhat test",
+    "blockchain": "hardhat node",
+    "deploy:local": "hardhat run scripts/deploy.ts --network local",
     "deploy:mumbai": "hardhat run scripts/deploy.ts --network mumbai"
   },
   "author": "Valist, Inc.",
   "contributors": [
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
-    "Zachary J. Pelkey <zach@valist.io> (valist.io)"
+    "Zachary J. Pelkey <zach@valist.io> (valist.io)",
+    "Keenan Nemetz <keenan@valist.io> (valist.io)"
   ],
   "license": "MPL-2.0",
   "devDependencies": {

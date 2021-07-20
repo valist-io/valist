@@ -30,7 +30,7 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
         const versions: any = {};
 
         // eslint-disable-next-line no-plusplus
-        for (let i = 0; i < releases.length; i++) {
+        for (let i = 0; i < releases.length; ++i) {
           const { tag, metaCID, releaseCID } = releases[i];
           versions[tag] = {};
           try {
@@ -47,7 +47,7 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
           versions[tag].name = cleanReleaseName;
           versions[tag].version = tag;
           versions[tag].dist = {
-            tarball: `https://gateway.valist.io/ipfs/${releaseCID}`,
+            tarball: `https://ipfs.io/ipfs/${releaseCID}`,
           };
         }
 
@@ -59,14 +59,17 @@ const getReleasesFromRepo = async (req: NextApiRequest, res: NextApiResponse) =>
           },
           versions,
         });
+        return;
       }
     } catch (e) {
-      console.error('Could not find', cleanReleaseName, 'on Valist', e);
+      if (!e.message.toString().includes('orgID not found')) {
+        console.error('Could not find', cleanReleaseName, 'on Valist', e);
+      }
     }
-  } else {
-    console.log(`Fetching Package ${cleanReleaseName} from https://registry.npmjs.org`);
-    res.redirect(`https://registry.npmjs.org/${cleanReleaseName}`);
   }
+
+  console.log(`Fetching Package ${cleanReleaseName} from https://registry.npmjs.org`);
+  res.redirect(`https://registry.npmjs.org/${cleanReleaseName}`);
 };
 
 export default withSentry(getReleasesFromRepo);

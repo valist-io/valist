@@ -1,14 +1,14 @@
-import { task } from "hardhat/config";
-import "@nomiclabs/hardhat-waffle";
-import "hardhat-gas-reporter";
-import "hardhat-contract-sizer";
+import { task } from 'hardhat/config';
+import '@nomiclabs/hardhat-waffle';
+import 'hardhat-gas-reporter';
+import 'hardhat-contract-sizer';
 
 const fs = require('fs');
-const deployKey = fs.readFileSync(".secret").toString().trim();
+const deployKey = fs.readFileSync('.secret').toString().trim();
 
 // This is a sample Hardhat task. To learn how to create your own go to
 // https://hardhat.org/guides/create-task.html
-task("accounts", "Prints the list of accounts", async (args, hre) => {
+task('accounts', 'Prints the list of accounts', async (args, hre) => {
   const accounts = await hre.ethers.getSigners();
 
   for (const account of accounts) {
@@ -21,7 +21,7 @@ task("accounts", "Prints the list of accounts", async (args, hre) => {
  */
 module.exports = {
   solidity: {
-    version: "0.8.4",
+    version: '0.8.4',
     settings: {
       optimizer: {
         enabled: true,
@@ -33,6 +33,9 @@ module.exports = {
     artifacts: '../lib/src/abis'
   },
   networks: {
+    local: {
+      url: 'http://localhost:8545'
+    },
     mumbai: {
       url: 'https://rpc-mumbai.maticvigil.com',
       accounts: [`0x${deployKey}`]

@@ -35,6 +35,8 @@ import {
   getValistRegistry,
 } from './utils';
 
+import { ValistSDKError } from './errors';
+
 // node-fetch polyfill
 // eslint-disable-next-line @typescript-eslint/no-var-requires
 const fetch = require('node-fetch');
@@ -100,7 +102,7 @@ class Valist {
     try {
       this.contract = await getValistContract(this.web3, this.chainID, this.contractAddress);
       this.contractAddress = this.contract._address;
-      if (!this.contractAddress) throw new Error('Could not get Valist contract address');
+      if (!this.contractAddress) throw new ValistSDKError('Could not get Valist contract address');
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -110,7 +112,7 @@ class Valist {
     try {
       this.registry = await getValistRegistry(this.web3, this.chainID, this.registryAddress);
       this.registryAddress = this.registry._address;
-      if (!this.registryAddress) throw new Error('Could not get Valist registry address');
+      if (!this.registryAddress) throw new ValistSDKError('Could not get Valist registry address');
     } catch (e) {
       const msg = 'Could not connect to Valist registry contract';
       console.error(msg, e);
@@ -132,7 +134,7 @@ class Valist {
   async createOrganization(orgName: string, orgMeta: OrgMeta): Promise<any> {
     try {
       await this.getOrgIDFromName(orgName);
-      throw new Error('Namespace already taken, please choose another name');
+      throw new ValistSDKError('Namespace already taken, please choose another name');
     } catch (e) {
       if (e.message !== 'orgID not found') {
         throw e;
@@ -146,7 +148,7 @@ class Valist {
         // eslint-disable-next-line prefer-destructuring
         orgID = this.metaTxEnabled ? tx.logs[0].topics[1] : tx.events.OrgCreated.returnValues._orgID;
       } catch (e) {
-        throw new Error('Could not parse new orgID from transaction');
+        throw new ValistSDKError('Could not parse new orgID from transaction');
       }
       return { ...tx, orgID };
     } catch (e) {
@@ -207,7 +209,7 @@ class Valist {
     try {
       const orgID = await this.getOrgIDFromName(orgName);
       const isRepoDev = await this.isRepoDev(orgName, repoName, account);
-      if (!isRepoDev) throw new Error('User does not have permission to publish release');
+      if (!isRepoDev) throw new ValistSDKError('User does not have permission to publish release');
 
       const tx = await this.sendTransaction(
         this.contract.methods.voteRelease(
@@ -226,7 +228,7 @@ class Valist {
   async linkNameToID(name: string, orgID: string): Promise<any> {
     try {
       await this.getOrgIDFromName(name);
-      throw new Error('Namespace already taken, please choose another name');
+      throw new ValistSDKError('Namespace already taken, please choose another name');
     } catch (e) {
       if (e.message !== 'orgID not found') {
         throw e;
@@ -281,7 +283,7 @@ class Valist {
     }
     if (this.cache.orgIDs[name] === '0x0000000000000000000000000000000000000000000000000000000000000000') {
       this.cache.orgIDs[name] = '';
-      throw new Error('orgID not found');
+      throw new ValistSDKError('orgID not found');
     }
     return this.cache.orgIDs[name];
   }
@@ -680,7 +682,7 @@ class Valist {
 
   async getPendingOrgAdminVotes(orgName: string, operation: string, address: string): Promise<PendingVote> {
     if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
-      throw new Error(`Invalid key operation ${operation}`);
+      throw new ValistSDKError(`Invalid key operation ${operation}`);
     }
     try {
       const orgID = await this.getOrgIDFromName(orgName);
@@ -735,7 +737,7 @@ class Valist {
     address: string,
   ): Promise<PendingVote> {
     if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
-      throw new Error(`Invalid key operation ${operation}`);
+      throw new ValistSDKError(`Invalid key operation ${operation}`);
     }
     try {
       const orgID = await this.getOrgIDFromName(orgName);
@@ -851,7 +853,7 @@ class Valist {
 
   async clearPendingOrgKey(orgName: string, operation: string, key: string, index: number): Promise<any> {
     if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
-      throw new Error(`Invalid key operation ${operation}`);
+      throw new ValistSDKError(`Invalid key operation ${operation}`);
     }
     try {
       const orgID = await this.getOrgIDFromName(orgName);
@@ -875,7 +877,7 @@ class Valist {
     index: number,
   ): Promise<any> {
     if (![ADD_KEY, REVOKE_KEY].includes(operation)) {
-      throw new Error(`Invalid key operation ${operation}`);
+      throw new ValistSDKError(`Invalid key operation ${operation}`);
     }
     try {
       const orgID = await this.getOrgIDFromName(orgName);

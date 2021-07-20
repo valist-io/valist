@@ -18,8 +18,8 @@ export default class ValistInit extends Command {
   ];
 
   async run(): Promise<void> {
-    const orgName = await cli.prompt('organization name');
-    const repoName = await cli.prompt('repository name');
+    const orgName = await cli.prompt('orgName or username');
+    const repoName = await cli.prompt('repoName');
 
     let projectType: ProjectType = await cli.prompt('repository type (binary)');
     while (!supportedTypes.includes(projectType)) {

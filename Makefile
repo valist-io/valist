@@ -20,6 +20,10 @@ dev-lib:
 dev-relay:
 	cd relay && npm run dev
 
+# hot reload docs
+dev-docs:
+	mkdocs serve
+
 # runs both dev servers in parallel, piping output to same shell
 dev:
 	@make -j 2 dev-lib dev-relay
@@ -39,19 +43,13 @@ static: frontend
 contracts:
 	cd hardhat && npm run compile
 
-# migrates/deploys Solidity contracts via Truffle
-migrate:
-	cd hardhat && npm run migrate
+# deploys Solidity contracts via Hardhat
+deploy-%:
+	cd hardhat && npm run deploy:$*
 
-deploy: migrate
-
-# launches truffle console
-console:
-	cd hardhat && npm run console
-
-# runs local ganache cli
+# runs local hardhat chain
 blockchain:
-	cd hardhat && npm run develop
+	cd hardhat && npm run blockchain
 
 # build all artifacts
 all: contracts lib relay
@@ -73,6 +71,9 @@ install-relay:
 	cd relay && npm i
 
 install-frontend: install-lib install-relay
+
+install-docs:
+	pip install mkdocs mkdocs-material
 
 install-all: install-hardhat install-lib install-cli install-relay
 
