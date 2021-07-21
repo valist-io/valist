@@ -13,7 +13,7 @@ $ npm install -g valist-cli
 $ valist COMMAND
 running command...
 $ valist (-v|--version|version)
-valist-cli/0.4.0 darwin-x64 node-v14.17.2
+valist-cli/0.4.1 darwin-x64 node-v14.17.2
 $ valist --help [COMMAND]
 USAGE
   $ valist COMMAND
@@ -49,7 +49,7 @@ EXAMPLE
   $ valist account:get
 ```
 
-_See code: [dist/commands/account/get.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/account/get.ts)_
+_See code: [dist/commands/account/get.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/account/get.ts)_
 
 ## `valist account:new`
 
@@ -63,7 +63,7 @@ EXAMPLE
   $ valist account:new
 ```
 
-_See code: [dist/commands/account/new.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/account/new.ts)_
+_See code: [dist/commands/account/new.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/account/new.ts)_
 
 ## `valist build`
 
@@ -77,7 +77,7 @@ EXAMPLE
   $ valist build
 ```
 
-_See code: [dist/commands/build.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/build.ts)_
+_See code: [dist/commands/build.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/build.ts)_
 
 ## `valist help [COMMAND]`
 
@@ -108,7 +108,7 @@ EXAMPLE
   $ valist init
 ```
 
-_See code: [dist/commands/init.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/init.ts)_
+_See code: [dist/commands/init.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/init.ts)_
 
 ## `valist org:get ORGNAME`
 
@@ -122,7 +122,7 @@ EXAMPLE
   $ valist org:get valist
 ```
 
-_See code: [dist/commands/org/get.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/org/get.ts)_
+_See code: [dist/commands/org/get.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/org/get.ts)_
 
 ## `valist org:key ORGNAME OPERATION KEY`
 
@@ -138,7 +138,7 @@ EXAMPLES
   $ valist org:key exampleOrg rotate <key>
 ```
 
-_See code: [dist/commands/org/key.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/org/key.ts)_
+_See code: [dist/commands/org/key.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/org/key.ts)_
 
 ## `valist org:new ORGNAME`
 
@@ -152,7 +152,7 @@ EXAMPLE
   $ valist org:new exampleOrg
 ```
 
-_See code: [dist/commands/org/new.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/org/new.ts)_
+_See code: [dist/commands/org/new.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/org/new.ts)_
 
 ## `valist org:update ORGNAME ORGMETA`
 
@@ -166,7 +166,7 @@ EXAMPLE
   $ valist org:update exampleOrg meta/orgMeta.json
 ```
 
-_See code: [dist/commands/org/update.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/org/update.ts)_
+_See code: [dist/commands/org/update.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/org/update.ts)_
 
 ## `valist publish`
 
@@ -180,7 +180,7 @@ EXAMPLE
   $ valist publish
 ```
 
-_See code: [dist/commands/publish.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/publish.ts)_
+_See code: [dist/commands/publish.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/publish.ts)_
 
 ## `valist repo:get ORGNAME REPONAME`
 
@@ -194,7 +194,7 @@ EXAMPLE
   $ valist repo:get exampleOrg exampleRepo
 ```
 
-_See code: [dist/commands/repo/get.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/repo/get.ts)_
+_See code: [dist/commands/repo/get.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/repo/get.ts)_
 
 ## `valist repo:key ORGNAME REPONAME OPERATION KEY`
 
@@ -210,7 +210,7 @@ EXAMPLES
   $ valist repo:key exampleOrg exampleRepo rotate <key>
 ```
 
-_See code: [dist/commands/repo/key.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/repo/key.ts)_
+_See code: [dist/commands/repo/key.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/repo/key.ts)_
 
 ## `valist repo:new ORGNAME REPONAME`
 
@@ -224,7 +224,7 @@ EXAMPLE
   $ valist repo:new exampleOrg exampleRepo
 ```
 
-_See code: [dist/commands/repo/new.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/repo/new.ts)_
+_See code: [dist/commands/repo/new.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/repo/new.ts)_
 
 ## `valist repo:update ORGNAME REPONAME REPOMETA`
 
@@ -238,5 +238,5 @@ EXAMPLE
   $ valist repo:update exampleOrg exampleRepo meta/repoMeta.json
 ```
 
-_See code: [dist/commands/repo/update.ts](https://github.com/valist-io/valist/blob/v0.4.0/dist/commands/repo/update.ts)_
+_See code: [dist/commands/repo/update.ts](https://github.com/valist-io/valist/blob/v0.4.1/dist/commands/repo/update.ts)_
 <!-- commandsstop -->
