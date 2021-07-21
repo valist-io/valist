@@ -70,7 +70,7 @@ export type PackageJson = {
   version: string
 };
 
-export const parsePackageJson = ():PackageJson => {
+export const parsePackageJson = (): PackageJson => {
   const { name, version } = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8'));
   const packageJSON: PackageJson = {
     name,
