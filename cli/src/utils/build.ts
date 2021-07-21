@@ -32,7 +32,6 @@ export const buildRelease = async ({
     fs.unlinkSync('Dockerfile.reproducible.dockerignore');
   }
 
-  // if package type is npm run npm pack
   const releaseFile = fs.createReadStream(path.join(process.cwd(), outArtifact));
 
   return releaseFile;
