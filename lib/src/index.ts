@@ -18,6 +18,7 @@ import {
   RepoMeta,
   Repository,
   ValistCache,
+  ValistConfig,
 } from './types';
 
 import {
@@ -182,16 +183,56 @@ class Valist {
     }
   }
 
-  async prepareRelease(tag: string, releaseFiles: any, metaFile: any): Promise<Release> {
+  createDistJSON(config: any, cids: string[]):any {
+    console.log(this.gatewayHost);
+    const date = (new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+    const distJson: Record <string, any> = {
+      id: config.repo,
+      version: config.tag,
+      name: config.repo,
+      date,
+      platforms: {
+      },
+    };
+
+    let cidIndex = 0;
+    // eslint-disable-next-line no-restricted-syntax
+    for (const artifactPlatform of Object.values(config.artifacts)) {
+      distJson.platforms[(artifactPlatform as string)] = cids[cidIndex];
+      cidIndex++;
+    }
+
+    // for (let cidIndex = 0; cidIndex > config.artifacts.length; cidIndex) {
+    //   distJson.platforms[config.artifacts[cidIndex]].cid = cids[cidIndex];
+    // }
+    return JSON.stringify(distJson);
+  }
+
+  async prepareRelease(config: ValistConfig, releaseFiles: any, metaFile: any): Promise<Release> {
     try {
       let releaseCID:string;
+      const artifactCIDS:any[] = [];
+      const releaseFilesWithDist = releaseFiles;
+
       if (releaseFiles.length > 1) {
-        releaseCID = await this.addFolderToIPFS(releaseFiles);
+        for (let i = 0; i < releaseFiles.length; i++) {
+          // eslint-disable-next-line no-await-in-loop
+          const { cid } = await this.ipfs.add(releaseFiles[i], { onlyHash: true, cidVersion: 1 });
+          artifactCIDS.push(cid.toString());
+        }
+
+        releaseFilesWithDist.push({
+          data: this.createDistJSON(config, artifactCIDS),
+          path: 'dist.json',
+        });
+
+        releaseCID = await this.addFolderToIPFS(releaseFilesWithDist, config.tag);
       } else {
         releaseCID = await this.addFileToIPFS(releaseFiles[0]);
       }
 
       const metaCID: string = await this.addFileToIPFS(metaFile);
+      const { tag } = config;
       return { tag, releaseCID, metaCID };
     } catch (e) {
       const msg = 'Could not publish release';
@@ -981,24 +1022,32 @@ class Valist {
     }
   }
 
-  async addFolderToIPFS(files: any): Promise<string> {
+  async addFolderToIPFS(files: any[], folder?: string): Promise<string> {
     try {
-      const results: string[] = [];
+      const cids: string[] = [];
       const filePaths: any[] = [];
 
-      files.forEach((file: any) => {
+      for (let i = 0; i < files.length; i++) {
+        let fileData = files[i];
+
+        // check if data is in-memory object
+        if (!files[i].bytesRead && files[i].data) {
+          fileData = files[i].data;
+        }
+
+        // @TODO Add check for if browser path
         filePaths.push({
-          path: path.join(path.basename(file.path)),
-          content: file,
+          path: path.join(`${folder}`, path.basename(files[i].path)),
+          content: fileData,
         });
-      });
+      }
 
       // eslint-disable-next-line no-restricted-syntax
-      for await (const result of this.ipfs.addAll(files)) {
-        results.push(result);
+      for await (const result of this.ipfs.addAll(filePaths)) {
+        cids.push(result.cid.toString());
       }
-      // @ts-ignore
-      return results[results.length - 1].cid.string;
+
+      return cids[cids.length - 1];
     } catch (e) {
       const msg = 'Could not add file to IPFS';
       console.error(msg, e);

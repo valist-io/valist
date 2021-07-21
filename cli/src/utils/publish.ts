@@ -40,12 +40,13 @@ export const publish = async (): Promise<void> => {
   // } else {
   // Call buildRelease with project type (npm, binary, etc) to return artifact path
   const releaseFiles = await buildRelease(config);
+  console.log('files', releaseFiles[0].path);
   // }
 
   const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
 
   console.log('🪐 Preparing release on IPFS...');
-  const releaseObject = await valist.prepareRelease(tag, releaseFiles, metaFile);
+  const releaseObject = await valist.prepareRelease(config, releaseFiles, metaFile);
   console.log('📦 Release Object:', releaseObject);
 
   // cleanup generated tarball/build artifact
@@ -53,21 +54,21 @@ export const publish = async (): Promise<void> => {
     fs.unlinkSync(releaseFiles[0].path);
   }
 
-  try {
-    console.log('⚡️ Publishing Release to Valist...');
-    const { threshold } = await valist.getRepository(org, repo);
-    const { transactionHash } = await valist.publishRelease(org, repo, releaseObject);
-    const { signers } = await valist.getPendingReleaseVotes(org, repo, releaseObject);
+  // try {
+  //   console.log('⚡️ Publishing Release to Valist...');
+  //   const { threshold } = await valist.getRepository(org, repo);
+  //   const { transactionHash } = await valist.publishRelease(org, repo, releaseObject);
+  //   const { signers } = await valist.getPendingReleaseVotes(org, repo, releaseObject);
 
-    if (signers.length < threshold) {
-      console.log(`🗳 Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
-    } else {
-      console.log(`✅ Approved release ${org}/${repo}/${tag}!`);
-    }
+  //   if (signers.length < threshold) {
+  //     console.log(`🗳 Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
+  //   } else {
+  //     console.log(`✅ Approved release ${org}/${repo}/${tag}!`);
+  //   }
 
-    console.log('📖 IPFS address of release:', `ipfs://${releaseObject.releaseCID}`);
-    console.log('🔗 Transaction Hash:', transactionHash);
-  } catch (e) {
-    // noop, error already handled/logged within, move on to cleanup
-  }
+  //   console.log('📖 IPFS address of release:', `ipfs://${releaseObject.releaseCID}`);
+  //   console.log('🔗 Transaction Hash:', transactionHash);
+  // } catch (e) {
+  //   // noop, error already handled/logged within, move on to cleanup
+  // }
 };
