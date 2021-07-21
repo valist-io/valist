@@ -1,7 +1,7 @@
 type: node
 org: valist
 repo: cli
-tag: 0.4.0
-install: npm install --registry=https://valist.io/api/npm
-build: npm run prepack
+tag: 0.4.1-rc.0
+install: apt update && apt install libsecret-1-0 -yy && npm install --registry=https://valist.io/api/npm
+build: npm run build
 out: dist

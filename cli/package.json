@@ -1,7 +1,7 @@
 {
   "name": "valist-cli",
   "description": "Valist CLI",
-  "version": "0.4.0",
+  "version": "0.4.1",
   "author": "Valist, Inc.",
   "contributors": [
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
