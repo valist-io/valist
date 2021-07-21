@@ -46,7 +46,7 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf dist && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "build": "rm -rf dist && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md",
     "lint": "eslint . --ext .ts",
@@ -62,7 +62,7 @@
     "cli-ux": "^5.6.3",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
-    "reproducible": "0.0.5"
+    "reproducible": "^0.0.6"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
