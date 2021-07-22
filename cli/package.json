@@ -62,7 +62,7 @@
     "cli-ux": "^5.6.3",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
-    "reproducible": "^0.0.7"
+    "reproducible": "^0.0.8"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",
