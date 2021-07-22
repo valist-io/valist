@@ -14,7 +14,7 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
   const [homepage, setHomepage] = useState('');
   const [repository, setRepository] = useState('');
   const [description, setDescription] = useState('');
-  const [projectType, setProjectType] = useState<ProjectType>();
+  const [projectType, setProjectType] = useState<ProjectType>(props.meta.projectType);
   const isOrgAdmin = useOrgAdmin(props.orgName);
 
   const submit = () => {
@@ -69,10 +69,16 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
                       {!props.hasReleased && <div className="sm:col-span-2">
                         <label className="block">
                           <span className="text-gray-700">Project Type</span>
-                          <select value={projectType} onChange={(e) => setProjectType(e.target.value)}
+                          <select value={projectType} onChange={(e) => setProjectType(e.target.value as ProjectType)}
                             className="form-select block w-full mt-1">
-                            <option value="node">node</option>
-                            <option value="go">go</option>
+                            <option value="binary">Binary</option>
+                            <option value="go">Go</option>
+                            <option value="rust">Rust</option>
+                            <option value="c++">C++</option>
+                            <option value="node">NodeJS</option>
+                            <option value="python">Python</option>
+                            <option value="docker">Docker</option>
+                            <option value="static">Static</option>
                           </select>
                         </label>
                       </div>}
