@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"io"
 	"math/big"
 	"net/http"
 
@@ -26,7 +25,7 @@ type Server struct {
 	http   *http.Server
 }
 
-func NewServer(client *core.Client) *Server {
+func NewServer(client *core.Client, addr string) *Server {
 	server := &Server{
 		client: client,
 	}
@@ -48,7 +47,7 @@ func NewServer(client *core.Client) *Server {
 		Methods(http.MethodGet)
 
 	server.http = &http.Server{
-		Addr:    ":3000",
+		Addr:    addr,
 		Handler: router,
 	}
 
@@ -100,19 +99,14 @@ func (server *Server) ListReleases(w http.ResponseWriter, req *http.Request) err
 	}
 
 	var releases []*core.Release
+
 	iter := server.client.ListReleases(vars["org"], vars["repo"], big.NewInt(page), big.NewInt(limit))
-
-	for {
-		release, err := iter.Next(ctx)
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			return err
-		}
-
+	err0 := iter.ForEach(ctx, func(release *core.Release) {
 		releases = append(releases, release)
+	})
+
+	if err0 != nil {
+		return err
 	}
 
 	w.Header().Add("Content-Type", "application/json")

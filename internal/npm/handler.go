@@ -3,7 +3,6 @@ package npm
 import (
 	"encoding/json"
 	"fmt"
-	"io"
 	"log"
 	"math/big"
 	"net/http"
@@ -46,17 +45,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	pack.Name = req.URL.Path
 
 	iter := h.client.ListReleases(orgName, repoName, big.NewInt(1), big.NewInt(10))
-	for {
-		release, err := iter.Next(req.Context())
-		if err == io.EOF {
-			break
-		}
-
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-			return
-		}
-
+	err0 := iter.ForEach(req.Context(), func(release *core.Release) {
 		data, err := h.client.GetReleaseMeta(req.Context(), release.MetaCID)
 		if err != nil {
 			log.Printf("Failed to get release meta: %v\n", err)
@@ -76,6 +65,11 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 
 		pack.Versions[release.Tag] = version
 		pack.DistTags["latest"] = release.Tag
+	})
+
+	if err0 != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Add("Content-Type", "application/json")
