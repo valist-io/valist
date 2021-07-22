@@ -222,7 +222,6 @@ class Valist {
       await this.getLatestRelease(orgName, repoName);
       return true;
     } catch (e) {
-      console.log(e);
       return false;
     }
   }
