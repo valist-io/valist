@@ -1,7 +1,7 @@
 {
   "name": "valist-cli",
   "description": "Valist CLI",
-  "version": "0.0.4",
+  "version": "0.4.1",
   "author": "Valist, Inc.",
   "contributors": [
     "Alec M. Wantoch <alec@valist.io> (valist.io)",
@@ -46,7 +46,7 @@
   "scripts": {
     "postpack": "rm -f oclif.manifest.json",
     "posttest": "eslint . --ext .ts --config .eslintrc",
-    "prepack": "rm -rf dist && tsc -b && oclif-dev manifest && oclif-dev readme",
+    "build": "rm -rf dist && tsc -b && oclif-dev manifest && oclif-dev readme",
     "test": "nyc --extension .ts mocha --forbid-only \"test/**/*.test.ts\"",
     "version": "oclif-dev readme && git add README.md",
     "lint": "eslint . --ext .ts",
@@ -58,11 +58,11 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@truffle/hdwallet-provider": "^1.4.0",
-    "@valist/sdk": "file:../lib",
+    "@valist/sdk": "^0.4.0",
     "cli-ux": "^5.6.3",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
-    "reproducible": "0.0.4"
+    "reproducible": "^0.0.9"
   },
   "devDependencies": {
     "@oclif/dev-cli": "^1.26.0",

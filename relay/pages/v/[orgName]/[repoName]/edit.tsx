@@ -22,6 +22,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [repo, setRepo] = useState<Repository>();
+  const [repoHasReleased, setRepoHasReleased] = useState<boolean>(true);
   const [repoDevs, setRepoDevs] = useState<string[]>([]);
   const [repoEvents, setRepoEvents] = useState<any[]>([]);
   const [pendingKeys, setPendingKeys] = useState<string[]>([]);
@@ -35,6 +36,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
     valist.getPendingRepoDevs(orgName, repoName).then(setPendingKeys),
     valist.getPendingRepoThresholds(orgName, repoName).then(setPendingThresholds),
     valist.getPendingReleases(orgName, repoName).then(setPendingReleases),
+    valist.repoHasReleased(orgName, repoName).then(setRepoHasReleased),
   ]);
 
   const getRepoData = async () => {
@@ -173,7 +175,7 @@ export const EditProjectPage: React.FC = (): JSX.Element => {
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
                       {repo && <EditProjectMetaForm meta={repo.meta} orgName={orgName} repoName={repoName}
-                      setRepoMeta={updateMeta} /> }
+                      setRepoMeta={updateMeta} hasReleased={repoHasReleased}/> }
                   </div>
                   <div className="flex-grow w-full pt-8 max-w-7xl mx-auto xl:px-8 lg:flex">
                       { repo && <EditProjectThresholdForm threshold={repo.threshold}

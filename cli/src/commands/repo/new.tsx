@@ -1,6 +1,6 @@
 import cli from 'cli-ux';
 import { Command } from '@oclif/command';
-import { ProjectType } from '@valist/sdk/dist/types';
+import { ProjectType, RepoMeta } from '@valist/sdk/dist/types';
 import { initValist, supportedTypes } from '../../utils/config';
 
 export default class RepoNew extends Command {
@@ -40,7 +40,7 @@ export default class RepoNew extends Command {
     const homepage = await cli.prompt('homepage');
     const repository = await cli.prompt('source code repository');
 
-    const repoMeta = {
+    const repoMeta: RepoMeta = {
       name,
       description,
       homepage,

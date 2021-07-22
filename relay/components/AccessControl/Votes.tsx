@@ -1,9 +1,10 @@
 /* eslint-disable no-underscore-dangle */
-import React from 'react';
+import React, { useContext } from 'react';
 import {
   VoteThresholdEvent, VoteKeyEvent, VoteReleaseEvent, Release, PendingRelease,
 } from 'valist/dist/types';
 import { ADD_KEY, REVOKE_KEY } from 'valist/dist/constants';
+import ValistContext from '../Valist/ValistContext';
 
 interface VotesProps {
   votes: any[],
@@ -39,6 +40,7 @@ interface VoteReleaseProps {
   event: VoteReleaseEvent,
   index: number,
   pending: PendingRelease,
+  tag: string,
   clear: (release: Release, index: number) => Promise<void>,
   vote: (release: Release) => Promise<void>
 }
@@ -108,7 +110,9 @@ const VoteRelease: React.FC<VoteReleaseProps> = (props: VoteReleaseProps): JSX.E
         Publish Release
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500 font-mono">
-        tag={ props.event._tag }
+        tag: { props.tag }<br />
+        metaCID: {props.event._metaCID }<br />
+        releaseCID: { props.event._releaseCID }
       </td>
       <td className="px-6 py-4 whitespace-nowrap text-sm text-gray-500">
         { props.event._sigCount } / { props.event._threshold }
@@ -126,6 +130,8 @@ const VoteRelease: React.FC<VoteReleaseProps> = (props: VoteReleaseProps): JSX.E
 };
 
 const Votes: React.FC<VotesProps> = (props: VotesProps): JSX.Element => {
+  const valist = useContext(ValistContext);
+
   const getKeyVote = (pending: string, index: number): JSX.Element => {
     const vote = props.votes.find((v) => v.returnValues._key === pending);
     if (!vote) return <React.Fragment key={index} />;
@@ -141,9 +147,11 @@ const Votes: React.FC<VotesProps> = (props: VotesProps): JSX.Element => {
   };
 
   const getReleaseVote = (pending: PendingRelease, index: number): JSX.Element => {
-    const vote = props.votes.find((v) => v.returnValues._tag === pending.tag);
+    const vote = props.votes.find((v) => v.returnValues._tag === valist.web3.utils.keccak256(pending.tag)
+        && v.returnValues._releaseCID === pending.releaseCID
+        && v.returnValues._metaCID === pending.metaCID);
     if (!vote || !props.clearPendingRelease || !props.voteRelease) return <React.Fragment key={index} />;
-    return <VoteRelease key={index} index={index} pending={pending}
+    return <VoteRelease key={index} index={index} pending={pending} tag={pending.tag}
       event={vote.returnValues} clear={props.clearPendingRelease} vote={props.voteRelease} />;
   };
 
