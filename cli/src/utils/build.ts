@@ -20,9 +20,9 @@ export const buildRelease = async (config : ValistConfig): Promise<fs.ReadStream
     const packagePath = await npmPack();
     releaseFiles.push(fs.createReadStream(packagePath));
   } else {
-    // eslint-disable-next-line no-restricted-syntax
-    for (const artifactName of Object.values(config.artifacts)) {
-      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), '/dist/', artifactName)));
+    const artifacts = Object.values(config.artifacts);
+    for (let i = 0; i < artifacts.length; ++i) {
+      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), 'dist', artifacts[i])));
     }
   }
   return releaseFiles;

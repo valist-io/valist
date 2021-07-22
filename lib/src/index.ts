@@ -183,39 +183,44 @@ class Valist {
     }
   }
 
-  createDistJSON(config: any, cids: string[]):any {
-    console.log(this.gatewayHost);
-    const date = (new Date()).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' });
+  createDistJSON(config: any, cids: string[]): string {
     const distJson: Record <string, any> = {
       id: config.repo,
       version: config.tag,
       name: config.repo,
-      date,
       platforms: {
       },
     };
 
-    let cidIndex = 0;
-    // eslint-disable-next-line no-restricted-syntax
-    for (const artifactPlatform of Object.values(config.artifacts)) {
-      distJson.platforms[(artifactPlatform as string)] = cids[cidIndex];
-      cidIndex++;
+    const artifactPlatforms = Object.keys(config.artifacts);
+    for (let i = 0; i < artifactPlatforms.length; ++i) {
+      const [os, arch] = artifactPlatforms[i].split('/');
+      distJson.platforms[os] = {
+        name: '',
+        archs: {},
+      };
+      const currentEntry = distJson.platforms[os];
+      currentEntry.name = config.repo;
+      currentEntry.archs[arch] = {
+        cid: cids[i],
+      };
     }
 
-    // for (let cidIndex = 0; cidIndex > config.artifacts.length; cidIndex) {
-    //   distJson.platforms[config.artifacts[cidIndex]].cid = cids[cidIndex];
-    // }
     return JSON.stringify(distJson);
   }
 
-  async prepareRelease(config: ValistConfig, releaseFiles: any, metaFile: any): Promise<Release> {
+  async prepareRelease(
+    config: ValistConfig,
+    releaseFiles: any,
+    metaFile: any,
+  ): Promise<Release> {
     try {
-      let releaseCID:string;
-      const artifactCIDS:any[] = [];
+      let releaseCID: string;
+      const artifactCIDS: any[] = [];
       const releaseFilesWithDist = releaseFiles;
 
       if (releaseFiles.length > 1) {
-        for (let i = 0; i < releaseFiles.length; i++) {
+        for (let i = 0; i < releaseFiles.length; ++i) {
           // eslint-disable-next-line no-await-in-loop
           const { cid } = await this.ipfs.add(releaseFiles[i], { onlyHash: true, cidVersion: 1 });
           artifactCIDS.push(cid.toString());
@@ -1022,28 +1027,30 @@ class Valist {
     }
   }
 
-  async addFolderToIPFS(files: any[], folder?: string): Promise<string> {
+  async addFolderToIPFS(files: any[], folder = ''): Promise<string> {
     try {
       const cids: string[] = [];
       const filePaths: any[] = [];
 
-      for (let i = 0; i < files.length; i++) {
-        let fileData = files[i];
+      for (let i = 0; i < files.length; ++i) {
+        let fileData;
 
         // check if data is in-memory object
         if (!files[i].bytesRead && files[i].data) {
           fileData = files[i].data;
+        } else {
+          fileData = files[i];
         }
 
         // @TODO Add check for if browser path
         filePaths.push({
-          path: path.join(`${folder}`, path.basename(files[i].path)),
+          path: path.join(folder, path.basename(files[i].path)),
           content: fileData,
         });
       }
 
       // eslint-disable-next-line no-restricted-syntax
-      for await (const result of this.ipfs.addAll(filePaths)) {
+      for await (const result of this.ipfs.addAll(filePaths, { cidVersion: 1 })) {
         cids.push(result.cid.toString());
       }
 

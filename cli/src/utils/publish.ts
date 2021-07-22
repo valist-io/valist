@@ -40,7 +40,7 @@ export const publish = async (): Promise<void> => {
   // } else {
   // Call buildRelease with project type (npm, binary, etc) to return artifact path
   const releaseFiles = await buildRelease(config);
-  console.log('files', releaseFiles[0].path);
+  console.log('files', releaseFiles.length);
   // }
 
   const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
