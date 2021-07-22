@@ -60,7 +60,7 @@ export const publish = async (): Promise<void> => {
     const { signers } = await valist.getPendingReleaseVotes(org, repo, releaseObject);
 
     if (signers.length < threshold) {
-      console.log(`🗳 Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
+      console.log(`🗳  Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
     } else {
       console.log(`✅ Approved release ${org}/${repo}/${tag}!`);
     }

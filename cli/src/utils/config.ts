@@ -1,5 +1,6 @@
 import * as yaml from 'js-yaml';
 import * as fs from 'fs';
+import * as path from 'path';
 import Valist from '@valist/sdk';
 import type { ValistConfig, ProjectType } from '@valist/sdk/dist/types';
 import { getWeb3Provider, getSignerKey } from './crypto';
@@ -62,6 +63,21 @@ export const defaultBuilds: Record<ProjectType, string> = {
   docker: '',
   'c++': 'make build',
   static: '',
+};
+
+export type PackageJson = {
+  name: string,
+  version: string
+};
+
+export const parsePackageJson = (): PackageJson => {
+  const { name, version } = JSON.parse(fs.readFileSync(path.join(process.cwd(), 'package.json'), 'utf-8'));
+  const packageJSON: PackageJson = {
+    name,
+    version,
+  };
+
+  return packageJSON;
 };
 
 export const parseValistConfig = (): ValistConfig => {

@@ -1,6 +1,6 @@
 {
   "name": "valist",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
   "author": "Valist, Inc.",
   "contributors": [
@@ -8,7 +8,7 @@
     "Zachary J. Pelkey <zach@valist.io> (valist.io)",
     "Keenan Nemetz <keenan@valist.io> (valist.io)"
   ],
-  "license": "MIT",
+  "license": "MPL-2.0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/valist-io/valist.git"
