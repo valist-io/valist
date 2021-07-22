@@ -27,8 +27,8 @@ const EditProjectMetaForm: React.FC<EditProjectMetaFormProps> = (props: EditProj
   };
 
   useEffect(() => {
-    setHomepage(props.meta.homepage);
-    setRepository(props.meta.repository);
+    if (props.meta.homepage) setHomepage(props.meta.homepage);
+    if (props.meta.repository) setRepository(props.meta.repository);
     setDescription(props.meta.description);
     setProjectType(props.meta.projectType);
   }, [props.meta]);

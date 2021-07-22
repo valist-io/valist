@@ -15,8 +15,8 @@ export type RepoMeta = {
   name: string,
   description: string,
   projectType: ProjectType,
-  homepage: string,
-  repository: string
+  homepage?: string,
+  repository?: string
 };
 
 export type Organization = {
