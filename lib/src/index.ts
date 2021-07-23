@@ -4,8 +4,6 @@ import Web3 from 'web3';
 // @ts-ignore ipfs client types are finicky
 import ipfsClient from 'ipfs-http-client';
 
-import path from 'path';
-
 import { provider, EventLog } from 'web3-core/types';
 
 import {
@@ -183,32 +181,6 @@ class Valist {
     }
   }
 
-  createDistJSON(config: any, cids: string[]): string {
-    const distJson: Record <string, any> = {
-      id: config.repo,
-      version: config.tag,
-      name: config.repo,
-      platforms: {
-      },
-    };
-
-    const artifactPlatforms = Object.keys(config.artifacts);
-    for (let i = 0; i < artifactPlatforms.length; ++i) {
-      const [os, arch] = artifactPlatforms[i].split('/');
-      distJson.platforms[os] = {
-        name: '',
-        archs: {},
-      };
-      const currentEntry = distJson.platforms[os];
-      currentEntry.name = config.repo;
-      currentEntry.archs[arch] = {
-        cid: cids[i],
-      };
-    }
-
-    return JSON.stringify(distJson);
-  }
-
   async prepareRelease(
     config: ValistConfig,
     releaseFiles: any,
@@ -216,22 +188,9 @@ class Valist {
   ): Promise<Release> {
     try {
       let releaseCID: string;
-      const artifactCIDS: any[] = [];
-      const releaseFilesWithDist = releaseFiles;
 
       if (releaseFiles.length > 1) {
-        for (let i = 0; i < releaseFiles.length; ++i) {
-          // eslint-disable-next-line no-await-in-loop
-          const { cid } = await this.ipfs.add(releaseFiles[i], { onlyHash: true, cidVersion: 1 });
-          artifactCIDS.push(cid.toString());
-        }
-
-        releaseFilesWithDist.push({
-          data: this.createDistJSON(config, artifactCIDS),
-          path: 'dist.json',
-        });
-
-        releaseCID = await this.addFolderToIPFS(releaseFilesWithDist, config.tag);
+        releaseCID = await this.addFolderToIPFS(releaseFiles);
       } else {
         releaseCID = await this.addFileToIPFS(releaseFiles[0]);
       }
@@ -1041,34 +1000,34 @@ class Valist {
     }
   }
 
-  async addFolderToIPFS(files: any[], folder = ''): Promise<string> {
+  async addFolderToIPFS(files: any[]): Promise<string> {
     try {
-      const cids: string[] = [];
       const filePaths: any[] = [];
 
       for (let i = 0; i < files.length; ++i) {
         let fileData;
 
         // check if data is in-memory object
-        if (!files[i].bytesRead && files[i].data) {
-          fileData = files[i].data;
+        if (!files[i].bytesRead && files[i].json) {
+          fileData = files[i].json;
         } else {
           fileData = files[i];
         }
 
         // @TODO Add check for if browser path
         filePaths.push({
-          path: path.join(folder, path.basename(files[i].path)),
+          path: files[i].path.split(/\\|\//).pop(),
           content: fileData,
         });
       }
 
+      let cid;
       // eslint-disable-next-line no-restricted-syntax
-      for await (const result of this.ipfs.addAll(filePaths, { cidVersion: 1 })) {
-        cids.push(result.cid.toString());
+      for await (const result of this.ipfs.addAll(filePaths, { wrapWithDirectory: true, cidVersion: 1 })) {
+        cid = result.cid.string;
       }
 
-      return cids[cids.length - 1];
+      return cid;
     } catch (e) {
       const msg = 'Could not add file to IPFS';
       console.error(msg, e);
