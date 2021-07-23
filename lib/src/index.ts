@@ -1002,7 +1002,7 @@ class Valist {
     }
   }
 
-  async addFolderToIPFS(files: any[], parent: string): Promise<string> {
+  async addFolderToIPFS(files: any[], parent = ''): Promise<string> {
     try {
       const filePaths: any[] = [];
 
