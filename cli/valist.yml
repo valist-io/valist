@@ -7,4 +7,3 @@ install:
 
   RUN npm install --registry=https://valist.io/api/npm
 build: npm run build
-out: dist
