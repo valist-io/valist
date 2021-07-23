@@ -3,6 +3,7 @@ import * as path from 'path';
 import Valist from '@valist/sdk';
 import { createBuild, exportBuild, generateDockerfile } from 'reproducible';
 import { ValistConfig } from '@valist/sdk/dist/types';
+import { stripParentFolderFromPath } from '@valist/sdk/dist/utils';
 import { defaultImages, parsePackageJson } from './config';
 
 const createDistJSON = async (valist: Valist, config: any, releaseFiles: any): Promise<string> => {
@@ -24,6 +25,7 @@ const createDistJSON = async (valist: Valist, config: any, releaseFiles: any): P
     currentEntry.archs[arch] = {
       // eslint-disable-next-line no-await-in-loop
       cid: (await valist.ipfs.add(releaseFiles[i], { onlyHash: true, cidVersion: 1 })).cid.string,
+      path: stripParentFolderFromPath(releaseFiles[i].path, config.out),
     };
   }
 
@@ -67,6 +69,7 @@ Promise<(fs.ReadStream | { json: string, path: string | Buffer })[]> => {
       tempStreams.push(fs.createReadStream(path.join(process.cwd(), config.out, artifacts[i])));
     }
 
+    // create dist.json from artifacts and push it to releaseFiles
     const distFile = fs.createWriteStream(path.join(config.out, 'dist.json'));
     distFile.write(await createDistJSON(valist, config, tempStreams));
     distFile.end();
@@ -75,11 +78,20 @@ Promise<(fs.ReadStream | { json: string, path: string | Buffer })[]> => {
   } else if (
     fs.statSync(config.out).isDirectory()
   ) {
-    const filePaths = fs.readdirSync(config.out);
+    // if config.out is a directory, recursively fetch file paths and open readStreams for each
+    const getAllFiles = (folder: string) => {
+      const files = fs.readdirSync(folder);
 
-    for (let i = 0; i < filePaths.length; ++i) {
-      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out, filePaths[i])));
-    }
+      files.forEach((file) => {
+        if (fs.statSync(path.join(folder, file)).isDirectory()) {
+          getAllFiles(path.join(folder, file));
+        } else {
+          releaseFiles.push(fs.createReadStream(path.join(process.cwd(), folder, file)));
+        }
+      });
+    };
+
+    getAllFiles(config.out);
   } else {
     releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out)));
   }

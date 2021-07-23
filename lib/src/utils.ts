@@ -39,3 +39,12 @@ export const getValistRegistry = async (web3: Web3, chainID: number, address?: s
 export const sendMetaTransaction = sendMetaTx;
 
 export const Web3Providers = Web3.providers;
+
+// strip first occurrence of parent folder from absolute path.
+// allows for sub-folders to be the same name as the parent
+// e.g. '/example-projects/cli-publish-binary/dist/dist/dist/nested' => '/dist/dist/nested'
+// also works with 'C:\\example-projects\\cli-publish-binary\\dist\\dist\\dist\\nested' => '\dist\dist\nested'
+export const stripParentFolderFromPath = (filePath: string, parent: string): string => filePath.replace(
+  new RegExp(`^.+?${parent.replace(/\/|\\$/, '')}`),
+  '',
+);

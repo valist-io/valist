@@ -44,8 +44,10 @@ export const publish = async (): Promise<void> => {
 
   const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
 
+  const parent = fs.statSync(config.out).isDirectory() ? config.out : '';
+
   console.log('🪐 Preparing release on IPFS...');
-  const releaseObject = await valist.prepareRelease(config, releaseFiles, metaFile);
+  const releaseObject = await valist.prepareRelease(config, releaseFiles, metaFile, parent);
   console.log('📦 Release Object:', releaseObject);
 
   // cleanup generated tarball/build artifact
@@ -59,11 +61,11 @@ export const publish = async (): Promise<void> => {
   //   const { transactionHash } = await valist.publishRelease(org, repo, releaseObject);
   //   const { signers } = await valist.getPendingReleaseVotes(org, repo, releaseObject);
 
-  // if (signers.length < threshold) {
-  //   console.log(`🗳  Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
-  // } else {
-  //   console.log(`✅ Approved release ${org}/${repo}/${tag}!`);
-  // }
+  //   if (signers.length < threshold) {
+  //     console.log(`🗳  Voted to publish release ${org}/${repo}/${tag}: ${signers.length}/${threshold}`);
+  //   } else {
+  //     console.log(`✅ Approved release ${org}/${repo}/${tag}!`);
+  //   }
 
   //   console.log('📖 IPFS address of release:', `ipfs://${releaseObject.releaseCID}`);
   //   console.log('🔗 Transaction Hash:', transactionHash);

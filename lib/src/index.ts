@@ -32,6 +32,7 @@ import {
   shortnameFilterRegex,
   sendMetaTransaction,
   getValistRegistry,
+  stripParentFolderFromPath,
 } from './utils';
 
 import { ValistSDKError } from './errors';
@@ -185,12 +186,13 @@ class Valist {
     config: ValistConfig,
     releaseFiles: any,
     metaFile: any,
+    parentFolder = '',
   ): Promise<Release> {
     try {
       let releaseCID: string;
 
       if (releaseFiles.length > 1) {
-        releaseCID = await this.addFolderToIPFS(releaseFiles);
+        releaseCID = await this.addFolderToIPFS(releaseFiles, parentFolder);
       } else {
         releaseCID = await this.addFileToIPFS(releaseFiles[0]);
       }
@@ -1000,7 +1002,7 @@ class Valist {
     }
   }
 
-  async addFolderToIPFS(files: any[]): Promise<string> {
+  async addFolderToIPFS(files: any[], parent: string): Promise<string> {
     try {
       const filePaths: any[] = [];
 
@@ -1016,7 +1018,7 @@ class Valist {
 
         // @TODO Add check for if browser path
         filePaths.push({
-          path: files[i].path.split(/\\|\//).pop(),
+          path: stripParentFolderFromPath(files[i].path, parent),
           content: fileData,
         });
       }
