@@ -39,14 +39,13 @@ export const publish = async (): Promise<void> => {
   //   releaseFile = fs.createReadStream(path.join(process.cwd(), out));
   // } else {
   // Call buildRelease with project type (npm, binary, etc) to return artifact path
-  const releaseFiles = await buildRelease(config);
-  console.log('files', releaseFiles.length);
+  const releaseFiles = await buildRelease(valist, config);
   // }
 
   const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
 
   console.log('🪐 Preparing release on IPFS...');
-  const releaseObject = await valist.prepareRelease(config.tag, releaseFiles, metaFile);
+  const releaseObject = await valist.prepareRelease(config, releaseFiles, metaFile);
   console.log('📦 Release Object:', releaseObject);
 
   // cleanup generated tarball/build artifact

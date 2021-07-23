@@ -1,10 +1,37 @@
 import * as fs from 'fs';
 import * as path from 'path';
+import Valist from '@valist/sdk';
 import { createBuild, exportBuild, generateDockerfile } from 'reproducible';
 import { ValistConfig } from '@valist/sdk/dist/types';
 import { defaultImages, parsePackageJson } from './config';
 
-export const buildRelease = async (config : ValistConfig): Promise<fs.ReadStream[]> => {
+const createDistJSON = async (valist: Valist, config: any, releaseFiles: any): Promise<string> => {
+  const distJson: Record <string, any> = {
+    id: `${config.repo}-${config.tag}`,
+    version: config.tag,
+    name: config.repo,
+    platforms: {
+    },
+  };
+
+  const artifactPlatforms = Object.keys(config.artifacts);
+  for (let i = 0; i < artifactPlatforms.length; ++i) {
+    const [os, arch] = artifactPlatforms[i].split('/');
+    distJson.platforms[os] = {
+      archs: {},
+    };
+    const currentEntry = distJson.platforms[os];
+    currentEntry.archs[arch] = {
+      // eslint-disable-next-line no-await-in-loop
+      cid: (await valist.ipfs.add(releaseFiles[i], { onlyHash: true, cidVersion: 1 })).cid.string,
+    };
+  }
+
+  return JSON.stringify(distJson);
+};
+
+export const buildRelease = async (valist: Valist, config : ValistConfig):
+Promise<(fs.ReadStream | { json: string, path: string | Buffer })[]> => {
   let buildCommand = config.build;
   let outArtifact = config.out;
 
@@ -26,14 +53,36 @@ export const buildRelease = async (config : ValistConfig): Promise<fs.ReadStream
     fs.unlinkSync('Dockerfile.reproducible.dockerignore');
   }
 
-  const releaseFiles: fs.ReadStream[] = [];
+  // read streams for final upload
+  const releaseFiles: (fs.ReadStream | { json: string, path: string | Buffer })[] = [];
 
-  const artifacts: string[] = Object.values(config.artifacts);
-  for (let i = 0; i < artifacts.length; ++i) {
-    releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out, artifacts[i])));
+  if (config.artifacts) {
+    const artifacts: string[] = Object.values(config.artifacts);
+
+    // create temp array of stream to allow createDistJSON to
+    const tempStreams: fs.ReadStream[] = [];
+
+    for (let i = 0; i < artifacts.length; ++i) {
+      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out, artifacts[i])));
+      tempStreams.push(fs.createReadStream(path.join(process.cwd(), config.out, artifacts[i])));
+    }
+
+    const distFile = fs.createWriteStream(path.join(config.out, 'dist.json'));
+    distFile.write(await createDistJSON(valist, config, tempStreams));
+    distFile.end();
+
+    releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out, 'dist.json')));
+  } else if (
+    fs.statSync(config.out).isDirectory()
+  ) {
+    const filePaths = fs.readdirSync(config.out);
+
+    for (let i = 0; i < filePaths.length; ++i) {
+      releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out, filePaths[i])));
+    }
+  } else {
+    releaseFiles.push(fs.createReadStream(path.join(process.cwd(), config.out)));
   }
-
-  // const releaseFile = fs.createReadStream(path.join(process.cwd(), outArtifact));
 
   return releaseFiles;
 };
