@@ -43,6 +43,8 @@ Promise<(fs.ReadStream | { json: string, path: string | Buffer })[]> => {
     output = `${packageJson.name}-${packageJson.version}.tgz`;
   }
 
+  if (!output) throw new Error('Output file/directory not defined!');
+
   // Generate Dockerfile (uses current directory as source)
   generateDockerfile(config.image || defaultImages[config.type], './', buildCommand, config.install);
 

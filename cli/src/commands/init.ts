@@ -44,7 +44,12 @@ export default class ValistInit extends Command {
     const image: string | undefined = await cli.prompt(`docker image (${defaultImages[projectType]})`,
       { required: false });
 
-    const out = await cli.prompt('output file/directory (dist)');
+    let out;
+    if (projectType === 'node') {
+      out = await cli.prompt('output file/directory (none if publishing as npm package)', { required: false });
+    } else {
+      out = await cli.prompt('output file/directory (dist)', { required: false }) || 'dist';
+    }
 
     const configToWrite: any = {};
     configToWrite.type = projectType;
@@ -55,7 +60,7 @@ export default class ValistInit extends Command {
     if (image) configToWrite.image = image;
     configToWrite.install = install;
     configToWrite.build = build;
-    configToWrite.out = out;
+    if (out) configToWrite.out = out;
 
     const valistFile = yaml.dump(configToWrite);
 
