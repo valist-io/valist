@@ -44,7 +44,7 @@ export const publish = async (): Promise<void> => {
 
   const metaFile = fs.createReadStream(path.join(process.cwd(), meta as string));
 
-  const parent = fs.statSync(config.out).isDirectory() ? config.out : '';
+  const parent = config.out && fs.statSync(config.out).isDirectory() ? config.out : '';
 
   console.log('🪐 Preparing release on IPFS...');
   const releaseObject = await valist.prepareRelease(config, releaseFiles, metaFile, parent);
