@@ -1004,28 +1004,17 @@ class Valist {
 
   async addFolderToIPFS(files: any[], parent = ''): Promise<string> {
     try {
-      const filePaths: any[] = [];
-
-      for (let i = 0; i < files.length; ++i) {
-        let fileData;
-
-        // check if data is in-memory object
-        if (!files[i].bytesRead && files[i].json) {
-          fileData = files[i].json;
-        } else {
-          fileData = files[i];
-        }
-
-        // @TODO Add check for if browser path
-        filePaths.push({
-          path: stripParentFolderFromPath(files[i].path, parent),
-          content: fileData,
-        });
-      }
+      const fileObjects = files.map((file) => {
+        const fileObject = {
+          path: stripParentFolderFromPath(file.path, parent),
+          content: file,
+        };
+        return fileObject;
+      });
 
       let cid;
       // eslint-disable-next-line no-restricted-syntax
-      for await (const result of this.ipfs.addAll(filePaths, { wrapWithDirectory: true, cidVersion: 1 })) {
+      for await (const result of this.ipfs.addAll(fileObjects, { wrapWithDirectory: true, cidVersion: 1 })) {
         cid = result.cid.string;
       }
 
