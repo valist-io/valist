@@ -40,7 +40,7 @@ func (client *Client) GetRelease(ctx context.Context, orgName, repoName, tag str
 	callopts := bind.CallOpts{Context: ctx}
 	selector := crypto.Keccak256Hash(packed)
 
-	release, err := client.valistContract.Releases(&callopts, selector)
+	release, err := client.valist.Releases(&callopts, selector)
 	if err != nil {
 		return nil, ErrReleaseNotExist
 	}
@@ -71,7 +71,7 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgName, repoName st
 		return nil, err
 	}
 
-	tag, release, meta, signers, err := client.valistContract.GetLatestRelease(&callopts, orgID, repoName)
+	tag, release, meta, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
 	if err != nil {
 		return nil, err
 	}
@@ -143,7 +143,7 @@ func (it *ReleaseTagIterator) load(ctx context.Context) error {
 	callopts := bind.CallOpts{Context: ctx}
 	selector := crypto.Keccak256Hash(orgID[:], []byte(it.repoName))
 
-	tags, err := it.client.valistContract.GetReleaseTags(&callopts, selector, it.page, it.limit)
+	tags, err := it.client.valist.GetReleaseTags(&callopts, selector, it.page, it.limit)
 	if err != nil {
 		return err
 	}

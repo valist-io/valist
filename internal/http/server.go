@@ -67,7 +67,7 @@ func (s *Server) Shutdown(ctx context.Context) error {
 func (server *Server) GetOrganization(w http.ResponseWriter, req *http.Request) error {
 	vars := mux.Vars(req)
 
-	org, err := server.client.GetOrganizationByName(req.Context(), vars["org"])
+	org, err := server.client.GetOrganization(req.Context(), vars["org"])
 	if err != nil {
 		return err
 	}

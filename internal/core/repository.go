@@ -27,9 +27,7 @@ type Repository struct {
 	OrgID         common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	Meta          *RepositoryMeta
 	MetaCID       cid.Cid
-	Tags          []string
 }
 
 // GetRepository returns the repository with the given orgID and name.
@@ -42,7 +40,7 @@ func (client *Client) GetRepository(ctx context.Context, orgName string, repoNam
 	}
 
 	selector := crypto.Keccak256Hash(orgID[:], []byte(repoName))
-	repo, err := client.valistContract.Repos(&callopts, selector)
+	repo, err := client.valist.Repos(&callopts, selector)
 	if err != nil {
 		return nil, err
 	}
@@ -56,23 +54,11 @@ func (client *Client) GetRepository(ctx context.Context, orgName string, repoNam
 		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)
 	}
 
-	meta, err := client.GetRepositoryMeta(ctx, metaCID)
-	if err != nil {
-		return nil, err
-	}
-
-	tags, err := client.valistContract.GetReleaseTags(&callopts, selector, big.NewInt(1), big.NewInt(10))
-	if err != nil {
-		return nil, err
-	}
-
 	return &Repository{
 		OrgID:         orgID,
 		Threshold:     repo.Threshold,
 		ThresholdDate: repo.ThresholdDate,
-		Meta:          meta,
 		MetaCID:       metaCID,
-		Tags:          tags,
 	}, nil
 }
 

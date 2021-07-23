@@ -24,9 +24,7 @@ type Organization struct {
 	ID            common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	Meta          *OrganizationMeta
 	MetaCID       cid.Cid
-	RepoNames     []string
 }
 
 // GerOrganizationID returns the ID of the organization with the given name.
@@ -36,7 +34,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 	}
 
 	callopts := bind.CallOpts{Context: ctx}
-	orgID, err := client.registryContract.NameToID(&callopts, name)
+	orgID, err := client.registry.NameToID(&callopts, name)
 	if err != nil {
 		return emptyHash, fmt.Errorf("Failed to get organization id: %v", err)
 	}
@@ -49,21 +47,15 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 	return orgID, nil
 }
 
-// GetOrganizationByName returns the organization with the given name.
-func (client *Client) GetOrganizationByName(ctx context.Context, name string) (*Organization, error) {
+// GetOrganizationByName returns the organization with the given ID.
+func (client *Client) GetOrganization(ctx context.Context, name string) (*Organization, error) {
 	id, err := client.GetOrganizationID(ctx, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return client.GetOrganizationByID(ctx, id)
-}
-
-// GetOrganizationByName returns the organization with the given ID.
-func (client *Client) GetOrganizationByID(ctx context.Context, id common.Hash) (*Organization, error) {
 	callopts := bind.CallOpts{Context: ctx}
-
-	org, err := client.valistContract.Orgs(&callopts, id)
+	org, err := client.valist.Orgs(&callopts, id)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get organization id: %v", err)
 	}
@@ -73,23 +65,11 @@ func (client *Client) GetOrganizationByID(ctx context.Context, id common.Hash) (
 		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)
 	}
 
-	meta, err := client.GetOrganizationMeta(ctx, metaCID)
-	if err != nil {
-		return nil, err
-	}
-
-	repoNames, err := client.valistContract.GetRepoNames(&callopts, id, big.NewInt(1), big.NewInt(10))
-	if err != nil {
-		return nil, err
-	}
-
 	return &Organization{
 		ID:            id,
 		Threshold:     org.Threshold,
 		ThresholdDate: org.ThresholdDate,
 		MetaCID:       metaCID,
-		Meta:          meta,
-		RepoNames:     repoNames,
 	}, nil
 }
 
@@ -116,4 +96,58 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*Org
 	}
 
 	return &meta, nil
+}
+
+// CreateOrganization creates a new organization with the given meta and returns the orgID.
+func (client *Client) CreateOrganization(ctx context.Context, meta *OrganizationMeta) (common.Hash, error) {
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return emptyHash, err
+	}
+
+	path, err := client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(data))
+	if err != nil {
+		return emptyHash, err
+	}
+
+	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	if err != nil {
+		return emptyHash, err
+	}
+	txopts.Context = ctx
+
+	tx, err := client.valist.CreateOrganization(txopts, path.Cid().String())
+	if err != nil {
+		return emptyHash, err
+	}
+
+	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	if err != nil {
+		return emptyHash, err
+	}
+
+	if len(receipt.Logs) < 1 || len(receipt.Logs[0].Topics) < 2 {
+		return emptyHash, fmt.Errorf("Failed to get create organization log")
+	}
+
+	return receipt.Logs[0].Topics[1], nil
+}
+
+// LinkOrganizationName creates a link from the given orgID to the given name.
+func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) error {
+	// TODO validate name
+
+	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	if err != nil {
+		return err
+	}
+	txopts.Context = ctx
+
+	tx, err := client.registry.LinkNameToID(txopts, orgID, name)
+	if err != nil {
+		return err
+	}
+
+	_, err = bind.WaitMined(ctx, client.eth, tx)
+	return err
 }
