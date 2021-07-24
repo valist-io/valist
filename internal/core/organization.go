@@ -10,9 +10,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ipfs/go-cid"
 	files "github.com/ipfs/go-ipfs-files"
 	"github.com/ipfs/interface-go-ipfs-core/path"
+
+	"github.com/valist-io/registry/internal/contract/registry"
+	"github.com/valist-io/registry/internal/contract/valist"
 )
 
 type OrganizationMeta struct {
@@ -25,6 +29,16 @@ type Organization struct {
 	Threshold     *big.Int
 	ThresholdDate *big.Int
 	MetaCID       cid.Cid
+}
+
+type CreateOrgResult struct {
+	Log *valist.ValistOrgCreated
+	Err error
+}
+
+type LinkOrgNameResult struct {
+	Log *registry.ValistRegistryMappingEvent
+	Err error
 }
 
 // GerOrganizationID returns the ID of the organization with the given name.
@@ -47,13 +61,8 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 	return orgID, nil
 }
 
-// GetOrganizationByName returns the organization with the given ID.
-func (client *Client) GetOrganization(ctx context.Context, name string) (*Organization, error) {
-	id, err := client.GetOrganizationID(ctx, name)
-	if err != nil {
-		return nil, err
-	}
-
+// GetOrganization returns the organization with the given ID.
+func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*Organization, error) {
 	callopts := bind.CallOpts{Context: ctx}
 	org, err := client.valist.Orgs(&callopts, id)
 	if err != nil {
@@ -99,55 +108,97 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*Org
 }
 
 // CreateOrganization creates a new organization with the given meta and returns the orgID.
-func (client *Client) CreateOrganization(ctx context.Context, meta *OrganizationMeta) (common.Hash, error) {
+func (client *Client) CreateOrganization(ctx context.Context, meta *OrganizationMeta) (<-chan CreateOrgResult, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
-		return emptyHash, err
+		return nil, err
 	}
 
 	path, err := client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(data))
 	if err != nil {
-		return emptyHash, err
+		return nil, err
 	}
 
 	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
 	if err != nil {
-		return emptyHash, err
+		return nil, err
 	}
 	txopts.Context = ctx
 
 	tx, err := client.valist.CreateOrganization(txopts, path.Cid().String())
 	if err != nil {
-		return emptyHash, err
+		return nil, err
 	}
+
+	result := make(chan CreateOrgResult, 1)
+	go client.createOrganization(ctx, tx, result)
+
+	return result, nil
+}
+
+func (client *Client) createOrganization(ctx context.Context, tx *types.Transaction, result chan<- CreateOrgResult) {
+	defer close(result)
 
 	receipt, err := bind.WaitMined(ctx, client.eth, tx)
 	if err != nil {
-		return emptyHash, err
+		result <- CreateOrgResult{Err: err}
+		return
 	}
 
-	if len(receipt.Logs) < 1 || len(receipt.Logs[0].Topics) < 2 {
-		return emptyHash, fmt.Errorf("Failed to get create organization log")
+	if len(receipt.Logs) == 0 {
+		result <- CreateOrgResult{Err: fmt.Errorf("Failed to parse log")}
+		return
 	}
 
-	return receipt.Logs[0].Topics[1], nil
+	log, err := client.valist.ParseOrgCreated(*receipt.Logs[0])
+	if err != nil {
+		result <- CreateOrgResult{Err: err}
+		return
+	}
+
+	result <- CreateOrgResult{Log: log}
 }
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
-func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) error {
+func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (<-chan LinkOrgNameResult, error) {
 	// TODO validate name
 
 	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	txopts.Context = ctx
 
 	tx, err := client.registry.LinkNameToID(txopts, orgID, name)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
-	_, err = bind.WaitMined(ctx, client.eth, tx)
-	return err
+	result := make(chan LinkOrgNameResult, 1)
+	go client.linkOrganizationName(ctx, tx, result)
+
+	return result, err
+}
+
+func (client *Client) linkOrganizationName(ctx context.Context, tx *types.Transaction, result chan<- LinkOrgNameResult) {
+	defer close(result)
+
+	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	if err != nil {
+		result <- LinkOrgNameResult{Err: err}
+		return
+	}
+
+	if len(receipt.Logs) == 0 {
+		result <- LinkOrgNameResult{Err: fmt.Errorf("Failed to parse log")}
+		return
+	}
+
+	log, err := client.registry.ParseMappingEvent(*receipt.Logs[0])
+	if err != nil {
+		result <- LinkOrgNameResult{Err: err}
+		return
+	}
+
+	result <- LinkOrgNameResult{Log: log}
 }

@@ -5,7 +5,7 @@ import (
 	"math/big"
 )
 
-func (s *CoreSuite) TestOrganization() {
+func (s *CoreSuite) TestCreateOrganization() {
 	ctx := context.Background()
 
 	orgName := "valist"
@@ -14,17 +14,26 @@ func (s *CoreSuite) TestOrganization() {
 		Description: "Accelerating the transition to web3.",
 	}
 
-	orgID, err := s.client.CreateOrganization(ctx, orgMeta)
+	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
+	s.backend.Commit()
 
-	err = s.client.LinkOrganizationName(ctx, orgID, orgName)
+	res1 := <-txc1
+	s.Require().NoError(res1.Err, "Failed to create organization")
+	orgID := res1.Log.OrgID
+
+	txc2, err := s.client.LinkOrganizationName(ctx, orgID, orgName)
 	s.Require().NoError(err, "Failed to link organization name")
+	s.backend.Commit()
+
+	res2 := <-txc2
+	s.Require().NoError(res2.Err, "Failed to link organization name")
 
 	id, err := s.client.GetOrganizationID(ctx, orgName)
-	s.Require().NoError(err, "Failed to link organization name")
-	s.Assert().Equal(orgID, id)
+	s.Require().NoError(err, "Failed to get organization id")
+	s.Assert().Equal(orgID[:], id.Bytes())
 
-	org, err := s.client.GetOrganization(ctx, orgName)
+	org, err := s.client.GetOrganization(ctx, orgID)
 	s.Require().NoError(err, "Failed to get organization")
 	s.Assert().Equal(big.NewInt(0).Cmp(org.Threshold), 0)
 

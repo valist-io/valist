@@ -1,32 +1,21 @@
 package http
 
 import (
+	"math/big"
 	"net/url"
-	"strconv"
 )
 
 // Paginate parses query params used for pagination.
-func Paginate(query url.Values) (int64, int64, error) {
-	pageString := query.Get("page")
-	limitString := query.Get("limit")
-
-	if pageString == "" {
-		pageString = "1"
+func Paginate(query url.Values) (*big.Int, *big.Int, error) {
+	var limit big.Int
+	if _, ok := limit.SetString(query.Get("limit"), 10); !ok {
+		limit.SetInt64(10)
 	}
 
-	if limitString == "" {
-		limitString = "10"
+	var page big.Int
+	if _, ok := page.SetString(query.Get("page"), 10); !ok {
+		page.SetInt64(1)
 	}
 
-	page, err := strconv.ParseInt(pageString, 10, 64)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	limit, err := strconv.ParseInt(limitString, 10, 64)
-	if err != nil {
-		return 0, 0, err
-	}
-
-	return page, limit, nil
+	return &page, &limit, nil
 }

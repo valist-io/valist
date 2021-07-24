@@ -8,10 +8,13 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ipfs/go-cid"
 	files "github.com/ipfs/go-ipfs-files"
 	"github.com/ipfs/interface-go-ipfs-core/path"
+
+	"github.com/valist-io/registry/internal/contract/valist"
 )
 
 type Release struct {
@@ -21,15 +24,15 @@ type Release struct {
 	Signers    []common.Address
 }
 
-// GetRelease returns the release with the given tag in the repository with the given name and orgID.
-func (client *Client) GetRelease(ctx context.Context, orgName, repoName, tag string) (*Release, error) {
-	if tag == "latest" {
-		return client.GetLatestRelease(ctx, orgName, repoName)
-	}
+type VoteReleaseResult struct {
+	Log *valist.ValistVoteReleaseEvent
+	Err error
+}
 
-	orgID, err := client.GetOrganizationID(ctx, orgName)
-	if err != nil {
-		return nil, err
+// GetRelease returns the release with the given tag in the repository with the given name and orgID.
+func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoName, tag string) (*Release, error) {
+	if tag == "latest" {
+		return client.GetLatestRelease(ctx, orgID, repoName)
 	}
 
 	packed, err := packedEncoding(orgID, repoName, tag)
@@ -42,6 +45,10 @@ func (client *Client) GetRelease(ctx context.Context, orgName, repoName, tag str
 
 	release, err := client.valist.Releases(&callopts, selector)
 	if err != nil {
+		return nil, err
+	}
+
+	if release.ReleaseCID == "" {
 		return nil, ErrReleaseNotExist
 	}
 
@@ -63,13 +70,8 @@ func (client *Client) GetRelease(ctx context.Context, orgName, repoName, tag str
 }
 
 // GetLatestRelease returns the latest release from the repository with the given name and orgID.
-func (client *Client) GetLatestRelease(ctx context.Context, orgName, repoName string) (*Release, error) {
+func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, repoName string) (*Release, error) {
 	callopts := bind.CallOpts{Context: ctx}
-
-	orgID, err := client.GetOrganizationID(ctx, orgName)
-	if err != nil {
-		return nil, err
-	}
 
 	tag, release, meta, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
 	if err != nil {
@@ -109,10 +111,52 @@ func (client *Client) GetReleaseMeta(ctx context.Context, id cid.Cid) ([]byte, e
 	return io.ReadAll(file)
 }
 
+// VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
+func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, tag string, releaseCID, metaCID cid.Cid) (<-chan VoteReleaseResult, error) {
+	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	if err != nil {
+		return nil, err
+	}
+	txopts.Context = ctx
+
+	tx, err := client.valist.VoteRelease(txopts, orgID, repoName, tag, releaseCID.String(), metaCID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	result := make(chan VoteReleaseResult, 1)
+	go client.voteRelease(ctx, tx, result)
+
+	return result, nil
+}
+
+func (client *Client) voteRelease(ctx context.Context, tx *types.Transaction, result chan<- VoteReleaseResult) {
+	defer close(result)
+
+	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	if err != nil {
+		result <- VoteReleaseResult{Err: err}
+		return
+	}
+
+	if len(receipt.Logs) == 0 {
+		result <- VoteReleaseResult{Err: fmt.Errorf("Failed to parse log")}
+		return
+	}
+
+	log, err := client.valist.ParseVoteReleaseEvent(*receipt.Logs[0])
+	if err != nil {
+		result <- VoteReleaseResult{Err: err}
+		return
+	}
+
+	result <- VoteReleaseResult{Log: log}
+}
+
 // ReleaseTagIterator is used to iterate release tags.
 type ReleaseTagIterator struct {
 	client   *Client
-	orgName  string
+	orgID    common.Hash
 	repoName string
 	tags     []string
 	page     *big.Int
@@ -120,28 +164,23 @@ type ReleaseTagIterator struct {
 }
 
 // ListReleaseTags returns a new ReleaseTagIterator.
-func (client *Client) ListReleaseTags(orgName, repoName string, page, limit *big.Int) *ReleaseTagIterator {
+func (client *Client) ListReleaseTags(orgID common.Hash, repoName string, page, limit *big.Int) *ReleaseTagIterator {
 	return &ReleaseTagIterator{
 		client:   client,
-		orgName:  orgName,
+		orgID:    orgID,
 		repoName: repoName,
 		page:     page,
 		limit:    limit,
 	}
 }
 
-func (it *ReleaseTagIterator) load(ctx context.Context) error {
+func (it *ReleaseTagIterator) paginate(ctx context.Context) error {
 	if len(it.tags) != 0 {
 		return nil
 	}
 
-	orgID, err := it.client.GetOrganizationID(ctx, it.orgName)
-	if err != nil {
-		return err
-	}
-
 	callopts := bind.CallOpts{Context: ctx}
-	selector := crypto.Keccak256Hash(orgID[:], []byte(it.repoName))
+	selector := crypto.Keccak256Hash(it.orgID[:], []byte(it.repoName))
 
 	tags, err := it.client.valist.GetReleaseTags(&callopts, selector, it.page, it.limit)
 	if err != nil {
@@ -155,7 +194,7 @@ func (it *ReleaseTagIterator) load(ctx context.Context) error {
 
 // Next returns the next tag in the iterator.
 func (it *ReleaseTagIterator) Next(ctx context.Context) (string, error) {
-	if err := it.load(ctx); err != nil {
+	if err := it.paginate(ctx); err != nil {
 		return "", err
 	}
 
@@ -172,18 +211,18 @@ func (it *ReleaseTagIterator) Next(ctx context.Context) (string, error) {
 // ReleaseIterator is used to iterate releases.
 type ReleaseIterator struct {
 	client   *Client
-	orgName  string
+	orgID    common.Hash
 	repoName string
 	tags     *ReleaseTagIterator
 }
 
 // ListReleases returns a new ReleaseIterator.
-func (client *Client) ListReleases(orgName, repoName string, page, limit *big.Int) *ReleaseIterator {
+func (client *Client) ListReleases(orgID common.Hash, repoName string, page, limit *big.Int) *ReleaseIterator {
 	return &ReleaseIterator{
 		client:   client,
-		orgName:  orgName,
+		orgID:    orgID,
 		repoName: repoName,
-		tags:     client.ListReleaseTags(orgName, repoName, page, limit),
+		tags:     client.ListReleaseTags(orgID, repoName, page, limit),
 	}
 }
 
@@ -195,7 +234,7 @@ func (it *ReleaseIterator) Next(ctx context.Context) (*Release, error) {
 		return nil, err
 	}
 
-	release, err := it.client.GetRelease(ctx, it.orgName, it.repoName, tag)
+	release, err := it.client.GetRelease(ctx, it.orgID, it.repoName, tag)
 	if err != nil {
 		return nil, err
 	}

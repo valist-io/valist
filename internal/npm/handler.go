@@ -26,11 +26,9 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	orgName := strings.TrimLeft(parts[0], "@")
-	repoName := parts[1]
-
-	_, err := h.client.GetRepository(req.Context(), orgName, repoName)
-	if err == core.ErrRepositoryNotExist || err == core.ErrOrganizationNotExist {
+	orgName, repoName := strings.TrimLeft(parts[0], "@"), parts[1]
+	orgID, err := h.client.GetOrganizationID(req.Context(), orgName)
+	if err == core.ErrOrganizationNotExist {
 		http.Redirect(w, req, fmt.Sprintf("https://registry.npmjs.org/%s", req.URL.Path), http.StatusSeeOther)
 		return
 	}
@@ -44,7 +42,7 @@ func (h *Handler) ServeHTTP(w http.ResponseWriter, req *http.Request) {
 	pack.ID = req.URL.Path
 	pack.Name = req.URL.Path
 
-	iter := h.client.ListReleases(orgName, repoName, big.NewInt(1), big.NewInt(10))
+	iter := h.client.ListReleases(orgID, repoName, big.NewInt(1), big.NewInt(10))
 	err0 := iter.ForEach(req.Context(), func(release *core.Release) {
 		data, err := h.client.GetReleaseMeta(req.Context(), release.MetaCID)
 		if err != nil {

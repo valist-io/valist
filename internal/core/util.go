@@ -12,7 +12,7 @@ func packedEncoding(args ...interface{}) ([]byte, error) {
 
 	for _, arg := range args {
 		switch arg.(type) {
-		case common.Hash:
+		case [32]byte, common.Hash:
 			argtype, _ := abi.NewType("bytes32", "", nil)
 			arguments = append(arguments, abi.Argument{Type: argtype})
 		case string:

@@ -13,7 +13,10 @@ import (
 	"github.com/valist-io/registry/internal/contract/valist"
 )
 
-var emptyHash = common.HexToHash("0x0000000000000000000000000000000000000000")
+var (
+	emptyHash    = common.HexToHash("0x0")
+	emptyAddress = common.HexToAddress("0x0")
+)
 
 var (
 	ErrOrganizationNotExist = errors.New("Organization does not exist")

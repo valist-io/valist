@@ -3,7 +3,6 @@ package http
 import (
 	"context"
 	"encoding/json"
-	"math/big"
 	"net/http"
 
 	"github.com/gorilla/mux"
@@ -34,17 +33,11 @@ func NewServer(client *core.Client, addr string) *Server {
 	npmHandler = http.StripPrefix("/npm/", npmHandler)
 
 	router := mux.NewRouter()
-	router.PathPrefix("/npm/").
-		Handler(npmHandler).
-		Methods(http.MethodGet)
-	router.Handle("/api/{org}", Route(server.GetOrganization)).
-		Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}", Route(server.GetRepository)).
-		Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}/releases", Route(server.ListReleases)).
-		Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}/{tag}", Route(server.GetRelease)).
-		Methods(http.MethodGet)
+	router.PathPrefix("/npm/").Handler(npmHandler).Methods(http.MethodGet)
+	router.Handle("/api/{org}", Route(server.GetOrganization)).Methods(http.MethodGet)
+	router.Handle("/api/{org}/{repo}", Route(server.GetRepository)).Methods(http.MethodGet)
+	router.Handle("/api/{org}/{repo}/releases", Route(server.ListReleases)).Methods(http.MethodGet)
+	router.Handle("/api/{org}/{repo}/{tag}", Route(server.GetRelease)).Methods(http.MethodGet)
 
 	server.http = &http.Server{
 		Addr:    addr,
@@ -67,7 +60,12 @@ func (s *Server) Shutdown(ctx context.Context) error {
 func (server *Server) GetOrganization(w http.ResponseWriter, req *http.Request) error {
 	vars := mux.Vars(req)
 
-	org, err := server.client.GetOrganization(req.Context(), vars["org"])
+	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	if err != nil {
+		return err
+	}
+
+	org, err := server.client.GetOrganization(req.Context(), orgID)
 	if err != nil {
 		return err
 	}
@@ -77,10 +75,14 @@ func (server *Server) GetOrganization(w http.ResponseWriter, req *http.Request) 
 }
 
 func (server *Server) GetRepository(w http.ResponseWriter, req *http.Request) error {
-	ctx := req.Context()
 	vars := mux.Vars(req)
 
-	repo, err := server.client.GetRepository(ctx, vars["org"], vars["repo"])
+	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	if err != nil {
+		return err
+	}
+
+	repo, err := server.client.GetRepository(req.Context(), orgID, vars["repo"])
 	if err != nil {
 		return err
 	}
@@ -90,7 +92,6 @@ func (server *Server) GetRepository(w http.ResponseWriter, req *http.Request) er
 }
 
 func (server *Server) ListReleases(w http.ResponseWriter, req *http.Request) error {
-	ctx := req.Context()
 	vars := mux.Vars(req)
 
 	page, limit, err := Paginate(req.URL.Query())
@@ -98,10 +99,14 @@ func (server *Server) ListReleases(w http.ResponseWriter, req *http.Request) err
 		return err
 	}
 
-	var releases []*core.Release
+	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	if err != nil {
+		return err
+	}
 
-	iter := server.client.ListReleases(vars["org"], vars["repo"], big.NewInt(page), big.NewInt(limit))
-	err0 := iter.ForEach(ctx, func(release *core.Release) {
+	var releases []*core.Release
+	iter := server.client.ListReleases(orgID, vars["repo"], page, limit)
+	err0 := iter.ForEach(req.Context(), func(release *core.Release) {
 		releases = append(releases, release)
 	})
 
@@ -114,10 +119,14 @@ func (server *Server) ListReleases(w http.ResponseWriter, req *http.Request) err
 }
 
 func (server *Server) GetRelease(w http.ResponseWriter, req *http.Request) error {
-	ctx := req.Context()
 	vars := mux.Vars(req)
 
-	release, err := server.client.GetRelease(ctx, vars["org"], vars["repo"], vars["tag"])
+	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	if err != nil {
+		return err
+	}
+
+	release, err := server.client.GetRelease(req.Context(), orgID, vars["repo"], vars["tag"])
 	if err != nil {
 		return err
 	}
