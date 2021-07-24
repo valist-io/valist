@@ -5,6 +5,13 @@ import (
 	"math/big"
 )
 
+func (s *CoreSuite) TestGetOrganizationID() {
+	ctx := context.Background()
+
+	_, err := s.client.GetOrganizationID(ctx, "empty")
+	s.Assert().Equal(ErrOrganizationNotExist, err)
+}
+
 func (s *CoreSuite) TestCreateOrganization() {
 	ctx := context.Background()
 

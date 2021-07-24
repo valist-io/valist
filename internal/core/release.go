@@ -112,14 +112,17 @@ func (client *Client) GetReleaseMeta(ctx context.Context, id cid.Cid) ([]byte, e
 }
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
-func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, tag string, releaseCID, metaCID cid.Cid) (<-chan VoteReleaseResult, error) {
+func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *Release) (<-chan VoteReleaseResult, error) {
 	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
 	if err != nil {
 		return nil, err
 	}
 	txopts.Context = ctx
 
-	tx, err := client.valist.VoteRelease(txopts, orgID, repoName, tag, releaseCID.String(), metaCID.String())
+	releaseCID := release.ReleaseCID.String()
+	metaCID := release.MetaCID.String()
+
+	tx, err := client.valist.VoteRelease(txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
 	if err != nil {
 		return nil, err
 	}

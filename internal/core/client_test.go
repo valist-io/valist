@@ -39,9 +39,11 @@ func (s *CoreSuite) SetupTest() {
 
 	_, _, valist, err := contract.DeployValist(opts, s.backend, emptyAddress)
 	s.Require().NoError(err, "Failed to deploy valist contract")
+	s.backend.Commit()
 
 	_, _, registry, err := contract.DeployRegistry(opts, s.backend, emptyAddress)
 	s.Require().NoError(err, "Failed to deploy valist registry contract")
+	s.backend.Commit()
 
 	node, err := coremock.NewMockNode()
 	s.Require().NoError(err, "Failed to create IPFS node")

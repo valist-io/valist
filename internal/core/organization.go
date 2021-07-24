@@ -69,6 +69,8 @@ func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*Org
 		return nil, fmt.Errorf("Failed to get organization id: %v", err)
 	}
 
+	// TODO there's no way to check if an org exists
+
 	metaCID, err := cid.Decode(org.MetaCID)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)

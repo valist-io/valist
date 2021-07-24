@@ -5,6 +5,13 @@ import (
 	"math/big"
 )
 
+func (s *CoreSuite) TestGetRepository() {
+	ctx := context.Background()
+
+	_, err := s.client.GetRepository(ctx, emptyHash, "empty")
+	s.Assert().Equal(ErrRepositoryNotExist, err)
+}
+
 func (s *CoreSuite) TestCreateRepository() {
 	ctx := context.Background()
 

@@ -6,6 +6,13 @@ import (
 	files "github.com/ipfs/go-ipfs-files"
 )
 
+func (s *CoreSuite) TestGetRelease() {
+	ctx := context.Background()
+
+	_, err := s.client.GetRelease(ctx, emptyHash, "empty", "empty")
+	s.Assert().Equal(ErrReleaseNotExist, err)
+}
+
 func (s *CoreSuite) TestVoteRelease() {
 	ctx := context.Background()
 
@@ -23,17 +30,20 @@ func (s *CoreSuite) TestVoteRelease() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	releaseTag := "v0.0.1"
-	releaseMeta := []byte("hello")
-	releaseData := []byte("world")
+	metaFile := files.NewBytesFile([]byte("hello"))
+	dataFile := files.NewBytesFile([]byte("world"))
 
-	releaseMetaPath, err := s.client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(releaseMeta))
+	metaPath, err := s.client.ipfs.Unixfs().Add(ctx, metaFile)
 	s.Require().NoError(err, "Failed to add release meta")
-	metaCID := releaseMetaPath.Cid()
 
-	releaseDataPath, err := s.client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(releaseData))
+	dataPath, err := s.client.ipfs.Unixfs().Add(ctx, dataFile)
 	s.Require().NoError(err, "Failed to add release data")
-	releaseCID := releaseDataPath.Cid()
+
+	release := &Release{
+		Tag:        "v0.0.1",
+		ReleaseCID: dataPath.Cid(),
+		MetaCID:    metaPath.Cid(),
+	}
 
 	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
@@ -50,19 +60,19 @@ func (s *CoreSuite) TestVoteRelease() {
 	res2 := <-txc2
 	s.Require().NoError(res2.Err, "Failed to create repository")
 
-	txc3, err := s.client.VoteRelease(ctx, orgID, repoName, releaseTag, releaseCID, metaCID)
+	txc3, err := s.client.VoteRelease(ctx, orgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
 	s.backend.Commit()
 
 	res3 := <-txc3
 	s.Require().NoError(res3.Err, "Failed to vote release")
 
-	release, err := s.client.GetRelease(ctx, orgID, repoName, releaseTag)
+	other, err := s.client.GetRelease(ctx, orgID, repoName, release.Tag)
 	s.Require().NoError(err, "Failed to get release")
-	s.Assert().Equal(release.ReleaseCID, releaseCID)
-	s.Assert().Equal(release.MetaCID, metaCID)
+	s.Assert().Equal(release.ReleaseCID, other.ReleaseCID)
+	s.Assert().Equal(release.MetaCID, other.MetaCID)
 
 	latest, err := s.client.GetLatestRelease(ctx, orgID, repoName)
 	s.Require().NoError(err, "Failed to get latest release")
-	s.Assert().Equal(latest.Tag, releaseTag)
+	s.Assert().Equal(release.Tag, latest.Tag)
 }
