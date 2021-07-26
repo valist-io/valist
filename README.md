@@ -11,7 +11,7 @@ git clone https://github.com/valist-io/registry
 
 cd registry
 
-go build .
+go build ./cmd/valist
 ```
 
 ## Contributing
