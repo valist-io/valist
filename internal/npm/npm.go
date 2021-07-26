@@ -2,6 +2,8 @@
 // https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 package npm
 
+// TODO https://github.com/npm/normalize-package-data
+
 type Package struct {
 	// the package name
 	ID string `json:"_id"`

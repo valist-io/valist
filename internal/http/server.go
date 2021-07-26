@@ -1,136 +1,160 @@
 package http
 
 import (
-	"context"
-	"encoding/json"
+	"fmt"
+	"math/big"
 	"net/http"
+	"strings"
 
-	"github.com/gorilla/mux"
+	"github.com/gin-gonic/gin"
 	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/npm"
 )
 
-// Route wraps an http handler func that returns an error.
-type Route func(http.ResponseWriter, *http.Request) error
-
-func (r Route) ServeHTTP(w http.ResponseWriter, req *http.Request) {
-	if err := r(w, req); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
-	}
-}
-
 type Server struct {
-	client *core.Client
-	http   *http.Server
+	client core.CoreAPI
 }
 
-func NewServer(client *core.Client, addr string) *Server {
-	server := &Server{
+func NewServer(client core.CoreAPI, addr string) *http.Server {
+	server := Server{
 		client: client,
 	}
 
-	npmHandler := npm.NewHandler(client)
-	npmHandler = http.StripPrefix("/npm/", npmHandler)
+	router := gin.Default()
+	router.GET("/api/:org", server.GetOrganization)
+	router.GET("/api/:org/:repo", server.GetRepository)
+	router.GET("/api/:org/:repo/releases", server.ListReleases)
+	router.GET("/api/:org/:repo/:tag", server.GetRelease)
+	router.GET("/npm/:org", server.GetNodePackage)
+	router.GET("/npm/:org/*repo", server.GetNodePackage)
 
-	router := mux.NewRouter()
-	router.PathPrefix("/npm/").Handler(npmHandler).Methods(http.MethodGet)
-	router.Handle("/api/{org}", Route(server.GetOrganization)).Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}", Route(server.GetRepository)).Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}/releases", Route(server.ListReleases)).Methods(http.MethodGet)
-	router.Handle("/api/{org}/{repo}/{tag}", Route(server.GetRelease)).Methods(http.MethodGet)
-
-	server.http = &http.Server{
+	return &http.Server{
 		Addr:    addr,
 		Handler: router,
 	}
-
-	return server
 }
 
-// ListenAndServe starts the HTTP server.
-func (s *Server) ListenAndServe() error {
-	return s.http.ListenAndServe()
+func (s Server) GetOrganization(c *gin.Context) {
+	ctx := c.Request.Context()
+	orgName := c.Param("org")
+
+	orgID, err := s.client.GetOrganizationID(ctx, orgName)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	org, err := s.client.GetOrganization(ctx, orgID)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, org)
 }
 
-// Shutdown stops the HTTP server.
-func (s *Server) Shutdown(ctx context.Context) error {
-	return s.http.Shutdown(ctx)
+func (s Server) GetRepository(c *gin.Context) {
+	ctx := c.Request.Context()
+	orgName := c.Param("org")
+	repoName := c.Param("repo")
+
+	orgID, err := s.client.GetOrganizationID(ctx, orgName)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	repo, err := s.client.GetRepository(ctx, orgID, repoName)
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, repo)
 }
 
-func (server *Server) GetOrganization(w http.ResponseWriter, req *http.Request) error {
-	vars := mux.Vars(req)
+func (s Server) ListReleases(c *gin.Context) {
+	ctx := c.Request.Context()
+	orgName := c.Param("org")
+	repoName := c.Param("repo")
 
-	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
-	if err != nil {
-		return err
+	var limit *big.Int
+	if _, ok := limit.SetString(c.Query("limit"), 10); !ok {
+		limit.SetInt64(10)
 	}
 
-	org, err := server.client.GetOrganization(req.Context(), orgID)
-	if err != nil {
-		return err
+	var page *big.Int
+	if _, ok := page.SetString(c.Query("page"), 10); !ok {
+		page.SetInt64(1)
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(org)
-}
-
-func (server *Server) GetRepository(w http.ResponseWriter, req *http.Request) error {
-	vars := mux.Vars(req)
-
-	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	orgID, err := s.client.GetOrganizationID(ctx, orgName)
 	if err != nil {
-		return err
-	}
-
-	repo, err := server.client.GetRepository(req.Context(), orgID, vars["repo"])
-	if err != nil {
-		return err
-	}
-
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(repo)
-}
-
-func (server *Server) ListReleases(w http.ResponseWriter, req *http.Request) error {
-	vars := mux.Vars(req)
-
-	page, limit, err := Paginate(req.URL.Query())
-	if err != nil {
-		return err
-	}
-
-	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
-	if err != nil {
-		return err
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
 
 	var releases []*core.Release
-	iter := server.client.ListReleases(orgID, vars["repo"], page, limit)
-	err0 := iter.ForEach(req.Context(), func(release *core.Release) {
+	iter := s.client.ListReleases(orgID, repoName, page, limit)
+	err0 := iter.ForEach(ctx, func(release *core.Release) {
 		releases = append(releases, release)
 	})
 
 	if err0 != nil {
-		return err
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(releases)
+	c.JSON(http.StatusOK, releases)
 }
 
-func (server *Server) GetRelease(w http.ResponseWriter, req *http.Request) error {
-	vars := mux.Vars(req)
+func (s Server) GetRelease(c *gin.Context) {
+	ctx := c.Request.Context()
+	orgName := c.Param("org")
+	repoName := c.Param("repo")
+	releaseTag := c.Param("tag")
 
-	orgID, err := server.client.GetOrganizationID(req.Context(), vars["org"])
+	orgID, err := s.client.GetOrganizationID(ctx, orgName)
 	if err != nil {
-		return err
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
 
-	release, err := server.client.GetRelease(req.Context(), orgID, vars["repo"], vars["tag"])
+	release, err := s.client.GetRelease(ctx, orgID, repoName, releaseTag)
 	if err != nil {
-		return err
+		c.String(http.StatusBadRequest, err.Error())
+		return
 	}
 
-	w.Header().Add("Content-Type", "application/json")
-	return json.NewEncoder(w).Encode(release)
+	c.JSON(http.StatusOK, release)
+}
+
+func (s Server) GetNodePackage(c *gin.Context) {
+	ctx := c.Request.Context()
+	orgName := strings.TrimLeft(c.Param("org"), "@")
+	repoName := strings.TrimLeft(c.Param("repo"), "/")
+
+	// handle unscoped package redirects
+	if repoName == "" {
+		redirect := fmt.Sprintf("%s/%s", npm.DefaultRegistry, orgName)
+		c.Redirect(http.StatusSeeOther, redirect)
+		return
+	}
+
+	// TODO move to registry mapping
+	registry := npm.NewRegistry(s.client)
+
+	pack, err := registry.GetScopedPackage(ctx, orgName, repoName)
+	if err == core.ErrOrganizationNotExist {
+		redirect := fmt.Sprintf("%s/%s/%s", npm.DefaultRegistry, orgName, repoName)
+		c.Redirect(http.StatusSeeOther, redirect)
+		return
+	}
+
+	if err != nil {
+		c.String(http.StatusBadRequest, err.Error())
+		return
+	}
+
+	c.JSON(http.StatusOK, pack)
 }
