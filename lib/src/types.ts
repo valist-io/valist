@@ -125,5 +125,6 @@ export type ValistConfig = {
   image: string,
   build: string,
   install: string,
-  out: string,
+  out?: string,
+  artifacts?: Record<string, string>,
 };

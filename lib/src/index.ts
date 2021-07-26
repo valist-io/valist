@@ -16,6 +16,7 @@ import {
   RepoMeta,
   Repository,
   ValistCache,
+  ValistConfig,
 } from './types';
 
 import {
@@ -31,6 +32,7 @@ import {
   shortnameFilterRegex,
   sendMetaTransaction,
   getValistRegistry,
+  stripParentFolderFromPath,
 } from './utils';
 
 import { ValistSDKError } from './errors';
@@ -180,10 +182,23 @@ class Valist {
     }
   }
 
-  async prepareRelease(tag: string, releaseFile: any, metaFile: any): Promise<Release> {
+  async prepareRelease(
+    config: ValistConfig,
+    releaseFiles: any,
+    metaFile: any,
+    parentFolder = '',
+  ): Promise<Release> {
     try {
-      const releaseCID: string = await this.addFileToIPFS(releaseFile);
+      let releaseCID: string;
+
+      if (releaseFiles.length > 1) {
+        releaseCID = await this.addFolderToIPFS(releaseFiles, parentFolder);
+      } else {
+        releaseCID = await this.addFileToIPFS(releaseFiles[0]);
+      }
+
       const metaCID: string = await this.addFileToIPFS(metaFile);
+      const { tag } = config;
       return { tag, releaseCID, metaCID };
     } catch (e) {
       const msg = 'Could not publish release';
@@ -980,6 +995,30 @@ class Valist {
     try {
       const result = await this.ipfs.add(data, { onlyHash, cidVersion: 1 });
       return result.cid.string;
+    } catch (e) {
+      const msg = 'Could not add file to IPFS';
+      console.error(msg, e);
+      throw e;
+    }
+  }
+
+  async addFolderToIPFS(files: any[], parent = ''): Promise<string> {
+    try {
+      const fileObjects = files.map((file) => {
+        const fileObject = {
+          path: stripParentFolderFromPath(file.path, parent),
+          content: file,
+        };
+        return fileObject;
+      });
+
+      let cid;
+      // eslint-disable-next-line no-restricted-syntax
+      for await (const result of this.ipfs.addAll(fileObjects, { wrapWithDirectory: true, cidVersion: 1 })) {
+        cid = result.cid.string;
+      }
+
+      return cid;
     } catch (e) {
       const msg = 'Could not add file to IPFS';
       console.error(msg, e);

@@ -99,6 +99,7 @@ export const parseValistConfig = (): ValistConfig => {
       build: configFile.build,
       install: configFile.install,
       out: configFile.out,
+      artifacts: configFile.artifacts,
     };
 
     if (!config.meta) {

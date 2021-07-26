@@ -1,3 +1,4 @@
+import Valist from '@valist/sdk';
 import { Command } from '@oclif/command';
 import { buildRelease } from '../utils/build';
 import { parseValistConfig } from '../utils/config';
@@ -13,8 +14,8 @@ export default class Build extends Command {
     // Get current config from valist.yml
     const config = parseValistConfig();
 
-    const releaseFile = await buildRelease(config);
-    this.log('🔨 Project built to path:', releaseFile.path);
+    const releaseFiles = await buildRelease(new Valist({ web3Provider: 'https://rpc.valist.io' }), config);
+    this.log('🔨 Project built to path:', releaseFiles[releaseFiles.length - 1].path);
     this.exit(0);
   }
 }

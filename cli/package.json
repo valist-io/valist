@@ -58,7 +58,7 @@
     "@oclif/config": "^1.17.0",
     "@oclif/plugin-help": "^3.2.2",
     "@truffle/hdwallet-provider": "^1.4.0",
-    "@valist/sdk": "^0.4.0",
+    "@valist/sdk": "file:../lib",
     "cli-ux": "^5.6.3",
     "js-yaml": "^4.1.0",
     "keytar": "^7.7.0",
