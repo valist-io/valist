@@ -27,10 +27,11 @@ export default class RepoThreshold extends Command {
     const { args } = this.parse(RepoThreshold);
     const valist = await initValist();
 
+    const { threshold } = await valist.getRepository(args.orgName, args.repo);
     const { transactionHash } = await valist.voteRepoThreshold(args.orgName, args.repoName, args.thresholdNumber);
     const { signers } = await valist.getPendingRepoThresholdVotes(args.orgName, args.repoName, args.thresholdNumber);
 
-    if (signers.length < args.thresholdNumber) {
+    if (threshold > 1 && signers.length < threshold) {
       this.log(
         `🗳  Voted to set threshold for ${args.orgName}/${args.repoName}: ${signers.length}/${args.thresholdNumber}`,
       );

@@ -23,12 +23,13 @@ export default class OrgThreshold extends Command {
     const { args } = this.parse(OrgThreshold);
     const valist = await initValist();
 
+    const { threshold } = await valist.getOrganization(args.orgName);
     const { transactionHash } = await valist.voteOrgThreshold(args.orgName, args.thresholdNumber);
     const { signers } = await valist.getPendingOrgThresholdVotes(args.orgName, args.thresholdNumber);
 
-    if (signers.length < args.thresholdNumber) {
+    if (threshold > 1 && signers.length < threshold) {
       this.log(
-        `🗳  Voted to set threshold for ${args.orgName}: ${signers.length + 1}/${args.thresholdNumber}`,
+        `🗳  Voted to set threshold for ${args.orgName}: ${signers.length}/${args.thresholdNumber}`,
       );
     } else {
       this.log(`✅ Approved threshold of ${args.thresholdNumber} for ${args.orgName}}!`);
