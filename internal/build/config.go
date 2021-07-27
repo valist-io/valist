@@ -94,13 +94,13 @@ func ParseValistConfig() (ValistConfig, error) {
 	// Read yaml file from disk
 	yamlFile, err := ioutil.ReadFile("valist.yml")
 
-	// Print error if unable to read file
-	if err != nil {
-		return ValistConfig{}, err
-	}
-
 	// Create valsit config object
 	config := ValistConfig{}
+
+	// Print error if unable to read file
+	if err != nil {
+		return config, err
+	}
 
 	// Decode yaml data
 	err = yaml.Unmarshal(yamlFile, &config)
