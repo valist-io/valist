@@ -10,7 +10,7 @@ func TestParseValistConfig(t *testing.T) {
 
 	config := ParseValistConfig()
 
-	testConfig := &ValistConfig{
+	testConfig := ValistConfig{
 		ProjectType: "go",
 		Org:         "test",
 		Repo:        "binary",
