@@ -1,0 +1,7 @@
+projectType: go
+org: test
+repo: binary
+tag: 0.0.2
+meta: README.md
+build: make all
+out: dist
