@@ -1,4 +1,4 @@
-projectType: go
+type: go
 org: test
 repo: binary
 tag: 0.0.2

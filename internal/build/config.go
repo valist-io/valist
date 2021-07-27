@@ -9,16 +9,16 @@ import (
 
 // Define type for ValistConfig.
 type ValistConfig struct {
-	ProjectType string            `yaml:"projectType"`
-	Org         string            `yaml:"org"`
-	Repo        string            `yaml:"repo"`
-	Tag         string            `yaml:"tag"`
-	Meta        string            `yaml:"meta"`
-	Image       string            `yaml:"image"`
-	Build       string            `yaml:"build"`
-	Install     string            `yaml:"install"`
-	Out         string            `yaml:"out"`
-	Artifacts   map[string]string `yaml:"artifacts"`
+	Type      string            `yaml:"type"`
+	Org       string            `yaml:"org"`
+	Repo      string            `yaml:"repo"`
+	Tag       string            `yaml:"tag"`
+	Meta      string            `yaml:"meta"`
+	Image     string            `yaml:"image"`
+	Build     string            `yaml:"build"`
+	Install   string            `yaml:"install"`
+	Out       string            `yaml:"out"`
+	Artifacts map[string]string `yaml:"artifacts"`
 }
 
 func ParseValistConfig() ValistConfig {
