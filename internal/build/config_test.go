@@ -1,6 +1,7 @@
 package build
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
@@ -28,7 +29,10 @@ func TestCreateValistConfig(t *testing.T) {
 
 func TestParseValistConfig(t *testing.T) {
 
-	config := ParseValistConfig()
+	config, err := ParseValistConfig()
+	if err != nil {
+		fmt.Print(err)
+	}
 
 	testConfig := ValistConfig{
 		Type:    "go",

@@ -1,7 +1,6 @@
 package build
 
 import (
-	"fmt"
 	"io/ioutil"
 
 	"gopkg.in/yaml.v3"
@@ -64,7 +63,7 @@ func CreateValistConfig(
 	install string,
 	out string,
 	artifacts map[string]string,
-) {
+) error {
 	valistConfig := ValistConfig{
 		Type:      projectType,
 		Org:       orgName,
@@ -80,22 +79,24 @@ func CreateValistConfig(
 	yamlData, err := yaml.Marshal(valistConfig)
 
 	if err != nil {
-		fmt.Printf("Could not create yaml object: %s\n", err)
+		return err
 	}
 
 	err = ioutil.WriteFile("valist.yml", yamlData, 0644)
 	if err != nil {
-		fmt.Printf("Error writing YAML file to disk: %s\n", err)
+		return err
 	}
+
+	return nil
 }
 
-func ParseValistConfig() ValistConfig {
+func ParseValistConfig() (ValistConfig, error) {
 	// Read yaml file from disk
 	yamlFile, err := ioutil.ReadFile("valist.yml")
 
 	// Print error if unable to read file
 	if err != nil {
-		fmt.Printf("Error reading YAML file: %s\n", err)
+		return ValistConfig{}, err
 	}
 
 	// Create valsit config object
@@ -106,8 +107,8 @@ func ParseValistConfig() ValistConfig {
 
 	// Print error if unable to parse yaml file
 	if err != nil {
-		fmt.Printf("Error parsing YAML file: %s\n", err)
+		return config, err
 	}
 
-	return config
+	return config, err
 }
