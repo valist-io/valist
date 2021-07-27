@@ -23,7 +23,7 @@ func TestCreateValistConfig(t *testing.T) {
 		},
 	)
 
-	assert.FileExists(t, "valist.yml")
+	assert.FileExists(t, "valist.yml", "Valist file has been created")
 }
 
 func TestParseValistConfig(t *testing.T) {
@@ -45,5 +45,5 @@ func TestParseValistConfig(t *testing.T) {
 		},
 	}
 
-	assert.Equal(t, config, testConfig, "Test if parsed config matches expected result")
+	assert.Equal(t, config, testConfig, "Parsed config matches expected result")
 }

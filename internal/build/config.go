@@ -83,7 +83,10 @@ func CreateValistConfig(
 		fmt.Printf("Could not create yaml object: %s\n", err)
 	}
 
-	ioutil.WriteFile("valist.yml", yamlData, 0644)
+	err = ioutil.WriteFile("valist.yml", yamlData, 0644)
+	if err != nil {
+		fmt.Printf("Error writing YAML file to disk: %s\n", err)
+	}
 }
 
 func ParseValistConfig() ValistConfig {
