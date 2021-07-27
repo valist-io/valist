@@ -3,9 +3,9 @@ package repository
 import (
 	"fmt"
 
-	"github.com/valist-io/registry/internal/impl"
-
 	"github.com/urfave/cli/v2"
+
+	"github.com/valist-io/registry/internal/impl"
 )
 
 func NewFetchCommand() *cli.Command {
@@ -20,7 +20,7 @@ func NewFetchCommand() *cli.Command {
 			orgName := c.Args().Get(0)
 			repoName := c.Args().Get(1)
 
-			client, err := impl.NewClient(c.Context)
+			client, err := impl.NewClient(c.Context, nil)
 			if err != nil {
 				return err
 			}

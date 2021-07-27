@@ -84,7 +84,11 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
 func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *core.Release) (<-chan core.VoteReleaseResult, error) {
-	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	if client.transact == nil {
+		return nil, ErrNoTransactor
+	}
+
+	txopts, err := client.transact()
 	if err != nil {
 		return nil, err
 	}

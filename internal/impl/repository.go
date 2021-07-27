@@ -58,6 +58,10 @@ func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.
 
 // CreateRepository creates a repository in the organization with the given orgID.
 func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, name string, meta *core.RepositoryMeta) (<-chan core.CreateRepoResult, error) {
+	if client.transact == nil {
+		return nil, ErrNoTransactor
+	}
+
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -68,7 +72,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	txopts, err := client.transact()
 	if err != nil {
 		return nil, err
 	}

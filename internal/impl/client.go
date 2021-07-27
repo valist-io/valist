@@ -2,8 +2,7 @@ package impl
 
 import (
 	"context"
-	"crypto/ecdsa"
-	"math/big"
+	"errors"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -22,7 +21,11 @@ import (
 var _ core.CoreAPI = (*Client)(nil)
 
 var (
-	chainID           = big.NewInt(80001)
+	ErrNoTransactor = errors.New("Client transactor required")
+)
+
+var (
+	// chainID           = big.NewInt(80001)
 	ethereumRPC       = "https://rpc.valist.io"
 	ipfsAPI           = ma.StringCast("/dns/pin.valist.io")
 	valistPeerAddress = ma.StringCast("/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98")
@@ -32,6 +35,9 @@ var (
 	emptyAddress      = common.HexToAddress("0x0")
 )
 
+// Transactor returns authorization data for a transaction.
+type Transactor func() (*bind.TransactOpts, error)
+
 // Client is a Valist SDK client.
 type Client struct {
 	eth      bind.DeployBackend
@@ -39,12 +45,11 @@ type Client struct {
 	orgs     map[string]common.Hash
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
-	chainID  *big.Int
-	private  *ecdsa.PrivateKey
+	transact Transactor
 }
 
 // NewClient returns a Client with default settings.
-func NewClient(ctx context.Context) (core.CoreAPI, error) {
+func NewClient(ctx context.Context, transact Transactor) (core.CoreAPI, error) {
 	ipfs, err := httpapi.NewApi(ipfsAPI)
 	if err != nil {
 		return nil, err
@@ -79,6 +84,6 @@ func NewClient(ctx context.Context) (core.CoreAPI, error) {
 		orgs:     make(map[string]common.Hash),
 		valist:   valist,
 		registry: registry,
-		chainID:  chainID,
+		transact: transact,
 	}, nil
 }

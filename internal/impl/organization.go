@@ -53,6 +53,10 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 
 // CreateOrganization creates a new organization with the given meta and returns the orgID.
 func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (<-chan core.CreateOrgResult, error) {
+	if client.transact == nil {
+		return nil, ErrNoTransactor
+	}
+
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -63,7 +67,7 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		return nil, err
 	}
 
-	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	txopts, err := client.transact()
 	if err != nil {
 		return nil, err
 	}

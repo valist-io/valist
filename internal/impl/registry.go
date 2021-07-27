@@ -34,7 +34,11 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
 func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (<-chan core.LinkOrgNameResult, error) {
-	txopts, err := bind.NewKeyedTransactorWithChainID(client.private, client.chainID)
+	if client.transact == nil {
+		return nil, ErrNoTransactor
+	}
+
+	txopts, err := client.transact()
 	if err != nil {
 		return nil, err
 	}

@@ -36,7 +36,8 @@ func NewDaemonCommand() *cli.Command {
 		Name:  "daemon",
 		Usage: "Runs a persistent Valist relay",
 		Action: func(c *cli.Context) error {
-			client, err := impl.NewClient(c.Context)
+			// TODO do we want a default transactor?
+			client, err := impl.NewClient(c.Context, nil)
 			if err != nil {
 				return err
 			}
