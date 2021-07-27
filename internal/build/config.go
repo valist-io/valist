@@ -1,13 +1,13 @@
 package build
 
 import (
-	"io/ioutil"
+	"os"
 
 	"gopkg.in/yaml.v3"
 )
 
-// Define type for ValistConfig.
-type ValistConfig struct {
+// Define type for Config.
+type Config struct {
 	Type      string            `yaml:"type"`
 	Org       string            `yaml:"org"`
 	Repo      string            `yaml:"repo"`
@@ -53,62 +53,28 @@ var defaultBuilds = map[string]string{
 	"static": "",
 }
 
-func CreateValistConfig(
-	projectType string,
-	orgName string,
-	repoName string,
-	tag string,
-	meta string,
-	build string,
-	install string,
-	out string,
-	artifacts map[string]string,
-) error {
-	valistConfig := ValistConfig{
-		Type:      projectType,
-		Org:       orgName,
-		Repo:      repoName,
-		Tag:       tag,
-		Meta:      meta,
-		Build:     build,
-		Install:   install,
-		Out:       out,
-		Artifacts: artifacts,
-	}
-
-	yamlData, err := yaml.Marshal(valistConfig)
-
+func (c Config) Save(path string) error {
+	yamlData, err := yaml.Marshal(c)
 	if err != nil {
 		return err
 	}
 
-	err = ioutil.WriteFile("valist.yml", yamlData, 0644)
-	if err != nil {
-		return err
-	}
-
-	return nil
+	return os.WriteFile(path, yamlData, 0644)
 }
 
-func ParseValistConfig() (ValistConfig, error) {
+func (c *Config) Load(path string) error {
 	// Read yaml file from disk
-	yamlFile, err := ioutil.ReadFile("valist.yml")
-
-	// Create valsit config object
-	config := ValistConfig{}
-
-	// Print error if unable to read file
+	yamlFile, err := os.ReadFile(path)
 	if err != nil {
-		return config, err
+		return err
 	}
 
-	// Decode yaml data
-	err = yaml.Unmarshal(yamlFile, &config)
-
-	// Print error if unable to parse yaml file
-	if err != nil {
-		return config, err
-	}
-
-	return config, err
+	return yaml.Unmarshal(yamlFile, c)
 }
+
+// https://pkg.go.dev/github.com/go-playground/validator/v10
+// func (c Config) Validate() error {
+// 	if c.Type != "go" {
+// 		return err
+// 	}
+// }
