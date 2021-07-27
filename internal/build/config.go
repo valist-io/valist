@@ -14,11 +14,11 @@ type ValistConfig struct {
 	Repo      string            `yaml:"repo"`
 	Tag       string            `yaml:"tag"`
 	Meta      string            `yaml:"meta"`
-	Image     string            `yaml:"image"`
-	Build     string            `yaml:"build"`
-	Install   string            `yaml:"install"`
-	Out       string            `yaml:"out"`
-	Artifacts map[string]string `yaml:"artifacts"`
+	Image     string            `yaml:"image,omitempty"`
+	Build     string            `yaml:"build,omitempty"`
+	Install   string            `yaml:"install,omitempty"`
+	Out       string            `yaml:"out,omitempty"`
+	Artifacts map[string]string `yaml:"artifacts,omitempty"`
 }
 
 var defaultImages = map[string]string{
@@ -52,6 +52,38 @@ var defaultBuilds = map[string]string{
 	"docker": "",
 	"c++":    "make build",
 	"static": "",
+}
+
+func CreateValistConfig(
+	projectType string,
+	orgName string,
+	repoName string,
+	tag string,
+	meta string,
+	build string,
+	install string,
+	out string,
+	artifacts map[string]string,
+) {
+	valistConfig := ValistConfig{
+		Type:      projectType,
+		Org:       orgName,
+		Repo:      repoName,
+		Tag:       tag,
+		Meta:      meta,
+		Build:     build,
+		Install:   install,
+		Out:       out,
+		Artifacts: artifacts,
+	}
+
+	yamlData, err := yaml.Marshal(valistConfig)
+
+	if err != nil {
+		fmt.Printf("Could not create yaml object: %s\n", err)
+	}
+
+	ioutil.WriteFile("valist.yml", yamlData, 0644)
 }
 
 func ParseValistConfig() ValistConfig {

@@ -4,7 +4,8 @@ repo: binary
 tag: 0.0.2
 meta: README.md
 build: make all
+install: go mod tidy
 out: dist
 artifacts:
-  linux/amd64: bin/lin000x/hello-world
-  darwin/amd64: bin/macz/hello-world
+    darwin/amd64: bin/macz/hello-world
+    linux/amd64: bin/lin000x/hello-world
