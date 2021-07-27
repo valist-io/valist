@@ -21,8 +21,40 @@ type ValistConfig struct {
 	Artifacts map[string]string `yaml:"artifacts"`
 }
 
-func ParseValistConfig() ValistConfig {
+var defaultImages = map[string]string{
+	"binary": "gcc:bullseye",
+	"node":   "node:buster",
+	"go":     "golang:buster",
+	"rust":   "rust:buster",
+	"python": "python:buster",
+	"docker": "scratch",
+	"c++":    "gcc:bullseye",
+	"static": "",
+}
 
+var defaultInstalls = map[string]string{
+	"binary": "make install",
+	"node":   "npm install",
+	"go":     "go get",
+	"rust":   "cargo install",
+	"python": "pip install -r requirements.txt",
+	"docker": "",
+	"c++":    "make install",
+	"static": "",
+}
+
+var defaultBuilds = map[string]string{
+	"binary": "make build",
+	"node":   "npm run build",
+	"go":     "go build",
+	"rust":   "cargo build",
+	"python": "python3 -m build",
+	"docker": "",
+	"c++":    "make build",
+	"static": "",
+}
+
+func ParseValistConfig() ValistConfig {
 	// Read yaml file from disk
 	yamlFile, err := ioutil.ReadFile("valist.yml")
 
