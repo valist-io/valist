@@ -5,3 +5,6 @@ tag: 0.0.2
 meta: README.md
 build: make all
 out: dist
+artifacts:
+  linux/amd64: bin/lin000x/hello-world
+  darwin/amd64: bin/macz/hello-world

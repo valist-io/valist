@@ -18,6 +18,10 @@ func TestParseValistConfig(t *testing.T) {
 		Meta:  "README.md",
 		Build: "make all",
 		Out:   "dist",
+		Artifacts: map[string]string{
+			"linux/amd64":  "bin/lin000x/hello-world",
+			"darwin/amd64": "bin/macz/hello-world",
+		},
 	}
 
 	assert.Equal(t, config, testConfig, "Test if parsed config matches expected result")
