@@ -1,12 +1,32 @@
 package command
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v2"
 	"github.com/valist-io/registry/internal/build"
 )
+
+func validateLength(value string) error {
+	if len(value) > 0 {
+		return nil
+	}
+	return errors.New("Length must be greater than 0")
+}
+
+func validateYesNo(value string) error {
+	switch value {
+	case
+		"y",
+		"Y",
+		"n",
+		"N":
+		return nil
+	}
+	return errors.New("Must be y or n")
+}
 
 func NewInitCommand() *cli.Command {
 	return &cli.Command{
@@ -15,22 +35,6 @@ func NewInitCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			var out string
 
-			orgPrompt := promptui.Prompt{
-				Label: "Organization name or Username",
-			}
-			org, err := orgPrompt.Run()
-			if err != nil {
-				return err
-			}
-
-			repoPrompt := promptui.Prompt{
-				Label: "Repository name",
-			}
-			repo, err := repoPrompt.Run()
-			if err != nil {
-				return err
-			}
-
 			projectPrompt := promptui.Select{
 				Label: "Repository type",
 				Items: []string{
@@ -38,6 +42,41 @@ func NewInitCommand() *cli.Command {
 				},
 			}
 			_, projectType, err := projectPrompt.Run()
+			if err != nil {
+				return err
+			}
+
+			orgPrompt := promptui.Prompt{
+				Label:    "Organization name or Username",
+				Validate: validateLength,
+			}
+			org, err := orgPrompt.Run()
+			if err != nil {
+				return err
+			}
+
+			repoPrompt := promptui.Prompt{
+				Label:    "Repository name",
+				Validate: validateLength,
+			}
+			repo, err := repoPrompt.Run()
+			if err != nil {
+				return err
+			}
+
+			tagPrompt := promptui.Prompt{
+				Label:   "Release tag",
+				Default: "0.0.1",
+			}
+			tag, err := tagPrompt.Run()
+			if err != nil {
+				return err
+			}
+
+			metaPrompt := promptui.Prompt{
+				Label: "Release meta file",
+			}
+			meta, err := metaPrompt.Run()
 			if err != nil {
 				return err
 			}
@@ -58,23 +97,6 @@ func NewInitCommand() *cli.Command {
 				Default: defaultBuild,
 			}
 			buildCommand, err := buildPrompt.Run()
-			if err != nil {
-				return err
-			}
-
-			tagPrompt := promptui.Prompt{
-				Label:   "Release tag",
-				Default: "0.0.1",
-			}
-			tag, err := tagPrompt.Run()
-			if err != nil {
-				return err
-			}
-
-			metaPrompt := promptui.Prompt{
-				Label: "Release meta file",
-			}
-			meta, err := metaPrompt.Run()
 			if err != nil {
 				return err
 			}
@@ -116,13 +138,14 @@ func NewInitCommand() *cli.Command {
 			artifactsPrompt := promptui.Prompt{
 				Label:     "Does your build have artifacts?",
 				IsConfirm: true,
+				Validate:  validateYesNo,
 			}
 			// If there is artifacts set isArtifacts to y
 			isArtifacts, err := artifactsPrompt.Run()
 			if err != nil {
 			}
 
-			// If there are artifacts prompt for their os, arch, & name/path
+			// If there are artifacts then prompt for their os, arch, & name/path
 			for isArtifacts == "y" || isArtifacts == "Y" {
 				osPrompt := promptui.Prompt{
 					Label: "Artifact operating system (leave blank to quit)",
