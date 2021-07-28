@@ -1,28 +1,28 @@
-package core
+package impl
 
 import (
 	"context"
 
-	files "github.com/ipfs/go-ipfs-files"
+	"github.com/valist-io/registry/internal/core"
 )
 
-func (s *CoreSuite) TestGetRelease() {
+func (s *ClientSuite) TestGetRelease() {
 	ctx := context.Background()
 
 	_, err := s.client.GetRelease(ctx, emptyHash, "empty", "empty")
-	s.Assert().Equal(ErrReleaseNotExist, err)
+	s.Assert().Equal(core.ErrReleaseNotExist, err)
 }
 
-func (s *CoreSuite) TestVoteRelease() {
+func (s *ClientSuite) TestVoteRelease() {
 	ctx := context.Background()
 
-	orgMeta := &OrganizationMeta{
+	orgMeta := &core.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
 	repoName := "sdk"
-	repoMeta := &RepositoryMeta{
+	repoMeta := &core.RepositoryMeta{
 		Name:        "sdk",
 		Description: "Valist core sdk.",
 		ProjectType: "npm",
@@ -30,39 +30,36 @@ func (s *CoreSuite) TestVoteRelease() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	metaFile := files.NewBytesFile([]byte("hello"))
-	dataFile := files.NewBytesFile([]byte("world"))
+	metaCID, err := s.client.AddFile(ctx, []byte("hello"))
+	s.Require().NoError(err, "Failed to add meta file")
 
-	metaPath, err := s.client.ipfs.Unixfs().Add(ctx, metaFile)
-	s.Require().NoError(err, "Failed to add release meta")
+	releaseCID, err := s.client.AddFile(ctx, []byte("world"))
+	s.Require().NoError(err, "Failed to add release file")
 
-	dataPath, err := s.client.ipfs.Unixfs().Add(ctx, dataFile)
-	s.Require().NoError(err, "Failed to add release data")
-
-	release := &Release{
+	release := &core.Release{
 		Tag:        "v0.0.1",
-		ReleaseCID: dataPath.Cid(),
-		MetaCID:    metaPath.Cid(),
+		ReleaseCID: releaseCID,
+		MetaCID:    metaCID,
 	}
 
 	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
+	s.client.Commit()
 
 	res1 := <-txc1
 	s.Require().NoError(res1.Err, "Failed to create organization")
-	orgID := res1.Log.OrgID
+	orgID := res1.OrgID
 
 	txc2, err := s.client.CreateRepository(ctx, orgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.backend.Commit()
+	s.client.Commit()
 
 	res2 := <-txc2
 	s.Require().NoError(res2.Err, "Failed to create repository")
 
 	txc3, err := s.client.VoteRelease(ctx, orgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
-	s.backend.Commit()
+	s.client.Commit()
 
 	res3 := <-txc3
 	s.Require().NoError(res3.Err, "Failed to vote release")

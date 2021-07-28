@@ -1,44 +1,27 @@
-package core
+package impl
 
 import (
 	"context"
 	"math/big"
+
+	"github.com/valist-io/registry/internal/core"
 )
 
-func (s *CoreSuite) TestGetOrganizationID() {
+func (s *ClientSuite) TestCreateOrganization() {
 	ctx := context.Background()
 
-	_, err := s.client.GetOrganizationID(ctx, "empty")
-	s.Assert().Equal(ErrOrganizationNotExist, err)
-}
-
-func (s *CoreSuite) TestCreateOrganization() {
-	ctx := context.Background()
-
-	orgName := "valist"
-	orgMeta := &OrganizationMeta{
+	orgMeta := &core.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
 	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
+	s.client.Commit()
 
 	res1 := <-txc1
 	s.Require().NoError(res1.Err, "Failed to create organization")
-	orgID := res1.Log.OrgID
-
-	txc2, err := s.client.LinkOrganizationName(ctx, orgID, orgName)
-	s.Require().NoError(err, "Failed to link organization name")
-	s.backend.Commit()
-
-	res2 := <-txc2
-	s.Require().NoError(res2.Err, "Failed to link organization name")
-
-	id, err := s.client.GetOrganizationID(ctx, orgName)
-	s.Require().NoError(err, "Failed to get organization id")
-	s.Assert().Equal(orgID[:], id.Bytes())
+	orgID := res1.OrgID
 
 	org, err := s.client.GetOrganization(ctx, orgID)
 	s.Require().NoError(err, "Failed to get organization")
