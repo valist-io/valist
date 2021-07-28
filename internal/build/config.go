@@ -12,7 +12,7 @@ type Config struct {
 	Org       string            `yaml:"org"`
 	Repo      string            `yaml:"repo"`
 	Tag       string            `yaml:"tag"`
-	Meta      string            `yaml:"meta"`
+	Meta      string            `yaml:"meta,omitempty"`
 	Image     string            `yaml:"image,omitempty"`
 	Build     string            `yaml:"build,omitempty"`
 	Install   string            `yaml:"install,omitempty"`
@@ -20,7 +20,7 @@ type Config struct {
 	Artifacts map[string]string `yaml:"artifacts,omitempty"`
 }
 
-var defaultImages = map[string]string{
+var DefaultImages = map[string]string{
 	"binary": "gcc:bullseye",
 	"node":   "node:buster",
 	"go":     "golang:buster",
@@ -31,7 +31,7 @@ var defaultImages = map[string]string{
 	"static": "",
 }
 
-var defaultInstalls = map[string]string{
+var DefaultInstalls = map[string]string{
 	"binary": "make install",
 	"node":   "npm install",
 	"go":     "go get",
@@ -42,7 +42,7 @@ var defaultInstalls = map[string]string{
 	"static": "",
 }
 
-var defaultBuilds = map[string]string{
+var DefaultBuilds = map[string]string{
 	"binary": "make build",
 	"node":   "npm run build",
 	"go":     "go build",
