@@ -136,7 +136,7 @@ func NewInitCommand() *cli.Command {
 			}
 
 			artifactsPrompt := promptui.Prompt{
-				Label:     "Does your build have artifacts?",
+				Label:     "Are you building for multiple architecures?",
 				IsConfirm: true,
 				Validate:  validateYesNo,
 			}
