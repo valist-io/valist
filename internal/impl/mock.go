@@ -1,6 +1,7 @@
 package impl
 
 import (
+	"crypto/ecdsa"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -12,14 +13,12 @@ import (
 	coremock "github.com/ipfs/go-ipfs/core/mock"
 
 	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/core"
 )
-
-var _ core.CoreAPI = (*MockClient)(nil)
 
 // MockClient is an in memory API client.
 type MockClient struct {
-	core.CoreAPI
+	*Client
+	private *ecdsa.PrivateKey
 	backend *backends.SimulatedBackend
 }
 
@@ -55,6 +54,11 @@ func NewMockClient() (*MockClient, error) {
 		return nil, err
 	}
 
+	_, _, forwarder, err := contract.DeployForwarder(opts, backend, address)
+	if err != nil {
+		return nil, err
+	}
+
 	node, err := coremock.NewMockNode()
 	if err != nil {
 		return nil, err
@@ -70,13 +74,14 @@ func NewMockClient() (*MockClient, error) {
 
 	return &MockClient{
 		backend: backend,
-		CoreAPI: &Client{
-			eth:      backend,
-			ipfs:     ipfs,
-			orgs:     make(map[string]common.Hash),
-			valist:   valist,
-			registry: registry,
-			transact: transact,
+		Client: &Client{
+			eth:       backend,
+			ipfs:      ipfs,
+			orgs:      make(map[string]common.Hash),
+			valist:    valist,
+			registry:  registry,
+			forwarder: forwarder,
+			transact:  transact,
 		},
 	}, nil
 }
