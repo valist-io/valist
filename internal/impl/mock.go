@@ -36,11 +36,7 @@ func NewMockClient() (*MockClient, error) {
 		address: {Balance: big.NewInt(9223372036854775807)},
 	}, 8000029)
 
-	transact := func() (*bind.TransactOpts, error) {
-		return bind.NewKeyedTransactorWithChainID(private, chainID)
-	}
-
-	opts, err := transact()
+	opts, err := bind.NewKeyedTransactorWithChainID(private, chainID)
 	if err != nil {
 		return nil, err
 	}
@@ -76,7 +72,6 @@ func NewMockClient() (*MockClient, error) {
 			orgs:     make(map[string]common.Hash),
 			valist:   valist,
 			registry: registry,
-			transact: transact,
 		},
 	}, nil
 }

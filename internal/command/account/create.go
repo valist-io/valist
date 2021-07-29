@@ -4,10 +4,11 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/manifoldco/promptui"
+	"github.com/ethereum/go-ethereum/signer/core"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/signer"
 )
 
 func NewCreateCommand() *cli.Command {
@@ -25,24 +26,25 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			prompt := promptui.Prompt{
-				Label:       "Password",
-				Mask:        '*',
-				HideEntered: true,
-			}
-
-			password, err := prompt.Run()
+			api, err := signer.NewSignerAPI(cfg)
 			if err != nil {
 				return err
 			}
+			server := core.NewUIServerAPI(api)
 
-			acc, err := cfg.KeyStore().NewAccount(password)
+			address, err := server.New(c.Context)
 			if err != nil {
 				return err
 			}
+			fmt.Println("Account created:", address)
 
-			fmt.Println(acc.Address)
-			return nil
+			if _, ok := cfg.Accounts["default"]; ok {
+				return nil
+			}
+
+			fmt.Println("Setting default account")
+			cfg.Accounts["default"] = address
+			return cfg.Save()
 		},
 	}
 }

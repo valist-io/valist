@@ -6,19 +6,12 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
-	rootDir     = ".valist"
-	configFile  = "config"
-	keystoreDir = "keystore"
-)
-
-const (
-	scryptN = keystore.StandardScryptN
-	scryptP = keystore.StandardScryptP
+	rootDir    = ".valist"
+	configFile = "config"
 )
 
 type Ethereum struct {
@@ -37,20 +30,35 @@ type IPFS struct {
 	Peers []string `json:"peers"`
 }
 
+type Signer struct {
+	// AdvancedMode allows warning instead of rejecting.
+	AdvancedMode bool `json:"advanced_mode"`
+	// LightKDF enables faster KDF for low power devices.
+	LightKDF bool `json:"light_kdf"`
+	// NoUSB disables usb signer devices.
+	NoUSB bool `json:"no_usb"`
+	// SmartCardPath enables smart card signing.
+	SmartCardPath string `json:"smart_card_path"`
+	// KeyStorePath is the path to the key store.
+	KeyStorePath string `json:"key_store_path"`
+	// IPCAddress is the signer ipc address.
+	IPCAddress string `json:"ipc_address"`
+}
+
 type Config struct {
 	rootPath string
-	// Ethereum contains ethereum config.
-	Ethereum Ethereum `json:"ethereum"`
-	// IPFS contains ipfs config.
-	IPFS IPFS `json:"ipfs"`
-	// Accounts is a mapping of names to addresses.
 	Accounts map[string]common.Address `json:"accounts"`
+	Ethereum Ethereum                  `json:"ethereum"`
+	IPFS     IPFS                      `json:"ipfs"`
+	Signer   Signer                    `json:"signer"`
 }
 
 // Default returns a config with default settings.
-func Default() Config {
+func Default(rootPath string) Config {
 	return Config{
-		Ethereum: Ethereum{
+		rootPath,
+		make(map[string]common.Address),
+		Ethereum{
 			RPC:     "https://rpc.valist.io",
 			ChainID: big.NewInt(80001),
 			Contracts: map[string]common.Address{
@@ -58,21 +66,26 @@ func Default() Config {
 				"registry": common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
 			},
 		},
-		IPFS: IPFS{
+		IPFS{
 			API: "/dns/pin.valist.io",
 			Peers: []string{
 				"/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
 			},
 		},
-		Accounts: make(map[string]common.Address),
+		Signer{
+			AdvancedMode:  false,
+			LightKDF:      false,
+			NoUSB:         false,
+			SmartCardPath: "",
+			KeyStorePath:  filepath.Join(rootPath, "keystore"),
+			IPCAddress:    filepath.Join(rootPath, "signer.ipc"),
+		},
 	}
 }
 
 // Exists returns true of the config root exists.
 func Exists(path string) (bool, error) {
-	rootPath := filepath.Join(path, rootDir)
-
-	info, err := os.Stat(rootPath)
+	info, err := os.Stat(filepath.Join(path, rootDir))
 	if os.IsNotExist(err) {
 		return false, nil
 	}
@@ -85,23 +98,13 @@ func Exists(path string) (bool, error) {
 }
 
 // Init initializes a config with a default account.
-func Init(path, password string) error {
+func Init(path string) error {
 	rootPath := filepath.Join(path, rootDir)
-	keystorePath := filepath.Join(rootPath, keystoreDir)
-
 	if err := os.Mkdir(rootPath, 0755); err != nil {
 		return err
 	}
 
-	account, err := keystore.StoreKey(keystorePath, password, scryptN, scryptP)
-	if err != nil {
-		return err
-	}
-
-	config := Default()
-	config.Accounts["default"] = account.Address
-	config.rootPath = rootPath
-
+	config := Default(rootPath)
 	return config.Save()
 }
 
@@ -133,10 +136,4 @@ func (c Config) Save() error {
 
 	configPath := filepath.Join(c.rootPath, configFile)
 	return os.WriteFile(configPath, data, 0666)
-}
-
-// KeyStore returns the keystore from the root path.
-func (c Config) KeyStore() *keystore.KeyStore {
-	dir := filepath.Join(c.rootPath, keystoreDir)
-	return keystore.NewKeyStore(dir, scryptN, scryptP)
 }

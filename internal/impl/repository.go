@@ -16,8 +16,11 @@ import (
 
 // GetRepository returns the repository with the given orgID and name.
 func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repoName string) (*core.Repository, error) {
-	callopts := bind.CallOpts{Context: ctx}
 	selector := crypto.Keccak256Hash(orgID[:], []byte(repoName))
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.account.Address,
+	}
 
 	repo, err := client.valist.Repos(&callopts, selector)
 	if err != nil {
@@ -58,10 +61,6 @@ func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.
 
 // CreateRepository creates a repository in the organization with the given orgID.
 func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, name string, meta *core.RepositoryMeta) (<-chan core.CreateRepoResult, error) {
-	if client.transact == nil {
-		return nil, ErrNoTransactor
-	}
-
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -72,10 +71,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts, err := client.transact()
-	if err != nil {
-		return nil, err
-	}
+	txopts := bind.NewClefTransactor(client.signer, client.account)
 	txopts.Context = ctx
 
 	tx, err := client.valist.CreateRepository(txopts, orgID, name, metaCID.String())
