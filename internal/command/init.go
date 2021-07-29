@@ -74,7 +74,7 @@ func NewInitCommand() *cli.Command {
 			}
 
 			metaPrompt := promptui.Prompt{
-				Label: "Meta file path (README.md)",
+				Label: "Path to meta file(README.md)",
 			}
 			meta, err := metaPrompt.Run()
 			if err != nil {
@@ -83,7 +83,7 @@ func NewInitCommand() *cli.Command {
 
 			defaultInstall := build.DefaultInstalls[projectType]
 			installPrompt := promptui.Prompt{
-				Label:   "Install command",
+				Label:   "Command used to install dependencies",
 				Default: defaultInstall,
 			}
 			install, err := installPrompt.Run()
@@ -93,7 +93,7 @@ func NewInitCommand() *cli.Command {
 
 			defaultBuild := build.DefaultBuilds[projectType]
 			buildPrompt := promptui.Prompt{
-				Label:   "Build command",
+				Label:   "Command used to build your project",
 				Default: defaultBuild,
 			}
 			buildCommand, err := buildPrompt.Run()
@@ -113,7 +113,7 @@ func NewInitCommand() *cli.Command {
 			// If the project type is not node prompt for out path
 			if projectType != "node" {
 				outPrompt := promptui.Prompt{
-					Label: "output file/directory",
+					Label: "Build output file/directory",
 				}
 				out, err = outPrompt.Run()
 				if err != nil {
