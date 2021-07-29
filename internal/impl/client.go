@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"errors"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -13,6 +14,7 @@ import (
 	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/valist-io/registry/internal/contract"
+	"github.com/valist-io/registry/internal/contract/metatx"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
@@ -25,7 +27,7 @@ var (
 )
 
 var (
-	// chainID           = big.NewInt(80001)
+	chainID           = big.NewInt(80001)
 	ethereumRPC       = "https://rpc.valist.io"
 	ipfsAPI           = ma.StringCast("/dns/pin.valist.io")
 	valistPeerAddress = ma.StringCast("/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98")
@@ -40,12 +42,13 @@ type Transactor func() (*bind.TransactOpts, error)
 
 // Client is a Valist SDK client.
 type Client struct {
-	eth      bind.DeployBackend
-	ipfs     coreiface.CoreAPI
-	orgs     map[string]common.Hash
-	valist   *valist.Valist
-	registry *registry.ValistRegistry
-	transact Transactor
+	eth       bind.DeployBackend
+	ipfs      coreiface.CoreAPI
+	orgs      map[string]common.Hash
+	valist    *valist.Valist
+	registry  *registry.ValistRegistry
+	forwarder *metatx.Metatx
+	transact  Transactor
 }
 
 // NewClient returns a Client with default settings.
@@ -78,12 +81,18 @@ func NewClient(ctx context.Context, transact Transactor) (core.CoreAPI, error) {
 		return nil, err
 	}
 
+	forwarder, err := contract.NewForwarder(common.HexToAddress("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b"), eth)
+	if err != nil {
+		return nil, err
+	}
+
 	return &Client{
-		eth:      eth,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		valist:   valist,
-		registry: registry,
-		transact: transact,
+		eth:       eth,
+		ipfs:      ipfs,
+		orgs:      make(map[string]common.Hash),
+		valist:    valist,
+		registry:  registry,
+		forwarder: forwarder,
+		transact:  transact,
 	}, nil
 }
