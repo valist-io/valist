@@ -31,7 +31,7 @@ func validateYesNo(value string) error {
 func NewInitCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "init",
-		Usage: "Generate a new valist project",
+		Usage: "Generate a new Valist project",
 		Action: func(c *cli.Context) error {
 			var out string
 
@@ -47,7 +47,7 @@ func NewInitCommand() *cli.Command {
 			}
 
 			orgPrompt := promptui.Prompt{
-				Label:    "Organization name or Username",
+				Label:    "Organization name or username",
 				Validate: validateLength,
 			}
 			org, err := orgPrompt.Run()
@@ -74,14 +74,14 @@ func NewInitCommand() *cli.Command {
 			}
 
 			metaPrompt := promptui.Prompt{
-				Label: "Release meta file",
+				Label: "Meta file path (README.md)",
 			}
 			meta, err := metaPrompt.Run()
 			if err != nil {
 				return err
 			}
 
-			defaultInstall := build.DefaultImages[projectType]
+			defaultInstall := build.DefaultInstalls[projectType]
 			installPrompt := promptui.Prompt{
 				Label:   "Install command",
 				Default: defaultInstall,
@@ -169,17 +169,17 @@ func NewInitCommand() *cli.Command {
 					return err
 				}
 
-				namePrompt := promptui.Prompt{
-					Label: "Artifact path/name",
+				srcPrompt := promptui.Prompt{
+					Label: "Artifact source",
 				}
 
-				name, err := namePrompt.Run()
+				src, err := srcPrompt.Run()
 				if err != nil {
 					return err
 				}
 
-				// Set artifact key to os/arch and value to name
-				cfg.Artifacts[fmt.Sprintf("%s/%s", osName, arch)] = name
+				// Set artifact key to os/arch and value to src
+				cfg.Artifacts[fmt.Sprintf("%s/%s", osName, arch)] = src
 			}
 
 			return cfg.Save("valist.yml")
