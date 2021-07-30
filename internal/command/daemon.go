@@ -8,8 +8,11 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/http"
 	"github.com/valist-io/registry/internal/impl"
 )
@@ -34,10 +37,33 @@ var bindAddr = ":8080"
 func NewDaemonCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "daemon",
-		Usage: "Runs a persistent Valist relay",
+		Usage: "Runs a relay node",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "account",
+				Value: "default",
+				Usage: "Account to authenticate with",
+			},
+		},
 		Action: func(c *cli.Context) error {
-			// TODO do we want a default transactor?
-			client, err := impl.NewClient(c.Context, nil)
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return err
+			}
+
+			cfg, err := config.Load(home)
+			if err != nil {
+				return err
+			}
+
+			var account accounts.Account
+			if address, ok := cfg.Accounts[c.String("account")]; ok {
+				account.Address = address
+			} else {
+				account.Address = common.HexToAddress(c.String("account"))
+			}
+
+			client, err := impl.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

@@ -5,13 +5,13 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/impl"
+	"github.com/valist-io/registry/internal/signer"
 )
 
 func NewCreateCommand() *cli.Command {
@@ -22,7 +22,7 @@ func NewCreateCommand() *cli.Command {
 			&cli.StringFlag{
 				Name:  "account",
 				Value: "default",
-				Usage: "account to authorize transaction",
+				Usage: "Account to authenticate with",
 			},
 		},
 		Action: func(c *cli.Context) error {
@@ -40,21 +40,20 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			address, ok := cfg.Accounts[c.String("account")]
-			if !ok {
-				address = common.HexToAddress(c.String("account"))
-			}
-
-			account, err := cfg.KeyStore().Find(accounts.Account{Address: address})
+			listener, _, err := signer.StartIPCEndpoint(cfg)
 			if err != nil {
 				return err
 			}
+			defer listener.Close()
 
-			transact := func() (*bind.TransactOpts, error) {
-				return bind.NewKeyStoreTransactorWithChainID(cfg.KeyStore(), account, cfg.Ethereum.ChainID)
+			var account accounts.Account
+			if address, ok := cfg.Accounts[c.String("account")]; ok {
+				account.Address = address
+			} else {
+				account.Address = common.HexToAddress(c.String("account"))
 			}
 
-			client, err := impl.NewClient(c.Context, transact)
+			client, err := impl.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
@@ -62,8 +61,8 @@ func NewCreateCommand() *cli.Command {
 			// TODO prompt
 			orgName := c.Args().Get(0)
 			orgMeta := core.OrganizationMeta{
-				Name:        "",
-				Description: "",
+				Name:        "test",
+				Description: "test",
 			}
 
 			fmt.Println("Creating organization...")

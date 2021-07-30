@@ -8,23 +8,18 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestConfigInit(t *testing.T) {
+func TestConfig(t *testing.T) {
 	dir, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create tmp dir")
 	defer os.RemoveAll(dir)
-
-	password := "supersecret"
 
 	exists, err := Exists(dir)
 	require.NoError(t, err, "Failed to check if config exists")
 	assert.False(t, exists)
 
-	err = Init(dir, password)
+	err = Init(dir)
 	require.NoError(t, err, "Failed to init config")
 
-	config, err := Load(dir)
+	_, err = Load(dir)
 	require.NoError(t, err, "Failed to load config")
-
-	keystore := config.KeyStore()
-	assert.Len(t, keystore.Accounts(), 1)
 }
