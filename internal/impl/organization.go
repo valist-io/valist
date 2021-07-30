@@ -67,10 +67,13 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		return nil, err
 	}
 
-	txopts := bind.NewClefTransactor(client.signer, client.account)
-	txopts.Context = ctx
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
+	}
 
-	tx, err := client.valist.CreateOrganization(txopts, metaCID.String())
+	tx, err := client.valist.CreateOrganization(&txopts, metaCID.String())
 	if err != nil {
 		return nil, err
 	}

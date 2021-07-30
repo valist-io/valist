@@ -71,10 +71,13 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts := bind.NewClefTransactor(client.signer, client.account)
-	txopts.Context = ctx
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
+	}
 
-	tx, err := client.valist.CreateRepository(txopts, orgID, name, metaCID.String())
+	tx, err := client.valist.CreateRepository(&txopts, orgID, name, metaCID.String())
 	if err != nil {
 		return nil, err
 	}

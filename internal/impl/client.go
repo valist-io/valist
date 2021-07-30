@@ -36,7 +36,7 @@ type Client struct {
 	orgs     map[string]common.Hash
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
-	signer   *external.ExternalSigner
+	wallet   accounts.Wallet
 	account  accounts.Account
 }
 
@@ -110,7 +110,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		orgs:     make(map[string]common.Hash),
 		valist:   valist,
 		registry: registry,
-		signer:   signer,
+		wallet:   signer,
 		account:  account,
 	}, nil
 }

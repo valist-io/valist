@@ -38,10 +38,13 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
 func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (<-chan core.LinkOrgNameResult, error) {
-	txopts := bind.NewClefTransactor(client.signer, client.account)
-	txopts.Context = ctx
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
+	}
 
-	tx, err := client.registry.LinkNameToID(txopts, orgID, name)
+	tx, err := client.registry.LinkNameToID(&txopts, orgID, name)
 	if err != nil {
 		return nil, err
 	}

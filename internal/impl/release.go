@@ -90,13 +90,16 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
 func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *core.Release) (<-chan core.VoteReleaseResult, error) {
-	txopts := bind.NewClefTransactor(client.signer, client.account)
-	txopts.Context = ctx
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
+	}
 
 	releaseCID := release.ReleaseCID.String()
 	metaCID := release.MetaCID.String()
 
-	tx, err := client.valist.VoteRelease(txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
+	tx, err := client.valist.VoteRelease(&txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
 	if err != nil {
 		return nil, err
 	}

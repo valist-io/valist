@@ -19,7 +19,7 @@ func (s *ClientSuite) TestGetOrganizationID() {
 
 	txc1, err := s.client.LinkOrganizationName(ctx, orgID, orgName)
 	s.Require().NoError(err, "Failed to link organization name")
-	s.client.Commit()
+	s.backend.Commit()
 
 	res1 := <-txc1
 	s.Require().NoError(res1.Err, "Failed to link organization name")
