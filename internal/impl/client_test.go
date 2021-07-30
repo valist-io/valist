@@ -70,6 +70,7 @@ func (s *ClientSuite) SetupTest() {
 		eth:      backend,
 		ipfs:     ipfs,
 		orgs:     make(map[string]common.Hash),
+		chainID:  chainID,
 		valist:   valist,
 		registry: registry,
 		wallet:   signer.Wallets()[0],

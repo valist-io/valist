@@ -3,6 +3,7 @@ package impl
 import (
 	"context"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -30,14 +31,17 @@ var (
 
 // Client is a Valist SDK client.
 type Client struct {
-	cfg      *config.Config
-	eth      bind.DeployBackend
-	ipfs     coreiface.CoreAPI
-	orgs     map[string]common.Hash
+	eth  bind.DeployBackend
+	ipfs coreiface.CoreAPI
+
+	orgs map[string]common.Hash
+
+	chainID  *big.Int
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
-	wallet   accounts.Wallet
-	account  accounts.Account
+
+	wallet  accounts.Wallet
+	account accounts.Account
 }
 
 // NewClient returns a Client with default settings.
@@ -104,10 +108,10 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	return &Client{
-		cfg:      cfg,
 		eth:      eth,
 		ipfs:     ipfs,
 		orgs:     make(map[string]common.Hash),
+		chainID:  cfg.Ethereum.ChainID,
 		valist:   valist,
 		registry: registry,
 		wallet:   signer,

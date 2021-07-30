@@ -1,8 +1,6 @@
 package impl
 
 import (
-	"math/big"
-
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -13,5 +11,5 @@ func (client *Client) Signer(address common.Address, tx *types.Transaction) (*ty
 		return nil, bind.ErrNotAuthorized
 	}
 
-	return client.wallet.SignTx(client.account, tx, big.NewInt(1337))
+	return client.wallet.SignTx(client.account, tx, client.chainID)
 }
