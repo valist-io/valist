@@ -1,48 +1,72 @@
 package build
 
 import (
-	"bufio"
 	"fmt"
 	"os"
 	"os/exec"
+	"path/filepath"
 )
 
 type Dockerfile struct {
-	path           string
-	baseImage      string
-	source         string
-	buildCommand   string
-	installCommand string
+	Path           string
+	BaseImage      string
+	Source         string
+	BuildCommand   string
+	InstallCommand string
 }
 
-func generateDockerfile(buildConfig Dockerfile) {
+func GenerateDockerfile(buildConfig Dockerfile) {
 	var dockerfile = fmt.Sprintf(
 		"FROM %s\nWORKDIR /opt/build\nCOPY %s ./",
-		buildConfig.baseImage, buildConfig.source,
+		buildConfig.BaseImage, buildConfig.Source,
 	)
 
-	if buildConfig.buildCommand != "" {
-		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.buildCommand)
+	if buildConfig.BuildCommand != "" {
+		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.BuildCommand)
 	}
 
-	if buildConfig.installCommand != "" {
-		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.installCommand)
+	if buildConfig.InstallCommand != "" {
+		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.InstallCommand)
 	}
 
-	os.WriteFile(buildConfig.path, []byte(dockerfile), 0644)
+	os.WriteFile(buildConfig.Path, []byte(dockerfile), 0644)
 }
 
-func CreateBuild(imageTag string) error {
-	cmd := exec.Command(fmt.Sprintf("DOCKER_BUILDKIT=1 docker build -t %s .", imageTag))
-	stdout, err := cmd.StdoutPipe()
+func Create(imageTag string) error {
+	cmd := exec.Command("docker", "build", ".", "-t", imageTag)
+	cmd.Env = os.Environ()
+	cmd.Env = append(cmd.Env, "DOCKER_BUILDKIT=1")
+
+	stdoutStderr, err := cmd.CombinedOutput()
 	if err != nil {
 		return err
 	}
-	cmd.Start()
 
-	buf := bufio.NewReader(stdout)
-	for {
-		line, _, _ := buf.ReadLine()
-		fmt.Println(string(line))
+	fmt.Printf("%s\n", stdoutStderr)
+	return nil
+}
+
+func Export(image string, out string) error {
+	cwd, err := os.Getwd()
+	if err != nil {
+		return err
 	}
+	hostPath := filepath.Join(cwd, out)
+	containerPath := fmt.Sprintf("valist-build:/opt/build/%s", out)
+
+	err = exec.Command("docker", "create", "--name=valist-build", "valist-build").Run()
+	if err != nil {
+		return err
+	}
+
+	err = exec.Command("docker", "cp", containerPath, hostPath).Run()
+	if err != nil {
+		return err
+	}
+
+	err = exec.Command("docker", "rm", "valist-build").Run()
+	if err != nil {
+		return err
+	}
+	return nil
 }
