@@ -7,7 +7,7 @@ import (
 	"path/filepath"
 )
 
-type Dockerfile struct {
+type DockerConfig struct {
 	Path           string
 	BaseImage      string
 	Source         string
@@ -15,21 +15,21 @@ type Dockerfile struct {
 	InstallCommand string
 }
 
-func GenerateDockerfile(buildConfig Dockerfile) {
+func GenerateDockerfile(dockerConfig DockerConfig) {
 	var dockerfile = fmt.Sprintf(
 		"FROM %s\nWORKDIR /opt/build\nCOPY %s ./",
-		buildConfig.BaseImage, buildConfig.Source,
+		dockerConfig.BaseImage, dockerConfig.Source,
 	)
 
-	if buildConfig.BuildCommand != "" {
-		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.BuildCommand)
+	if dockerConfig.BuildCommand != "" {
+		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.BuildCommand)
 	}
 
-	if buildConfig.InstallCommand != "" {
-		dockerfile += fmt.Sprintf("\nRUN %s", buildConfig.InstallCommand)
+	if dockerConfig.InstallCommand != "" {
+		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.InstallCommand)
 	}
 
-	os.WriteFile(buildConfig.Path, []byte(dockerfile), 0644)
+	os.WriteFile(dockerConfig.Path, []byte(dockerfile), 0644)
 }
 
 func Create(imageTag string) error {
