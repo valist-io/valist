@@ -51,6 +51,17 @@ func Export(image string, out string) error {
 	hostPath := filepath.Join(cwd, out)
 	containerPath := fmt.Sprintf("valist-build:/opt/build/%s", out)
 
+	// fmt.Println(hostPath)
+	// fmt.Println(containerPath)
+
+	// If output is a single directory, remove the directory
+	if _, err := os.Stat(hostPath); !os.IsNotExist(err) {
+		err := os.Remove(hostPath)
+		if err != nil {
+			return err
+		}
+	}
+
 	createCmd := exec.Command("docker", "create", "--name=valist-build", "valist-build")
 	createCmd.Stdout = os.Stdout
 	createCmd.Stderr = os.Stderr
@@ -62,6 +73,7 @@ func Export(image string, out string) error {
 	cpCmd := exec.Command("docker", "cp", containerPath, hostPath)
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
+
 	cpCmd.Run()
 	if err != nil {
 		return err
