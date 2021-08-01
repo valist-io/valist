@@ -33,16 +33,13 @@ func GenerateDockerfile(dockerConfig DockerConfig) {
 }
 
 func Create(imageTag string) error {
-	cmd := exec.Command("docker", "build", ".", "-t", imageTag)
+	cmd := exec.Command("docker", "build", ".", "-t", imageTag, "--progress=plain")
 	cmd.Env = os.Environ()
 	cmd.Env = append(cmd.Env, "DOCKER_BUILDKIT=1")
+	cmd.Stdout = os.Stdout
+	cmd.Stderr = os.Stderr
+	cmd.Run()
 
-	stdoutStderr, err := cmd.CombinedOutput()
-	if err != nil {
-		return err
-	}
-
-	fmt.Printf("%s\n", stdoutStderr)
 	return nil
 }
 
@@ -54,17 +51,26 @@ func Export(image string, out string) error {
 	hostPath := filepath.Join(cwd, out)
 	containerPath := fmt.Sprintf("valist-build:/opt/build/%s", out)
 
-	err = exec.Command("docker", "create", "--name=valist-build", "valist-build").Run()
+	createCmd := exec.Command("docker", "create", "--name=valist-build", "valist-build")
+	createCmd.Stdout = os.Stdout
+	createCmd.Stderr = os.Stderr
+	err = createCmd.Run()
 	if err != nil {
 		return err
 	}
 
-	err = exec.Command("docker", "cp", containerPath, hostPath).Run()
+	cpCmd := exec.Command("docker", "cp", containerPath, hostPath)
+	cpCmd.Stdout = os.Stdout
+	cpCmd.Stderr = os.Stderr
+	cpCmd.Run()
 	if err != nil {
 		return err
 	}
 
-	err = exec.Command("docker", "rm", "valist-build").Run()
+	rmCmd := exec.Command("docker", "rm", "valist-build")
+	rmCmd.Stdout = os.Stdout
+	rmCmd.Stderr = os.Stderr
+	rmCmd.Run()
 	if err != nil {
 		return err
 	}
