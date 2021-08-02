@@ -21,10 +21,11 @@ func TestGenerateDockerfile(t *testing.T) {
 
 func TestCreateBuild(t *testing.T) {
 	err := Create("valist-build")
-	assert.NoError(t, err, "Valist build returns with no errors")
+	assert.NoError(t, err, "Create build returns with no errors")
 }
 
 func TestExportBuild(t *testing.T) {
-	Export("valist-build", "dist")
+	err := Export("valist-build", "dist")
+	assert.NoError(t, err, "Export build returns with no errors")
 	assert.FileExists(t, "dist/main", "Artifact has been created")
 }

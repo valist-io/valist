@@ -15,7 +15,7 @@ type DockerConfig struct {
 	InstallCommand string
 }
 
-func GenerateDockerfile(dockerConfig DockerConfig) {
+func GenerateDockerfile(dockerConfig DockerConfig) error {
 	var dockerfile = fmt.Sprintf(
 		"FROM %s\nWORKDIR /opt/build\nCOPY %s ./",
 		dockerConfig.BaseImage, dockerConfig.Source,
@@ -29,7 +29,7 @@ func GenerateDockerfile(dockerConfig DockerConfig) {
 		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.InstallCommand)
 	}
 
-	os.WriteFile(dockerConfig.Path, []byte(dockerfile), 0644)
+	return os.WriteFile(dockerConfig.Path, []byte(dockerfile), 0644)
 }
 
 func Create(imageTag string) error {
@@ -38,7 +38,10 @@ func Create(imageTag string) error {
 	cmd.Env = append(cmd.Env, "DOCKER_BUILDKIT=1")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	cmd.Run()
+	err := cmd.Run()
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
@@ -51,12 +54,9 @@ func Export(image string, out string) error {
 	hostPath := filepath.Join(cwd, out)
 	containerPath := fmt.Sprintf("valist-build:/opt/build/%s", out)
 
-	// fmt.Println(hostPath)
-	// fmt.Println(containerPath)
-
 	// If output is a single directory, remove the directory
 	if _, err := os.Stat(hostPath); !os.IsNotExist(err) {
-		err := os.Remove(hostPath)
+		err := os.RemoveAll(hostPath)
 		if err != nil {
 			return err
 		}
@@ -65,26 +65,19 @@ func Export(image string, out string) error {
 	createCmd := exec.Command("docker", "create", "--name=valist-build", "valist-build")
 	createCmd.Stdout = os.Stdout
 	createCmd.Stderr = os.Stderr
-	err = createCmd.Run()
-	if err != nil {
+	if err := createCmd.Run(); err != nil {
 		return err
 	}
 
 	cpCmd := exec.Command("docker", "cp", containerPath, hostPath)
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
-
-	cpCmd.Run()
-	if err != nil {
+	if err := cpCmd.Run(); err != nil {
 		return err
 	}
 
 	rmCmd := exec.Command("docker", "rm", "valist-build")
 	rmCmd.Stdout = os.Stdout
 	rmCmd.Stderr = os.Stderr
-	rmCmd.Run()
-	if err != nil {
-		return err
-	}
-	return nil
+	return rmCmd.Run()
 }
