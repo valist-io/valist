@@ -48,4 +48,5 @@ func TestValistFileFromTemplate(t *testing.T) {
 	cfgPath := filepath.Join(tmp, "valist.yml")
 	err = ValistFileFromTemplate("go", cfgPath)
 	require.NoError(t, err)
+	assert.FileExists(t, cfgPath, "Valist file has been created")
 }
