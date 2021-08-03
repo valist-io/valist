@@ -4,11 +4,9 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/ethereum/go-ethereum/signer/core"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/signer"
 )
 
 func NewListCommand() *cli.Command {
@@ -26,19 +24,12 @@ func NewListCommand() *cli.Command {
 				return err
 			}
 
-			api, err := signer.NewSignerAPI(cfg)
-			if err != nil {
-				return err
-			}
-			server := core.NewUIServerAPI(api)
-
-			accounts, err := server.ListAccounts(c.Context)
-			if err != nil {
-				return err
-			}
-
-			for _, acc := range accounts {
-				fmt.Println(acc.Address.String())
+			for _, account := range cfg.Accounts.Pinned {
+				if cfg.Accounts.Default == account {
+					fmt.Printf("%s (default)\n", account)
+				} else {
+					fmt.Printf("%s\n", account)
+				}
 			}
 
 			return nil

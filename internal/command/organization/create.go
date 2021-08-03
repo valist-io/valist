@@ -47,10 +47,10 @@ func NewCreateCommand() *cli.Command {
 			defer listener.Close()
 
 			var account accounts.Account
-			if address, ok := cfg.Accounts[c.String("account")]; ok {
-				account.Address = address
-			} else {
+			if c.IsSet("account") {
 				account.Address = common.HexToAddress(c.String("account"))
+			} else {
+				account.Address = cfg.Accounts.Default
 			}
 
 			client, err := impl.NewClient(c.Context, cfg, account)
