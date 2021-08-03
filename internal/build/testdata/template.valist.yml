@@ -1,0 +1,23 @@
+# The project type
+type: go
+
+# The valist organization
+org: 
+
+# The valist repository
+repo: 
+
+# The latest release tag
+tag: 
+
+# The command used for building the project
+build: go build
+
+# The command used for installing the project's dependencies
+# install: go get ./...
+
+# The project's build/output folder
+out: path_to_artifact_or_build_directory
+
+# The docker image used for building the project. Will default to golang:buster for go.
+# image: golang:buster
