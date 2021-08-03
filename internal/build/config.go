@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"os"
+	"strings"
+	"text/template"
 
 	"github.com/manifoldco/promptui"
 	"gopkg.in/yaml.v3"
@@ -20,12 +22,13 @@ type Config struct {
 	Build     string            `yaml:"build,omitempty"`
 	Install   string            `yaml:"install,omitempty"`
 	Out       string            `yaml:"out,omitempty"`
-	Artifacts map[string]string `yaml:"artifacts,omitempty"`
+	Platforms map[string]string `yaml:"artifacts,omitempty"`
 }
 
 var DefaultImages = map[string]string{
 	"binary": "gcc:bullseye",
 	"node":   "node:buster",
+	"npm":    "node:buster",
 	"go":     "golang:buster",
 	"rust":   "rust:buster",
 	"python": "python:buster",
@@ -37,7 +40,8 @@ var DefaultImages = map[string]string{
 var DefaultInstalls = map[string]string{
 	"binary": "make install",
 	"node":   "npm install",
-	"go":     "go get",
+	"npm":    "npm install",
+	"go":     "go get ./...",
 	"rust":   "cargo install",
 	"python": "pip install -r requirements.txt",
 	"docker": "",
@@ -48,6 +52,7 @@ var DefaultInstalls = map[string]string{
 var DefaultBuilds = map[string]string{
 	"binary": "make build",
 	"node":   "npm run build",
+	"npm":    "npm run build",
 	"go":     "go build",
 	"rust":   "cargo build",
 	"python": "python3 -m build",
@@ -83,12 +88,10 @@ func validateLength(value string) error {
 }
 
 func validateYesNo(value string) error {
-	switch value {
+	switch strings.ToLower(string(value[0])) {
 	case
 		"y",
-		"Y",
-		"n",
-		"N":
+		"n":
 		return nil
 	}
 	return errors.New("Must be y or n")
@@ -166,7 +169,7 @@ func ValistFileFromWizard() error {
 
 	defaultImage := DefaultImages[projectType]
 	imagePrompt := promptui.Prompt{
-		Label: fmt.Sprintf("Docker image (if not set, will default to %s)", defaultImage),
+		Label: fmt.Sprintf("Docker image (if not set, will default to %v)", defaultImage),
 	}
 	image, err := imagePrompt.Run()
 	if err != nil {
@@ -195,23 +198,24 @@ func ValistFileFromWizard() error {
 		Build:     buildCommand,
 		Install:   install,
 		Out:       out,
-		Artifacts: map[string]string{},
+		Platforms: map[string]string{},
 	}
 
-	artifactsPrompt := promptui.Prompt{
+	platformsPrompt := promptui.Prompt{
 		Label:     "Are you building for multiple architecures? (y,N)",
 		IsConfirm: true,
 		Validate:  validateYesNo,
 	}
 	// If there is artifacts set isArtifacts to y
-	isArtifacts, err := artifactsPrompt.Run()
+	isArtifacts, err := platformsPrompt.Run()
 	if err != nil {
+		return err
 	}
 
 	// If there are artifacts then prompt for their os, arch, & name/path
-	for isArtifacts == "y" || isArtifacts == "Y" {
+	for isArtifacts == "y" {
 		osPrompt := promptui.Prompt{
-			Label: "Artifact operating system (leave blank to quit)",
+			Label: "Platform operating system, e.g. linux, darwin, freebsd, windows (leave blank to quit)",
 		}
 
 		osName, err := osPrompt.Run()
@@ -224,7 +228,7 @@ func ValistFileFromWizard() error {
 		}
 
 		archPrompt := promptui.Prompt{
-			Label: "Artifact architecture ",
+			Label: "Platform architecture, e.g. amd64, arm64",
 		}
 
 		arch, err := archPrompt.Run()
@@ -233,7 +237,7 @@ func ValistFileFromWizard() error {
 		}
 
 		srcPrompt := promptui.Prompt{
-			Label: "Artifact file-path/name",
+			Label: "Artifact file path",
 		}
 
 		src, err := srcPrompt.Run()
@@ -242,46 +246,83 @@ func ValistFileFromWizard() error {
 		}
 
 		// Set artifact key to os/arch and value to src
-		cfg.Artifacts[fmt.Sprintf("%s/%s", osName, arch)] = src
+		cfg.Platforms[fmt.Sprintf("%s/%s", osName, arch)] = src
 	}
 
 	return cfg.Save("valist.yml")
 }
 
-func ValistFileFromTemplate(projectType string) error {
-	var outValue string
-	if projectType != "npm" {
-		outValue = "_"
+func ValistFileFromTemplate(projectType string, path string) error {
+	type TemplateCfg struct {
+		RenderMeta      bool
+		RenderInstall   bool
+		RenderPlatforms bool
+		Config
 	}
 
-	yamlData, err := yaml.Marshal(Config{
-		Type: projectType,
-		Org:  "_",
-		Repo: "_",
-		Tag:  "_",
-		Out:  outValue,
-	})
+	cfg := TemplateCfg{}
+
+	cfg.Type = projectType
+	cfg.RenderMeta = true
+	cfg.RenderInstall = true
+	cfg.RenderPlatforms = true
+
+	if projectType != "npm" {
+		cfg.RenderMeta = false
+		cfg.RenderPlatforms = false
+		cfg.Out = "path_to_artifact_or_build_directory"
+	}
+
+	if projectType == "static" || projectType == "go" {
+		cfg.RenderInstall = false
+	}
+
+	cfg.Install = DefaultInstalls[projectType]
+	cfg.Image = DefaultImages[projectType]
+	cfg.Build = DefaultBuilds[projectType]
+
+	configTemplate, err := template.New("valistConfig").Parse(`# The project type
+type: {{.Type}}
+
+# The valist organization
+org: 
+
+# The valist repository
+repo: 
+
+# The latest release tag
+tag: 
+
+# The command used for building the project
+build: {{.Build}}
+
+# The command used for installing the project's dependencies
+{{if not .RenderInstall}}# {{end}}install: {{.Install}}
+
+{{if .Out}}# The project's build/output folder
+out: {{.Out}}{{end}}
+{{if .RenderMeta}}# The metadata file for the latest release, typically README.md or RELEASE.md
+# meta: README.md
+{{end}}
+# The docker image used for building the project. Will default to {{.Image}} for {{.Type}}.
+# image: {{.Image}}
+{{if .Platforms}}
+# The project's supported os/arch platforms and their corresponding artifacts
+# platforms:
+  # linux/amd64: path_to_artifact
+  # linux/arm64: path_to_artifact
+  # darwin/amd64: path_to_artifact
+  # windows/amd64: path_to_artifact
+{{end}}`)
+
+	f, err := os.Create(path)
 	if err != nil {
 		return err
 	}
-	yamlString := string(yamlData)
+	defer f.Close()
 
-	if projectType != "npm" {
-		yamlString += "\n# The metadata file for the current release"
-		yamlString += "\n# meta: "
-
-		yamlString += "\n\n# The docker image used for building the project"
-		yamlString += "\n# image: "
-	}
-
-	yamlString += "\n\n# The command used for installing the project's dependencies"
-	yamlString += "\n# install: "
-
-	yamlString += "\n\n# The command used for building the project"
-	yamlString += "\n# build: "
-
-	yamlData = []byte(yamlString)
-	return os.WriteFile("valist.yml", yamlData, 0644)
+	// Write template to valist.yml
+	return configTemplate.Execute(f, cfg)
 }
 
 // https://pkg.go.dev/github.com/go-playground/validator/v10
