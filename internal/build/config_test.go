@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/require"
 )
 
-func TestCreateValistConfig(t *testing.T) {
+func TestLoadSaveValistConfig(t *testing.T) {
 	tmp, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create tmp dir")
 	defer os.RemoveAll(tmp)
@@ -23,7 +23,7 @@ func TestCreateValistConfig(t *testing.T) {
 		Build:   "make all",
 		Install: "go mod tidy",
 		Out:     "dist",
-		Artifacts: map[string]string{
+		Platforms: map[string]string{
 			"linux/amd64":  "bin/linux/hello-world",
 			"darwin/amd64": "bin/darwin/hello-world",
 		},
@@ -38,4 +38,14 @@ func TestCreateValistConfig(t *testing.T) {
 	err = fullConfigFile.Load(cfgPath)
 	require.NoError(t, err, "Failed to load config")
 	assert.Equal(t, fullConfigObject, fullConfigFile)
+}
+
+func TestValistFileFromTemplate(t *testing.T) {
+	tmp, err := os.MkdirTemp("", "test")
+	require.NoError(t, err, "Failed to create tmp dir")
+	defer os.RemoveAll(tmp)
+
+	cfgPath := filepath.Join(tmp, "valist.yml")
+	err = ValistFileFromTemplate("go", cfgPath)
+	require.NoError(t, err)
 }
