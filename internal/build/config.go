@@ -94,8 +94,20 @@ func validateYesNo(value string) error {
 	return errors.New("Must be y or n")
 }
 
-func GenerateFileInteractive(projectType string) error {
+func ValistFileFromWizard() error {
 	var out string
+
+	// If project type is not set ask for projectType
+	projectPrompt := promptui.Select{
+		Label: "Repository type",
+		Items: []string{
+			"binary", "go", "node", "python", "docker", "static",
+		},
+	}
+	_, projectType, err := projectPrompt.Run()
+	if err != nil {
+		return err
+	}
 
 	orgPrompt := promptui.Prompt{
 		Label:    "Organization name or username",
@@ -116,7 +128,7 @@ func GenerateFileInteractive(projectType string) error {
 	}
 
 	tagPrompt := promptui.Prompt{
-		Label:   "Release tag",
+		Label:   "Your current release tag/version",
 		Default: "0.0.1",
 	}
 	tag, err := tagPrompt.Run()
@@ -187,7 +199,7 @@ func GenerateFileInteractive(projectType string) error {
 	}
 
 	artifactsPrompt := promptui.Prompt{
-		Label:     "Are you building for multiple architecures?",
+		Label:     "Are you building for multiple architecures? (y,N)",
 		IsConfirm: true,
 		Validate:  validateYesNo,
 	}
@@ -221,7 +233,7 @@ func GenerateFileInteractive(projectType string) error {
 		}
 
 		srcPrompt := promptui.Prompt{
-			Label: "Artifact source",
+			Label: "Artifact file-path/name",
 		}
 
 		src, err := srcPrompt.Run()
@@ -236,25 +248,40 @@ func GenerateFileInteractive(projectType string) error {
 	return cfg.Save("valist.yml")
 }
 
-func GenerateValistFile(projectType string) error {
-
-	var cfg = Config{
-		Type:    projectType,
-		Org:     " ",
-		Repo:    " ",
-		Tag:     " ",
-		Meta:    " ",
-		Image:   " ",
-		Build:   " ",
-		Install: " ",
-		Out:     " ",
+func ValistFileFromTemplate(projectType string) error {
+	var outValue string
+	if projectType != "npm" {
+		outValue = "_"
 	}
 
-	if projectType == "node" {
-		return cfg.Save("valist.yml")
+	yamlData, err := yaml.Marshal(Config{
+		Type: projectType,
+		Org:  "_",
+		Repo: "_",
+		Tag:  "_",
+		Out:  outValue,
+	})
+	if err != nil {
+		return err
+	}
+	yamlString := string(yamlData)
+
+	if projectType != "npm" {
+		yamlString += "\n# The metadata file for the current release"
+		yamlString += "\n# meta: "
+
+		yamlString += "\n\n# The docker image used for building the project"
+		yamlString += "\n# image: "
 	}
 
-	return cfg.Save("valist.yml")
+	yamlString += "\n\n# The command used for installing the project's dependencies"
+	yamlString += "\n# install: "
+
+	yamlString += "\n\n# The command used for building the project"
+	yamlString += "\n# build: "
+
+	yamlData = []byte(yamlString)
+	return os.WriteFile("valist.yml", yamlData, 0644)
 }
 
 // https://pkg.go.dev/github.com/go-playground/validator/v10
