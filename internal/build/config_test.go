@@ -45,8 +45,44 @@ func TestValistFileFromTemplate(t *testing.T) {
 	require.NoError(t, err, "Failed to create tmp dir")
 	defer os.RemoveAll(tmp)
 
-	cfgPath := filepath.Join(tmp, "valist.yml")
-	err = ValistFileFromTemplate("go", cfgPath)
+	GoCfgPath := filepath.Join(tmp, "go.valist.yml")
+	NpmCfgPath := filepath.Join(tmp, "npm.valist.yml")
+
+	err = ValistFileFromTemplate("go", GoCfgPath)
+	err = ValistFileFromTemplate("npm", NpmCfgPath)
 	require.NoError(t, err)
-	assert.FileExists(t, cfgPath, "Valist file has been created")
+
+	assert.FileExists(t, GoCfgPath, "Valist file for go project has been created")
+	assert.FileExists(t, GoCfgPath, "Valist file for npm project has been created")
+
+	var GoConfigObject = Config{
+		Type:    "go",
+		Org:     "",
+		Repo:    "",
+		Tag:     "",
+		Meta:    "",
+		Build:   "go build",
+		Install: "",
+		Out:     "path_to_artifact_or_build_directory",
+	}
+
+	var NpmConfigObject = Config{
+		Type:    "npm",
+		Org:     "",
+		Repo:    "",
+		Tag:     "",
+		Meta:    "",
+		Build:   "npm run build",
+		Install: "",
+	}
+
+	var GoConfigFile Config
+	err = GoConfigFile.Load(GoCfgPath)
+	require.NoError(t, err, "Failed to load config")
+	assert.Equal(t, GoConfigObject, GoConfigFile)
+
+	var NpmConfigFile Config
+	err = NpmConfigFile.Load(NpmCfgPath)
+	require.NoError(t, err, "Failed to load config")
+	assert.Equal(t, NpmConfigObject, NpmConfigFile)
 }
