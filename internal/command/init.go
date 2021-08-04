@@ -20,24 +20,22 @@ func NewInitCommand() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			// Get interactive flag value
-			isInteractive := c.Bool("wizard")
 			wd, err := os.Getwd()
 			if err != nil {
 				return err
 			}
-			valistFilePath := filepath.Join(wd, "valist.yml")
 
-			if isInteractive {
-				return build.ValistFileFromWizard()
-			} else {
-				if c.NArg() != 1 {
-					cli.ShowSubcommandHelpAndExit(c, 1)
-				}
-
-				projectType := c.Args().Get(0)
-				return build.ValistFileFromTemplate(projectType, valistFilePath)
+			if c.Bool("wizard") {
+				return build.ConfigWizard()
 			}
+
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
+			projectType := c.Args().Get(0)
+			valistFilePath := filepath.Join(wd, "valist.yml")
+			return build.ConfigTemplate(projectType, valistFilePath)
 		},
 	}
 }

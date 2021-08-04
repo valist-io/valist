@@ -1,0 +1,34 @@
+# The project type
+type: {{.Type}}
+
+# The valist organization
+org: 
+
+# The valist repository
+repo: 
+
+# The latest release tag
+tag: 
+
+# The command used for building the project
+build: {{.Build}}
+
+# The command used for installing the project's dependencies
+# install: {{.Install}}
+
+# The docker image used for building the project. Will default to {{.Image}} for {{.Type}}.
+# image: {{.Image}}
+{{if .Out}}
+# The project's build/output folder
+out: {{.Out}}{{end}}
+{{if .RenderMeta}}
+# The metadata file for the latest release, typically README.md or RELEASE.md
+# meta: README.md{{end}}
+{{if .RenderPlatforms}}
+# The project's supported os/arch platforms and their corresponding artifacts
+# platforms:
+  # linux/amd64: path_to_artifact
+  # linux/arm64: path_to_artifact
+  # darwin/amd64: path_to_artifact
+  # windows/amd64: path_to_artifact
+{{end}}
