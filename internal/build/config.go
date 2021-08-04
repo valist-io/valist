@@ -71,7 +71,6 @@ func (c Config) Save(path string) error {
 }
 
 func (c *Config) Load(path string) error {
-	// Read yaml file from disk
 	yamlFile, err := os.ReadFile(path)
 	if err != nil {
 		return err
@@ -113,7 +112,7 @@ func ValistFileFromWizard() error {
 	}
 
 	orgPrompt := promptui.Prompt{
-		Label:    "Organization name or username",
+		Label:    "Valist Organization name or username",
 		Validate: validateLength,
 	}
 	org, err := orgPrompt.Run()
@@ -122,7 +121,7 @@ func ValistFileFromWizard() error {
 	}
 
 	repoPrompt := promptui.Prompt{
-		Label:    "Repository name",
+		Label:    "Valist Repository name",
 		Validate: validateLength,
 	}
 	repo, err := repoPrompt.Run()
@@ -131,7 +130,7 @@ func ValistFileFromWizard() error {
 	}
 
 	tagPrompt := promptui.Prompt{
-		Label:   "Your current release tag/version",
+		Label:   "The latest release tag",
 		Default: "0.0.1",
 	}
 	tag, err := tagPrompt.Run()
@@ -261,16 +260,17 @@ func ValistFileFromTemplate(projectType string, path string) error {
 	}
 
 	cfg := TemplateCfg{}
-
 	cfg.Type = projectType
 	cfg.RenderMeta = true
-	cfg.RenderInstall = true
 	cfg.RenderPlatforms = true
 
 	if projectType != "npm" {
+		cfg.Out = "path_to_artifact_or_build_directory"
+	}
+
+	if projectType == "npm" {
 		cfg.RenderMeta = false
 		cfg.RenderPlatforms = false
-		cfg.Out = "path_to_artifact_or_build_directory"
 	}
 
 	if projectType == "static" || projectType == "go" {
@@ -297,16 +297,17 @@ tag:
 build: {{.Build}}
 
 # The command used for installing the project's dependencies
-{{if not .RenderInstall}}# {{end}}install: {{.Install}}
+# install: {{.Install}}
 
-{{if .Out}}# The project's build/output folder
-out: {{.Out}}{{end}}
-{{if .RenderMeta}}# The metadata file for the latest release, typically README.md or RELEASE.md
-# meta: README.md
-{{end}}
 # The docker image used for building the project. Will default to {{.Image}} for {{.Type}}.
 # image: {{.Image}}
-{{if .Platforms}}
+{{if .Out}}
+# The project's build/output folder
+out: {{.Out}}{{end}}
+{{if .RenderMeta}}
+# The metadata file for the latest release, typically README.md or RELEASE.md
+# meta: README.md{{end}}
+{{if .RenderPlatforms}}
 # The project's supported os/arch platforms and their corresponding artifacts
 # platforms:
   # linux/amd64: path_to_artifact

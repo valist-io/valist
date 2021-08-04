@@ -1,6 +1,9 @@
 package command
 
 import (
+	"os"
+	"path/filepath"
+
 	"github.com/urfave/cli/v2"
 	"github.com/valist-io/registry/internal/build"
 )
@@ -19,6 +22,11 @@ func NewInitCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			// Get interactive flag value
 			isInteractive := c.Bool("wizard")
+			wd, err := os.Getwd()
+			if err != nil {
+				return err
+			}
+			valistFilePath := filepath.Join(wd, "valist.yml")
 
 			if isInteractive {
 				return build.ValistFileFromWizard()
@@ -28,7 +36,7 @@ func NewInitCommand() *cli.Command {
 				}
 
 				projectType := c.Args().Get(0)
-				return build.ValistFileFromTemplate(projectType)
+				return build.ValistFileFromTemplate(projectType, valistFilePath)
 			}
 		},
 	}
