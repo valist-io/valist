@@ -6,40 +6,64 @@ import (
 	"gopkg.in/yaml.v3"
 )
 
+const (
+	ProjectTypeBinary = "binary"
+	ProjectTypeNode   = "node"
+	ProjectTypeNPM    = "npm"
+	ProjectTypeGo     = "go"
+	ProjectTypeRust   = "rust"
+	ProjectTypePython = "python"
+	ProjectTypeDocker = "docker"
+	ProjectTypeCPP    = "c++"
+	ProjectTypeStatic = "static"
+)
+
 var DefaultImages = map[string]string{
-	"binary": "gcc:bullseye",
-	"node":   "node:buster",
-	"npm":    "node:buster",
-	"go":     "golang:buster",
-	"rust":   "rust:buster",
-	"python": "python:buster",
-	"docker": "scratch",
-	"c++":    "gcc:bullseye",
-	"static": "",
+	ProjectTypeBinary: "gcc:bullseye",
+	ProjectTypeNode:   "node:buster",
+	ProjectTypeNPM:    "node:buster",
+	ProjectTypeGo:     "golang:buster",
+	ProjectTypeRust:   "rust:buster",
+	ProjectTypePython: "python:buster",
+	ProjectTypeDocker: "scratch",
+	ProjectTypeCPP:    "gcc:bullseye",
+	ProjectTypeStatic: "",
 }
 
 var DefaultInstalls = map[string]string{
-	"binary": "make install",
-	"node":   "npm install",
-	"npm":    "npm install",
-	"go":     "go get ./...",
-	"rust":   "cargo install",
-	"python": "pip install -r requirements.txt",
-	"docker": "",
-	"c++":    "make install",
-	"static": "",
+	ProjectTypeBinary: "make install",
+	ProjectTypeNode:   "npm install",
+	ProjectTypeNPM:    "npm install",
+	ProjectTypeGo:     "go get ./...",
+	ProjectTypeRust:   "cargo install",
+	ProjectTypePython: "pip install -r requirements.txt",
+	ProjectTypeDocker: "",
+	ProjectTypeCPP:    "make install",
+	ProjectTypeStatic: "",
 }
 
 var DefaultBuilds = map[string]string{
-	"binary": "make build",
-	"node":   "npm run build",
-	"npm":    "npm run build",
-	"go":     "go build",
-	"rust":   "cargo build",
-	"python": "python3 -m build",
-	"docker": "",
-	"c++":    "make build",
-	"static": "",
+	ProjectTypeBinary: "make build",
+	ProjectTypeNode:   "npm run build",
+	ProjectTypeNPM:    "npm run build",
+	ProjectTypeGo:     "go build",
+	ProjectTypeRust:   "cargo build",
+	ProjectTypePython: "python3 -m build",
+	ProjectTypeDocker: "",
+	ProjectTypeCPP:    "make build",
+	ProjectTypeStatic: "",
+}
+
+var DefaultTemplates = map[string]string{
+	ProjectTypeBinary: "default.tmpl",
+	ProjectTypeNode:   "node.tmpl",
+	ProjectTypeNPM:    "npm.tmpl",
+	ProjectTypeGo:     "go.tmpl",
+	ProjectTypeRust:   "rust.tmpl",
+	ProjectTypePython: "python.tmpl",
+	ProjectTypeDocker: "docker.tmpl",
+	ProjectTypeCPP:    "cpp.tmpl",
+	ProjectTypeStatic: "static.tmpl",
 }
 
 // Config contains valist build settings.

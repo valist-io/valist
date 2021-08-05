@@ -2,45 +2,30 @@ package build
 
 import (
 	"embed"
+	"fmt"
 	"os"
 	"text/template"
 )
 
 //go:embed template
-var configFS embed.FS
+var templateFS embed.FS
 
 // ConfigTemplate creates a config from a project template.
 func ConfigTemplate(projectType string, path string) error {
-	type TemplateCfg struct {
-		RenderMeta      bool
-		RenderInstall   bool
-		RenderPlatforms bool
-		Config
+	templateFile, ok := DefaultTemplates[projectType]
+	if !ok {
+		return fmt.Errorf("Project type is not supported: %s", projectType)
 	}
 
-	cfg := TemplateCfg{}
-	cfg.Type = projectType
-	cfg.RenderMeta = true
-	cfg.RenderPlatforms = true
-
-	if projectType != "npm" {
-		cfg.Out = "path_to_artifact_or_build_directory"
+	cfg := Config{
+		Type:    projectType,
+		Out:     "path_to_artifact_or_build_directory",
+		Install: DefaultInstalls[projectType],
+		Image:   DefaultImages[projectType],
+		Build:   DefaultBuilds[projectType],
 	}
 
-	if projectType == "npm" {
-		cfg.RenderMeta = false
-		cfg.RenderPlatforms = false
-	}
-
-	if projectType == "static" || projectType == "go" {
-		cfg.RenderInstall = false
-	}
-
-	cfg.Install = DefaultInstalls[projectType]
-	cfg.Image = DefaultImages[projectType]
-	cfg.Build = DefaultBuilds[projectType]
-
-	configTemplate, err := template.New("default.tmpl").ParseFS(configFS, "template/*.tmpl")
+	configTemplate, err := template.ParseFS(templateFS, "template/*.tmpl")
 	if err != nil {
 		return err
 	}
@@ -52,5 +37,5 @@ func ConfigTemplate(projectType string, path string) error {
 	defer f.Close()
 
 	// Write template to valist.yml
-	return configTemplate.Execute(f, cfg)
+	return configTemplate.ExecuteTemplate(f, templateFile, cfg)
 }

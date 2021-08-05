@@ -49,31 +49,23 @@ func TestValistFileFromTemplate(t *testing.T) {
 	NpmCfgPath := filepath.Join(tmp, "npm.valist.yml")
 
 	err = ConfigTemplate("go", GoCfgPath)
+	require.NoError(t, err)
+
 	err = ConfigTemplate("npm", NpmCfgPath)
 	require.NoError(t, err)
 
 	assert.FileExists(t, GoCfgPath, "Valist file for go project has been created")
-	assert.FileExists(t, GoCfgPath, "Valist file for npm project has been created")
+	assert.FileExists(t, NpmCfgPath, "Valist file for npm project has been created")
 
 	var GoConfigObject = Config{
-		Type:    "go",
-		Org:     "",
-		Repo:    "",
-		Tag:     "",
-		Meta:    "",
-		Build:   "go build",
-		Install: "",
-		Out:     "path_to_artifact_or_build_directory",
+		Type:  "go",
+		Build: "go build",
+		Out:   "path_to_artifact_or_build_directory",
 	}
 
 	var NpmConfigObject = Config{
-		Type:    "npm",
-		Org:     "",
-		Repo:    "",
-		Tag:     "",
-		Meta:    "",
-		Build:   "npm run build",
-		Install: "",
+		Type:  "npm",
+		Build: "npm run build",
 	}
 
 	var GoConfigFile Config
