@@ -61,8 +61,13 @@ func NewCreateCommand() *cli.Command {
 			// TODO prompt
 			orgName := c.Args().Get(0)
 			orgMeta := core.OrganizationMeta{
-				Name:        "test",
+				Name:        "test11",
 				Description: "test",
+			}
+
+			_, err = client.GetOrganizationID(c.Context, orgName)
+			if err == nil {
+				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
 			}
 
 			fmt.Println("Creating organization...")
@@ -76,7 +81,7 @@ func NewCreateCommand() *cli.Command {
 				return createRes.Err
 			}
 
-			fmt.Println("Linking organization name...")
+			fmt.Println(fmt.Sprintf("Linking name '%v' to orgID '%v'...", orgName, createRes.OrgID))
 			linkTx, err := client.LinkOrganizationName(c.Context, createRes.OrgID, orgName)
 			if err != nil {
 				return err

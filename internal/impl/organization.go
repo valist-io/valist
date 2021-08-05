@@ -73,7 +73,14 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		Signer:  client.Signer,
 	}
 
+	PrepareMetaTx(client, &txopts)
+
 	tx, err := client.valist.CreateOrganization(&txopts, metaCID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err = SendMetaTx(client, tx, client.valist.CreateOrganization)
 	if err != nil {
 		return nil, err
 	}
