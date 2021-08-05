@@ -166,15 +166,15 @@ func SendMetaTx(client *Client, tx *types.Transaction, function interface{}) (*t
 	}
 
 	eip712Message := biconomyEIP712Message{
-		opts.From.Hex(),
-		tx.To().Hex(),
-		"0x0000000000000000000000000000000000000000",
-		tx.Gas(),
-		"0",
-		0,
-		nonce,
-		fmt.Sprint(time.Now().Unix() + 3600), // 1 hour timeout
-		hexutil.Encode(tx.Data()),
+		From:          opts.From.Hex(),
+		To:            tx.To().Hex(),
+		Token:         "0x0000000000000000000000000000000000000000",
+		TxGas:         tx.Gas(),
+		TokenGasPrice: "0",
+		BatchId:       0,
+		BatchNonce:    nonce,
+		Deadline:      fmt.Sprint(time.Now().Unix() + 3600), // 1 hour timeout
+		Data:          hexutil.Encode(tx.Data()),
 	}
 
 	signature, err := client.wallet.SignData(client.account, signer.DataTyped.Mime, data)
@@ -195,11 +195,11 @@ func SendMetaTx(client *Client, tx *types.Transaction, function interface{}) (*t
 	}
 
 	reqBody, err := json.Marshal(biconomyRequest{
-		tx.To().Hex(),
-		functionID,
-		[]interface{}{eip712Message, hexutil.Encode(domainSeparator), hexutil.Encode(signature)},
-		opts.From.Hex(),
-		"EIP712_SIGN",
+		To:            tx.To().Hex(),
+		ApiId:         functionID,
+		Params:        []interface{}{eip712Message, hexutil.Encode(domainSeparator), hexutil.Encode(signature)},
+		From:          opts.From.Hex(),
+		SignatureType: "EIP712_SIGN",
 	})
 
 	if err != nil {
