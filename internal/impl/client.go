@@ -6,7 +6,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -17,6 +16,7 @@ import (
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/contract"
+	"github.com/valist-io/registry/internal/contract/metatx"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
@@ -31,14 +31,17 @@ var (
 
 // Client is a Valist SDK client.
 type Client struct {
-	eth  bind.DeployBackend
+	eth  *ethclient.Client
 	ipfs coreiface.CoreAPI
 
 	orgs map[string]common.Hash
 
-	chainID  *big.Int
-	valist   *valist.Valist
-	registry *registry.ValistRegistry
+	chainID   *big.Int
+	valist    *valist.Valist
+	registry  *registry.ValistRegistry
+	forwarder *metatx.Metatx
+
+	metaTx bool
 
 	wallet  accounts.Wallet
 	account accounts.Account
@@ -66,12 +69,22 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, fmt.Errorf("Registry contract address required")
 	}
 
+	forwarderAddress, ok := cfg.Ethereum.Contracts["forwarder"]
+	if !ok {
+		return nil, fmt.Errorf("MetaTx forwarder contract address required")
+	}
+
 	valist, err := contract.NewValist(valistAddr, eth)
 	if err != nil {
 		return nil, err
 	}
 
 	registry, err := contract.NewRegistry(registryAddr, eth)
+	if err != nil {
+		return nil, err
+	}
+
+	forwarder, err := contract.NewForwarder(forwarderAddress, eth)
 	if err != nil {
 		return nil, err
 	}
@@ -108,13 +121,15 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	return &Client{
-		eth:      eth,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		chainID:  cfg.Ethereum.ChainID,
-		valist:   valist,
-		registry: registry,
-		wallet:   signer,
-		account:  account,
+		eth:       eth,
+		ipfs:      ipfs,
+		orgs:      make(map[string]common.Hash),
+		chainID:   cfg.Ethereum.ChainID,
+		valist:    valist,
+		registry:  registry,
+		forwarder: forwarder,
+		metaTx:    true,
+		wallet:    signer,
+		account:   account,
 	}, nil
 }

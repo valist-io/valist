@@ -49,10 +49,13 @@ func (s *ClientSuite) SetupTest() {
 	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, account, chainID)
 	s.Require().NoError(err, "Failed to create transactor")
 
-	_, _, valist, err := contract.DeployValist(opts, backend, emptyAddress)
+	forwarderAddress, _, forwarder, err := contract.DeployForwarder(opts, backend, account.Address)
+	s.Require().NoError(err, "Failed to deploy forwarder contract")
+
+	_, _, valist, err := contract.DeployValist(opts, backend, forwarderAddress)
 	s.Require().NoError(err, "Failed to deploy valist contract")
 
-	_, _, registry, err := contract.DeployRegistry(opts, backend, emptyAddress)
+	_, _, registry, err := contract.DeployRegistry(opts, backend, forwarderAddress)
 	s.Require().NoError(err, "Failed to deploy registry contract")
 
 	node, err := coremock.NewMockNode()
@@ -66,15 +69,18 @@ func (s *ClientSuite) SetupTest() {
 	s.backend.Commit()
 
 	s.tmp = tmp
+
 	s.client = &Client{
-		eth:      backend,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		chainID:  chainID,
-		valist:   valist,
-		registry: registry,
-		wallet:   signer.Wallets()[0],
-		account:  account,
+		eth:       backend,
+		ipfs:      ipfs,
+		orgs:      make(map[string]common.Hash),
+		chainID:   chainID,
+		valist:    valist,
+		registry:  registry,
+		forwarder: forwarder,
+		metaTx:    false,
+		wallet:    signer.Wallets()[0],
+		account:   account,
 	}
 }
 

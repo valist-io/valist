@@ -13,3 +13,8 @@ func (client *Client) Signer(address common.Address, tx *types.Transaction) (*ty
 
 	return client.wallet.SignTx(client.account, tx, client.chainID)
 }
+
+// EmptySigner facilitates metatransactions by returning tx.Data() without signing
+func (client *Client) EmptySigner(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+	return tx, nil
+}
