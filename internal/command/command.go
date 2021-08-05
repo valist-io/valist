@@ -17,6 +17,12 @@ func NewApp() *cli.App {
 		HelpName:    "valist",
 		Usage:       "Valist command line interface",
 		Description: `Universal package repository.`,
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:  "account",
+				Usage: "Account to transact with",
+			},
+		},
 		Before: func(c *cli.Context) error {
 			home, err := os.UserHomeDir()
 			if err != nil {

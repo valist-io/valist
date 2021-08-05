@@ -18,13 +18,6 @@ func NewCreateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create",
 		Usage: "Create an organization",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "account",
-				Value: "default",
-				Usage: "Account to authenticate with",
-			},
-		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
