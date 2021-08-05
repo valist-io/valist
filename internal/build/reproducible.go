@@ -55,11 +55,9 @@ func Export(image string, out string) error {
 	containerPath := fmt.Sprintf("valist-build:/opt/build/%s", out)
 
 	// If output is a single directory, remove the directory
-	if _, err := os.Stat(hostPath); !os.IsNotExist(err) {
-		err := os.RemoveAll(hostPath)
-		if err != nil {
-			return err
-		}
+	err = os.RemoveAll(hostPath)
+	if err != nil {
+		return err
 	}
 
 	createCmd := exec.Command("docker", "create", "--name=valist-build", "valist-build")
