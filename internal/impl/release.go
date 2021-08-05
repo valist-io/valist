@@ -26,8 +26,11 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 		return nil, fmt.Errorf("Failed to get release: %v", err)
 	}
 
-	callopts := bind.CallOpts{Context: ctx}
 	selector := crypto.Keccak256Hash(packed)
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.account.Address,
+	}
 
 	release, err := client.valist.Releases(&callopts, selector)
 	if err != nil {
@@ -57,7 +60,10 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 
 // GetLatestRelease returns the latest release from the repository with the given name and orgID.
 func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, repoName string) (*core.Release, error) {
-	callopts := bind.CallOpts{Context: ctx}
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.account.Address,
+	}
 
 	tag, release, meta, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
 	if err != nil {
@@ -84,20 +90,16 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
 func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *core.Release) (<-chan core.VoteReleaseResult, error) {
-	if client.transact == nil {
-		return nil, ErrNoTransactor
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
 	}
-
-	txopts, err := client.transact()
-	if err != nil {
-		return nil, err
-	}
-	txopts.Context = ctx
 
 	releaseCID := release.ReleaseCID.String()
 	metaCID := release.MetaCID.String()
 
-	tx, err := client.valist.VoteRelease(txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
+	tx, err := client.valist.VoteRelease(&txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
 	if err != nil {
 		return nil, err
 	}
@@ -178,8 +180,11 @@ func (it *ReleaseTagIterator) paginate(ctx context.Context) error {
 		return nil
 	}
 
-	callopts := bind.CallOpts{Context: ctx}
 	selector := crypto.Keccak256Hash(it.orgID[:], []byte(it.repoName))
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    it.client.account.Address,
+	}
 
 	tags, err := it.client.valist.GetReleaseTags(&callopts, selector, it.page, it.limit)
 	if err != nil {

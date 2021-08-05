@@ -17,7 +17,7 @@ func (s *ClientSuite) TestCreateOrganization() {
 
 	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.client.Commit()
+	s.backend.Commit()
 
 	res1 := <-txc1
 	s.Require().NoError(res1.Err, "Failed to create organization")

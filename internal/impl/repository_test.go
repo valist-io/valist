@@ -33,7 +33,7 @@ func (s *ClientSuite) TestCreateRepository() {
 
 	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.client.Commit()
+	s.backend.Commit()
 
 	res1 := <-txc1
 	s.Require().NoError(res1.Err, "Failed to create organization")
@@ -41,7 +41,7 @@ func (s *ClientSuite) TestCreateRepository() {
 
 	txc2, err := s.client.CreateRepository(ctx, orgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.client.Commit()
+	s.backend.Commit()
 
 	res2 := <-txc2
 	s.Require().NoError(res2.Err, "Failed to create repository")

@@ -18,7 +18,11 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 		return orgID, nil
 	}
 
-	callopts := bind.CallOpts{Context: ctx}
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.account.Address,
+	}
+
 	orgID, err := client.registry.NameToID(&callopts, name)
 	if err != nil {
 		return emptyHash, fmt.Errorf("Failed to get organization id: %v", err)
@@ -34,17 +38,13 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
 func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (<-chan core.LinkOrgNameResult, error) {
-	if client.transact == nil {
-		return nil, ErrNoTransactor
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
 	}
 
-	txopts, err := client.transact()
-	if err != nil {
-		return nil, err
-	}
-	txopts.Context = ctx
-
-	tx, err := client.registry.LinkNameToID(txopts, orgID, name)
+	tx, err := client.registry.LinkNameToID(&txopts, orgID, name)
 	if err != nil {
 		return nil, err
 	}

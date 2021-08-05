@@ -15,7 +15,11 @@ import (
 
 // GetOrganization returns the organization with the given ID.
 func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*core.Organization, error) {
-	callopts := bind.CallOpts{Context: ctx}
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.account.Address,
+	}
+
 	org, err := client.valist.Orgs(&callopts, id)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get organization id: %v", err)
@@ -53,10 +57,6 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 
 // CreateOrganization creates a new organization with the given meta and returns the orgID.
 func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (<-chan core.CreateOrgResult, error) {
-	if client.transact == nil {
-		return nil, ErrNoTransactor
-	}
-
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -67,13 +67,13 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		return nil, err
 	}
 
-	txopts, err := client.transact()
-	if err != nil {
-		return nil, err
+	txopts := bind.TransactOpts{
+		Context: ctx,
+		From:    client.account.Address,
+		Signer:  client.Signer,
 	}
-	txopts.Context = ctx
 
-	tx, err := client.valist.CreateOrganization(txopts, metaCID.String())
+	tx, err := client.valist.CreateOrganization(&txopts, metaCID.String())
 	if err != nil {
 		return nil, err
 	}
