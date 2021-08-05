@@ -17,11 +17,15 @@ func NewBuildCommand() *cli.Command {
 				BuildCommand: "make all",
 			}
 
-			build.GenerateDockerfile(dockerConfig)
-			build.Create("valist-build")
-			build.Export("valist-build", "dist")
+			if err := build.GenerateDockerfile(dockerConfig); err != nil {
+				return err
+			}
 
-			return nil
+			if err := build.Create("valist-build"); err != nil {
+				return err
+			}
+
+			return build.Export("valist-build", "dist")
 		},
 	}
 }

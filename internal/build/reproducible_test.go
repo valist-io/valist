@@ -1,26 +1,33 @@
 package build
 
 import (
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-func TestGenerateDockerfile(t *testing.T) {
+func TestCreateBuild(t *testing.T) {
+	tmp, err := os.MkdirTemp("", "test")
+	require.NoError(t, err, "Failed to create tmp dir")
+
+	ymlFilePath := filepath.Join(tmp, "valist.yml")
+	dockerFilePath := filepath.Join(tmp, "Dockerfile")
 
 	var dockerConfig = DockerConfig{
-		Path:         "Dockerfile",
+		Path:         ymlFilePath,
 		BaseImage:    "golang:buster",
 		Source:       "./",
 		BuildCommand: "go build -o ./dist/main testdata/main.go",
 	}
 
-	GenerateDockerfile(dockerConfig)
-	assert.FileExists(t, "Dockerfile", "Dockerfile has been created")
-}
+	err = GenerateDockerfile(dockerConfig)
+	assert.NoError(t, err, "Generate Dockerfile returns with no errors")
+	assert.FileExists(t, ymlFilePath, "Dockerfile has been created")
 
-func TestCreateBuild(t *testing.T) {
-	err := Create("valist-build")
+	err = Create("valist-build", dockerFilePath)
 	assert.NoError(t, err, "Create build returns with no errors")
 }
 
