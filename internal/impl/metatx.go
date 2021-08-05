@@ -64,10 +64,10 @@ var biconomyFunctionIDMap = map[string]string{
 	"revokeRole":            "d4040355-b755-4a1a-9f16-0f0462bd56d1",
 }
 
-var biconomyForwarderAddressMap = map[*big.Int]string{
-	big.NewInt(80001): "0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b", // Polygon mumbai
-	big.NewInt(137):   "0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8", // Polygon mainnet
-	big.NewInt(1):     "0x84a0856b038eaAd1cC7E297cF34A7e72685A8693", // Ethereum mainnet
+var biconomyForwarderAddressMap = map[string]string{
+	"80001": "0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b", // Polygon mumbai
+	"137":   "0x86C80a8aa58e0A4fa09A69624c31Ab2a6CAD56b8", // Polygon mainnet
+	"1":     "0x84a0856b038eaAd1cC7E297cF34A7e72685A8693", // Ethereum mainnet
 }
 
 const eip712PrimaryType = "ERC20ForwardRequest"
@@ -124,7 +124,7 @@ func SendMetaTx(client *Client, tx *types.Transaction, function interface{}) (*t
 		return tx, nil
 	}
 
-	forwarderAddress, ok := biconomyForwarderAddressMap[client.chainID]
+	forwarderAddress, ok := biconomyForwarderAddressMap[client.chainID.String()]
 	if !ok {
 		return nil, fmt.Errorf("MetaTransactions not available on this network")
 	}
