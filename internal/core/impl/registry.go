@@ -44,14 +44,7 @@ func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Has
 		Signer:  client.Signer,
 	}
 
-	PrepareMetaTx(client, &txopts)
-
 	tx, err := client.registry.LinkNameToID(&txopts, orgID, name)
-	if err != nil {
-		return nil, err
-	}
-
-	tx, err = SendMetaTx(client, tx, client.registry.LinkNameToID)
 	if err != nil {
 		return nil, err
 	}

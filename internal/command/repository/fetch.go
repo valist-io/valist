@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/impl"
+	"github.com/valist-io/registry/internal/core/impl"
 )
 
 func NewFetchCommand() *cli.Command {

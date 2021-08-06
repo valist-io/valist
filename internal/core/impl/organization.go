@@ -10,6 +10,7 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ipfs/go-cid"
 
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
 )
 
@@ -55,8 +56,26 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 	return &meta, nil
 }
 
+func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (*valist.ValistOrgCreated, error) {
+	tx, err := client.CoreTransactorAPI.CreateOrganizationTx(ctx, meta)
+	if err != nil {
+		return nil, err
+	}
+
+	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(receipt.Logs) == 0 {
+		return nil, err
+	}
+
+	return client.valist.ParseOrgCreated(*receipt.Logs[0])
+}
+
 // CreateOrganization creates a new organization with the given meta and returns the orgID.
-func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (<-chan core.CreateOrgResult, error) {
+func (client *Client) CreateOrganizationTx(ctx context.Context, meta *core.OrganizationMeta) (*types.Transaction, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -71,54 +90,8 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		Context: ctx,
 		From:    client.account.Address,
 		Signer:  client.Signer,
+		NoSend:  client.metaTx,
 	}
 
-	PrepareMetaTx(client, &txopts)
-
-	tx, err := client.valist.CreateOrganization(&txopts, metaCID.String())
-	if err != nil {
-		return nil, err
-	}
-
-	tx, err = SendMetaTx(client, tx, client.valist.CreateOrganization)
-	if err != nil {
-		return nil, err
-	}
-
-	result := make(chan core.CreateOrgResult, 1)
-	go client.createOrganization(ctx, tx, result)
-
-	return result, nil
-}
-
-func (client *Client) createOrganization(ctx context.Context, tx *types.Transaction, result chan<- core.CreateOrgResult) {
-	defer close(result)
-
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
-	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
-	}
-
-	if len(receipt.Logs) == 0 {
-		result <- core.CreateOrgResult{Err: fmt.Errorf("Failed to parse log")}
-		return
-	}
-
-	log, err := client.valist.ParseOrgCreated(*receipt.Logs[0])
-	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
-	}
-
-	metaCID, err := cid.Decode(log.MetaCID)
-	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
-	}
-
-	result <- core.CreateOrgResult{
-		OrgID:   log.OrgID,
-		MetaCID: metaCID,
-	}
+	return client.valist.CreateOrganization(&txopts, metaCID.String())
 }

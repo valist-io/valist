@@ -6,6 +6,7 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -16,10 +17,10 @@ import (
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/contract/metatx"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/metatx"
 )
 
 var _ core.CoreAPI = (*Client)(nil)
@@ -31,24 +32,25 @@ var (
 
 // Client is a Valist SDK client.
 type Client struct {
-	eth  *ethclient.Client
+	eth  bind.DeployBackend
 	ipfs coreiface.CoreAPI
 
 	orgs map[string]common.Hash
 
-	chainID   *big.Int
-	valist    *valist.Valist
-	registry  *registry.ValistRegistry
-	forwarder *metatx.Metatx
+	chainID  *big.Int
+	valist   *valist.Valist
+	registry *registry.ValistRegistry
 
 	metaTx bool
 
 	wallet  accounts.Wallet
 	account accounts.Account
+
+	core.CoreTransactorAPI
 }
 
 // NewClient returns a Client with default settings.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (core.CoreAPI, error) {
+func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	signer, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
 	if err != nil {
 		return nil, err
@@ -69,22 +71,12 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, fmt.Errorf("Registry contract address required")
 	}
 
-	forwarderAddress, ok := cfg.Ethereum.Contracts["forwarder"]
-	if !ok {
-		return nil, fmt.Errorf("MetaTx forwarder contract address required")
-	}
-
 	valist, err := contract.NewValist(valistAddr, eth)
 	if err != nil {
 		return nil, err
 	}
 
 	registry, err := contract.NewRegistry(registryAddr, eth)
-	if err != nil {
-		return nil, err
-	}
-
-	forwarder, err := contract.NewForwarder(forwarderAddress, eth)
 	if err != nil {
 		return nil, err
 	}
@@ -121,15 +113,37 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	return &Client{
-		eth:       eth,
-		ipfs:      ipfs,
-		orgs:      make(map[string]common.Hash),
-		chainID:   cfg.Ethereum.ChainID,
-		valist:    valist,
-		registry:  registry,
-		forwarder: forwarder,
-		metaTx:    true,
-		wallet:    signer,
-		account:   account,
+		eth:      eth,
+		ipfs:     ipfs,
+		orgs:     make(map[string]common.Hash),
+		chainID:  cfg.Ethereum.ChainID,
+		valist:   valist,
+		registry: registry,
+		wallet:   signer,
+		account:  account,
 	}, nil
+}
+
+func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accounts.Account) (core.CoreAPI, error) {
+	client, err := NewClient(ctx, cfg, account)
+	if err != nil {
+		return nil, err
+	}
+
+	address, ok := metatx.BiconomyForwarderAddressMap[client.chainID.String()]
+	if !ok {
+		return nil, fmt.Errorf("Forwarder contract address required")
+	}
+
+	// TODO don't cast directly to ethclient
+	meta, err := metatx.NewClient(client, client.eth.(*ethclient.Client), common.HexToAddress(address), client.chainID, account, client.wallet)
+	if err != nil {
+		return nil, err
+	}
+
+	client.CoreTransactorAPI = meta
+	client.account = accounts.Account{Address: emptyAddress}
+	client.metaTx = true
+
+	return client, nil
 }

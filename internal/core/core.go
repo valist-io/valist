@@ -11,9 +11,18 @@ var (
 )
 
 type CoreAPI interface {
+	CoreContractAPI
+	CoreTransactorAPI
+}
+
+type CoreContractAPI interface {
 	OrganizationAPI
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
 	StorageAPI
+}
+
+type CoreTransactorAPI interface {
+	OrganizationTransactorAPI
 }
