@@ -1,0 +1,33 @@
+# The project type
+type: go
+
+# The valist organization
+org: 
+
+# The valist repository
+repo: 
+
+# The latest release tag
+tag: 
+
+# The command used for building the project
+build: go build
+
+# The command used for installing the project's dependencies
+# install: go get ./...
+
+# The docker image used for building the project. Will default to golang:buster for go.
+# image: golang:buster
+
+# The project's build/output folder
+out: path_to_artifact_or_build_directory
+
+# The metadata file for the latest release, typically README.md or RELEASE.md
+# meta: README.md
+
+# The project's supported os/arch platforms and their corresponding artifacts
+# platforms:
+  # linux/amd64: path_to_artifact
+  # linux/arm64: path_to_artifact
+  # darwin/amd64: path_to_artifact
+  # windows/amd64: path_to_artifact
