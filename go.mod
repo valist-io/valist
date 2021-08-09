@@ -11,6 +11,7 @@ require (
 	github.com/ipfs/go-ipfs-http-client v0.1.0
 	github.com/ipfs/interface-go-ipfs-core v0.4.0
 	github.com/libp2p/go-libp2p-core v0.8.5
+	github.com/manifoldco/promptui v0.8.0
 	github.com/multiformats/go-multiaddr v0.3.3
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
