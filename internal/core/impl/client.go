@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	httpapi "github.com/ipfs/go-ipfs-http-client"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
@@ -20,6 +21,7 @@ import (
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/basetx"
 	"github.com/valist-io/registry/internal/core/metatx"
 )
 
@@ -46,10 +48,9 @@ type Client struct {
 	wallet  accounts.Wallet
 	account accounts.Account
 
-	core.CoreTransactorAPI
+	transactor core.TransactorAPI
 }
 
-// NewClient returns a Client with default settings.
 func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	signer, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
 	if err != nil {
@@ -112,38 +113,51 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		go ipfs.Swarm().Connect(ctx, *peerInfo)
 	}
 
+	transactor := basetx.NewTransactor(valist, registry)
+
 	return &Client{
-		eth:      eth,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		chainID:  cfg.Ethereum.ChainID,
-		valist:   valist,
-		registry: registry,
-		wallet:   signer,
-		account:  account,
+		eth:        eth,
+		ipfs:       ipfs,
+		orgs:       make(map[string]common.Hash),
+		chainID:    cfg.Ethereum.ChainID,
+		valist:     valist,
+		registry:   registry,
+		wallet:     signer,
+		account:    account,
+		transactor: transactor,
 	}, nil
 }
 
-func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accounts.Account) (core.CoreAPI, error) {
+func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	client, err := NewClient(ctx, cfg, account)
 	if err != nil {
 		return nil, err
 	}
 
-	address, ok := metatx.BiconomyForwarderAddressMap[client.chainID.String()]
-	if !ok {
-		return nil, fmt.Errorf("Forwarder contract address required")
-	}
-
-	// TODO don't cast directly to ethclient
-	meta, err := metatx.NewClient(client, client.eth.(*ethclient.Client), common.HexToAddress(address), client.chainID, account, client.wallet)
+	// @TODO don't cast directly to ethclient
+	transactor, err := metatx.NewTransactor(client.eth.(*ethclient.Client), client.valist, client.registry, account, client.wallet)
 	if err != nil {
 		return nil, err
 	}
 
-	client.CoreTransactorAPI = meta
-	client.account = accounts.Account{Address: emptyAddress}
-	client.metaTx = true
-
+	client.transactor = transactor
 	return client, nil
+}
+
+func (client *Client) NewTransactOpts() *bind.TransactOpts {
+	return &bind.TransactOpts{
+		From:   client.account.Address,
+		NoSend: client.metaTx,
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+			if address != client.account.Address {
+				return nil, bind.ErrNotAuthorized
+			}
+
+			if client.metaTx {
+				return tx, nil
+			}
+
+			return client.wallet.SignTx(client.account, tx, client.chainID)
+		},
+	}
 }

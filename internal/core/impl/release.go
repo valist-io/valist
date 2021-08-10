@@ -93,7 +93,7 @@ func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoNa
 	txopts := bind.TransactOpts{
 		Context: ctx,
 		From:    client.account.Address,
-		Signer:  client.Signer,
+		// Signer:  client.Signer,
 	}
 
 	releaseCID := release.ReleaseCID.String()

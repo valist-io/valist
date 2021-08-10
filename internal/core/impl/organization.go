@@ -7,7 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ipfs/go-cid"
 
 	"github.com/valist-io/registry/internal/contract/valist"
@@ -56,8 +55,19 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 	return &meta, nil
 }
 
-func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (*valist.ValistOrgCreated, error) {
-	tx, err := client.CoreTransactorAPI.CreateOrganizationTx(ctx, meta)
+func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.TransactOpts, meta *core.OrganizationMeta) (*valist.ValistOrgCreated, error) {
+	fmt.Println("txopts for creatOrganization", txopts)
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return nil, err
+	}
+
+	metaCID, err := client.AddFile(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := client.transactor.CreateOrganizationTx(ctx, txopts, metaCID)
 	if err != nil {
 		return nil, err
 	}
@@ -72,26 +82,4 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 	}
 
 	return client.valist.ParseOrgCreated(*receipt.Logs[0])
-}
-
-// CreateOrganization creates a new organization with the given meta and returns the orgID.
-func (client *Client) CreateOrganizationTx(ctx context.Context, meta *core.OrganizationMeta) (*types.Transaction, error) {
-	data, err := json.Marshal(meta)
-	if err != nil {
-		return nil, err
-	}
-
-	metaCID, err := client.AddFile(ctx, data)
-	if err != nil {
-		return nil, err
-	}
-
-	txopts := bind.TransactOpts{
-		Context: ctx,
-		From:    client.account.Address,
-		Signer:  client.Signer,
-		NoSend:  client.metaTx,
-	}
-
-	return client.valist.CreateOrganization(&txopts, metaCID.String())
 }

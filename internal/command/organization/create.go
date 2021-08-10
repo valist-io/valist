@@ -5,6 +5,7 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
@@ -71,18 +72,21 @@ func NewCreateCommand() *cli.Command {
 			}
 
 			fmt.Println("Creating organization...")
-			create, err := client.CreateOrganization(c.Context, &orgMeta)
+
+			create, err := client.CreateOrganization(c.Context, &bind.TransactOpts{}, &orgMeta)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("Linking name '%v' to orgID '%v'...\n", orgName, create.OrgID)
-			_, err = client.LinkOrganizationName(c.Context, create.OrgID, orgName)
+			fmt.Printf("Linking name '%v' to orgID 0x'%x'...\n", orgName, create.OrgID)
+			_, err = client.LinkOrganizationName(c.Context, &bind.TransactOpts{}, create.OrgID, orgName)
 			if err != nil {
 				return err
 			}
 
-			fmt.Println("Success!")
+			fmt.Printf("Successfully created %v!\n", orgName)
+			fmt.Printf("Your Valist ID: 0x%x\n", create.OrgID)
+
 			return nil
 		},
 	}

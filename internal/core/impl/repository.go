@@ -74,7 +74,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 	txopts := bind.TransactOpts{
 		Context: ctx,
 		From:    client.account.Address,
-		Signer:  client.Signer,
+		// Signer:  client.Signer,
 	}
 
 	tx, err := client.valist.CreateRepository(&txopts, orgID, name, metaCID.String())

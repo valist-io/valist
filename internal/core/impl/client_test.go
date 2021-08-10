@@ -49,7 +49,7 @@ func (s *ClientSuite) SetupTest() {
 	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, account, chainID)
 	s.Require().NoError(err, "Failed to create transactor")
 
-	forwarderAddress, _, forwarder, err := contract.DeployForwarder(opts, backend, account.Address)
+	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, account.Address)
 	s.Require().NoError(err, "Failed to deploy forwarder contract")
 
 	_, _, valist, err := contract.DeployValist(opts, backend, forwarderAddress)
@@ -71,16 +71,15 @@ func (s *ClientSuite) SetupTest() {
 	s.tmp = tmp
 
 	s.client = &Client{
-		eth:       backend,
-		ipfs:      ipfs,
-		orgs:      make(map[string]common.Hash),
-		chainID:   chainID,
-		valist:    valist,
-		registry:  registry,
-		forwarder: forwarder,
-		metaTx:    false,
-		wallet:    signer.Wallets()[0],
-		account:   account,
+		eth:      backend,
+		ipfs:     ipfs,
+		orgs:     make(map[string]common.Hash),
+		chainID:  chainID,
+		valist:   valist,
+		registry: registry,
+		metaTx:   false,
+		wallet:   signer.Wallets()[0],
+		account:  account,
 	}
 }
 

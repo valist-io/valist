@@ -7,8 +7,8 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 
+	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/core"
 )
 
@@ -37,46 +37,26 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 }
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
-func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (<-chan core.LinkOrgNameResult, error) {
-	txopts := bind.TransactOpts{
-		Context: ctx,
-		From:    client.account.Address,
-		Signer:  client.Signer,
-	}
-
-	tx, err := client.registry.LinkNameToID(&txopts, orgID, name)
+func (client *Client) LinkOrganizationName(
+	ctx context.Context,
+	txopts *bind.TransactOpts,
+	orgID common.Hash,
+	name string,
+) (*registry.ValistRegistryMappingEvent, error) {
+	fmt.Println("txopts for link", txopts)
+	tx, err := client.transactor.LinkOrganizationNameTx(ctx, txopts, orgID, name)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make(chan core.LinkOrgNameResult, 1)
-	go client.linkOrganizationName(ctx, tx, result)
-
-	return result, err
-}
-
-func (client *Client) linkOrganizationName(ctx context.Context, tx *types.Transaction, result chan<- core.LinkOrgNameResult) {
-	defer close(result)
-
 	receipt, err := bind.WaitMined(ctx, client.eth, tx)
 	if err != nil {
-		result <- core.LinkOrgNameResult{Err: err}
-		return
+		return nil, err
 	}
 
 	if len(receipt.Logs) == 0 {
-		result <- core.LinkOrgNameResult{Err: fmt.Errorf("Failed to parse log")}
-		return
+		return nil, err
 	}
 
-	log, err := client.registry.ParseMappingEvent(*receipt.Logs[0])
-	if err != nil {
-		result <- core.LinkOrgNameResult{Err: err}
-		return
-	}
-
-	result <- core.LinkOrgNameResult{
-		OrgID: log.OrgID,
-		Name:  log.Name,
-	}
+	return client.registry.ParseMappingEvent(*receipt.Logs[0])
 }
