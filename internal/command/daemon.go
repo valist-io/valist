@@ -71,7 +71,7 @@ func NewDaemonCommand() *cli.Command {
 
 			server := http.NewServer(client, bindAddr)
 			fmt.Println("Server running on", bindAddr)
-			go server.ListenAndServe()
+			go server.ListenAndServe() //nolint:errcheck
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
