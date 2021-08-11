@@ -29,7 +29,9 @@ type CoreAPI interface {
 
 type TransactorAPI interface {
 	CreateOrganizationTx(context.Context, *bind.TransactOpts, cid.Cid) (*types.Transaction, error)
-	LinkOrganizationNameTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string) (*types.Transaction, error)
+	LinkOrganizationNameTx(context.Context, *bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
+	CreateRepositoryTx(context.Context, *bind.TransactOpts, [32]byte, string, string) (*types.Transaction, error)
+	VoteReleaseTx(context.Context, *bind.TransactOpts, [32]byte, string, string, string, string) (*types.Transaction, error)
 }
 
 type OrganizationAPI interface {
@@ -40,21 +42,21 @@ type OrganizationAPI interface {
 
 type RegistryAPI interface {
 	GetOrganizationID(context.Context, string) (common.Hash, error)
-	LinkOrganizationName(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string) (*registry.ValistRegistryMappingEvent, error)
+	LinkOrganizationName(context.Context, *bind.TransactOpts, common.Hash, string) (*registry.ValistRegistryMappingEvent, error)
 }
 
 type ReleaseAPI interface {
 	GetRelease(context.Context, common.Hash, string, string) (*Release, error)
 	GetLatestRelease(context.Context, common.Hash, string) (*Release, error)
-	VoteRelease(context.Context, common.Hash, string, *Release) (<-chan VoteReleaseResult, error)
 	ListReleaseTags(common.Hash, string, *big.Int, *big.Int) ReleaseTagIterator
 	ListReleases(common.Hash, string, *big.Int, *big.Int) ReleaseIterator
+	VoteRelease(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*valist.ValistVoteReleaseEvent, error)
 }
 
 type RepositoryAPI interface {
 	GetRepository(context.Context, common.Hash, string) (*Repository, error)
 	GetRepositoryMeta(context.Context, cid.Cid) (*RepositoryMeta, error)
-	CreateRepository(context.Context, common.Hash, string, *RepositoryMeta) (<-chan CreateRepoResult, error)
+	CreateRepository(context.Context, *bind.TransactOpts, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
 }
 
 type ReleaseTagIterator interface {
