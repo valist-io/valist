@@ -75,12 +75,12 @@ func Run(projectPath, configYml string) ([]string, error) {
 		return nil, err
 	}
 
-	// If project type is npm return outPath
+	// If project type is npm return projectPath + packageName
 	if valistFile.Type == "npm" {
 		return append(artifactPaths, filepath.Join(projectPath, packageName)), nil
 	}
 
-	// If platforms are defined in config then use artifact paths
+	// If platforms are defined in config then use out + artifactPath
 	if len(valistFile.Platforms) > 0 {
 		for _, artifact := range valistFile.Platforms {
 			artifactPaths = append(
@@ -91,7 +91,7 @@ func Run(projectPath, configYml string) ([]string, error) {
 		return artifactPaths, nil
 	}
 
-	// If platforms are not defined but out is defined in config then use out path
+	// If platforms are not defined but out is defined, use valistFile.Out
 	if valistFile.Out != "" {
 		return append(artifactPaths, filepath.Join(projectPath, valistFile.Out)), nil
 	}
