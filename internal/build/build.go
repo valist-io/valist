@@ -29,9 +29,6 @@ func Run(projectPath, configYml string) ([]string, error) {
 		containerPath = fmt.Sprintf("valist-build:/opt/build/%s/.", filepath.Dir(valistFile.Out))
 	}
 
-	fmt.Println("container", containerPath)
-	fmt.Println("host", hostPath)
-
 	// If projectType is npm, run npm pack and set out to .tgz
 	if valistFile.Type == "npm" {
 		packageJsonPath := filepath.Join(projectPath, "package.json")
