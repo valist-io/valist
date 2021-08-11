@@ -2,6 +2,7 @@ package impl
 
 import (
 	"context"
+	"fmt"
 	"math/big"
 
 	"github.com/valist-io/registry/internal/core"
@@ -15,15 +16,14 @@ func (s *ClientSuite) TestCreateOrganization() {
 		Description: "Accelerating the transition to web3.",
 	}
 
-	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
-	s.Require().NoError(err, "Failed to create organization")
+	txopts := s.client.NewTransactOpts()
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.backend.Commit()
+	fmt.Println("ORG CREATED", orgCreatedEvent)
+	s.Require().NoError(err, "Failed to create organization")
 
-	res1 := <-txc1
-	s.Require().NoError(res1.Err, "Failed to create organization")
-	orgID := res1.OrgID
-
-	org, err := s.client.GetOrganization(ctx, orgID)
+	org, err := s.client.GetOrganization(ctx, orgCreatedEvent.OrgID)
+	fmt.Println("THIS IS THE ORG", org)
 	s.Require().NoError(err, "Failed to get organization")
 	s.Assert().Equal(big.NewInt(0).Cmp(org.Threshold), 0)
 

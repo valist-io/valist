@@ -43,7 +43,7 @@ func (client *Client) LinkOrganizationName(
 	orgID common.Hash,
 	name string,
 ) (*registry.ValistRegistryMappingEvent, error) {
-	fmt.Println("txopts for link", txopts)
+
 	tx, err := client.transactor.LinkOrganizationNameTx(ctx, txopts, orgID, name)
 	if err != nil {
 		return nil, err

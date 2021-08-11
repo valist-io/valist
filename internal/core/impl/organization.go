@@ -56,7 +56,7 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 }
 
 func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.TransactOpts, meta *core.OrganizationMeta) (*valist.ValistOrgCreated, error) {
-	fmt.Println("txopts for creatOrganization", txopts)
+
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err

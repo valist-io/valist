@@ -23,7 +23,7 @@ func (t *Transactor) CreateOrganizationTx(ctx context.Context, txopts *bind.Tran
 		return nil, err
 	}
 
-	return gasless.SendTransaction(ctx, t.meta, message, t.account, t.wallet)
+	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
 }
 
 func (t *Transactor) LinkOrganizationNameTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string) (*types.Transaction, error) {
@@ -39,5 +39,45 @@ func (t *Transactor) LinkOrganizationNameTx(ctx context.Context, txopts *bind.Tr
 		return nil, err
 	}
 
-	return gasless.SendTransaction(ctx, t.meta, message, t.account, t.wallet)
+	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
+}
+
+func (t *Transactor) CreateRepositoryTx(ctx context.Context, txopts *bind.TransactOpts, orgID [32]byte, repoName string, repoMeta string) (*types.Transaction, error) {
+	setMetaTransactOpts(txopts)
+
+	tx, err := t.base.CreateRepositoryTx(ctx, txopts, orgID, repoName, repoMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	message, err := t.newMessage(ctx, tx, createRepositoryBFID)
+	if err != nil {
+		return nil, err
+	}
+
+	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
+}
+
+func (t *Transactor) VoteReleaseTx(
+	ctx context.Context,
+	txopts *bind.TransactOpts,
+	orgID [32]byte,
+	repoName string,
+	tag string,
+	releaseCID string,
+	metaCID string,
+) (*types.Transaction, error) {
+	setMetaTransactOpts(txopts)
+
+	tx, err := t.base.VoteReleaseTx(ctx, txopts, orgID, repoName, tag, releaseCID, metaCID)
+	if err != nil {
+		return nil, err
+	}
+
+	message, err := t.newMessage(ctx, tx, voteReleaseBFID)
+	if err != nil {
+		return nil, err
+	}
+
+	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
 }

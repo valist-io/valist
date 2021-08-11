@@ -7,10 +7,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ipfs/go-cid"
 
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
 )
 
@@ -60,7 +60,14 @@ func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.
 }
 
 // CreateRepository creates a repository in the organization with the given orgID.
-func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, name string, meta *core.RepositoryMeta) (<-chan core.CreateRepoResult, error) {
+func (client *Client) CreateRepository(
+	ctx context.Context,
+	txopts *bind.TransactOpts,
+	orgID common.Hash,
+	name string,
+	meta *core.RepositoryMeta,
+) (*valist.ValistRepoCreated, error) {
+
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -71,54 +78,19 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts := bind.TransactOpts{
-		Context: ctx,
-		From:    client.account.Address,
-		// Signer:  client.Signer,
-	}
-
-	tx, err := client.valist.CreateRepository(&txopts, orgID, name, metaCID.String())
+	tx, err := client.transactor.CreateRepositoryTx(ctx, txopts, orgID, name, metaCID.String())
 	if err != nil {
 		return nil, err
 	}
 
-	result := make(chan core.CreateRepoResult, 1)
-	go client.createRepository(ctx, tx, result)
-
-	return result, nil
-}
-
-func (client *Client) createRepository(ctx context.Context, tx *types.Transaction, result chan<- core.CreateRepoResult) {
-	defer close(result)
-
 	receipt, err := bind.WaitMined(ctx, client.eth, tx)
 	if err != nil {
-		result <- core.CreateRepoResult{Err: err}
-		return
+		return nil, err
 	}
 
 	if len(receipt.Logs) == 0 {
-		result <- core.CreateRepoResult{Err: fmt.Errorf("Failed to parse log")}
-		return
+		return nil, err
 	}
 
-	log, err := client.valist.ParseRepoCreated(*receipt.Logs[0])
-	if err != nil {
-		result <- core.CreateRepoResult{Err: err}
-		return
-	}
-
-	metaCID, err := cid.Decode(log.MetaCID)
-	if err != nil {
-		result <- core.CreateRepoResult{Err: err}
-		return
-	}
-
-	result <- core.CreateRepoResult{
-		OrgID:        log.OrgID,
-		RepoNameHash: log.RepoNameHash,
-		RepoName:     log.RepoName,
-		MetaCIDHash:  log.MetaCIDHash,
-		MetaCID:      metaCID,
-	}
+	return client.valist.ParseRepoCreated(*receipt.Logs[0])
 }

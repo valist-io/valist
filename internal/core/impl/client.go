@@ -135,12 +135,11 @@ func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accoun
 	}
 
 	// @TODO don't cast directly to ethclient
-	transactor, err := metatx.NewTransactor(client.eth.(*ethclient.Client), client.valist, client.registry, account, client.wallet)
+	client.transactor, err = metatx.NewTransactor(ctx, client.eth.(*ethclient.Client), client.valist, client.registry, account, client.wallet)
 	if err != nil {
 		return nil, err
 	}
 
-	client.transactor = transactor
 	return client, nil
 }
 

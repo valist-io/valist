@@ -15,6 +15,7 @@ import (
 	"github.com/stretchr/testify/suite"
 
 	"github.com/valist-io/registry/internal/contract"
+	"github.com/valist-io/registry/internal/core/basetx"
 )
 
 const (
@@ -70,16 +71,19 @@ func (s *ClientSuite) SetupTest() {
 
 	s.tmp = tmp
 
+	transactor := basetx.NewTransactor(valist, registry)
+
 	s.client = &Client{
-		eth:      backend,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		chainID:  chainID,
-		valist:   valist,
-		registry: registry,
-		metaTx:   false,
-		wallet:   signer.Wallets()[0],
-		account:  account,
+		eth:        backend,
+		ipfs:       ipfs,
+		orgs:       make(map[string]common.Hash),
+		chainID:    chainID,
+		valist:     valist,
+		registry:   registry,
+		metaTx:     false,
+		wallet:     signer.Wallets()[0],
+		account:    account,
+		transactor: transactor,
 	}
 }
 

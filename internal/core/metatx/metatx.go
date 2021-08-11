@@ -8,6 +8,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/common/hexutil"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/valist-io/gasless"
@@ -51,18 +52,22 @@ type Transactor struct {
 
 	account accounts.Account
 	wallet  accounts.Wallet
+	signer  gasless.Signer
 }
 
 func NewTransactor(
+	ctx context.Context,
 	eth *ethclient.Client,
 	valist *valist.Valist,
 	registry *registry.ValistRegistry,
 	account accounts.Account,
 	wallet accounts.Wallet) (core.TransactorAPI, error) {
-	meta, err := mexa.NewMexa(context.TODO(), eth, "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878") // public key
+	meta, err := mexa.NewMexa(ctx, eth, "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", big.NewInt(0)) // public key
 	if err != nil {
 		return nil, err
 	}
+
+	signer := gasless.NewWalletSigner(account, wallet)
 
 	base := basetx.NewTransactor(valist, registry)
 
@@ -72,6 +77,7 @@ func NewTransactor(
 		meta:    meta,
 		account: account,
 		wallet:  wallet,
+		signer:  signer,
 	}, nil
 }
 
@@ -93,10 +99,10 @@ func (t *Transactor) newMessage(ctx context.Context, tx *types.Transaction, apiI
 		To:            *tx.To(),
 		Token:         emptyAddress,
 		TxGas:         tx.Gas(),
-		TokenGasPrice: big.NewInt(0),
+		TokenGasPrice: "0",
 		BatchId:       big.NewInt(0),
 		BatchNonce:    nonce,
 		Deadline:      big.NewInt(time.Now().Unix() + 3600),
-		Data:          tx.Data(),
+		Data:          hexutil.Encode(tx.Data()),
 	}, nil
 }
