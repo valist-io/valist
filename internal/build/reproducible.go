@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"os"
 	"os/exec"
-	"path/filepath"
 )
 
 type DockerConfig struct {
@@ -21,19 +20,19 @@ func GenerateDockerfile(dockerConfig DockerConfig) error {
 		dockerConfig.BaseImage, dockerConfig.Source,
 	)
 
-	if dockerConfig.BuildCommand != "" {
-		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.BuildCommand)
-	}
-
 	if dockerConfig.InstallCommand != "" {
 		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.InstallCommand)
+	}
+
+	if dockerConfig.BuildCommand != "" {
+		dockerfile += fmt.Sprintf("\nRUN %s", dockerConfig.BuildCommand)
 	}
 
 	return os.WriteFile(dockerConfig.Path, []byte(dockerfile), 0644)
 }
 
 func Create(imageTag string, path string) error {
-	if path != "" {
+	if path == "" {
 		path = "."
 	}
 
@@ -49,16 +48,13 @@ func Create(imageTag string, path string) error {
 	return nil
 }
 
-func Export(image string, out string) error {
-	cwd, err := os.Getwd()
-	if err != nil {
-		return err
-	}
-	hostPath := filepath.Join(cwd, out)
-	// TODO fix for windows path
-	containerPath := fmt.Sprintf("valist-build:/opt/build/%s/.", out)
-
-	createCmd := exec.Command("docker", "create", "--name=valist-build", "valist-build")
+func Export(image string, hostPath string, containerPath string) error {
+	createCmd := exec.Command(
+		"docker",
+		"create",
+		fmt.Sprintf("--name=%s", image),
+		image,
+	)
 	createCmd.Stdout = os.Stdout
 	createCmd.Stderr = os.Stderr
 	if err := createCmd.Run(); err != nil {
@@ -66,7 +62,7 @@ func Export(image string, out string) error {
 	}
 
 	defer func() error {
-		rmCmd := exec.Command("docker", "rm", "valist-build")
+		rmCmd := exec.Command("docker", "rm", image)
 		rmCmd.Stdout = os.Stdout
 		rmCmd.Stderr = os.Stderr
 		return rmCmd.Run()
