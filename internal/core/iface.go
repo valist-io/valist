@@ -28,6 +28,7 @@ type CoreAPI interface {
 }
 
 type TransactorAPI interface {
+	// Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
 	CreateOrganizationTx(context.Context, *bind.TransactOpts, cid.Cid) (*types.Transaction, error)
 	LinkOrganizationNameTx(context.Context, *bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	CreateRepositoryTx(context.Context, *bind.TransactOpts, [32]byte, string, string) (*types.Transaction, error)

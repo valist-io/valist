@@ -72,14 +72,10 @@ func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.Trans
 		return nil, err
 	}
 
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := getTxLogs(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		return nil, err
-	}
-
-	return client.valist.ParseOrgCreated(*receipt.Logs[0])
+	return client.valist.ParseOrgCreated(*logs[0])
 }

@@ -49,14 +49,10 @@ func (client *Client) LinkOrganizationName(
 		return nil, err
 	}
 
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := getTxLogs(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		return nil, err
-	}
-
-	return client.registry.ParseMappingEvent(*receipt.Logs[0])
+	return client.registry.ParseMappingEvent(*logs[0])
 }

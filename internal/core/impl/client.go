@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -159,4 +160,24 @@ func (client *Client) NewTransactOpts() *bind.TransactOpts {
 			return client.wallet.SignTx(client.account, tx, client.chainID)
 		},
 	}
+}
+
+func getTxLogs(ctx context.Context, eth bind.DeployBackend, tx *types.Transaction) ([]*types.Log, error) {
+
+	// @TODO: Enforce checking eth is actually SimulatedBackend and not some other test chain
+	// Will crash when using chainID 1337 on a chain like Ganache outside of test environment
+	if tx.ChainId().Cmp(big.NewInt(1337)) == 0 {
+		eth.(*backends.SimulatedBackend).Commit()
+	}
+
+	receipt, err := bind.WaitMined(ctx, eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	if len(receipt.Logs) == 0 {
+		return nil, err
+	}
+
+	return receipt.Logs, nil
 }

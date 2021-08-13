@@ -83,14 +83,10 @@ func (client *Client) CreateRepository(
 		return nil, err
 	}
 
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := getTxLogs(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		return nil, err
-	}
-
-	return client.valist.ParseRepoCreated(*receipt.Logs[0])
+	return client.valist.ParseRepoCreated(*logs[0])
 }

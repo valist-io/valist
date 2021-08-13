@@ -105,16 +105,12 @@ func (client *Client) VoteRelease(
 		return nil, err
 	}
 
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := getTxLogs(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		return nil, err
-	}
-
-	return client.valist.ParseVoteReleaseEvent(*receipt.Logs[0])
+	return client.valist.ParseVoteReleaseEvent(*logs[0])
 }
 
 // ReleaseTagIterator is used to iterate release tags.
