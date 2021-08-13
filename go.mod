@@ -17,10 +17,8 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/valist-io/gasless v0.0.1
+	github.com/valist-io/gasless v0.0.2
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
 
 replace github.com/ethereum/go-ethereum => github.com/nasdf/go-ethereum v1.10.7-0.20210731182913-02804a7b22b2
-
-replace github.com/valist-io/gasless => ../gasless
