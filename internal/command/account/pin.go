@@ -1,20 +1,24 @@
 package account
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/signer"
 )
 
-func NewCreateCommand() *cli.Command {
+func NewPinCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "create",
-		Usage: "Create an account",
+		Name:  "pin",
+		Usage: "Pin an account from an external wallets",
 		Action: func(c *cli.Context) error {
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
 			home, err := os.UserHomeDir()
 			if err != nil {
 				return err
@@ -25,14 +29,15 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			api, _, err := signer.NewSigner(cfg)
-			if err != nil {
-				return err
+			if !common.IsHexAddress(c.Args().Get(0)) {
+				return fmt.Errorf("Invalid account address")
 			}
 
-			address, err := api.New(c.Context)
-			if err != nil {
-				return err
+			address := common.HexToAddress(c.Args().Get(0))
+			for _, pinned := range cfg.Accounts.Pinned {
+				if pinned == address {
+					return fmt.Errorf("Account already pinned")
+				}
 			}
 
 			if cfg.Accounts.Default == common.HexToAddress("0x0") {

@@ -11,6 +11,9 @@ func NewCommand() *cli.Command {
 		Subcommands: []*cli.Command{
 			NewCreateCommand(),
 			NewListCommand(),
+			NewDefaultCommand(),
+			NewPinCommand(),
+			NewUnpinCommand(),
 			NewSignerCommand(),
 		},
 	}

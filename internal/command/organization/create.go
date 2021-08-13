@@ -19,13 +19,6 @@ func NewCreateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create",
 		Usage: "Create an organization",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "account",
-				Value: "default",
-				Usage: "Account to authenticate with",
-			},
-		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
@@ -48,10 +41,10 @@ func NewCreateCommand() *cli.Command {
 			defer listener.Close()
 
 			var account accounts.Account
-			if address, ok := cfg.Accounts[c.String("account")]; ok {
-				account.Address = address
-			} else {
+			if c.IsSet("account") {
 				account.Address = common.HexToAddress(c.String("account"))
+			} else {
+				account.Address = cfg.Accounts.Default
 			}
 
 			client, err := impl.NewClientWithMetaTx(c.Context, cfg, account)

@@ -57,10 +57,10 @@ func NewDaemonCommand() *cli.Command {
 			}
 
 			var account accounts.Account
-			if address, ok := cfg.Accounts[c.String("account")]; ok {
-				account.Address = address
-			} else {
+			if c.IsSet("account") {
 				account.Address = common.HexToAddress(c.String("account"))
+			} else {
+				account.Address = cfg.Accounts.Default
 			}
 
 			client, err := impl.NewClient(c.Context, cfg, account)
@@ -71,7 +71,7 @@ func NewDaemonCommand() *cli.Command {
 
 			server := http.NewServer(client, bindAddr)
 			fmt.Println("Server running on", bindAddr)
-			go server.ListenAndServe()
+			go server.ListenAndServe() //nolint:errcheck
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
