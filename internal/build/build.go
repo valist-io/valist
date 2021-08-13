@@ -10,7 +10,7 @@ func Run(projectPath, configYml string) ([]string, error) {
 	var artifactPaths []string
 	var packageName string
 
-	dockerFilePath := filepath.Join(projectPath, "Dockerfile")
+	dockerFilePath := filepath.Join(projectPath, "Dockerfile.repro")
 	valistFilePath := filepath.Join(projectPath, configYml)
 
 	// Load valist.yml
@@ -65,6 +65,7 @@ func Run(projectPath, configYml string) ([]string, error) {
 		return nil, err
 	}
 
+	// @ TODO Construct image name from (orgName, repoName, tag)
 	// Create the build image using the dockerfile
 	if err := Create("valist-build", projectPath); err != nil {
 		return nil, err

@@ -36,12 +36,29 @@ func Create(imageTag string, path string) error {
 		path = "."
 	}
 
+	ignoreFilePaths := [2]string{".gitignore", ".dockerignore"}
+	dockerIgnoreFile, err := os.Create("Dockerfile.repro.dockerignore")
+	if err != nil {
+		return err
+	}
+	for _, file := range ignoreFilePaths {
+		currentFile, err := os.ReadFile(file)
+		if err != nil {
+			return nil
+		}
+		if _, err := dockerIgnoreFile.Write(currentFile); err != nil {
+			return err
+		}
+	}
+	if err := dockerIgnoreFile.Close(); err != nil {
+		return err
+	}
+
 	cmd := exec.Command("docker", "build", path, "-t", imageTag, "--progress=plain")
 	cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	err := cmd.Run()
-	if err != nil {
+	if err := cmd.Run(); err != nil {
 		return err
 	}
 
