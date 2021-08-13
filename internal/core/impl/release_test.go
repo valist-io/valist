@@ -46,15 +46,12 @@ func (s *ClientSuite) TestVoteRelease() {
 
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
 
 	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.backend.Commit()
 
 	_, err = s.client.VoteRelease(ctx, txopts, orgCreatedEvent.OrgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
-	s.backend.Commit()
 
 	released, err := s.client.GetRelease(ctx, orgCreatedEvent.OrgID, repoName, release.Tag)
 	s.Require().NoError(err, "Failed to get release")

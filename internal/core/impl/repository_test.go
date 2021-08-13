@@ -35,11 +35,9 @@ func (s *ClientSuite) TestCreateRepository() {
 
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
 
 	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.backend.Commit()
 
 	repo, err := s.client.GetRepository(ctx, orgCreatedEvent.OrgID, repoName)
 	s.Require().NoError(err, "Failed to get repository")

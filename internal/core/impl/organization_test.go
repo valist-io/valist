@@ -2,7 +2,6 @@ package impl
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
 	"github.com/valist-io/registry/internal/core"
@@ -17,13 +16,13 @@ func (s *ClientSuite) TestCreateOrganization() {
 	}
 
 	txopts := s.client.NewTransactOpts()
+
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
-	s.backend.Commit()
-	fmt.Println("ORG CREATED", orgCreatedEvent)
+
 	s.Require().NoError(err, "Failed to create organization")
 
 	org, err := s.client.GetOrganization(ctx, orgCreatedEvent.OrgID)
-	fmt.Println("THIS IS THE ORG", org)
+
 	s.Require().NoError(err, "Failed to get organization")
 	s.Assert().Equal(big.NewInt(0).Cmp(org.Threshold), 0)
 
