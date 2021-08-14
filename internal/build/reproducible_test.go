@@ -1,7 +1,6 @@
 package build
 
 import (
-	"fmt"
 	"os"
 	"path/filepath"
 	"testing"
@@ -15,6 +14,7 @@ func TestCreateExportBuild(t *testing.T) {
 	dockerImageName := "valist-test-create-export"
 	tmp, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create tmp dir")
+
 	defer os.RemoveAll(tmp)
 
 	// Copy goTestProject from testdata to tmp directory
@@ -22,9 +22,9 @@ func TestCreateExportBuild(t *testing.T) {
 	require.NoError(t, err, "Failed to copy test files to tmp directory")
 
 	// Create dockerConfig with Path, Image, Source, & BuildCommand
-	dockerFilePath := filepath.Join(tmp, "Dockerfile")
+	dockerFilePath := filepath.Join(tmp, "Dockerfile.repro")
 	var dockerConfig = DockerConfig{
-		Path:         filepath.Join(tmp, "Dockerfile"),
+		Path:         dockerFilePath,
 		BaseImage:    "golang:buster",
 		Source:       "./",
 		BuildCommand: "go build -o dist/main src/main.go",
@@ -34,13 +34,14 @@ func TestCreateExportBuild(t *testing.T) {
 	assert.NoError(t, err, "Generate Dockerfile returns with no errors")
 	assert.FileExists(t, dockerFilePath, "Dockerfile has been created")
 
-	err = Create(dockerImageName, tmp)
+	err = Create(dockerImageName, dockerFilePath)
 	assert.NoError(t, err, "Create build returns with no errors")
 
-	containerPath := fmt.Sprintf("%s:/opt/build/%s", dockerImageName, "dist")
-	hostPath := filepath.Join(tmp, "dist")
+	containerPath := "dist"
+	err = Export(dockerImageName, tmp, containerPath)
 
-	err = Export(dockerImageName, hostPath, containerPath)
 	assert.NoError(t, err, "Export build returns with no errors")
 	assert.FileExists(t, filepath.Join(tmp, "dist/main"), "Artifact file exists")
+	assert.FileExists(t, filepath.Join(tmp, "Dockerfile.repro"), "Dockerfile exists")
+	assert.FileExists(t, filepath.Join(tmp, "Dockerfile.repro.dockerignore"), "dockerignore exists")
 }
