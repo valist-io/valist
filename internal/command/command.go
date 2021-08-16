@@ -45,6 +45,7 @@ func NewApp() *cli.App {
 			organization.NewCommand(),
 			repository.NewCommand(),
 			NewDaemonCommand(),
+			NewBuildCommand(),
 			NewInitCommand(),
 		},
 	}

@@ -2,6 +2,11 @@
 // https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 package npm
 
+import (
+	"encoding/json"
+	"os"
+)
+
 // TODO https://github.com/npm/normalize-package-data
 
 type Package struct {
@@ -98,4 +103,18 @@ func NewVersion() Version {
 		DevDependencies: make(map[string]string),
 		Scripts:         make(map[string]string),
 	}
+}
+
+func ParsePackageJSON(path string) (*Version, error) {
+	data, err := os.ReadFile(path)
+	if err != nil {
+		return nil, err
+	}
+
+	var version Version
+	if err := json.Unmarshal(data, &version); err != nil {
+		return nil, err
+	}
+
+	return &version, nil
 }

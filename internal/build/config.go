@@ -77,7 +77,7 @@ type Config struct {
 	Build     string            `yaml:"build,omitempty"`
 	Install   string            `yaml:"install,omitempty"`
 	Out       string            `yaml:"out,omitempty"`
-	Platforms map[string]string `yaml:"artifacts,omitempty"`
+	Platforms map[string]string `yaml:"platforms,omitempty"`
 }
 
 func (c Config) Save(path string) error {
