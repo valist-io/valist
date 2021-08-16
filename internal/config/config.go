@@ -15,12 +15,14 @@ const (
 )
 
 type Ethereum struct {
-	// RPC is the ethereum rpc address.
-	RPC string `json:"rpc"`
+	// BiconomyApiKey is the mexa public api key.
+	BiconomyApiKey string
 	// Contracts is a mapping of contract addresses.
 	Contracts map[string]common.Address `json:"contracts"`
 	// ChainID is the unique id of the ethereum chain.
 	ChainID *big.Int `json:"chain_id"`
+	// RPC is the ethereum rpc address.
+	RPC string `json:"rpc"`
 }
 
 type IPFS struct {
@@ -64,13 +66,14 @@ func Default(rootPath string) Config {
 		rootPath,
 		Accounts{},
 		Ethereum{
-			RPC:     "https://rpc.valist.io",
-			ChainID: big.NewInt(80001),
+			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
+			ChainID:        big.NewInt(80001),
 			Contracts: map[string]common.Address{
 				"valist":    common.HexToAddress("0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6"),
 				"registry":  common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
 				"forwarder": common.HexToAddress("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b"),
 			},
+			RPC: "https://rpc.valist.io",
 		},
 		IPFS{
 			API: "/dns/pin.valist.io",
