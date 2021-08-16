@@ -3,6 +3,7 @@ package signer
 import (
 	"net"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/rpc"
 	"github.com/ethereum/go-ethereum/signer/core"
 	"github.com/ethereum/go-ethereum/signer/fourbyte"
@@ -11,10 +12,10 @@ import (
 	"github.com/valist-io/registry/internal/config"
 )
 
-func NewSignerAPI(cfg *config.Config) (*core.SignerAPI, error) {
+func NewSigner(cfg *config.Config) (*core.SignerAPI, *accounts.Manager, error) {
 	validator, err := fourbyte.New()
 	if err != nil {
-		return nil, err
+		return nil, nil, err
 	}
 
 	ksLocation := cfg.Signer.KeyStorePath
@@ -26,12 +27,14 @@ func NewSignerAPI(cfg *config.Config) (*core.SignerAPI, error) {
 	credentials := &storage.NoStorage{}
 
 	ui := core.NewCommandlineUI()
-	am := core.StartClefAccountManager(ksLocation, noUSB, lightKDF, scpath)
-	return core.NewSignerAPI(am, chainID, noUSB, ui, validator, advancedMode, credentials), nil
+	manager := core.StartClefAccountManager(ksLocation, noUSB, lightKDF, scpath)
+	api := core.NewSignerAPI(manager, chainID, noUSB, ui, validator, advancedMode, credentials)
+
+	return api, manager, nil
 }
 
 func StartIPCEndpoint(cfg *config.Config) (net.Listener, *rpc.Server, error) {
-	api, err := NewSignerAPI(cfg)
+	api, _, err := NewSigner(cfg)
 	if err != nil {
 		return nil, nil, err
 	}

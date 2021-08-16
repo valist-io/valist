@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -42,34 +42,23 @@ func (s *ClientSuite) TestVoteRelease() {
 		MetaCID:    metaCID,
 	}
 
-	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
+	txopts := s.client.NewTransactOpts()
+
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
 
-	res1 := <-txc1
-	s.Require().NoError(res1.Err, "Failed to create organization")
-	orgID := res1.OrgID
-
-	txc2, err := s.client.CreateRepository(ctx, orgID, repoName, repoMeta)
+	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.backend.Commit()
 
-	res2 := <-txc2
-	s.Require().NoError(res2.Err, "Failed to create repository")
-
-	txc3, err := s.client.VoteRelease(ctx, orgID, repoName, release)
+	_, err = s.client.VoteRelease(ctx, txopts, orgCreatedEvent.OrgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
-	s.backend.Commit()
 
-	res3 := <-txc3
-	s.Require().NoError(res3.Err, "Failed to vote release")
-
-	other, err := s.client.GetRelease(ctx, orgID, repoName, release.Tag)
+	released, err := s.client.GetRelease(ctx, orgCreatedEvent.OrgID, repoName, release.Tag)
 	s.Require().NoError(err, "Failed to get release")
-	s.Assert().Equal(release.ReleaseCID, other.ReleaseCID)
-	s.Assert().Equal(release.MetaCID, other.MetaCID)
+	s.Assert().Equal(release.ReleaseCID, released.ReleaseCID)
+	s.Assert().Equal(release.MetaCID, released.MetaCID)
 
-	latest, err := s.client.GetLatestRelease(ctx, orgID, repoName)
+	latest, err := s.client.GetLatestRelease(ctx, orgCreatedEvent.OrgID, repoName)
 	s.Require().NoError(err, "Failed to get latest release")
 	s.Assert().Equal(release.Tag, latest.Tag)
 }

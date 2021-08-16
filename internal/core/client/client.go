@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -9,25 +9,27 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
 	httpapi "github.com/ipfs/go-ipfs-http-client"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/valist-io/gasless"
+	"github.com/valist-io/gasless/mexa"
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/contract"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/basetx"
+	"github.com/valist-io/registry/internal/core/metatx"
 )
 
 var _ core.CoreAPI = (*Client)(nil)
 
-var (
-	emptyHash    = common.HexToHash("0x0")
-	emptyAddress = common.HexToAddress("0x0")
-)
+var emptyHash = common.HexToHash("0x0")
 
 // Client is a Valist SDK client.
 type Client struct {
@@ -40,12 +42,16 @@ type Client struct {
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
 
+	metaTx bool
+
 	wallet  accounts.Wallet
 	account accounts.Account
+
+	transactor core.TransactorAPI
 }
 
-// NewClient returns a Client with default settings.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (core.CoreAPI, error) {
+// NewClient create a client with a base transactor.
+func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	signer, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
 	if err != nil {
 		return nil, err
@@ -107,14 +113,64 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
 	}
 
+	transactor := basetx.NewTransactor(valist, registry)
+
 	return &Client{
-		eth:      eth,
-		ipfs:     ipfs,
-		orgs:     make(map[string]common.Hash),
-		chainID:  cfg.Ethereum.ChainID,
-		valist:   valist,
-		registry: registry,
-		wallet:   signer,
-		account:  account,
+		eth:        eth,
+		ipfs:       ipfs,
+		orgs:       make(map[string]common.Hash),
+		chainID:    cfg.Ethereum.ChainID,
+		valist:     valist,
+		registry:   registry,
+		wallet:     signer,
+		account:    account,
+		transactor: transactor,
 	}, nil
+}
+
+// NewClientWithMetaTx creates a client with a metatx transactor.
+func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
+	client, err := NewClient(ctx, cfg, account)
+	if err != nil {
+		return nil, err
+	}
+
+	eth, ok := client.eth.(*ethclient.Client)
+	if !ok {
+		return nil, fmt.Errorf("cannot create metatx transactor with simulated backend")
+	}
+
+	// TODO move to config
+	meta, err := mexa.NewMexa(ctx, eth, "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", big.NewInt(0))
+	if err != nil {
+		return nil, err
+	}
+
+	signer := gasless.NewWalletSigner(client.account, client.wallet)
+	transactor, err := metatx.NewTransactor(client.transactor, meta, signer, account)
+	if err != nil {
+		return nil, err
+	}
+
+	client.transactor = transactor
+	return client, nil
+}
+
+// NewTransactOpts creates a transaction signer.
+func (client *Client) NewTransactOpts() *bind.TransactOpts {
+	return &bind.TransactOpts{
+		From:   client.account.Address,
+		NoSend: client.metaTx,
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+			if address != client.account.Address {
+				return nil, bind.ErrNotAuthorized
+			}
+
+			if client.metaTx {
+				return tx, nil
+			}
+
+			return client.wallet.SignTx(client.account, tx, client.chainID)
+		},
+	}
 }

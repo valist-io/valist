@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -7,9 +7,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ipfs/go-cid"
 
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
 )
 
@@ -55,8 +55,8 @@ func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*cor
 	return &meta, nil
 }
 
-// CreateOrganization creates a new organization with the given meta and returns the orgID.
-func (client *Client) CreateOrganization(ctx context.Context, meta *core.OrganizationMeta) (<-chan core.CreateOrgResult, error) {
+func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.TransactOpts, meta *core.OrganizationMeta) (*valist.ValistOrgCreated, error) {
+
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -67,51 +67,15 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *core.Organiz
 		return nil, err
 	}
 
-	txopts := bind.TransactOpts{
-		Context: ctx,
-		From:    client.account.Address,
-		Signer:  client.Signer,
-	}
-
-	tx, err := client.valist.CreateOrganization(&txopts, metaCID.String())
+	tx, err := client.transactor.CreateOrganizationTx(ctx, txopts, metaCID)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make(chan core.CreateOrgResult, 1)
-	go client.createOrganization(ctx, tx, result)
-
-	return result, nil
-}
-
-func (client *Client) createOrganization(ctx context.Context, tx *types.Transaction, result chan<- core.CreateOrgResult) {
-	defer close(result)
-
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := waitMined(ctx, client.eth, tx)
 	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
+		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		result <- core.CreateOrgResult{Err: fmt.Errorf("Failed to parse log")}
-		return
-	}
-
-	log, err := client.valist.ParseOrgCreated(*receipt.Logs[0])
-	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
-	}
-
-	metaCID, err := cid.Decode(log.MetaCID)
-	if err != nil {
-		result <- core.CreateOrgResult{Err: err}
-		return
-	}
-
-	result <- core.CreateOrgResult{
-		OrgID:   log.OrgID,
-		MetaCID: metaCID,
-	}
+	return client.valist.ParseOrgCreated(*logs[0])
 }

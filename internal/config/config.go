@@ -45,25 +45,31 @@ type Signer struct {
 	IPCAddress string `json:"ipc_address"`
 }
 
+type Accounts struct {
+	Pinned  []common.Address `json:"pinned,omitempty"`
+	Default common.Address   `json:"default,omitempty"`
+}
+
 type Config struct {
 	rootPath string
-	Accounts map[string]common.Address `json:"accounts"`
-	Ethereum Ethereum                  `json:"ethereum"`
-	IPFS     IPFS                      `json:"ipfs"`
-	Signer   Signer                    `json:"signer"`
+	Accounts Accounts `json:"accounts"`
+	Ethereum Ethereum `json:"ethereum"`
+	IPFS     IPFS     `json:"ipfs"`
+	Signer   Signer   `json:"signer"`
 }
 
 // Default returns a config with default settings.
 func Default(rootPath string) Config {
 	return Config{
 		rootPath,
-		make(map[string]common.Address),
+		Accounts{},
 		Ethereum{
 			RPC:     "https://rpc.valist.io",
 			ChainID: big.NewInt(80001),
 			Contracts: map[string]common.Address{
-				"valist":   common.HexToAddress("0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6"),
-				"registry": common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
+				"valist":    common.HexToAddress("0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6"),
+				"registry":  common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
+				"forwarder": common.HexToAddress("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b"),
 			},
 		},
 		IPFS{

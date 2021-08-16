@@ -1,10 +1,14 @@
-package impl
+package client
 
 import (
+	"context"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/core/types"
 )
 
 func packedEncoding(args ...interface{}) ([]byte, error) {
@@ -24,4 +28,17 @@ func packedEncoding(args ...interface{}) ([]byte, error) {
 	}
 
 	return arguments.Pack(args...)
+}
+
+func waitMined(ctx context.Context, eth bind.DeployBackend, tx *types.Transaction) ([]*types.Log, error) {
+	if sim, ok := eth.(*backends.SimulatedBackend); ok {
+		sim.Commit()
+	}
+
+	receipt, err := bind.WaitMined(ctx, eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return receipt.Logs, nil
 }

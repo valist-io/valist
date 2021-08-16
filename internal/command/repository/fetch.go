@@ -9,20 +9,13 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/impl"
+	"github.com/valist-io/registry/internal/core/client"
 )
 
 func NewFetchCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "fetch",
 		Usage: "Fetch repository info",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "account",
-				Value: "default",
-				Usage: "Account to authenticate with",
-			},
-		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
@@ -39,13 +32,13 @@ func NewFetchCommand() *cli.Command {
 			}
 
 			var account accounts.Account
-			if address, ok := cfg.Accounts[c.String("account")]; ok {
-				account.Address = address
-			} else {
+			if c.IsSet("account") {
 				account.Address = common.HexToAddress(c.String("account"))
+			} else {
+				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := impl.NewClient(c.Context, cfg, account)
+			client, err := client.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
