@@ -2,22 +2,10 @@
 package metatx
 
 import (
-	"context"
-	"math/big"
-	"time"
-
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/common/hexutil"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/valist-io/gasless"
-	"github.com/valist-io/gasless/mexa"
 
 	"github.com/valist-io/registry/internal/core"
 )
-
-var emptyAddress = common.HexToAddress("0x0")
 
 const (
 	clearPendingKeyBFID       = "a0dfd7b2-fb2b-46da-a662-3cbb87c7b83e" //nolint
@@ -39,46 +27,11 @@ const (
 )
 
 type Transactor struct {
-	base core.TransactorAPI
-	meta gasless.MetaTransactor
-
-	account accounts.Account
-	signer  gasless.Signer
+	base   core.TransactorAPI
+	meta   gasless.Transactor
+	signer gasless.Signer
 }
 
-func NewTransactor(base core.TransactorAPI, meta gasless.MetaTransactor, signer gasless.Signer, account accounts.Account) (core.TransactorAPI, error) {
-	return &Transactor{
-		base:    base,
-		meta:    meta,
-		account: account,
-		signer:  signer,
-	}, nil
-}
-
-func setMetaTransactOpts(txopts *bind.TransactOpts) {
-	txopts.From = emptyAddress
-	txopts.NoSend = true
-	txopts.Signer = func(address common.Address, transaction *types.Transaction) (*types.Transaction, error) {
-		return transaction, nil
-	}
-}
-
-func (t *Transactor) newMessage(ctx context.Context, tx *types.Transaction, apiId string) (gasless.EIP712Message, error) {
-	nonce, err := t.meta.Nonce(ctx, t.account.Address)
-	if err != nil {
-		return nil, err
-	}
-
-	return &mexa.Message{
-		ApiId:         apiId,
-		From:          t.account.Address,
-		To:            *tx.To(),
-		Token:         emptyAddress,
-		TxGas:         tx.Gas(),
-		TokenGasPrice: "0",
-		BatchId:       big.NewInt(0),
-		BatchNonce:    nonce,
-		Deadline:      big.NewInt(time.Now().Unix() + 3600),
-		Data:          hexutil.Encode(tx.Data()),
-	}, nil
+func NewTransactor(base core.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) core.TransactorAPI {
+	return &Transactor{base, meta, signer}
 }

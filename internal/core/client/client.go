@@ -140,19 +140,14 @@ func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accoun
 		return nil, fmt.Errorf("cannot create metatx transactor with simulated backend")
 	}
 
-	// TODO move to config
-	meta, err := mexa.NewMexa(ctx, eth, "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", big.NewInt(0))
+	meta, err := mexa.NewMexa(ctx, eth, cfg.Ethereum.BiconomyApiKey)
 	if err != nil {
 		return nil, err
 	}
 
 	signer := gasless.NewWalletSigner(client.account, client.wallet)
-	transactor, err := metatx.NewTransactor(client.transactor, meta, signer, account)
-	if err != nil {
-		return nil, err
-	}
+	client.transactor = metatx.NewTransactor(client.transactor, meta, signer)
 
-	client.transactor = transactor
 	return client, nil
 }
 
