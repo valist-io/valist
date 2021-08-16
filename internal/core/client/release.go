@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -97,15 +97,12 @@ func (client *Client) VoteRelease(
 	release *core.Release,
 ) (*valist.ValistVoteReleaseEvent, error) {
 
-	releaseCID := release.ReleaseCID.String()
-	metaCID := release.MetaCID.String()
-
-	tx, err := client.transactor.VoteReleaseTx(ctx, txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
+	tx, err := client.transactor.VoteReleaseTx(ctx, txopts, orgID, repoName, release)
 	if err != nil {
 		return nil, err
 	}
 
-	logs, err := getTxLogs(ctx, client.eth, tx)
+	logs, err := waitMined(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}

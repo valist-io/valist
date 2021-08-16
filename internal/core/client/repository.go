@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -83,7 +83,7 @@ func (client *Client) CreateRepository(
 		return nil, err
 	}
 
-	logs, err := getTxLogs(ctx, client.eth, tx)
+	logs, err := waitMined(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}

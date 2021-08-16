@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"bytes"
@@ -49,7 +49,7 @@ func (client *Client) LinkOrganizationName(
 		return nil, err
 	}
 
-	logs, err := getTxLogs(ctx, client.eth, tx)
+	logs, err := waitMined(ctx, client.eth, tx)
 	if err != nil {
 		return nil, err
 	}

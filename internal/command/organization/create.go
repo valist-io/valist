@@ -11,7 +11,7 @@ import (
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/impl"
+	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/signer"
 )
 
@@ -47,7 +47,7 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := impl.NewClientWithMetaTx(c.Context, cfg, account)
+			client, err := client.NewClientWithMetaTx(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

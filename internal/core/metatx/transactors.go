@@ -8,6 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ipfs/go-cid"
 	"github.com/valist-io/gasless"
+
+	"github.com/valist-io/registry/internal/core"
 )
 
 func (t *Transactor) CreateOrganizationTx(ctx context.Context, txopts *bind.TransactOpts, metaCID cid.Cid) (*types.Transaction, error) {
@@ -42,7 +44,7 @@ func (t *Transactor) LinkOrganizationNameTx(ctx context.Context, txopts *bind.Tr
 	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
 }
 
-func (t *Transactor) CreateRepositoryTx(ctx context.Context, txopts *bind.TransactOpts, orgID [32]byte, repoName string, repoMeta string) (*types.Transaction, error) {
+func (t *Transactor) CreateRepositoryTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*types.Transaction, error) {
 	setMetaTransactOpts(txopts)
 
 	tx, err := t.base.CreateRepositoryTx(ctx, txopts, orgID, repoName, repoMeta)
@@ -58,18 +60,10 @@ func (t *Transactor) CreateRepositoryTx(ctx context.Context, txopts *bind.Transa
 	return gasless.SendTransaction(ctx, t.meta, message, t.signer)
 }
 
-func (t *Transactor) VoteReleaseTx(
-	ctx context.Context,
-	txopts *bind.TransactOpts,
-	orgID [32]byte,
-	repoName string,
-	tag string,
-	releaseCID string,
-	metaCID string,
-) (*types.Transaction, error) {
+func (t *Transactor) VoteReleaseTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, release *core.Release) (*types.Transaction, error) {
 	setMetaTransactOpts(txopts)
 
-	tx, err := t.base.VoteReleaseTx(ctx, txopts, orgID, repoName, tag, releaseCID, metaCID)
+	tx, err := t.base.VoteReleaseTx(ctx, txopts, orgID, repoName, release)
 	if err != nil {
 		return nil, err
 	}

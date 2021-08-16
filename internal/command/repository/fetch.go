@@ -9,7 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/core/impl"
+	"github.com/valist-io/registry/internal/core/client"
 )
 
 func NewFetchCommand() *cli.Command {
@@ -38,7 +38,7 @@ func NewFetchCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := impl.NewClient(c.Context, cfg, account)
+			client, err := client.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

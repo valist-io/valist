@@ -19,6 +19,7 @@ var (
 	ErrReleaseNotExist      = errors.New("Release does not exist")
 )
 
+// CoreAPI defines the high-level interface for Valist.
 type CoreAPI interface {
 	OrganizationAPI
 	RegistryAPI
@@ -27,12 +28,13 @@ type CoreAPI interface {
 	StorageAPI
 }
 
+// TransactorAPI defines functions to abstract blockchain transactions.
+// TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
 type TransactorAPI interface {
-	// Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
 	CreateOrganizationTx(context.Context, *bind.TransactOpts, cid.Cid) (*types.Transaction, error)
 	LinkOrganizationNameTx(context.Context, *bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	CreateRepositoryTx(context.Context, *bind.TransactOpts, [32]byte, string, string) (*types.Transaction, error)
-	VoteReleaseTx(context.Context, *bind.TransactOpts, [32]byte, string, string, string, string) (*types.Transaction, error)
+	CreateRepositoryTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteReleaseTx(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
 }
 
 type OrganizationAPI interface {
@@ -99,18 +101,6 @@ type Release struct {
 	Signers    []common.Address
 }
 
-type VoteReleaseResult struct {
-	OrgID      common.Hash
-	RepoName   common.Hash
-	Tag        common.Hash
-	ReleaseCID cid.Cid
-	MetaCID    cid.Cid
-	Signer     common.Address
-	SigCount   *big.Int
-	Threshold  *big.Int
-	Err        error
-}
-
 type Repository struct {
 	OrgID         common.Hash
 	Threshold     *big.Int
@@ -124,13 +114,4 @@ type RepositoryMeta struct {
 	ProjectType string `json:"projectType"`
 	Homepage    string `json:"homepage"`
 	Repository  string `json:"repository"`
-}
-
-type CreateRepoResult struct {
-	OrgID        common.Hash
-	RepoNameHash common.Hash
-	RepoName     string
-	MetaCIDHash  common.Hash
-	MetaCID      cid.Cid
-	Err          error
 }

@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -7,7 +7,6 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -16,6 +15,8 @@ import (
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
+	"github.com/valist-io/gasless"
+	"github.com/valist-io/gasless/mexa"
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/contract"
@@ -28,10 +29,7 @@ import (
 
 var _ core.CoreAPI = (*Client)(nil)
 
-var (
-	emptyHash    = common.HexToHash("0x0")
-	emptyAddress = common.HexToAddress("0x0")
-)
+var emptyHash = common.HexToHash("0x0")
 
 // Client is a Valist SDK client.
 type Client struct {
@@ -52,6 +50,7 @@ type Client struct {
 	transactor core.TransactorAPI
 }
 
+// NewClient create a client with a base transactor.
 func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	signer, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
 	if err != nil {
@@ -129,21 +128,35 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}, nil
 }
 
+// NewClientWithMetaTx creates a client with a metatx transactor.
 func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
 	client, err := NewClient(ctx, cfg, account)
 	if err != nil {
 		return nil, err
 	}
 
-	// @TODO don't cast directly to ethclient
-	client.transactor, err = metatx.NewTransactor(ctx, client.eth.(*ethclient.Client), client.valist, client.registry, account, client.wallet)
+	eth, ok := client.eth.(*ethclient.Client)
+	if !ok {
+		return nil, fmt.Errorf("cannot create metatx transactor with simulated backend")
+	}
+
+	// TODO move to config
+	meta, err := mexa.NewMexa(ctx, eth, "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878", big.NewInt(0))
 	if err != nil {
 		return nil, err
 	}
 
+	signer := gasless.NewWalletSigner(client.account, client.wallet)
+	transactor, err := metatx.NewTransactor(client.transactor, meta, signer, account)
+	if err != nil {
+		return nil, err
+	}
+
+	client.transactor = transactor
 	return client, nil
 }
 
+// NewTransactOpts creates a transaction signer.
 func (client *Client) NewTransactOpts() *bind.TransactOpts {
 	return &bind.TransactOpts{
 		From:   client.account.Address,
@@ -160,24 +173,4 @@ func (client *Client) NewTransactOpts() *bind.TransactOpts {
 			return client.wallet.SignTx(client.account, tx, client.chainID)
 		},
 	}
-}
-
-func getTxLogs(ctx context.Context, eth bind.DeployBackend, tx *types.Transaction) ([]*types.Log, error) {
-
-	// @TODO: Enforce checking eth is actually SimulatedBackend and not some other test chain
-	// Will crash when using chainID 1337 on a chain like Ganache outside of test environment
-	if tx.ChainId().Cmp(big.NewInt(1337)) == 0 {
-		eth.(*backends.SimulatedBackend).Commit()
-	}
-
-	receipt, err := bind.WaitMined(ctx, eth, tx)
-	if err != nil {
-		return nil, err
-	}
-
-	if len(receipt.Logs) == 0 {
-		return nil, err
-	}
-
-	return receipt.Logs, nil
 }
