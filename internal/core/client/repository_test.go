@@ -31,8 +31,7 @@ func (s *ClientSuite) TestCreateRepository() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	txopts := s.client.NewTransactOpts()
-
+	txopts := s.client.TransactOpts()
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 

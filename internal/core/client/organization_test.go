@@ -15,14 +15,11 @@ func (s *ClientSuite) TestCreateOrganization() {
 		Description: "Accelerating the transition to web3.",
 	}
 
-	txopts := s.client.NewTransactOpts()
-
+	txopts := s.client.TransactOpts()
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
-
 	s.Require().NoError(err, "Failed to create organization")
 
 	org, err := s.client.GetOrganization(ctx, orgCreatedEvent.OrgID)
-
 	s.Require().NoError(err, "Failed to get organization")
 	s.Assert().Equal(big.NewInt(0).Cmp(org.Threshold), 0)
 

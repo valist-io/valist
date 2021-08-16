@@ -42,8 +42,7 @@ func (s *ClientSuite) TestVoteRelease() {
 		MetaCID:    metaCID,
 	}
 
-	txopts := s.client.NewTransactOpts()
-
+	txopts := s.client.TransactOpts()
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 

@@ -17,8 +17,7 @@ func (s *ClientSuite) TestGetOrganizationID() {
 	orgName := "valist"
 	orgID := common.HexToHash("0xDEADBEEF")
 
-	txopts := s.client.NewTransactOpts()
-
+	txopts := s.client.TransactOpts()
 	_, err = s.client.LinkOrganizationName(ctx, txopts, orgID, orgName)
 	s.Require().NoError(err, "Failed to link organization name")
 

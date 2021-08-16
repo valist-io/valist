@@ -151,8 +151,8 @@ func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accoun
 	return client, nil
 }
 
-// NewTransactOpts creates a transaction signer.
-func (client *Client) NewTransactOpts() *bind.TransactOpts {
+// TransactOpts creates a transaction signer.
+func (client *Client) TransactOpts() *bind.TransactOpts {
 	return &bind.TransactOpts{
 		From:   client.account.Address,
 		NoSend: client.metaTx,
