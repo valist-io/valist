@@ -5,12 +5,13 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/impl"
+	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/signer"
 )
 
@@ -46,7 +47,7 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := impl.NewClient(c.Context, cfg, account)
+			client, err := client.NewClientWithMetaTx(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
@@ -54,33 +55,31 @@ func NewCreateCommand() *cli.Command {
 			// TODO prompt
 			orgName := c.Args().Get(0)
 			orgMeta := core.OrganizationMeta{
-				Name:        "test",
+				Name:        "test11",
 				Description: "test",
 			}
 
+			_, err = client.GetOrganizationID(c.Context, orgName)
+			if err == nil {
+				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
+			}
+
 			fmt.Println("Creating organization...")
-			createTx, err := client.CreateOrganization(c.Context, &orgMeta)
+
+			create, err := client.CreateOrganization(c.Context, &bind.TransactOpts{}, &orgMeta)
 			if err != nil {
 				return err
 			}
 
-			createRes := <-createTx
-			if createRes.Err != nil {
-				return createRes.Err
-			}
-
-			fmt.Println("Linking organization name...")
-			linkTx, err := client.LinkOrganizationName(c.Context, createRes.OrgID, orgName)
+			fmt.Printf("Linking name '%v' to orgID 0x'%x'...\n", orgName, create.OrgID)
+			_, err = client.LinkOrganizationName(c.Context, &bind.TransactOpts{}, create.OrgID, orgName)
 			if err != nil {
 				return err
 			}
 
-			linkRes := <-linkTx
-			if linkRes.Err != nil {
-				return linkRes.Err
-			}
+			fmt.Printf("Successfully created %v!\n", orgName)
+			fmt.Printf("Your Valist ID: 0x%x\n", create.OrgID)
 
-			fmt.Println("Success!")
 			return nil
 		},
 	}

@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -31,22 +31,15 @@ func (s *ClientSuite) TestCreateRepository() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	txc1, err := s.client.CreateOrganization(ctx, orgMeta)
+	txopts := s.client.NewTransactOpts()
+
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
-	s.backend.Commit()
 
-	res1 := <-txc1
-	s.Require().NoError(res1.Err, "Failed to create organization")
-	orgID := res1.OrgID
-
-	txc2, err := s.client.CreateRepository(ctx, orgID, repoName, repoMeta)
+	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
-	s.backend.Commit()
 
-	res2 := <-txc2
-	s.Require().NoError(res2.Err, "Failed to create repository")
-
-	repo, err := s.client.GetRepository(ctx, orgID, repoName)
+	repo, err := s.client.GetRepository(ctx, orgCreatedEvent.OrgID, repoName)
 	s.Require().NoError(err, "Failed to get repository")
 	s.Assert().Equal(big.NewInt(0).Cmp(repo.Threshold), 0)
 

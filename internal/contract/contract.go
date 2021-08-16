@@ -1,11 +1,13 @@
 //go:generate abigen --sol ../../contracts/Valist.sol --pkg valist --out ./valist/valist.go
 //go:generate abigen --sol ../../contracts/ValistRegistry.sol --pkg registry --out ./registry/registry.go
+//go:generate abigen --abi ../../contracts/BiconomyForwarderABI.json --bin ../../contracts/BiconomyForwarder.bin --pkg metatx --out ./metatx/forwarder.go
 package contract
 
 import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/valist-io/registry/internal/contract/metatx"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 )
@@ -24,4 +26,12 @@ func NewRegistry(address common.Address, backend bind.ContractBackend) (*registr
 
 func DeployRegistry(auth *bind.TransactOpts, backend bind.ContractBackend, metaTxForwarder common.Address) (common.Address, *types.Transaction, *registry.ValistRegistry, error) {
 	return registry.DeployValistRegistry(auth, backend, metaTxForwarder)
+}
+
+func NewForwarder(address common.Address, backend bind.ContractBackend) (*metatx.Metatx, error) {
+	return metatx.NewMetatx(address, backend)
+}
+
+func DeployForwarder(auth *bind.TransactOpts, backend bind.ContractBackend, owner common.Address) (common.Address, *types.Transaction, *metatx.Metatx, error) {
+	return metatx.DeployMetatx(auth, backend, owner)
 }

@@ -13,23 +13,23 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/http"
-	"github.com/valist-io/registry/internal/impl"
 )
 
 const banner = `
-                                                      
-@@@  @@@   @@@@@@   @@@       @@@   @@@@@@   @@@@@@@  
-@@@  @@@  @@@@@@@@  @@@       @@@  @@@@@@@   @@@@@@@  
-@@!  @@@  @@!  @@@  @@!       @@!  !@@         @@!    
-!@!  @!@  !@!  @!@  !@!       !@!  !@!         !@!    
-@!@  !@!  @!@!@!@!  @!!       !!@  !!@@!!      @!!    
-!@!  !!!  !!!@!!!!  !!!       !!!   !!@!!!     !!!    
-:!:  !!:  !!:  !!!  !!:       !!:       !:!    !!:    
- ::!!:!   :!:  !:!   :!:      :!:      !:!     :!:    
-  ::::    ::   :::   :: ::::   ::  :::: ::      ::    
-   :       :   : :  : :: : :  :    :: : :       :     
-                                                                                            
+
+@@@  @@@   @@@@@@   @@@       @@@   @@@@@@   @@@@@@@
+@@@  @@@  @@@@@@@@  @@@       @@@  @@@@@@@   @@@@@@@
+@@!  @@@  @@!  @@@  @@!       @@!  !@@         @@!
+!@!  @!@  !@!  @!@  !@!       !@!  !@!         !@!
+@!@  !@!  @!@!@!@!  @!!       !!@  !!@@!!      @!!
+!@!  !!!  !!!@!!!!  !!!       !!!   !!@!!!     !!!
+:!:  !!:  !!:  !!!  !!:       !!:       !:!    !!:
+ ::!!:!   :!:  !:!   :!:      :!:      !:!     :!:
+  ::::    ::   :::   :: ::::   ::  :::: ::      ::
+   :       :   : :  : :: : :  :    :: : :       :
+
 `
 
 var bindAddr = ":8080"
@@ -63,7 +63,7 @@ func NewDaemonCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := impl.NewClient(c.Context, cfg, account)
+			client, err := client.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

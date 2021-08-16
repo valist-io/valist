@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -8,10 +8,10 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/ipfs/go-cid"
 
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
 )
 
@@ -89,69 +89,25 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 }
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
-func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *core.Release) (<-chan core.VoteReleaseResult, error) {
-	txopts := bind.TransactOpts{
-		Context: ctx,
-		From:    client.account.Address,
-		Signer:  client.Signer,
-	}
+func (client *Client) VoteRelease(
+	ctx context.Context,
+	txopts *bind.TransactOpts,
+	orgID common.Hash,
+	repoName string,
+	release *core.Release,
+) (*valist.ValistVoteReleaseEvent, error) {
 
-	releaseCID := release.ReleaseCID.String()
-	metaCID := release.MetaCID.String()
-
-	tx, err := client.valist.VoteRelease(&txopts, orgID, repoName, release.Tag, releaseCID, metaCID)
+	tx, err := client.transactor.VoteReleaseTx(ctx, txopts, orgID, repoName, release)
 	if err != nil {
 		return nil, err
 	}
 
-	result := make(chan core.VoteReleaseResult, 1)
-	go client.voteRelease(ctx, tx, result)
-
-	return result, nil
-}
-
-func (client *Client) voteRelease(ctx context.Context, tx *types.Transaction, result chan<- core.VoteReleaseResult) {
-	defer close(result)
-
-	receipt, err := bind.WaitMined(ctx, client.eth, tx)
+	logs, err := waitMined(ctx, client.eth, tx)
 	if err != nil {
-		result <- core.VoteReleaseResult{Err: err}
-		return
+		return nil, err
 	}
 
-	if len(receipt.Logs) == 0 {
-		result <- core.VoteReleaseResult{Err: fmt.Errorf("Failed to parse log")}
-		return
-	}
-
-	log, err := client.valist.ParseVoteReleaseEvent(*receipt.Logs[0])
-	if err != nil {
-		result <- core.VoteReleaseResult{Err: err}
-		return
-	}
-
-	releaseCID, err := cid.Decode(log.ReleaseCID)
-	if err != nil {
-		result <- core.VoteReleaseResult{Err: err}
-		return
-	}
-
-	metaCID, err := cid.Decode(log.MetaCID)
-	if err != nil {
-		result <- core.VoteReleaseResult{Err: err}
-		return
-	}
-
-	result <- core.VoteReleaseResult{
-		OrgID:      log.OrgID,
-		RepoName:   log.RepoName,
-		Tag:        log.Tag,
-		ReleaseCID: releaseCID,
-		MetaCID:    metaCID,
-		Signer:     log.Signer,
-		SigCount:   log.SigCount,
-		Threshold:  log.Threshold,
-	}
+	return client.valist.ParseVoteReleaseEvent(*logs[0])
 }
 
 // ReleaseTagIterator is used to iterate release tags.

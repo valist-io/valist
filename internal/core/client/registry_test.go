@@ -1,4 +1,4 @@
-package impl
+package client
 
 import (
 	"context"
@@ -17,12 +17,10 @@ func (s *ClientSuite) TestGetOrganizationID() {
 	orgName := "valist"
 	orgID := common.HexToHash("0xDEADBEEF")
 
-	txc1, err := s.client.LinkOrganizationName(ctx, orgID, orgName)
-	s.Require().NoError(err, "Failed to link organization name")
-	s.backend.Commit()
+	txopts := s.client.NewTransactOpts()
 
-	res1 := <-txc1
-	s.Require().NoError(res1.Err, "Failed to link organization name")
+	_, err = s.client.LinkOrganizationName(ctx, txopts, orgID, orgName)
+	s.Require().NoError(err, "Failed to link organization name")
 
 	id, err := s.client.GetOrganizationID(ctx, orgName)
 	s.Require().NoError(err, "Failed to get organization id")
