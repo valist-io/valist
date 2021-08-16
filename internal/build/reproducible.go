@@ -55,20 +55,12 @@ func Create(imageTag string, dockerFilePath string) error {
 	cmd.Env = append(os.Environ(), "DOCKER_BUILDKIT=1")
 	cmd.Stdout = os.Stdout
 	cmd.Stderr = os.Stderr
-	if err := cmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
+	return cmd.Run()
 }
 
 func Export(image string, hostPath string, out string) error {
 	cpCmd := exec.Command("bash", "-c", fmt.Sprintf("docker run -v %s:/opt/out -i %s cp -R %s /opt/out", hostPath, image, out))
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr
-	if err := cpCmd.Run(); err != nil {
-		return err
-	}
-
-	return nil
+	return cpCmd.Run()
 }

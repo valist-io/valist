@@ -4,6 +4,8 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+
+	"github.com/valist-io/registry/internal/npm"
 )
 
 func Run(projectPath, configYml string) ([]string, error) {
@@ -15,8 +17,7 @@ func Run(projectPath, configYml string) ([]string, error) {
 
 	// Load valist.yml
 	var valistFile Config
-	err := valistFile.Load(valistFilePath)
-	if err != nil {
+	if err := valistFile.Load(valistFilePath); err != nil {
 		return nil, err
 	}
 
@@ -31,7 +32,7 @@ func Run(projectPath, configYml string) ([]string, error) {
 	// If projectType is npm, run npm pack and set out to .tgz
 	if valistFile.Type == "npm" {
 		packageJsonPath := filepath.Join(projectPath, "package.json")
-		packageJson, err := ParsePackageJson(packageJsonPath)
+		packageJson, err := npm.ParsePackageJSON(packageJsonPath)
 		if err != nil {
 			return nil, err
 		}
@@ -80,20 +81,18 @@ func Run(projectPath, configYml string) ([]string, error) {
 	}
 
 	// If platforms are defined in config then use out + artifactPath
-	if len(valistFile.Platforms) > 0 {
-		for _, artifact := range valistFile.Platforms {
-			artifactPaths = append(
-				artifactPaths,
-				filepath.Join(projectPath, valistFile.Out, artifact),
-			)
-		}
-		return artifactPaths, nil
+	for _, artifact := range valistFile.Platforms {
+		artifactPaths = append(artifactPaths, filepath.Join(projectPath, valistFile.Out, artifact))
 	}
 
 	// If platforms are not defined but out is defined, use valistFile.Out
-	if valistFile.Out != "" {
-		return append(artifactPaths, filepath.Join(projectPath, valistFile.Out)), nil
+	if len(valistFile.Platforms) == 0 && valistFile.Out != "" {
+		artifactPaths = append(artifactPaths, filepath.Join(projectPath, valistFile.Out))
 	}
 
-	return nil, errors.New("Must define either out or platforms in config for this package type")
+	if len(artifactPaths) == 0 {
+		return nil, errors.New("Must define either out or platforms in config for this package type")
+	}
+
+	return artifactPaths, nil
 }

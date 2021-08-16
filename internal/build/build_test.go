@@ -16,6 +16,7 @@ func TestRunGoBuild(t *testing.T) {
 
 	// Copy goTestProject from testdata to tmp directory
 	err = copy.Copy("testdata/goTestProject", tmp)
+	require.NoError(t, err, "Failed to copy goTestProject")
 
 	artifactPaths, err := Run(tmp, "valist.yml")
 	assert.NoError(t, err, "build.Run() executes with no errors")
@@ -32,6 +33,8 @@ func TestRunNpmBuild(t *testing.T) {
 
 	// Copy npmTestProject from testdata to tmp directory
 	err = copy.Copy("testdata/npmTestProject", tmp)
+	require.NoError(t, err, "Failed to copy npmTestProject")
+
 	artifactPaths, err := Run(tmp, "valist.yml")
 	assert.NoError(t, err, "build.Run() executes with no errors")
 

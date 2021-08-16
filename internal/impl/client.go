@@ -104,7 +104,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 			continue
 		}
 
-		go ipfs.Swarm().Connect(ctx, *peerInfo)
+		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
 	}
 
 	return &Client{
