@@ -5,17 +5,19 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/prompt"
 )
 
-func NewFetchCommand() *cli.Command {
+func NewUpdateCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "fetch",
-		Usage: "Fetch repository info",
+		Name:  "update",
+		Usage: "Update repository metadata",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
@@ -62,12 +64,37 @@ func NewFetchCommand() *cli.Command {
 				return err
 			}
 
-			fmt.Printf("OrgID: %s\n", orgID.String())
-			fmt.Printf("Repo: %s/%s\n", orgName, repoName)
-			fmt.Printf("Name: %s\n", meta.Name)
-			fmt.Printf("Description: %s\n", meta.Description)
-			fmt.Printf("Signature Threshold: %d\n", repo.Threshold)
+			name, err := prompt.RepositoryName(meta.Name).Run()
+			if err != nil {
+				return err
+			}
 
+			desc, err := prompt.RepositoryDescription(meta.Description).Run()
+			if err != nil {
+				return err
+			}
+
+			homepage, err := prompt.RepositoryHomepage(meta.Homepage).Run()
+			if err != nil {
+				return err
+			}
+
+			url, err := prompt.RepositoryURL(meta.Repository).Run()
+			if err != nil {
+				return err
+			}
+
+			meta.Name = name
+			meta.Description = desc
+			meta.Homepage = homepage
+			meta.Repository = url
+
+			_, err = client.SetRepositoryMeta(c.Context, &bind.TransactOpts{}, orgID, repoName, meta)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Repository updated!")
 			return nil
 		},
 	}

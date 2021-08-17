@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -60,14 +61,7 @@ func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.
 }
 
 // CreateRepository creates a repository in the organization with the given orgID.
-func (client *Client) CreateRepository(
-	ctx context.Context,
-	txopts *bind.TransactOpts,
-	orgID common.Hash,
-	name string,
-	meta *core.RepositoryMeta,
-) (*valist.ValistRepoCreated, error) {
-
+func (client *Client) CreateRepository(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, meta *core.RepositoryMeta) (*valist.ValistRepoCreated, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -89,4 +83,42 @@ func (client *Client) CreateRepository(
 	}
 
 	return client.valist.ParseRepoCreated(*logs[0])
+}
+
+func (client *Client) SetRepositoryMeta(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, meta *core.RepositoryMeta) (*valist.ValistMetaUpdate, error) {
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return nil, err
+	}
+
+	metaCID, err := client.AddFile(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	tx, err := client.transactor.SetRepositoryMetaTx(ctx, txopts, orgID, name, metaCID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseMetaUpdate(*logs[0])
+}
+
+func (client *Client) VoteRepositoryThreshold(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
+	tx, err := client.transactor.VoteRepositoryThresholdTx(ctx, txopts, orgID, name, threshold)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseVoteThresholdEvent(*logs[0])
 }

@@ -13,6 +13,30 @@ import (
 	"github.com/valist-io/registry/internal/contract/valist"
 )
 
+const (
+	ProjectTypeBinary = "binary"
+	ProjectTypeNode   = "node"
+	ProjectTypeNPM    = "npm"
+	ProjectTypeGo     = "go"
+	ProjectTypeRust   = "rust"
+	ProjectTypePython = "python"
+	ProjectTypeDocker = "docker"
+	ProjectTypeCPP    = "c++"
+	ProjectTypeStatic = "static"
+)
+
+var ProjectTypes = []string{
+	ProjectTypeBinary,
+	ProjectTypeNode,
+	ProjectTypeNPM,
+	ProjectTypeGo,
+	ProjectTypeRust,
+	ProjectTypePython,
+	ProjectTypeDocker,
+	ProjectTypeCPP,
+	ProjectTypeStatic,
+}
+
 var (
 	ErrOrganizationNotExist = errors.New("Organization does not exist")
 	ErrRepositoryNotExist   = errors.New("Repository does not exist")
@@ -35,6 +59,8 @@ type TransactorAPI interface {
 	LinkOrganizationNameTx(context.Context, *bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	CreateRepositoryTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteReleaseTx(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
+	SetRepositoryMetaTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteRepositoryThresholdTx(context.Context, *bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
 }
 
 type OrganizationAPI interface {
@@ -60,6 +86,8 @@ type RepositoryAPI interface {
 	GetRepository(context.Context, common.Hash, string) (*Repository, error)
 	GetRepositoryMeta(context.Context, cid.Cid) (*RepositoryMeta, error)
 	CreateRepository(context.Context, *bind.TransactOpts, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
+	SetRepositoryMeta(context.Context, *bind.TransactOpts, common.Hash, string, *RepositoryMeta) (*valist.ValistMetaUpdate, error)
+	VoteRepositoryThreshold(context.Context, *bind.TransactOpts, common.Hash, string, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
 
 type ReleaseTagIterator interface {

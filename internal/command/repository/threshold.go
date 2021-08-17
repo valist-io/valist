@@ -2,9 +2,12 @@ package repository
 
 import (
 	"fmt"
+	"math/big"
 	"os"
+	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
@@ -12,12 +15,12 @@ import (
 	"github.com/valist-io/registry/internal/core/client"
 )
 
-func NewFetchCommand() *cli.Command {
+func NewThresholdCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "fetch",
-		Usage: "Fetch repository info",
+		Name:  "threshold",
+		Usage: "Vote for repository threshold",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 3 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -47,26 +50,26 @@ func NewFetchCommand() *cli.Command {
 			orgName := c.Args().Get(0)
 			repoName := c.Args().Get(1)
 
+			threshold, err := strconv.ParseInt(c.Args().Get(2), 10, 64)
+			if err != nil {
+				return err
+			}
+
 			orgID, err := client.GetOrganizationID(c.Context, orgName)
 			if err != nil {
 				return err
 			}
 
-			repo, err := client.GetRepository(c.Context, orgID, repoName)
+			vote, err := client.VoteRepositoryThreshold(c.Context, &bind.TransactOpts{}, orgID, repoName, big.NewInt(threshold))
 			if err != nil {
 				return err
 			}
 
-			meta, err := client.GetRepositoryMeta(c.Context, repo.MetaCID)
-			if err != nil {
-				return err
+			if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+				fmt.Printf("Voted to set threshold %d/%d\n", vote.SigCount, threshold)
+			} else {
+				fmt.Printf("Approved threshold %d\n", threshold)
 			}
-
-			fmt.Printf("OrgID: %s\n", orgID.String())
-			fmt.Printf("Repo: %s/%s\n", orgName, repoName)
-			fmt.Printf("Name: %s\n", meta.Name)
-			fmt.Printf("Description: %s\n", meta.Description)
-			fmt.Printf("Signature Threshold: %d\n", repo.Threshold)
 
 			return nil
 		},
