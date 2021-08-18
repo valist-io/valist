@@ -52,12 +52,20 @@ type Accounts struct {
 	Default common.Address   `json:"default,omitempty"`
 }
 
+type HTTP struct {
+	// ApiAddr is the api server address to use
+	ApiAddr string `json:"api_address"`
+	// WebAddr is the static web server address to use
+	WebAddr string `json:"web_address"`
+}
+
 type Config struct {
 	rootPath string
 	Accounts Accounts `json:"accounts"`
 	Ethereum Ethereum `json:"ethereum"`
 	IPFS     IPFS     `json:"ipfs"`
 	Signer   Signer   `json:"signer"`
+	HTTP     HTTP     `json:"http"`
 }
 
 // Default returns a config with default settings.
@@ -88,6 +96,10 @@ func Default(rootPath string) Config {
 			SmartCardPath: "",
 			KeyStorePath:  filepath.Join(rootPath, "keystore"),
 			IPCAddress:    filepath.Join(rootPath, "signer.ipc"),
+		},
+		HTTP{
+			ApiAddr: "localhost:8080",
+			WebAddr: "localhost:8081",
 		},
 	}
 }
