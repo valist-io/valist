@@ -1,4 +1,3 @@
-//go:generate ipfs get /ipns/valist.io
 package web
 
 import (
@@ -7,20 +6,20 @@ import (
 	"net/http"
 )
 
-//go:embed valist.io
-//go:embed valist.io/_next
-//go:embed valist.io/_next/static/chunks/pages/*.js
-//go:embed valist.io/_next/static/*/*.js
+//go:embed relay/out
+//go:embed relay/out/_next
+//go:embed relay/out/_next/static/chunks/pages/*.js
+//go:embed relay/out/_next/static/*/*.js
 var valistFS embed.FS
 
 func NewServer(bindAddr string) *http.Server {
-	rootFS, err := fs.Sub(valistFS, "valist.io")
+	subFS, err := fs.Sub(valistFS, "relay/out")
 	if err != nil {
 		panic("failed to get valist.io sub fs")
 	}
 	
 	return &http.Server{
 		Addr:    bindAddr,
-		Handler: http.FileServer(http.FS(rootFS)),
+		Handler: http.FileServer(http.FS(subFS)),
 	}
 }

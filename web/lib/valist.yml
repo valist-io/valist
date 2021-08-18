@@ -1,0 +1,7 @@
+type: node
+org: valist
+repo: sdk
+tag: 0.4.0
+install: npm install
+build: npm run build
+out: dist
