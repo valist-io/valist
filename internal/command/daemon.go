@@ -67,7 +67,7 @@ func NewDaemonCommand() *cli.Command {
 				return err
 			}
 			defer client.Close()
-			
+
 			fmt.Println(banner)
 			fmt.Println("Api server running on", cfg.HTTP.ApiAddr)
 			fmt.Println("Web server running on", cfg.HTTP.WebAddr)
@@ -87,8 +87,8 @@ func NewDaemonCommand() *cli.Command {
 			ctx, cancel := context.WithTimeout(c.Context, 30*time.Second)
 			defer cancel()
 
-			apiServer.Shutdown(ctx)
-			webServer.Shutdown(ctx)
+			apiServer.Shutdown(ctx) //nolint:errcheck
+			webServer.Shutdown(ctx) //nolint:errcheck
 
 			return nil
 		},
