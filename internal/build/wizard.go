@@ -3,24 +3,8 @@ package build
 import (
 	"fmt"
 
-	"github.com/manifoldco/promptui"
+	"github.com/valist-io/registry/internal/prompt"
 )
-
-func validateLength(value string) error {
-	if len(value) > 0 {
-		return nil
-	}
-	return fmt.Errorf("Length must be greater than 0")
-}
-
-func validateYesNo(value string) error {
-	switch value[0] {
-	case 'Y', 'y', 'N', 'n':
-		return nil
-	default:
-		return fmt.Errorf("Must be y or n")
-	}
-}
 
 // ConfigWizard runs an interactive configurator.
 func ConfigWizard() error {
@@ -28,111 +12,67 @@ func ConfigWizard() error {
 	var err error
 
 	// If project type is not set ask for projectType
-	projectPrompt := promptui.Select{
-		Label: "Repository type",
-		Items: []string{
-			"binary", "go", "node", "python", "docker", "static",
-		},
-	}
-	_, cfg.Type, err = projectPrompt.Run()
+	_, cfg.Type, err = prompt.RepositoryProjectType().Run()
 	if err != nil {
 		return err
 	}
 
-	orgPrompt := promptui.Prompt{
-		Label:    "Valist Organization name or username",
-		Validate: validateLength,
-	}
-	cfg.Org, err = orgPrompt.Run()
+	cfg.Org, err = prompt.OrganizationName("").Run()
 	if err != nil {
 		return err
 	}
 
-	repoPrompt := promptui.Prompt{
-		Label:    "Valist Repository name",
-		Validate: validateLength,
-	}
-	cfg.Repo, err = repoPrompt.Run()
+	cfg.Repo, err = prompt.RepositoryName("").Run()
 	if err != nil {
 		return err
 	}
 
-	tagPrompt := promptui.Prompt{
-		Label:   "The latest release tag",
-		Default: "0.0.1",
-	}
-	cfg.Tag, err = tagPrompt.Run()
+	cfg.Tag, err = prompt.ReleaseTag("0.0.1").Run()
 	if err != nil {
 		return err
 	}
 
-	metaPrompt := promptui.Prompt{
-		Label: "Path to meta file(README.md)",
-	}
-	cfg.Meta, err = metaPrompt.Run()
+	cfg.Meta, err = prompt.ReleaseMetaPath().Run()
 	if err != nil {
 		return err
 	}
 
 	defaultInstall := DefaultInstalls[cfg.Type]
-	installPrompt := promptui.Prompt{
-		Label:   "Command used to install dependencies",
-		Default: defaultInstall,
-	}
-	cfg.Install, err = installPrompt.Run()
+	cfg.Install, err = prompt.InstallCommand(defaultInstall).Run()
 	if err != nil {
 		return err
 	}
 
 	defaultBuild := DefaultBuilds[cfg.Type]
-	buildPrompt := promptui.Prompt{
-		Label:   "Command used to build your project",
-		Default: defaultBuild,
-	}
-	cfg.Build, err = buildPrompt.Run()
+	cfg.Build, err = prompt.BuildCommand(defaultBuild).Run()
 	if err != nil {
 		return err
 	}
 
 	defaultImage := DefaultImages[cfg.Type]
-	imagePrompt := promptui.Prompt{
-		Label: fmt.Sprintf("Docker image (if not set, will default to %v)", defaultImage),
-	}
-	cfg.Image, err = imagePrompt.Run()
+	cfg.Image, err = prompt.DockerImage(defaultImage).Run()
 	if err != nil {
 		return err
 	}
 
 	// If the project type is not node prompt for out path
 	if cfg.Type != "node" {
-		outPrompt := promptui.Prompt{
-			Label: "Build output file/directory",
-		}
-		cfg.Out, err = outPrompt.Run()
+		cfg.Out, err = prompt.BuildOutPath().Run()
 		if err != nil {
 			return err
 		}
 	}
 
 	cfg.Platforms = make(map[string]string)
-	platformsPrompt := promptui.Prompt{
-		Label:     "Are you building for multiple architecures? (y,N)",
-		IsConfirm: true,
-		Validate:  validateYesNo,
-	}
 	// If there is artifacts set isArtifacts to y
-	isArtifacts, err := platformsPrompt.Run()
+	isArtifacts, err := prompt.BuildPlatforms().Run()
 	if err != nil {
 		return err
 	}
 
 	// If there are artifacts then prompt for their os, arch, & name/path
 	for isArtifacts == "y" {
-		osPrompt := promptui.Prompt{
-			Label: "Platform operating system, e.g. linux, darwin, freebsd, windows (leave blank to quit)",
-		}
-
-		osName, err := osPrompt.Run()
+		osName, err := prompt.BuildOS().Run()
 		if err != nil {
 			return err
 		}
@@ -141,20 +81,12 @@ func ConfigWizard() error {
 			break
 		}
 
-		archPrompt := promptui.Prompt{
-			Label: "Platform architecture, e.g. amd64, arm64",
-		}
-
-		arch, err := archPrompt.Run()
+		arch, err := prompt.BuildArch().Run()
 		if err != nil {
 			return err
 		}
 
-		srcPrompt := promptui.Prompt{
-			Label: "Artifact file path",
-		}
-
-		src, err := srcPrompt.Run()
+		src, err := prompt.BuildArtifactPath().Run()
 		if err != nil {
 			return err
 		}

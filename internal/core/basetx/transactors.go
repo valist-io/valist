@@ -2,6 +2,7 @@ package basetx
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -25,4 +26,12 @@ func (t *Transactor) CreateRepositoryTx(ctx context.Context, txopts *bind.Transa
 
 func (t *Transactor) VoteReleaseTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, release *core.Release) (*types.Transaction, error) {
 	return t.valist.VoteRelease(txopts, orgID, repoName, release.Tag, release.ReleaseCID.String(), release.MetaCID.String())
+}
+
+func (t *Transactor) SetRepositoryMetaTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*types.Transaction, error) {
+	return t.valist.SetRepoMeta(txopts, orgID, repoName, repoMeta)
+}
+
+func (t *Transactor) VoteRepositoryThresholdTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, threshold *big.Int) (*types.Transaction, error) {
+	return t.valist.VoteThreshold(txopts, orgID, repoName, threshold)
 }

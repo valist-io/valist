@@ -1,4 +1,4 @@
-package organization
+package repository
 
 import (
 	"fmt"
@@ -18,9 +18,9 @@ import (
 func NewCreateCommand() *cli.Command {
 	return &cli.Command{
 		Name:  "create",
-		Usage: "Create an organization",
+		Usage: "Create a repository",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 1 {
+			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -41,49 +41,59 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClientWithMetaTx(c.Context, cfg, account)
+			client, err := client.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
 			defer client.Close()
 
-			name, err := prompt.OrganizationName("").Run()
-			if err != nil {
-				return err
-			}
-
-			desc, err := prompt.OrganizationDescription("").Run()
-			if err != nil {
-				return err
-			}
-
 			orgName := c.Args().Get(0)
-			orgMeta := core.OrganizationMeta{
+			repoName := c.Args().Get(1)
+
+			orgID, err := client.GetOrganizationID(c.Context, orgName)
+			if err != nil {
+				return err
+			}
+
+			name, err := prompt.RepositoryName("").Run()
+			if err != nil {
+				return err
+			}
+
+			desc, err := prompt.RepositoryDescription("").Run()
+			if err != nil {
+				return err
+			}
+
+			_, projectType, err := prompt.RepositoryProjectType().Run()
+			if err != nil {
+				return err
+			}
+
+			homepage, err := prompt.RepositoryHomepage("").Run()
+			if err != nil {
+				return err
+			}
+
+			url, err := prompt.RepositoryURL("").Run()
+			if err != nil {
+				return err
+			}
+
+			meta := core.RepositoryMeta{
 				Name:        name,
 				Description: desc,
+				ProjectType: projectType,
+				Homepage:    homepage,
+				Repository:  url,
 			}
 
-			_, err = client.GetOrganizationID(c.Context, orgName)
-			if err == nil {
-				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
-			}
-
-			fmt.Println("Creating organization...")
-
-			create, err := client.CreateOrganization(c.Context, &bind.TransactOpts{}, &orgMeta)
+			_, err = client.CreateRepository(c.Context, &bind.TransactOpts{}, orgID, repoName, &meta)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("Linking name '%v' to orgID 0x'%x'...\n", orgName, create.OrgID)
-			_, err = client.LinkOrganizationName(c.Context, &bind.TransactOpts{}, create.OrgID, orgName)
-			if err != nil {
-				return err
-			}
-
-			fmt.Printf("Successfully created %v!\n", orgName)
-			fmt.Printf("Your Valist ID: 0x%x\n", create.OrgID)
-
+			fmt.Println("Repository created!")
 			return nil
 		},
 	}

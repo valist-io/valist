@@ -11,6 +11,9 @@ func NewCommand() *cli.Command {
 		Usage:   "Create, update, or fetch repositories",
 		Subcommands: []*cli.Command{
 			NewFetchCommand(),
+			NewCreateCommand(),
+			NewUpdateCommand(),
+			NewThresholdCommand(),
 		},
 	}
 }

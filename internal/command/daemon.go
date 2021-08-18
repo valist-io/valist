@@ -15,7 +15,6 @@ import (
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/http"
-	"github.com/valist-io/registry/internal/signer"
 	"github.com/valist-io/registry/web"
 )
 
@@ -56,12 +55,6 @@ func NewDaemonCommand() *cli.Command {
 				return err
 			}
 
-			listener, _, err := signer.StartIPCEndpoint(cfg)
-			if err != nil {
-				return err
-			}
-			defer listener.Close()
-
 			var account accounts.Account
 			if c.IsSet("account") {
 				account.Address = common.HexToAddress(c.String("account"))
@@ -73,7 +66,8 @@ func NewDaemonCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-
+			defer client.Close()
+			
 			fmt.Println(banner)
 			fmt.Println("Api server running on", cfg.HTTP.ApiAddr)
 			fmt.Println("Web server running on", cfg.HTTP.WebAddr)

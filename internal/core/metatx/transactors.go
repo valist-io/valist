@@ -2,6 +2,7 @@ package metatx
 
 import (
 	"context"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -54,4 +55,26 @@ func (t *Transactor) VoteReleaseTx(ctx context.Context, txopts *bind.TransactOpt
 	}
 
 	return t.meta.Transact(ctx, tx, t.signer, voteReleaseBFID)
+}
+
+func (t *Transactor) SetRepositoryMetaTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*types.Transaction, error) {
+	txopts = gasless.TransactOpts(txopts)
+
+	tx, err := t.base.SetRepositoryMetaTx(ctx, txopts, orgID, repoName, repoMeta)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(ctx, tx, t.signer, setRepoMetaBFID)
+}
+
+func (t *Transactor) VoteRepositoryThresholdTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, threshold *big.Int) (*types.Transaction, error) {
+	txopts = gasless.TransactOpts(txopts)
+
+	tx, err := t.base.VoteRepositoryThresholdTx(ctx, txopts, orgID, repoName, threshold)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(ctx, tx, t.signer, voteThresholdBFID)
 }
