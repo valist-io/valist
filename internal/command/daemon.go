@@ -67,8 +67,9 @@ func NewDaemonCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			fmt.Println(banner)
+			defer client.Close()
 
+			fmt.Println(banner)
 			server := http.NewServer(client, bindAddr)
 			fmt.Println("Server running on", bindAddr)
 			go server.ListenAndServe() //nolint:errcheck

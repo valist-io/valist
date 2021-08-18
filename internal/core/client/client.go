@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"math/big"
+	"net"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -25,6 +26,7 @@ import (
 	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/core/basetx"
 	"github.com/valist-io/registry/internal/core/metatx"
+	"github.com/valist-io/registry/internal/signer"
 )
 
 var _ core.CoreAPI = (*Client)(nil)
@@ -38,21 +40,27 @@ type Client struct {
 
 	orgs map[string]common.Hash
 
-	chainID  *big.Int
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
 
-	metaTx bool
+	chainID *big.Int
+	metaTx  bool
 
 	wallet  accounts.Wallet
 	account accounts.Account
 
 	transactor core.TransactorAPI
+	listener   net.Listener
 }
 
 // NewClient create a client with a base transactor.
 func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*Client, error) {
-	signer, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
+	listener, _, err := signer.StartIPCEndpoint(cfg)
+	if err != nil {
+		return nil, err
+	}
+
+	wallet, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
 	if err != nil {
 		return nil, err
 	}
@@ -62,24 +70,14 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, err
 	}
 
-	valistAddr, ok := cfg.Ethereum.Contracts["valist"]
-	if !ok {
-		return nil, fmt.Errorf("Valist contract address required")
-	}
-
-	registryAddr, ok := cfg.Ethereum.Contracts["registry"]
-	if !ok {
-		return nil, fmt.Errorf("Registry contract address required")
-	}
-
-	valist, err := contract.NewValist(valistAddr, eth)
+	valist, err := contract.NewValist(cfg.Ethereum.Contracts["valist"], eth)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize valist contract: %v", err)
 	}
 
-	registry, err := contract.NewRegistry(registryAddr, eth)
+	registry, err := contract.NewRegistry(cfg.Ethereum.Contracts["registry"], eth)
 	if err != nil {
-		return nil, err
+		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
 	// TODO redirects do not work
@@ -122,9 +120,10 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		chainID:    cfg.Ethereum.ChainID,
 		valist:     valist,
 		registry:   registry,
-		wallet:     signer,
+		wallet:     wallet,
 		account:    account,
 		transactor: transactor,
+		listener:   listener,
 	}, nil
 }
 
@@ -149,6 +148,17 @@ func NewClientWithMetaTx(ctx context.Context, cfg *config.Config, account accoun
 	client.transactor = metatx.NewTransactor(client.transactor, meta, signer)
 
 	return client, nil
+}
+
+// Close releases client resources.
+func (client *Client) Close() {
+	if client.listener != nil {
+		client.listener.Close()
+	}
+
+	if eth, ok := client.eth.(*ethclient.Client); ok {
+		eth.Close()
+	}
 }
 
 // TransactOpts creates a transaction signer.

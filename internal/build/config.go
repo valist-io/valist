@@ -4,66 +4,56 @@ import (
 	"os"
 
 	"gopkg.in/yaml.v3"
-)
 
-const (
-	ProjectTypeBinary = "binary"
-	ProjectTypeNode   = "node"
-	ProjectTypeNPM    = "npm"
-	ProjectTypeGo     = "go"
-	ProjectTypeRust   = "rust"
-	ProjectTypePython = "python"
-	ProjectTypeDocker = "docker"
-	ProjectTypeCPP    = "c++"
-	ProjectTypeStatic = "static"
+	"github.com/valist-io/registry/internal/core"
 )
 
 var DefaultImages = map[string]string{
-	ProjectTypeBinary: "gcc:bullseye",
-	ProjectTypeNode:   "node:buster",
-	ProjectTypeNPM:    "node:buster",
-	ProjectTypeGo:     "golang:buster",
-	ProjectTypeRust:   "rust:buster",
-	ProjectTypePython: "python:buster",
-	ProjectTypeDocker: "scratch",
-	ProjectTypeCPP:    "gcc:bullseye",
-	ProjectTypeStatic: "",
+	core.ProjectTypeBinary: "gcc:bullseye",
+	core.ProjectTypeNode:   "node:buster",
+	core.ProjectTypeNPM:    "node:buster",
+	core.ProjectTypeGo:     "golang:buster",
+	core.ProjectTypeRust:   "rust:buster",
+	core.ProjectTypePython: "python:buster",
+	core.ProjectTypeDocker: "scratch",
+	core.ProjectTypeCPP:    "gcc:bullseye",
+	core.ProjectTypeStatic: "",
 }
 
 var DefaultInstalls = map[string]string{
-	ProjectTypeBinary: "make install",
-	ProjectTypeNode:   "npm install",
-	ProjectTypeNPM:    "npm install",
-	ProjectTypeGo:     "go get ./...",
-	ProjectTypeRust:   "cargo install",
-	ProjectTypePython: "pip install -r requirements.txt",
-	ProjectTypeDocker: "",
-	ProjectTypeCPP:    "make install",
-	ProjectTypeStatic: "",
+	core.ProjectTypeBinary: "make install",
+	core.ProjectTypeNode:   "npm install",
+	core.ProjectTypeNPM:    "npm install",
+	core.ProjectTypeGo:     "go get ./...",
+	core.ProjectTypeRust:   "cargo install",
+	core.ProjectTypePython: "pip install -r requirements.txt",
+	core.ProjectTypeDocker: "",
+	core.ProjectTypeCPP:    "make install",
+	core.ProjectTypeStatic: "",
 }
 
 var DefaultBuilds = map[string]string{
-	ProjectTypeBinary: "make build",
-	ProjectTypeNode:   "npm run build",
-	ProjectTypeNPM:    "npm run build",
-	ProjectTypeGo:     "go build",
-	ProjectTypeRust:   "cargo build",
-	ProjectTypePython: "python3 -m build",
-	ProjectTypeDocker: "",
-	ProjectTypeCPP:    "make build",
-	ProjectTypeStatic: "",
+	core.ProjectTypeBinary: "make build",
+	core.ProjectTypeNode:   "npm run build",
+	core.ProjectTypeNPM:    "npm run build",
+	core.ProjectTypeGo:     "go build",
+	core.ProjectTypeRust:   "cargo build",
+	core.ProjectTypePython: "python3 -m build",
+	core.ProjectTypeDocker: "",
+	core.ProjectTypeCPP:    "make build",
+	core.ProjectTypeStatic: "",
 }
 
 var DefaultTemplates = map[string]string{
-	ProjectTypeBinary: "default.tmpl",
-	ProjectTypeNode:   "node.tmpl",
-	ProjectTypeNPM:    "npm.tmpl",
-	ProjectTypeGo:     "go.tmpl",
-	ProjectTypeRust:   "rust.tmpl",
-	ProjectTypePython: "python.tmpl",
-	ProjectTypeDocker: "docker.tmpl",
-	ProjectTypeCPP:    "cpp.tmpl",
-	ProjectTypeStatic: "static.tmpl",
+	core.ProjectTypeBinary: "default.tmpl",
+	core.ProjectTypeNode:   "node.tmpl",
+	core.ProjectTypeNPM:    "npm.tmpl",
+	core.ProjectTypeGo:     "go.tmpl",
+	core.ProjectTypeRust:   "rust.tmpl",
+	core.ProjectTypePython: "python.tmpl",
+	core.ProjectTypeDocker: "docker.tmpl",
+	core.ProjectTypeCPP:    "cpp.tmpl",
+	core.ProjectTypeStatic: "static.tmpl",
 }
 
 // Config contains valist build settings.
