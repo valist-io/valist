@@ -4,6 +4,7 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/valist-io/registry/internal/npm"
 )
@@ -21,13 +22,17 @@ func Run(projectPath, configYml string) ([]string, error) {
 		return nil, err
 	}
 
-	buildCommand := valistFile.Build
-	outPath := valistFile.Out
+	if valistFile.Org == "" || valistFile.Repo == "" || valistFile.Tag == "" {
+		return nil, errors.New("Org, Repo & Tag required in valist config")
+	}
 
-	// Prevent artifacts from being copied into nested folder if folder already exists
-	// if valistFile.Out != filepath.Dir(valistFile.Out) {
-	// 	containerPath = fmt.Sprintf("%s/.", filepath.Dir(valistFile.Out))
-	// }
+	buildCommand := valistFile.Build
+	buildImageName := fmt.Sprintf("%s-%s-%s",
+		strings.ToLower(valistFile.Org),
+		strings.ToLower(valistFile.Repo),
+		strings.ToLower(valistFile.Tag),
+	)
+	outPath := valistFile.Out
 
 	// If projectType is npm, run npm pack and set out to .tgz
 	if valistFile.Type == "npm" {
@@ -66,12 +71,12 @@ func Run(projectPath, configYml string) ([]string, error) {
 
 	// @ TODO Construct image name from (orgName, repoName, tag)
 	// Create the build image using the dockerfile
-	if err := Create("valist-build", dockerFilePath); err != nil {
+	if err := Create(buildImageName, dockerFilePath); err != nil {
 		return nil, err
 	}
 
 	// Export the build from the build image
-	if err := Export("valist-build", projectPath, outPath); err != nil {
+	if err := Export(buildImageName, projectPath, outPath); err != nil {
 		return nil, err
 	}
 
