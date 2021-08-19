@@ -59,6 +59,10 @@ func Create(imageTag string, dockerFilePath string) error {
 }
 
 func Export(image string, hostPath string, out string) error {
+	if filepath.Dir(out) == "." {
+		out = filepath.Dir(out)
+	}
+
 	cpCmd := exec.Command("bash", "-c", fmt.Sprintf("docker run -v %s:/opt/out -i %s cp -R %s /opt/out", hostPath, image, out))
 	cpCmd.Stdout = os.Stdout
 	cpCmd.Stderr = os.Stderr

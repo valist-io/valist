@@ -4,12 +4,22 @@ import (
 	"errors"
 	"fmt"
 	"path/filepath"
+	"strings"
 
 	"github.com/valist-io/registry/internal/npm"
 )
 
 func Run(projectPath string, valistFile Config) ([]string, error) {
 	var artifactPaths []string
+	if valistFile.Org == "" || valistFile.Repo == "" || valistFile.Tag == "" {
+		return nil, errors.New("Org, Repo & Tag required in valist config")
+	}
+
+	buildImageName := fmt.Sprintf("%s-%s-%s",
+		strings.ToLower(valistFile.Org),
+		strings.ToLower(valistFile.Repo),
+		strings.ToLower(valistFile.Tag),
+	)
 
 	// If projectType is npm, run npm pack and set out to .tgz
 	if valistFile.Type == "npm" {
@@ -48,12 +58,12 @@ func Run(projectPath string, valistFile Config) ([]string, error) {
 
 	// @ TODO Construct image name from (orgName, repoName, tag)
 	// Create the build image using the dockerfile
-	if err := Create("valist-build", dockerFilePath); err != nil {
+	if err := Create(buildImageName, dockerFilePath); err != nil {
 		return nil, err
 	}
 
 	// Export the build from the build image
-	if err := Export("valist-build", projectPath, valistFile.Out); err != nil {
+	if err := Export(buildImageName, projectPath, valistFile.Out); err != nil {
 		return nil, err
 	}
 	
