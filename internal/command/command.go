@@ -47,6 +47,7 @@ func NewApp() *cli.App {
 			NewDaemonCommand(),
 			NewBuildCommand(),
 			NewInitCommand(),
+			NewPublishCommand(),
 		},
 	}
 }

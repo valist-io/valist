@@ -39,7 +39,7 @@ func (r *Registry) GetScopedPackage(ctx context.Context, orgName, repoName strin
 
 	iter := r.client.ListReleases(orgID, repoName, big.NewInt(1), big.NewInt(10))
 	err0 := iter.ForEach(ctx, func(release *core.Release) {
-		data, err := r.client.GetFile(ctx, release.MetaCID)
+		data, err := r.client.ReadFile(ctx, release.MetaCID)
 		if err != nil {
 			log.Printf("Failed to get release meta: %v\n", err)
 		}
