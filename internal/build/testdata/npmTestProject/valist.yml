@@ -1,3 +1,6 @@
+org: npmTest
+repo: npmExample
+tag: 0.0.1
 type: npm
 install: npm install
 build: npm run build
