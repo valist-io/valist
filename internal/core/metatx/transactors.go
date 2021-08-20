@@ -78,3 +78,15 @@ func (t *Transactor) VoteRepositoryThresholdTx(ctx context.Context, txopts *bind
 
 	return t.meta.Transact(ctx, tx, t.signer, voteThresholdBFID)
 }
+
+func (t *Transactor) VoteOrganizationThresholdTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, threshold *big.Int) (*types.Transaction, error) {
+	txopts = gasless.TransactOpts(txopts)
+
+	tx, err := t.base.VoteOrganizationThresholdTx(ctx, txopts, orgID, threshold)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(ctx, tx, t.signer, voteThresholdBFID)
+
+}

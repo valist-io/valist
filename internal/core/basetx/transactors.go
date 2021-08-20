@@ -35,3 +35,7 @@ func (t *Transactor) SetRepositoryMetaTx(ctx context.Context, txopts *bind.Trans
 func (t *Transactor) VoteRepositoryThresholdTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, repoName string, threshold *big.Int) (*types.Transaction, error) {
 	return t.valist.VoteThreshold(txopts, orgID, repoName, threshold)
 }
+
+func (t *Transactor) VoteOrganizationThresholdTx(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, threshold *big.Int) (*types.Transaction, error) {
+	return t.valist.VoteThreshold(txopts, orgID, "", threshold)
+}
