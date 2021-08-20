@@ -1,0 +1,7 @@
+type: go
+org: valist
+repo: cli
+tag: 0.5.0
+install: go get ./...
+build: go build ./cmd/valist
+out: ./valist

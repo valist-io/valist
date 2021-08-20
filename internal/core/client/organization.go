@@ -42,7 +42,7 @@ func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*cor
 
 // GetOrganizationMeta returns the organization meta with the given CID.
 func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*core.OrganizationMeta, error) {
-	data, err := client.GetFile(ctx, id)
+	data, err := client.ReadFile(ctx, id)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get organization meta: %v", err)
 	}
@@ -62,7 +62,7 @@ func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.Trans
 		return nil, err
 	}
 
-	metaCID, err := client.AddFile(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}

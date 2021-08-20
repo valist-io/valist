@@ -2,6 +2,7 @@ package build
 
 import (
 	"os"
+	"path/filepath"
 	"testing"
 
 	copy "github.com/otiai10/copy"
@@ -18,7 +19,11 @@ func TestRunGoBuild(t *testing.T) {
 	err = copy.Copy("testdata/goTestProject", tmp)
 	require.NoError(t, err, "Failed to copy goTestProject")
 
-	artifactPaths, err := Run(tmp, "valist.yml")
+	var valistFile Config
+	err = valistFile.Load(filepath.Join(tmp, "valist.yml"))
+	require.NoError(t, err, "Failed to load config")
+
+	artifactPaths, err := Run(tmp, valistFile)
 	assert.NoError(t, err, "build.Run() executes with no errors")
 
 	for _, artifact := range artifactPaths {
@@ -35,7 +40,11 @@ func TestRunNpmBuild(t *testing.T) {
 	err = copy.Copy("testdata/npmTestProject", tmp)
 	require.NoError(t, err, "Failed to copy npmTestProject")
 
-	artifactPaths, err := Run(tmp, "valist.yml")
+	var valistFile Config
+	err = valistFile.Load(filepath.Join(tmp, "valist.yml"))
+	require.NoError(t, err, "Failed to load config")
+
+	artifactPaths, err := Run(tmp, valistFile)
 	assert.NoError(t, err, "build.Run() executes with no errors")
 
 	for _, artifact := range artifactPaths {

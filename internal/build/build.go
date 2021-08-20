@@ -9,30 +9,17 @@ import (
 	"github.com/valist-io/registry/internal/npm"
 )
 
-func Run(projectPath, configYml string) ([]string, error) {
+func Run(projectPath string, valistFile Config) ([]string, error) {
 	var artifactPaths []string
-	var packageName string
-
-	dockerFilePath := filepath.Join(projectPath, "Dockerfile.repro")
-	valistFilePath := filepath.Join(projectPath, configYml)
-
-	// Load valist.yml
-	var valistFile Config
-	if err := valistFile.Load(valistFilePath); err != nil {
-		return nil, err
-	}
-
 	if valistFile.Org == "" || valistFile.Repo == "" || valistFile.Tag == "" {
 		return nil, errors.New("Org, Repo & Tag required in valist config")
 	}
 
-	buildCommand := valistFile.Build
 	buildImageName := fmt.Sprintf("%s-%s-%s",
 		strings.ToLower(valistFile.Org),
 		strings.ToLower(valistFile.Repo),
 		strings.ToLower(valistFile.Tag),
 	)
-	outPath := valistFile.Out
 
 	// If projectType is npm, run npm pack and set out to .tgz
 	if valistFile.Type == "npm" {
@@ -42,9 +29,8 @@ func Run(projectPath, configYml string) ([]string, error) {
 			return nil, err
 		}
 
-		buildCommand = valistFile.Build + " && npm pack"
-		packageName = fmt.Sprintf("%s-%s.tgz", packageJson.Name, packageJson.Version)
-		outPath = packageName
+		valistFile.Build = valistFile.Build + " && npm pack"
+		valistFile.Out = fmt.Sprintf("%s-%s.tgz", packageJson.Name, packageJson.Version)
 	}
 
 	// If image is not set in valist.yml use default image
@@ -57,11 +43,12 @@ func Run(projectPath, configYml string) ([]string, error) {
 	}
 
 	// Create dockerConfig used to generate Dockerfile
+	dockerFilePath := filepath.Join(projectPath, "Dockerfile.repro")
 	dockerConfig := DockerConfig{
 		Path:           dockerFilePath,
 		BaseImage:      valistFile.Image,
 		Source:         "./",
-		BuildCommand:   buildCommand,
+		BuildCommand:   valistFile.Build,
 		InstallCommand: valistFile.Install,
 	}
 
@@ -76,15 +63,10 @@ func Run(projectPath, configYml string) ([]string, error) {
 	}
 
 	// Export the build from the build image
-	if err := Export(buildImageName, projectPath, outPath); err != nil {
+	if err := Export(buildImageName, projectPath, valistFile.Out); err != nil {
 		return nil, err
 	}
-
-	// If project type is npm return projectPath + packageName
-	if valistFile.Type == "npm" {
-		return append(artifactPaths, filepath.Join(projectPath, packageName)), nil
-	}
-
+	
 	// If platforms are defined in config then use out + artifactPath
 	for _, artifact := range valistFile.Platforms {
 		artifactPaths = append(artifactPaths, filepath.Join(projectPath, valistFile.Out, artifact))

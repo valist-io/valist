@@ -47,7 +47,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 
 // GetRepositoryMeta returns the repository meta with the given CID.
 func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.RepositoryMeta, error) {
-	data, err := client.GetFile(ctx, id)
+	data, err := client.ReadFile(ctx, id)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +67,7 @@ func (client *Client) CreateRepository(ctx context.Context, txopts *bind.Transac
 		return nil, err
 	}
 
-	metaCID, err := client.AddFile(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, txopts *bind.Transa
 		return nil, err
 	}
 
-	metaCID, err := client.AddFile(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}
