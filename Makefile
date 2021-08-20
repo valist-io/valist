@@ -5,15 +5,20 @@ all: valist
 valist: web
 	go build ./cmd/valist
 
-install: valist
+install: install-lib install-relay valist
 	go install ./cmd/valist
 
-web-lib:
+install-lib:
 	npm install --prefix ./web/lib
+
+install-relay:
+	npm install --prefix ./web/relay
+
+web-lib:
 	npm run build --prefix ./web/lib
 
 web-relay:
-	npm install --prefix ./web/relay
+	npm run build --prefix ./web/relay
 	npm run export --prefix ./web/relay
 
 web: web-lib web-relay

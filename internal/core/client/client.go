@@ -81,20 +81,20 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	// TODO redirects do not work
-	// ipfsAPI, err := ma.NewMultiaddr(cfg.IPFS.API)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	// ipfs, err := httpapi.NewApi(ipfsAPI)
-	// if err != nil {
-	// 	return nil, err
-	// }
-
-	ipfs, err := httpapi.NewLocalApi()
+	ipfsAPI, err := ma.NewMultiaddr(cfg.IPFS.API)
 	if err != nil {
 		return nil, err
 	}
+
+	ipfs, err := httpapi.NewApi(ipfsAPI)
+	if err != nil {
+		return nil, err
+	}
+
+	// ipfs, err := httpapi.NewLocalApi()
+	// if err != nil {
+	// 	return nil, err
+	// }
 
 	// attempt to add all IPFS peers to swarm
 	for _, peerString := range cfg.IPFS.Peers {
