@@ -15,6 +15,7 @@ import (
 	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/http"
+	"github.com/valist-io/registry/web"
 )
 
 const banner = `
@@ -31,8 +32,6 @@ const banner = `
    :       :   : :  : :: : :  :    :: : :       :
 
 `
-
-var bindAddr = ":8080"
 
 func NewDaemonCommand() *cli.Command {
 	return &cli.Command{
@@ -70,9 +69,14 @@ func NewDaemonCommand() *cli.Command {
 			defer client.Close()
 
 			fmt.Println(banner)
-			server := http.NewServer(client, bindAddr)
-			fmt.Println("Server running on", bindAddr)
-			go server.ListenAndServe() //nolint:errcheck
+			fmt.Println("Api server running on", cfg.HTTP.ApiAddr)
+			fmt.Println("Web server running on", cfg.HTTP.WebAddr)
+
+			apiServer := http.NewServer(client, cfg.HTTP.ApiAddr)
+			webServer := web.NewServer(cfg.HTTP.WebAddr)
+
+			go webServer.ListenAndServe() //nolint:errcheck
+			go apiServer.ListenAndServe() //nolint:errcheck
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -83,7 +87,10 @@ func NewDaemonCommand() *cli.Command {
 			ctx, cancel := context.WithTimeout(c.Context, 30*time.Second)
 			defer cancel()
 
-			return server.Shutdown(ctx)
+			apiServer.Shutdown(ctx) //nolint:errcheck
+			webServer.Shutdown(ctx) //nolint:errcheck
+
+			return nil
 		},
 	}
 }
