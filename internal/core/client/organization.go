@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
@@ -78,4 +79,18 @@ func (client *Client) CreateOrganization(ctx context.Context, txopts *bind.Trans
 	}
 
 	return client.valist.ParseOrgCreated(*logs[0])
+}
+
+func (client *Client) VoteOrganizationThreshold(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
+	tx, err := client.transactor.VoteOrganizationThresholdTx(ctx, txopts, orgID, threshold)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseVoteThresholdEvent(*logs[0])
 }

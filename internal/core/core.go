@@ -60,6 +60,7 @@ type TransactorAPI interface {
 	CreateRepositoryTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteReleaseTx(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
 	SetRepositoryMetaTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteOrganizationThresholdTx(context.Context, *bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
 	VoteRepositoryThresholdTx(context.Context, *bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
 }
 
@@ -67,6 +68,7 @@ type OrganizationAPI interface {
 	GetOrganization(context.Context, common.Hash) (*Organization, error)
 	GetOrganizationMeta(context.Context, cid.Cid) (*OrganizationMeta, error)
 	CreateOrganization(context.Context, *bind.TransactOpts, *OrganizationMeta) (*valist.ValistOrgCreated, error)
+	VoteOrganizationThreshold(context.Context, *bind.TransactOpts, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
 
 type RegistryAPI interface {

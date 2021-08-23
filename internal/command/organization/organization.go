@@ -11,6 +11,7 @@ func NewCommand() *cli.Command {
 		Usage:   "Create, update, or fetch organizations",
 		Subcommands: []*cli.Command{
 			NewCreateCommand(),
+			NewThresholdCommand(),
 		},
 	}
 }
