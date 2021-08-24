@@ -12,11 +12,11 @@ import (
 	"github.com/ipfs/go-cid"
 
 	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // GetRepository returns the repository with the given orgID and name.
-func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repoName string) (*core.Repository, error) {
+func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repoName string) (*types.Repository, error) {
 	selector := crypto.Keccak256Hash(orgID[:], []byte(repoName))
 	callopts := bind.CallOpts{
 		Context: ctx,
@@ -29,7 +29,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 	}
 
 	if !repo.Exists {
-		return nil, core.ErrRepositoryNotExist
+		return nil, types.ErrRepositoryNotExist
 	}
 
 	metaCID, err := cid.Decode(repo.MetaCID)
@@ -37,7 +37,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)
 	}
 
-	return &core.Repository{
+	return &types.Repository{
 		OrgID:         orgID,
 		Threshold:     repo.Threshold,
 		ThresholdDate: repo.ThresholdDate,
@@ -46,13 +46,13 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 }
 
 // GetRepositoryMeta returns the repository meta with the given CID.
-func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.RepositoryMeta, error) {
+func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*types.RepositoryMeta, error) {
 	data, err := client.ReadFile(ctx, id)
 	if err != nil {
 		return nil, err
 	}
 
-	var meta core.RepositoryMeta
+	var meta types.RepositoryMeta
 	if err := json.Unmarshal(data, &meta); err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*core.
 }
 
 // CreateRepository creates a repository in the organization with the given orgID.
-func (client *Client) CreateRepository(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, meta *core.RepositoryMeta) (*valist.ValistRepoCreated, error) {
+func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, name string, meta *types.RepositoryMeta) (*valist.ValistRepoCreated, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -72,7 +72,10 @@ func (client *Client) CreateRepository(ctx context.Context, txopts *bind.Transac
 		return nil, err
 	}
 
-	tx, err := client.transactor.CreateRepositoryTx(ctx, txopts, orgID, name, metaCID.String())
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +88,7 @@ func (client *Client) CreateRepository(ctx context.Context, txopts *bind.Transac
 	return client.valist.ParseRepoCreated(*logs[0])
 }
 
-func (client *Client) SetRepositoryMeta(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, meta *core.RepositoryMeta) (*valist.ValistMetaUpdate, error) {
+func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, name string, meta *types.RepositoryMeta) (*valist.ValistMetaUpdate, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
 		return nil, err
@@ -96,7 +99,10 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, txopts *bind.Transa
 		return nil, err
 	}
 
-	tx, err := client.transactor.SetRepositoryMetaTx(ctx, txopts, orgID, name, metaCID.String())
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -109,8 +115,11 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, txopts *bind.Transa
 	return client.valist.ParseMetaUpdate(*logs[0])
 }
 
-func (client *Client) VoteRepositoryThreshold(ctx context.Context, txopts *bind.TransactOpts, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	tx, err := client.transactor.VoteRepositoryThresholdTx(ctx, txopts, orgID, name, threshold)
+func (client *Client) VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.VoteRepositoryThresholdTx(txopts, orgID, name, threshold)
 	if err != nil {
 		return nil, err
 	}

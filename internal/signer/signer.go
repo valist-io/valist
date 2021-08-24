@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/signer/fourbyte"
 	"github.com/ethereum/go-ethereum/signer/storage"
 
-	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/core/config"
 )
 
 func NewSigner(cfg *config.Config) (*core.SignerAPI, *accounts.Manager, error) {

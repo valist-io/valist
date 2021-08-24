@@ -7,15 +7,15 @@ import (
 	"strings"
 
 	"github.com/gin-gonic/gin"
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 	"github.com/valist-io/registry/internal/npm"
 )
 
 type Server struct {
-	client core.CoreAPI
+	client types.CoreAPI
 }
 
-func NewServer(client core.CoreAPI, addr string) *http.Server {
+func NewServer(client types.CoreAPI, addr string) *http.Server {
 	server := Server{
 		client: client,
 	}
@@ -94,9 +94,9 @@ func (s Server) ListReleases(c *gin.Context) {
 		return
 	}
 
-	var releases []*core.Release
+	var releases []*types.Release
 	iter := s.client.ListReleases(orgID, repoName, page, limit)
-	err0 := iter.ForEach(ctx, func(release *core.Release) {
+	err0 := iter.ForEach(ctx, func(release *types.Release) {
 		releases = append(releases, release)
 	})
 
@@ -145,7 +145,7 @@ func (s Server) GetNodePackage(c *gin.Context) {
 	registry := npm.NewRegistry(s.client)
 
 	pack, err := registry.GetScopedPackage(ctx, orgName, repoName)
-	if err == core.ErrOrganizationNotExist {
+	if err == types.ErrOrganizationNotExist {
 		redirect := fmt.Sprintf("%s/%s/%s", npm.DefaultRegistry, orgName, repoName)
 		c.Redirect(http.StatusSeeOther, redirect)
 		return

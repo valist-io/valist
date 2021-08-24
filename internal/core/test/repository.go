@@ -1,29 +1,29 @@
-package client
+package test
 
 import (
 	"context"
 	"math/big"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
-func (s *ClientSuite) TestGetRepository() {
+func (s *CoreSuite) TestGetRepository() {
 	ctx := context.Background()
 
 	_, err := s.client.GetRepository(ctx, emptyHash, "empty")
-	s.Assert().Equal(core.ErrRepositoryNotExist, err)
+	s.Assert().Equal(types.ErrRepositoryNotExist, err)
 }
 
-func (s *ClientSuite) TestCreateRepository() {
+func (s *CoreSuite) TestCreateRepository() {
 	ctx := context.Background()
 
-	orgMeta := &core.OrganizationMeta{
+	orgMeta := &types.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
 	repoName := "sdk"
-	repoMeta := &core.RepositoryMeta{
+	repoMeta := &types.RepositoryMeta{
 		Name:        "sdk",
 		Description: "Valist core sdk.",
 		ProjectType: "npm",
@@ -31,11 +31,10 @@ func (s *ClientSuite) TestCreateRepository() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	txopts := s.client.TransactOpts()
-	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 
-	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
+	_, err = s.client.CreateRepository(ctx, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
 
 	repo, err := s.client.GetRepository(ctx, orgCreatedEvent.OrgID, repoName)

@@ -14,6 +14,7 @@ web-lib:
 
 web-relay:
 	npm install --prefix ./web/relay
+	npm run build --prefix ./web/relay
 	npm run export --prefix ./web/relay
 
 web: web-lib web-relay

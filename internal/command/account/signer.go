@@ -8,7 +8,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/core/config"
 	"github.com/valist-io/registry/internal/signer"
 )
 

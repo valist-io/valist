@@ -7,7 +7,7 @@ import (
 	"log"
 	"math/big"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // TODO replace with config
@@ -17,10 +17,10 @@ const (
 )
 
 type Registry struct {
-	client core.CoreAPI
+	client types.CoreAPI
 }
 
-func NewRegistry(client core.CoreAPI) *Registry {
+func NewRegistry(client types.CoreAPI) *Registry {
 	return &Registry{
 		client: client,
 	}
@@ -38,7 +38,7 @@ func (r *Registry) GetScopedPackage(ctx context.Context, orgName, repoName strin
 	pack.Name = fmt.Sprintf("@%s/%s", orgName, repoName)
 
 	iter := r.client.ListReleases(orgID, repoName, big.NewInt(1), big.NewInt(10))
-	err0 := iter.ForEach(ctx, func(release *core.Release) {
+	err0 := iter.ForEach(ctx, func(release *types.Release) {
 		data, err := r.client.ReadFile(ctx, release.MetaCID)
 		if err != nil {
 			log.Printf("Failed to get release meta: %v\n", err)

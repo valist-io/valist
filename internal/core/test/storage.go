@@ -1,10 +1,10 @@
-package client
+package test
 
 import (
 	"context"
 )
 
-func (s *ClientSuite) TestStorage() {
+func (s *CoreSuite) TestStorage() {
 	ctx := context.Background()
 	data := []byte("hello")
 

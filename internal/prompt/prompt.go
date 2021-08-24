@@ -5,7 +5,7 @@ import (
 
 	"github.com/manifoldco/promptui"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 func OrganizationName(value string) *promptui.Prompt {
@@ -43,7 +43,7 @@ func RepositoryDescription(value string) *promptui.Prompt {
 func RepositoryProjectType() *promptui.Select {
 	return &promptui.Select{
 		Label: "Repository project type",
-		Items: core.ProjectTypes,
+		Items: types.ProjectTypes,
 	}
 }
 
