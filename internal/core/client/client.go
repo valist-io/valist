@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"math/big"
 	"net"
+	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -80,21 +81,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	// TODO redirects do not work
-	ipfsAPI, err := ma.NewMultiaddr(cfg.IPFS.API)
-	if err != nil {
-		return nil, err
-	}
-
-	ipfs, err := httpapi.NewApi(ipfsAPI)
-	if err != nil {
-		return nil, err
-	}
-
-	// ipfs, err := httpapi.NewLocalApi()
-	// if err != nil {
-	// 	return nil, err
-	// }
+	ipfs, err := httpapi.NewURLApiWithClient("https://pin.valist.io", &http.Client{})
 
 	// attempt to add all IPFS peers to swarm
 	for _, peerString := range cfg.IPFS.Peers {
