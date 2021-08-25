@@ -81,7 +81,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	ipfs, err := httpapi.NewURLApiWithClient("https://pin.valist.io", &http.Client{})
+	ipfs, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
 
 	// attempt to add all IPFS peers to swarm
 	for _, peerString := range cfg.IPFS.Peers {
