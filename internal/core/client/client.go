@@ -82,6 +82,9 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	ipfs, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
+	if err != nil {
+		return nil, err
+	}
 
 	// attempt to add all IPFS peers to swarm
 	for _, peerString := range cfg.IPFS.Peers {
