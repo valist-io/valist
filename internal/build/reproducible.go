@@ -59,7 +59,7 @@ func Create(imageTag string, dockerFilePath string) error {
 }
 
 func Export(image string, hostPath string, out string) error {
-	if filepath.Dir(out) == "." {
+	if filepath.Dir(out) != "." {
 		out = filepath.Dir(out)
 	}
 
