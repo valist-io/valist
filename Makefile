@@ -1,12 +1,13 @@
 SHELL=/bin/bash
 
-all: valist
+all: install valist
 
-valist: web
-	go build ./cmd/valist
+bin:
+	go build -ldflags "-s -w" ./cmd/valist
 
-install: install-lib install-relay valist
-	go install ./cmd/valist
+valist: web bin
+
+install: install-lib install-relay
 
 install-lib:
 	npm install --prefix ./web/lib
