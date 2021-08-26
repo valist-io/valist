@@ -4,6 +4,9 @@
 package contract
 
 import (
+	"strings"
+
+	"github.com/ethereum/go-ethereum/accounts/abi"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -34,4 +37,8 @@ func NewForwarder(address common.Address, backend bind.ContractBackend) (*metatx
 
 func DeployForwarder(auth *bind.TransactOpts, backend bind.ContractBackend, owner common.Address) (common.Address, *types.Transaction, *metatx.Metatx, error) {
 	return metatx.DeployMetatx(auth, backend, owner)
+}
+
+func NewValistABI() (abi.ABI, error) {
+	return abi.JSON(strings.NewReader(valist.ValistABI))
 }

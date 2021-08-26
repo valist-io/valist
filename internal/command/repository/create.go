@@ -41,7 +41,7 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClient(c.Context, cfg, account)
+			client, err := client.NewClientWithMetaTx(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

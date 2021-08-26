@@ -7,8 +7,6 @@ import (
 	"os"
 )
 
-// TODO https://github.com/npm/normalize-package-data
-
 type Package struct {
 	// the package name
 	ID string `json:"_id"`
@@ -30,6 +28,8 @@ type Package struct {
 	Author Author `json:"author"`
 	// object with type and url of package repository as listed in package.json
 	Repository Repository `json:"repository"`
+	// http://docs.couchdb.org/en/2.0.0/intro/api.html#attachments
+	Attachments map[string]Attachment `json:"_attachments"`
 }
 
 type Version struct {
@@ -67,6 +67,12 @@ type Version struct {
 	NpmUser Author `json:"_npmUser"`
 	// an array of objects containing author objects as listed in package.json
 	Maintainers []Author `json:"maintainers"`
+}
+
+type Attachment struct {
+	ContentType string `json:"content_type"`
+	Data string        `json:"data"`
+	Length int64       `json:"length"`
 }
 
 type Time struct {
