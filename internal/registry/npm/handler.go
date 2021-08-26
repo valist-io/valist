@@ -3,7 +3,7 @@ package npm
 import (
 	"net/http"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 const (
@@ -12,10 +12,10 @@ const (
 )
 
 type Handler struct {
-	client core.CoreAPI
+	client types.CoreAPI
 }
 
-func NewHandler(client core.CoreAPI) http.Handler {
+func NewHandler(client types.CoreAPI) http.Handler {
 	return &Handler{client}
 }
 

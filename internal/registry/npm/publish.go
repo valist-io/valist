@@ -10,9 +10,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // Publish creates a new npm package from the given metadata.
@@ -87,8 +85,8 @@ func (h *Handler) Publish(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	//fmt.Println("MetaCID:", versionCID.String())
-	//fmt.Println("ReleaseCID:", tarCID.String())
+	fmt.Println("MetaCID:", versionCID.String())
+	fmt.Println("ReleaseCID:", tarCID.String())
 
 	orgID, err := h.client.GetOrganizationID(ctx, orgName)
 	if err != nil {
@@ -96,15 +94,14 @@ func (h *Handler) Publish(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	release := &core.Release{
+	release := &types.Release{
 		Tag:        semver,
 		ReleaseCID: tarCID,
 		MetaCID:    versionCID,
 	}
 
-	vote, err := h.client.VoteRelease(ctx, &bind.TransactOpts{}, orgID, repoName, release)
+	vote, err := h.client.VoteRelease(ctx, orgID, repoName, release)
 	if err != nil {
-		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

@@ -8,7 +8,7 @@ import (
 	"net/http"
 	"strings"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // Read serves an npm package with the given scoped name.
@@ -30,7 +30,7 @@ func (h *Handler) Read(w http.ResponseWriter, req *http.Request) {
 	fmt.Println(repoName)
 
 	orgID, err := h.client.GetOrganizationID(ctx, orgName)
-	if err == core.ErrOrganizationNotExist {
+	if err == types.ErrOrganizationNotExist {
 		http.Redirect(w, req, redirect, http.StatusSeeOther)
 		return
 	}
@@ -40,7 +40,7 @@ func (h *Handler) Read(w http.ResponseWriter, req *http.Request) {
 	pack.Name = fmt.Sprintf("@%s/%s", orgName, repoName)
 
 	iter := h.client.ListReleases(orgID, repoName, big.NewInt(1), big.NewInt(10))
-	err0 := iter.ForEach(ctx, func(release *core.Release) {
+	err0 := iter.ForEach(ctx, func(release *types.Release) {
 		data, err := h.client.ReadFile(ctx, release.MetaCID)
 		if err != nil {
 			log.Printf("Failed to get release meta: %v\n", err)
