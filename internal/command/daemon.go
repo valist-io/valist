@@ -69,7 +69,7 @@ func NewDaemonCommand() *cli.Command {
 
 			fmt.Println(banner)
 			fmt.Println("Web server running on", cfg.HTTP.WebAddr)
-			
+
 			webServer := web.NewServer(cfg.HTTP.WebAddr)
 			go webServer.ListenAndServe() //nolint:errcheck
 

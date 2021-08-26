@@ -71,8 +71,8 @@ type Version struct {
 
 type Attachment struct {
 	ContentType string `json:"content_type"`
-	Data string        `json:"data"`
-	Length int64       `json:"length"`
+	Data        string `json:"data"`
+	Length      int64  `json:"length"`
 }
 
 type Time struct {

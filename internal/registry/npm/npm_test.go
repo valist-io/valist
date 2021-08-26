@@ -2,10 +2,9 @@ package npm
 
 import (
 	"context"
-	"fmt"
+	"net/http"
 	"os"
 	"os/exec"
-	"net/http"
 	"testing"
 
 	"github.com/stretchr/testify/require"
@@ -51,8 +50,8 @@ func TestPublish(t *testing.T) {
 	registryAddr := "localhost:10001"
 	registryPath := "http://localhost:10001/@valist"
 
-	go http.ListenAndServe(registryAddr, NewHandler(client))
+	go http.ListenAndServe(registryAddr, NewHandler(client)) //nolint:errcheck
 
-	err := exec.Command("npm", "publish", "./testdata", "--registry", registryPath).Run()
+	err = exec.Command("npm", "publish", "./testdata", "--registry", registryPath).Run()
 	require.NoError(t, err, "Failed to publish npm package")
 }

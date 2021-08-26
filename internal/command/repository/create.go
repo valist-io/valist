@@ -40,7 +40,6 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-
 			client, err := core.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
