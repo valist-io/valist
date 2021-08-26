@@ -13,6 +13,7 @@ let moduleExports = {
       }
     ]
   },
+
   publicRuntimeConfig: {
     WEB3_PROVIDER: process.env.WEB3_PROVIDER || 'https://rpc.valist.io',
     MAGIC_PUBKEY: 'pk_test_54C6079CBEF87272',
@@ -26,6 +27,10 @@ let moduleExports = {
     }
     config.plugins.push(new options.webpack.IgnorePlugin({ resourceRegExp: /^electron$/ }));
     return config;
+  },
+  generateBuildId: async () => {
+    // use a build ID so go embed doesn't get mad
+    return 'v0';
   },
 }
 

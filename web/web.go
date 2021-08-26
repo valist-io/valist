@@ -17,7 +17,7 @@ func NewServer(bindAddr string) *http.Server {
 	if err != nil {
 		panic("failed to get valist.io sub fs")
 	}
-	
+
 	return &http.Server{
 		Addr:    bindAddr,
 		Handler: http.FileServer(http.FS(subFS)),

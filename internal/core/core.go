@@ -2,152 +2,100 @@ package core
 
 import (
 	"context"
-	"errors"
-	"math/big"
+	"fmt"
+	"net/http"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/ipfs/go-cid"
-	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/external"
+	"github.com/ethereum/go-ethereum/ethclient"
+	httpapi "github.com/ipfs/go-ipfs-http-client"
+	"github.com/libp2p/go-libp2p-core/peer"
+	ma "github.com/multiformats/go-multiaddr"
+	"github.com/valist-io/gasless"
+	"github.com/valist-io/gasless/mexa"
+
+	"github.com/valist-io/registry/internal/contract"
+	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core/client/basetx"
+	"github.com/valist-io/registry/internal/core/client/metatx"
+	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/registry/internal/signer"
 )
 
-const (
-	ProjectTypeBinary = "binary"
-	ProjectTypeNode   = "node"
-	ProjectTypeNPM    = "npm"
-	ProjectTypeGo     = "go"
-	ProjectTypeRust   = "rust"
-	ProjectTypePython = "python"
-	ProjectTypeDocker = "docker"
-	ProjectTypeCPP    = "c++"
-	ProjectTypeStatic = "static"
-)
+// NewClient builds a client based on the given config.
+func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
+	var onClose []client.Close
 
-var ProjectTypes = []string{
-	ProjectTypeBinary,
-	ProjectTypeNode,
-	ProjectTypeNPM,
-	ProjectTypeGo,
-	ProjectTypeRust,
-	ProjectTypePython,
-	ProjectTypeDocker,
-	ProjectTypeCPP,
-	ProjectTypeStatic,
-}
+	listener, _, err := signer.StartIPCEndpoint(cfg)
+	if err != nil {
+		return nil, err
+	}
+	onClose = append(onClose, listener.Close)
 
-var (
-	ErrOrganizationNotExist = errors.New("Organization does not exist")
-	ErrRepositoryNotExist   = errors.New("Repository does not exist")
-	ErrReleaseNotExist      = errors.New("Release does not exist")
-)
+	wallet, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
+	if err != nil {
+		return nil, err
+	}
 
-// CoreAPI defines the high-level interface for Valist.
-type CoreAPI interface {
-	OrganizationAPI
-	RegistryAPI
-	ReleaseAPI
-	RepositoryAPI
-	StorageAPI
-}
+	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
+	if err != nil {
+		return nil, err
+	}
 
-// TransactorAPI defines functions to abstract blockchain transactions.
-// TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
-type TransactorAPI interface {
-	CreateOrganizationTx(context.Context, *bind.TransactOpts, cid.Cid) (*types.Transaction, error)
-	LinkOrganizationNameTx(context.Context, *bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	CreateRepositoryTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteReleaseTx(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
-	SetRepositoryMetaTx(context.Context, *bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteOrganizationThresholdTx(context.Context, *bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
-	VoteRepositoryThresholdTx(context.Context, *bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
-}
+	valist, err := contract.NewValist(cfg.Ethereum.Contracts["valist"], eth)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize valist contract: %v", err)
+	}
 
-type OrganizationAPI interface {
-	GetOrganization(context.Context, common.Hash) (*Organization, error)
-	GetOrganizationMeta(context.Context, cid.Cid) (*OrganizationMeta, error)
-	CreateOrganization(context.Context, *bind.TransactOpts, *OrganizationMeta) (*valist.ValistOrgCreated, error)
-	VoteOrganizationThreshold(context.Context, *bind.TransactOpts, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
-}
+	registry, err := contract.NewRegistry(cfg.Ethereum.Contracts["registry"], eth)
+	if err != nil {
+		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
+	}
 
-type RegistryAPI interface {
-	GetOrganizationID(context.Context, string) (common.Hash, error)
-	LinkOrganizationName(context.Context, *bind.TransactOpts, common.Hash, string) (*registry.ValistRegistryMappingEvent, error)
-}
+	ipfs, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
+	if err != nil {
+		return nil, err
+	}
 
-type ReleaseAPI interface {
-	GetRelease(context.Context, common.Hash, string, string) (*Release, error)
-	GetLatestRelease(context.Context, common.Hash, string) (*Release, error)
-	ListReleaseTags(common.Hash, string, *big.Int, *big.Int) ReleaseTagIterator
-	ListReleases(common.Hash, string, *big.Int, *big.Int) ReleaseIterator
-	VoteRelease(context.Context, *bind.TransactOpts, common.Hash, string, *Release) (*valist.ValistVoteReleaseEvent, error)
-}
+	for _, peerString := range cfg.IPFS.Peers {
+		peerAddr, err := ma.NewMultiaddr(peerString)
+		if err != nil {
+			continue
+		}
 
-type RepositoryAPI interface {
-	GetRepository(context.Context, common.Hash, string) (*Repository, error)
-	GetRepositoryMeta(context.Context, cid.Cid) (*RepositoryMeta, error)
-	CreateRepository(context.Context, *bind.TransactOpts, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
-	SetRepositoryMeta(context.Context, *bind.TransactOpts, common.Hash, string, *RepositoryMeta) (*valist.ValistMetaUpdate, error)
-	VoteRepositoryThreshold(context.Context, *bind.TransactOpts, common.Hash, string, *big.Int) (*valist.ValistVoteThresholdEvent, error)
-}
+		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
+		if err != nil {
+			continue
+		}
 
-type ReleaseTagIterator interface {
-	Next(context.Context) (string, error)
-}
+		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+	}
 
-type ReleaseIterator interface {
-	Next(context.Context) (*Release, error)
-	ForEach(context.Context, func(*Release)) error
-}
+	opts := &client.Options{
+		IPFS:         ipfs,
+		Ethereum:     eth,
+		ChainID:      cfg.Ethereum.ChainID,
+		Valist:       valist,
+		Registry:     registry,
+		Account:      account,
+		Wallet:       wallet,
+		TransactOpts: basetx.TransactOpts,
+		Transactor:   basetx.NewTransactor(valist, registry),
+		OnClose:      onClose,
+	}
 
-type StorageAPI interface {
-	// ReadFile returns the contents of the file with the given CID.
-	ReadFile(context.Context, cid.Cid) ([]byte, error)
-	// WriteFile writes the given file contents and returns its CID.
-	WriteFile(context.Context, []byte) (cid.Cid, error)
-	// WriteFilePath writes the contents of the given file path and returns its CID.
-	WriteFilePath(context.Context, string) (cid.Cid, error)
-	// WriteDirEntries writes the given list of files into a directory and returns its CID.
-	WriteDirEntries(context.Context, string, []string) (cid.Cid, error)
-}
+	if !cfg.Ethereum.MetaTx {
+		return client.NewClient(opts)
+	}
 
-type Organization struct {
-	ID            common.Hash
-	Threshold     *big.Int
-	ThresholdDate *big.Int
-	MetaCID       cid.Cid
-}
+	meta, err := mexa.NewMexa(ctx, eth, cfg.Ethereum.BiconomyApiKey)
+	if err != nil {
+		return nil, err
+	}
 
-type OrganizationMeta struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-}
+	signer := gasless.NewWalletSigner(opts.Account, opts.Wallet)
+	opts.TransactOpts = metatx.TransactOpts
+	opts.Transactor = metatx.NewTransactor(opts.Transactor, meta, signer)
 
-type LinkOrgNameResult struct {
-	OrgID common.Hash
-	Name  string
-	Err   error
-}
-
-type Release struct {
-	Tag        string
-	ReleaseCID cid.Cid
-	MetaCID    cid.Cid
-	Signers    []common.Address
-}
-
-type Repository struct {
-	OrgID         common.Hash
-	Threshold     *big.Int
-	ThresholdDate *big.Int
-	MetaCID       cid.Cid
-}
-
-type RepositoryMeta struct {
-	Name        string `json:"name"`
-	Description string `json:"description"`
-	ProjectType string `json:"projectType"`
-	Homepage    string `json:"homepage"`
-	Repository  string `json:"repository"`
+	return client.NewClient(opts)
 }

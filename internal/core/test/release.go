@@ -1,28 +1,28 @@
-package client
+package test
 
 import (
 	"context"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
-func (s *ClientSuite) TestGetRelease() {
+func (s *CoreSuite) TestGetRelease() {
 	ctx := context.Background()
 
 	_, err := s.client.GetRelease(ctx, emptyHash, "empty", "empty")
-	s.Assert().Equal(core.ErrReleaseNotExist, err)
+	s.Assert().Equal(types.ErrReleaseNotExist, err)
 }
 
-func (s *ClientSuite) TestVoteRelease() {
+func (s *CoreSuite) TestVoteRelease() {
 	ctx := context.Background()
 
-	orgMeta := &core.OrganizationMeta{
+	orgMeta := &types.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
 	repoName := "sdk"
-	repoMeta := &core.RepositoryMeta{
+	repoMeta := &types.RepositoryMeta{
 		Name:        "sdk",
 		Description: "Valist core sdk.",
 		ProjectType: "npm",
@@ -36,20 +36,19 @@ func (s *ClientSuite) TestVoteRelease() {
 	releaseCID, err := s.client.WriteFile(ctx, []byte("world"))
 	s.Require().NoError(err, "Failed to add release file")
 
-	release := &core.Release{
+	release := &types.Release{
 		Tag:        "v0.0.1",
 		ReleaseCID: releaseCID,
 		MetaCID:    metaCID,
 	}
 
-	txopts := s.client.TransactOpts()
-	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 
-	_, err = s.client.CreateRepository(ctx, txopts, orgCreatedEvent.OrgID, repoName, repoMeta)
+	_, err = s.client.CreateRepository(ctx, orgCreatedEvent.OrgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
 
-	_, err = s.client.VoteRelease(ctx, txopts, orgCreatedEvent.OrgID, repoName, release)
+	_, err = s.client.VoteRelease(ctx, orgCreatedEvent.OrgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
 
 	released, err := s.client.GetRelease(ctx, orgCreatedEvent.OrgID, repoName, release.Tag)

@@ -2,9 +2,16 @@
 package metatx
 
 import (
+	"math/big"
+
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/common"
+	ethtypes "github.com/ethereum/go-ethereum/core/types"
+
 	"github.com/valist-io/gasless"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 const (
@@ -27,11 +34,26 @@ const (
 )
 
 type Transactor struct {
-	base   core.TransactorAPI
+	base   types.TransactorAPI
 	meta   gasless.Transactor
 	signer gasless.Signer
 }
 
-func NewTransactor(base core.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) core.TransactorAPI {
+func NewTransactor(base types.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) types.TransactorAPI {
 	return &Transactor{base, meta, signer}
+}
+
+// TransactOpts returns transaction options for a meta transcation.
+func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts {
+	return &bind.TransactOpts{
+		From:   common.HexToAddress("0x0"),
+		NoSend: true,
+		Signer: func(address common.Address, tx *ethtypes.Transaction) (*ethtypes.Transaction, error) {
+			if address != account.Address {
+				return nil, bind.ErrNotAuthorized
+			}
+
+			return tx, nil
+		},
+	}
 }

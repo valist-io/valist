@@ -66,7 +66,7 @@ func Run(projectPath string, valistFile Config) ([]string, error) {
 	if err := Export(buildImageName, projectPath, valistFile.Out); err != nil {
 		return nil, err
 	}
-	
+
 	// If platforms are defined in config then use out + artifactPath
 	for _, artifact := range valistFile.Platforms {
 		artifactPaths = append(artifactPaths, filepath.Join(projectPath, valistFile.Out, artifact))

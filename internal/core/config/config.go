@@ -16,11 +16,13 @@ const (
 
 type Ethereum struct {
 	// BiconomyApiKey is the mexa public api key.
-	BiconomyApiKey string
+	BiconomyApiKey string `json:"biconomy_api_key"`
 	// Contracts is a mapping of contract addresses.
 	Contracts map[string]common.Address `json:"contracts"`
 	// ChainID is the unique id of the ethereum chain.
 	ChainID *big.Int `json:"chain_id"`
+	// MetaTx enables meta transactions.
+	MetaTx bool `json:"meta_tx"`
 	// RPC is the ethereum rpc address.
 	RPC string `json:"rpc"`
 }
@@ -81,7 +83,8 @@ func Default(rootPath string) Config {
 				"registry":  common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
 				"forwarder": common.HexToAddress("0x9399BB24DBB5C4b782C70c2969F58716Ebbd6a3b"),
 			},
-			RPC: "https://rpc.valist.io",
+			MetaTx: true,
+			RPC:    "https://rpc.valist.io",
 		},
 		IPFS{
 			API: "https://pin.valist.io",

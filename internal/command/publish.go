@@ -7,15 +7,14 @@ import (
 	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	cid "github.com/ipfs/go-cid"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/build"
-	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 func NewPublishCommand() *cli.Command {
@@ -46,7 +45,7 @@ func NewPublishCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClient(c.Context, cfg, account)
+			client, err := core.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
@@ -88,7 +87,7 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			release := &core.Release{
+			release := &types.Release{
 				Tag:        valistFile.Tag,
 				ReleaseCID: releaseCID,
 				MetaCID:    metaCID,
@@ -105,7 +104,7 @@ func NewPublishCommand() *cli.Command {
 				return nil
 			}
 
-			vote, err := client.VoteRelease(c.Context, &bind.TransactOpts{}, orgID, valistFile.Repo, release)
+			vote, err := client.VoteRelease(c.Context, orgID, valistFile.Repo, release)
 			if err != nil {
 				return err
 			}
