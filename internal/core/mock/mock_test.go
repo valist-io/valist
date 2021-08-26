@@ -12,7 +12,7 @@ import (
 
 type ClientSuite struct {
 	test.CoreSuite
-	tmp string
+	tmp    string
 	client *client.Client
 }
 

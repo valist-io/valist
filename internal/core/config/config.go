@@ -87,9 +87,9 @@ func Default(rootPath string) Config {
 			RPC:    "https://rpc.valist.io",
 		},
 		IPFS{
-			API: "/dns/pin.valist.io",
+			API: "https://pin.valist.io",
 			Peers: []string{
-				"/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
+				"/dnsaddr/gateway.valist.io/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
 			},
 		},
 		Signer{

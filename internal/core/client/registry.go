@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/valist-io/registry/internal/core/types"
 	"github.com/valist-io/registry/internal/contract/registry"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // GetOrganizationID returns the ID of the organization with the given name.

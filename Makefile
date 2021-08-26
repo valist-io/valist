@@ -1,19 +1,24 @@
 SHELL=/bin/bash
 
-all: valist
+all: install valist
 
-valist: web
-	go build ./cmd/valist
+bin:
+	go build -ldflags "-s -w" ./cmd/valist
 
-install: valist
-	go install ./cmd/valist
+valist: web bin
+
+install: install-lib install-relay
+
+install-lib:
+	npm install --prefix ./web/lib
+
+install-relay:
+	npm install --prefix ./web/relay
 
 web-lib:
-	npm install --prefix ./web/lib
 	npm run build --prefix ./web/lib
 
 web-relay:
-	npm install --prefix ./web/relay
 	npm run build --prefix ./web/relay
 	npm run export --prefix ./web/relay
 
