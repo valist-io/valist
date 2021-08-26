@@ -47,6 +47,13 @@ func NewCreateCommand() *cli.Command {
 			}
 			defer client.Close()
 
+			orgName := c.Args().Get(0)
+
+			_, err = client.GetOrganizationID(c.Context, orgName)
+			if err == nil {
+				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
+			}
+
 			name, err := prompt.OrganizationName("").Run()
 			if err != nil {
 				return err
@@ -57,15 +64,9 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			orgName := c.Args().Get(0)
 			orgMeta := core.OrganizationMeta{
 				Name:        name,
 				Description: desc,
-			}
-
-			_, err = client.GetOrganizationID(c.Context, orgName)
-			if err == nil {
-				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
 			}
 
 			fmt.Println("Creating organization...")
