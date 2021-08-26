@@ -6,7 +6,6 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/command/account"
-	"github.com/valist-io/registry/internal/command/npm"
 	"github.com/valist-io/registry/internal/command/organization"
 	"github.com/valist-io/registry/internal/command/repository"
 	"github.com/valist-io/registry/internal/config"
@@ -45,7 +44,6 @@ func NewApp() *cli.App {
 			account.NewCommand(),
 			organization.NewCommand(),
 			repository.NewCommand(),
-			npm.NewCommand(),
 			NewDaemonCommand(),
 			NewBuildCommand(),
 			NewInitCommand(),
