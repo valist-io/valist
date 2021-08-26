@@ -18,6 +18,7 @@ func TestPublish(t *testing.T) {
 
 	tmp, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create temp dir")
+	defer os.RemoveAll(tmp)
 
 	client, err := mock.NewClient(tmp)
 	require.NoError(t, err, "Failed to create mock client")
