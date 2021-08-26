@@ -8,7 +8,7 @@ import (
 	"github.com/valist-io/registry/internal/command/account"
 	"github.com/valist-io/registry/internal/command/organization"
 	"github.com/valist-io/registry/internal/command/repository"
-	"github.com/valist-io/registry/internal/config"
+	"github.com/valist-io/registry/internal/core/config"
 )
 
 func NewApp() *cli.App {

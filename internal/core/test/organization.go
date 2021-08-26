@@ -1,23 +1,21 @@
-package client
+package test
 
 import (
 	"context"
-	"fmt"
 	"math/big"
 
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
-func (s *ClientSuite) TestCreateOrganization() {
+func (s *CoreSuite) TestCreateOrganization() {
 	ctx := context.Background()
 
-	orgMeta := &core.OrganizationMeta{
+	orgMeta := &types.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
-	txopts := s.client.TransactOpts()
-	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 
 	org, err := s.client.GetOrganization(ctx, orgCreatedEvent.OrgID)
@@ -30,23 +28,21 @@ func (s *ClientSuite) TestCreateOrganization() {
 	s.Assert().Equal(orgMeta.Description, meta.Description)
 }
 
-func (s *ClientSuite) TestVoteOrganizationThreshold() {
+func (s *CoreSuite) TestVoteOrganizationThreshold() {
 	ctx := context.Background()
 
-	orgMeta := &core.OrganizationMeta{
+	orgMeta := &types.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
 	}
 
-	txopts := s.client.TransactOpts()
-	orgCreatedEvent, err := s.client.CreateOrganization(ctx, txopts, orgMeta)
+	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
 
 	org, err := s.client.GetOrganization(ctx, orgCreatedEvent.OrgID)
 	s.Require().NoError(err, "Failed to get organization")
 	s.Assert().Equal(big.NewInt(0).Cmp(org.Threshold), 0)
 
-	voteThresholdEvent, err := s.client.VoteOrganizationThreshold(ctx, txopts, orgCreatedEvent.OrgID, big.NewInt(2))
+	_, err = s.client.VoteOrganizationThreshold(ctx, orgCreatedEvent.OrgID, big.NewInt(2))
 	s.Require().NoError(err, "Failed to set organization threshold")
-	fmt.Println(voteThresholdEvent)
 }

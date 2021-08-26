@@ -12,8 +12,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/config"
 	"github.com/valist-io/registry/web"
 )
 
@@ -61,7 +61,7 @@ func NewDaemonCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClient(c.Context, cfg, account)
+			client, err := core.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}

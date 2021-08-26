@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 
 	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/types"
 )
 
 // GetOrganizationID returns the ID of the organization with the given name.
@@ -29,7 +29,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 	}
 
 	if bytes.Equal(orgID[:], emptyHash.Bytes()) {
-		return emptyHash, core.ErrOrganizationNotExist
+		return emptyHash, types.ErrOrganizationNotExist
 	}
 
 	client.orgs[name] = orgID
@@ -37,14 +37,11 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 }
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
-func (client *Client) LinkOrganizationName(
-	ctx context.Context,
-	txopts *bind.TransactOpts,
-	orgID common.Hash,
-	name string,
-) (*registry.ValistRegistryMappingEvent, error) {
+func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (*registry.ValistRegistryMappingEvent, error) {
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
 
-	tx, err := client.transactor.LinkOrganizationNameTx(ctx, txopts, orgID, name)
+	tx, err := client.transactor.LinkOrganizationNameTx(txopts, orgID, name)
 	if err != nil {
 		return nil, err
 	}

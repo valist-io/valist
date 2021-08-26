@@ -2,6 +2,9 @@ type: go
 org: valist
 repo: cli
 tag: 0.5.0
-install: go get ./...
-build: go build ./cmd/valist
+install:
+  curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
+
+  RUN apt install -yy nodejs
+build: make
 out: ./valist

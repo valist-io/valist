@@ -5,13 +5,12 @@ import (
 	"os"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/config"
 	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/registry/internal/core/types"
 	"github.com/valist-io/registry/internal/prompt"
 )
 
@@ -41,7 +40,8 @@ func NewCreateCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClientWithMetaTx(c.Context, cfg, account)
+
+			client, err := core.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
@@ -80,7 +80,7 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			meta := core.RepositoryMeta{
+			meta := types.RepositoryMeta{
 				Name:        name,
 				Description: desc,
 				ProjectType: projectType,
@@ -88,7 +88,7 @@ func NewCreateCommand() *cli.Command {
 				Repository:  url,
 			}
 
-			_, err = client.CreateRepository(c.Context, &bind.TransactOpts{}, orgID, repoName, &meta)
+			_, err = client.CreateRepository(c.Context, orgID, repoName, &meta)
 			if err != nil {
 				return err
 			}

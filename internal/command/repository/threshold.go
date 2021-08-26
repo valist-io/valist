@@ -7,12 +7,11 @@ import (
 	"strconv"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/config"
-	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core"
+	"github.com/valist-io/registry/internal/core/config"
 )
 
 func NewThresholdCommand() *cli.Command {
@@ -41,7 +40,7 @@ func NewThresholdCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := client.NewClient(c.Context, cfg, account)
+			client, err := core.NewClient(c.Context, cfg, account)
 			if err != nil {
 				return err
 			}
@@ -60,7 +59,7 @@ func NewThresholdCommand() *cli.Command {
 				return err
 			}
 
-			vote, err := client.VoteRepositoryThreshold(c.Context, &bind.TransactOpts{}, orgID, repoName, big.NewInt(threshold))
+			vote, err := client.VoteRepositoryThreshold(c.Context, orgID, repoName, big.NewInt(threshold))
 			if err != nil {
 				return err
 			}
