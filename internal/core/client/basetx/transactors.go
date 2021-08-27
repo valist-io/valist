@@ -23,6 +23,10 @@ func (t *Transactor) CreateRepositoryTx(txopts *bind.TransactOpts, orgID common.
 	return t.valist.CreateRepository(txopts, orgID, repoName, repoMeta)
 }
 
+func (t *Transactor) VoteKeyTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*ethtypes.Transaction, error) {
+	return t.valist.VoteKey(txopts, orgID, repoName, operation, address)
+}
+
 func (t *Transactor) VoteReleaseTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, release *types.Release) (*ethtypes.Transaction, error) {
 	return t.valist.VoteRelease(txopts, orgID, repoName, release.Tag, release.ReleaseCID.String(), release.MetaCID.String())
 }

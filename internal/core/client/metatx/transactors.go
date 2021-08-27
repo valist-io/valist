@@ -47,6 +47,15 @@ func (t *Transactor) VoteReleaseTx(txopts *bind.TransactOpts, orgID common.Hash,
 	return t.meta.Transact(txopts.Context, tx, t.signer, voteReleaseBFID)
 }
 
+func (t *Transactor) VoteKeyTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*ethtypes.Transaction, error) {
+	tx, err := t.base.VoteKeyTx(txopts, orgID, repoName, operation, address)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(txopts.Context, tx, t.signer, voteKeyBFID)
+}
+
 func (t *Transactor) SetRepositoryMetaTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*ethtypes.Transaction, error) {
 	tx, err := t.base.SetRepositoryMetaTx(txopts, orgID, repoName, repoMeta)
 	if err != nil {
