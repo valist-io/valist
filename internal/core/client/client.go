@@ -7,6 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 
 	"github.com/valist-io/registry/internal/contract/registry"
@@ -14,7 +15,14 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-var emptyHash = common.HexToHash("0x0")
+var (
+	emptyHash  = common.HexToHash("0x0")
+	ORG_ADMIN  = crypto.Keccak256Hash([]byte("ORG_ADMIN_ROLE"))
+	REPO_DEV   = crypto.Keccak256Hash([]byte("REPO_DEV_ROLE"))
+	ADD_KEY    = crypto.Keccak256Hash([]byte("ADD_KEY_OPERATION"))
+	REVOKE_KEY = crypto.Keccak256Hash([]byte("REVOKE_KEY_OPERATION"))
+	ROTATE_KEY = crypto.Keccak256Hash([]byte("ROTATE_KEY_OPERATION"))
+)
 
 // Close is a callback invoked when the client is closed.
 type Close func() error
@@ -105,4 +113,9 @@ func (client *Client) Close() {
 	for _, close := range client.onClose {
 		close() // nolint:errcheck
 	}
+}
+
+func (client *Client) SwitchAccount(account accounts.Account, wallet accounts.Wallet) {
+	client.account = account
+	client.wallet = wallet
 }
