@@ -1,6 +1,7 @@
 package signer
 
 import (
+	"encoding/hex"
 	"net"
 
 	"github.com/ethereum/go-ethereum/accounts"
@@ -9,6 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/signer/fourbyte"
 	"github.com/ethereum/go-ethereum/signer/storage"
 
+	"github.com/valist-io/registry/internal/contract/registry"
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core/config"
 )
 
@@ -16,6 +19,30 @@ func NewSigner(cfg *config.Config) (*core.SignerAPI, *accounts.Manager, error) {
 	validator, err := fourbyte.New()
 	if err != nil {
 		return nil, nil, err
+	}
+
+	for fourbytes, signature := range valist.ValistFuncSigs {
+		bytes, err := hex.DecodeString(fourbytes)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		validator.AddSelector(signature, bytes)
+		if err != nil {
+			return nil, nil, err
+		}
+	}
+
+	for fourbytes, signature := range registry.ValistRegistryFuncSigs {
+		bytes, err := hex.DecodeString(fourbytes)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		validator.AddSelector(signature, bytes)
+		if err != nil {
+			return nil, nil, err
+		}
 	}
 
 	ksLocation := cfg.Signer.KeyStorePath
