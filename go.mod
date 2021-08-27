@@ -9,6 +9,7 @@ require (
 	github.com/ipfs/go-ipfs v0.9.1
 	github.com/ipfs/go-ipfs-files v0.0.8
 	github.com/ipfs/go-ipfs-http-client v0.1.0
+	github.com/ipfs/go-ipld-format v0.2.0 // indirect
 	github.com/ipfs/interface-go-ipfs-core v0.4.0
 	github.com/libp2p/go-libp2p-core v0.8.5
 	github.com/manifoldco/promptui v0.8.0

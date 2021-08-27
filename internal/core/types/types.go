@@ -9,6 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	cid "github.com/ipfs/go-cid"
+	ipld "github.com/ipfs/go-ipld-format"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 )
@@ -50,6 +51,7 @@ type CoreAPI interface {
 	ReleaseAPI
 	RepositoryAPI
 	StorageAPI
+	ResolverAPI
 	Close()
 }
 
@@ -113,6 +115,11 @@ type StorageAPI interface {
 	WriteDirEntries(context.Context, string, []string) (cid.Cid, error)
 }
 
+type ResolverAPI interface {
+	// ResolvePath resolves the organization, repository, release, and node from the given path.
+	ResolvePath(context.Context, string) (*ResolvedPath, error)
+}
+
 type Organization struct {
 	ID            common.Hash
 	Threshold     *big.Int
@@ -139,6 +146,7 @@ type Release struct {
 }
 
 type Repository struct {
+	Name          string
 	OrgID         common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
@@ -151,4 +159,11 @@ type RepositoryMeta struct {
 	ProjectType string `json:"projectType"`
 	Homepage    string `json:"homepage"`
 	Repository  string `json:"repository"`
+}
+
+type ResolvedPath struct {
+	Organization *Organization
+	Repository   *Repository
+	Release      *Release
+	Node         ipld.Node
 }

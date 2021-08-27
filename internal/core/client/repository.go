@@ -39,6 +39,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 
 	return &types.Repository{
 		OrgID:         orgID,
+		Name:          repoName,
 		Threshold:     repo.Threshold,
 		ThresholdDate: repo.ThresholdDate,
 		MetaCID:       metaCID,
