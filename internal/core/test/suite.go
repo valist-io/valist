@@ -1,6 +1,8 @@
 package test
 
 import (
+	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
@@ -12,6 +14,9 @@ var emptyHash = common.HexToHash("0x0")
 type CoreSuite struct {
 	suite.Suite
 	client types.CoreAPI
+
+	signer   *keystore.KeyStore
+	accounts []accounts.Account
 }
 
 func NewCoreSuite(client types.CoreAPI) CoreSuite {
@@ -20,4 +25,9 @@ func NewCoreSuite(client types.CoreAPI) CoreSuite {
 
 func (s *CoreSuite) SetClient(client types.CoreAPI) {
 	s.client = client
+}
+
+func (s *CoreSuite) SetAccounts(signer *keystore.KeyStore, accounts []accounts.Account) {
+	s.signer = signer
+	s.accounts = accounts
 }

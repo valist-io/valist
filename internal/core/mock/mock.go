@@ -3,6 +3,7 @@ package mock
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -23,30 +24,24 @@ const (
 	passphrase       = "secret"
 )
 
-func NewClient(ksLocation string) (*client.Client, error) {
+func NewClient(signer *keystore.KeyStore, accounts []accounts.Account) (*client.Client, error) {
 	var onClose []client.Close
 
-	signer := keystore.NewKeyStore(ksLocation, veryLightScryptN, veryLightScryptP)
-	account, err := signer.NewAccount(passphrase)
-	if err != nil {
-		return nil, err
-	}
-
-	if err = signer.Unlock(account, passphrase); err != nil {
-		return nil, err
-	}
-
 	backend := backends.NewSimulatedBackend(coreeth.GenesisAlloc{
-		account.Address: {Balance: big.NewInt(9223372036854775807)},
+		accounts[0].Address: {Balance: big.NewInt(9223372036854775807)},
+		accounts[1].Address: {Balance: big.NewInt(9223372036854775807)},
+		accounts[2].Address: {Balance: big.NewInt(9223372036854775807)},
+		accounts[3].Address: {Balance: big.NewInt(9223372036854775807)},
+		accounts[4].Address: {Balance: big.NewInt(9223372036854775807)},
 	}, 8000029)
 	onClose = append(onClose, backend.Close)
 
-	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, account, chainID)
+	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, accounts[0], chainID)
 	if err != nil {
 		return nil, err
 	}
 
-	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, account.Address)
+	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, accounts[0].Address)
 	if err != nil {
 		return nil, err
 	}
@@ -80,7 +75,7 @@ func NewClient(ksLocation string) (*client.Client, error) {
 		ChainID:      chainID,
 		Valist:       valist,
 		Registry:     registry,
-		Account:      account,
+		Account:      accounts[0],
 		Wallet:       signer.Wallets()[0],
 		TransactOpts: basetx.TransactOpts,
 		Transactor:   basetx.NewTransactor(valist, registry),
