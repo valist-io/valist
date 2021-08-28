@@ -49,10 +49,16 @@ func TestPublish(t *testing.T) {
 	require.NoError(t, err, "Failed to create repository")
 
 	registryAddr := "localhost:10001"
-	registryPath := "http://localhost:10001/@valist"
+	registryPath := "http://localhost:10001"
 
 	go http.ListenAndServe(registryAddr, NewHandler(client)) //nolint:errcheck
 
-	err = exec.Command("npm", "publish", "./testdata", "--registry", registryPath).Run()
+	err = exec.Command("npm", "publish", "./testdata/v0", "--registry", registryPath).Run()
+	require.NoError(t, err, "Failed to publish npm package")
+
+	err = exec.Command("npm", "view", "@valist/sdk", "--registry", registryPath).Run()
+	require.NoError(t, err, "Failed to view npm package")
+
+	err = exec.Command("npm", "publish", "./testdata/v1", "--registry", registryPath).Run()
 	require.NoError(t, err, "Failed to publish npm package")
 }
