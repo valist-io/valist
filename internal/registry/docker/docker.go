@@ -1,26 +1,34 @@
 package docker
 
 import (
+	"context"
 	"crypto/sha256"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
+	"path/filepath"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
+	cid "github.com/ipfs/go-cid"
+	files "github.com/ipfs/go-ipfs-files"
 
 	"github.com/valist-io/registry/internal/core/types"
 )
 
 type Handler struct {
 	client  types.CoreAPI
-	storage *Storage
+	blobs   map[string]cid.Cid
+	uploads map[string]int64
 }
 
 func NewHandler(client types.CoreAPI) http.Handler {
-	storage := NewStorage(client)
-	handler := &Handler{client, storage}
+	handler := &Handler{
+		client:  client,
+		blobs:   make(map[string]cid.Cid),
+		uploads: make(map[string]int64),
+	}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/v2/", handler.getVersion).Methods(http.MethodGet)
@@ -36,6 +44,70 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
+func (h *Handler) startUpload() (string, error) {
+	path, err := os.MkdirTemp("", "")
+	if err != nil {
+		return "", err
+	}
+
+	uuid := filepath.Base(path)
+	h.uploads[uuid] = 0
+
+	return uuid, nil
+}
+
+func (h *Handler) writeUpload(uuid string, r io.Reader) (int64, error) {
+	path := filepath.Join(os.TempDir(), uuid, "blob")
+
+	blob, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	if err != nil {
+		return 0, err
+	}
+	defer blob.Close()
+
+	size, err := io.Copy(blob, r)
+	if err != nil {
+		return 0, err
+	}
+
+	h.uploads[uuid] += size
+	return size, nil
+}
+
+func (h *Handler) finalizeUpload(ctx context.Context, uuid, digest string) error {
+	path := filepath.Join(os.TempDir(), uuid, "blob")
+
+	id, err := h.client.WriteFilePath(ctx, path)
+	if err != nil {
+		return err
+	}
+	defer os.RemoveAll(filepath.Dir(path))
+
+	h.blobs[digest] = id
+	delete(h.uploads, uuid)
+
+	return nil
+}
+
+func (h *Handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (files.File, error) {
+	if id, ok := h.blobs[digest]; ok {
+		return h.client.GetFile(ctx, id)
+	}
+
+	raw := fmt.Sprintf("%s/%s/latest/blobs/%s", orgName, repoName, digest)
+	res, err := h.client.ResolvePath(ctx, raw)
+	if err != nil {
+		return nil, err
+	}
+
+	file, ok := res.File.(files.File)
+	if !ok {
+		return nil, fmt.Errorf("not found")
+	}
+
+	return file, nil
+}
+
 func (h *Handler) getVersion(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
@@ -48,7 +120,7 @@ func (h *Handler) getBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	file, err := h.storage.GetBlob(ctx, orgName, repoName, digest)
+	file, err := h.loadBlob(ctx, orgName, repoName, digest)
 	if err != nil {
 		http.NotFound(w, req)
 		return
@@ -78,7 +150,7 @@ func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	uuid, err := h.storage.StartUpload()
+	uuid, err := h.startUpload()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -98,9 +170,9 @@ func (h *Handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 	repoName := vars["repo"]
 
 	// TODO verify Range header is valid and return 416 if not
-	start := h.storage.uploads[uuid]
+	start := h.uploads[uuid]
 
-	size, err := h.storage.WriteUpload(uuid, req.Body)
+	size, err := h.writeUpload(uuid, req.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -123,12 +195,12 @@ func (h *Handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	// TODO verify Range header is valid and return 416 if not
 	digest := req.URL.Query().Get("digest")
 
-	if _, err := h.storage.WriteUpload(uuid, req.Body); err != nil {
+	if _, err := h.writeUpload(uuid, req.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := h.storage.FinishUpload(ctx, uuid, digest); err != nil {
+	if err := h.finalizeUpload(ctx, uuid, digest); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
