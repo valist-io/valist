@@ -1,126 +1,175 @@
-// Package npm implements a read-only NodeJS package registry.
+// Package npm implements a NodeJS package registry.
 // https://github.com/npm/registry/blob/master/docs/REGISTRY-API.md
 package npm
 
 import (
+	"bytes"
+	"encoding/base64"
 	"encoding/json"
+	"fmt"
+	"io"
+	"log"
+	"math/big"
+	"net/http"
 	"os"
+
+	"github.com/gorilla/handlers"
+	"github.com/gorilla/mux"
+
+	"github.com/valist-io/registry/internal/core/types"
 )
 
-type Package struct {
-	// the package name
-	ID string `json:"_id"`
-	// latest revision id
-	Rev string `json:"_rev"`
-	// the package name
-	Name string `json:"name"`
-	// description from the package.json
-	Description string `json:"description"`
-	// an object with at least one key, latest, representing dist-tags
-	DistTags map[string]string `json:"dist-tags"`
-	// a List of all Version objects for the Package
-	Versions map[string]Version `json:"versions"`
-	// full text of the latest version's README
-	Readme string `json:"readme"`
-	// an object containing a created and modified time stamp
-	Time Time `json:"time"`
-	// object with name, email, and or url of author as listed in package.json
-	Author Author `json:"author"`
-	// object with type and url of package repository as listed in package.json
-	Repository Repository `json:"repository"`
-	// http://docs.couchdb.org/en/2.0.0/intro/api.html#attachments
-	Attachments map[string]Attachment `json:"_attachments"`
+const (
+	DefaultGateway  = "https://ipfs.io/ipfs"
+	DefaultRegistry = "https://registry.npmjs.org"
+)
+
+type Handler struct {
+	client types.CoreAPI
 }
 
-type Version struct {
-	// <name>@<version>
-	ID string `json:"_id"`
-	// package name
-	Name string `json:"name"`
-	// description as listed in package.json
-	Description string `json:"description"`
-	// version number
-	Version string `json:"version"`
-	// homepage listed in the package.json
-	Homepage string `json:"homepage"`
-	// object with type and url of package repository as listed in package.json
-	Repository Repository `json:"repository"`
-	// object with dependencies and versions as listed in package.json
-	Dependencies map[string]string `json:"dependencies"`
-	// object with devDependencies and versions as listed in package.json
-	DevDependencies map[string]string `json:"devDependencies"`
-	// object with scripts as listed in package.json
-	Scripts map[string]string `json:"scripts"`
-	// object with name, email, and or url of author as listed in package.json
-	Author Author `json:"author"`
-	// as listed in package.json
-	License string `json:"license"`
-	// full text of README file as pointed to in package.json
-	Readme string `json:"readme"`
-	// name of README file
-	ReadmeFilename string `json:"readmeFilename"`
-	// an object containing a shasum and tarball url, usually in the form of https://registry.npmjs.org/<name>/-/<name>-<version>.tgz
-	Dist Dist `json:"dist"`
-	// version of npm the package@version was published with
-	NpmVersion string `json:"_npmVersion"`
-	// an object containing the name and email of the npm user who published the package@version
-	NpmUser Author `json:"_npmUser"`
-	// an array of objects containing author objects as listed in package.json
-	Maintainers []Author `json:"maintainers"`
+func NewHandler(client types.CoreAPI) http.Handler {
+	handler := &Handler{client}
+
+	router := mux.NewRouter()
+	router.HandleFunc("/{org}/{repo}", handler.getPackage).Methods(http.MethodGet)
+	router.HandleFunc("/{org}/{repo}", handler.putPackage).Methods(http.MethodPut)
+
+	return handlers.LoggingHandler(os.Stdout, router)
 }
 
-type Attachment struct {
-	ContentType string `json:"content_type"`
-	Data        string `json:"data"`
-	Length      int64  `json:"length"`
-}
+func (h *Handler) getPackage(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	redirect := fmt.Sprintf("%s%s", DefaultRegistry, req.URL.Path)
 
-type Time struct {
-	Created  string `json:"created"`
-	Modified string `json:"modified"`
-}
-
-type Author struct {
-	Name  string `json:"name"`
-	Email string `json:"email"`
-	URL   string `json:"url"`
-}
-
-type Repository struct {
-	Type string `json:"type"`
-	URL  string `json:"url"`
-}
-
-type Dist struct {
-	Shasum  string `json:"shasum"`
-	Tarball string `json:"tarball"`
-}
-
-func NewPackage() Package {
-	return Package{
-		DistTags: make(map[string]string),
-		Versions: make(map[string]Version),
-	}
-}
-
-func NewVersion() Version {
-	return Version{
-		Dependencies:    make(map[string]string),
-		DevDependencies: make(map[string]string),
-		Scripts:         make(map[string]string),
-	}
-}
-
-func ParsePackageJSON(path string) (*Version, error) {
-	data, err := os.ReadFile(path)
+	res, err := h.client.ResolvePath(ctx, req.URL.Path)
 	if err != nil {
-		return nil, err
+		http.Redirect(w, req, redirect, http.StatusSeeOther)
+		return
 	}
 
-	var version Version
-	if err := json.Unmarshal(data, &version); err != nil {
-		return nil, err
+	pack := NewPackage()
+	pack.ID = req.URL.Path
+	pack.Name = req.URL.Path
+
+	iter := h.client.ListReleases(res.Organization.ID, res.Repository.Name, big.NewInt(1), big.NewInt(10))
+	err0 := iter.ForEach(ctx, func(release *types.Release) {
+		data, err := h.client.ReadFile(ctx, release.MetaCID)
+		if err != nil {
+			log.Printf("Failed to get release meta: %v\n", err)
+		}
+
+		var version Version
+		if err := json.Unmarshal(data, &version); err != nil {
+			log.Printf("Failed to parse release meta: %v\n", err)
+		}
+
+		version.ID = fmt.Sprintf("%s@%s", pack.ID, release.Tag)
+		version.Name = pack.Name
+		version.Version = release.Tag
+		version.Dist = Dist{
+			Tarball: fmt.Sprintf("%s/%s", DefaultGateway, release.ReleaseCID.String()),
+		}
+
+		pack.Versions[release.Tag] = version
+		pack.DistTags["latest"] = release.Tag
+	})
+
+	if err0 != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 
-	return &version, nil
+	w.Header().Add("Content-Type", "application/json")
+	w.WriteHeader(http.StatusOK)
+
+	if err := json.NewEncoder(w).Encode(pack); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
+}
+
+func (h *Handler) putPackage(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+
+	res, err := h.client.ResolvePath(ctx, req.URL.Path)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	var pack Package
+	if err := json.NewDecoder(req.Body).Decode(&pack); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// only support publishing latest version now
+	semver, ok := pack.DistTags["latest"]
+	if !ok {
+		http.Error(w, "latest version required", http.StatusBadRequest)
+		return
+	}
+
+	version, ok := pack.Versions[semver]
+	if !ok {
+		http.Error(w, "version not found", http.StatusBadRequest)
+		return
+	}
+
+	attachName := fmt.Sprintf("%s-%s.tgz", pack.Name, semver)
+	attach, ok := pack.Attachments[attachName]
+	if !ok {
+		http.Error(w, "attachment required", http.StatusBadRequest)
+		return
+	}
+
+	var tarData bytes.Buffer
+	buf := bytes.NewBufferString(attach.Data)
+	dec := base64.NewDecoder(base64.StdEncoding, buf)
+
+	if _, err := io.Copy(&tarData, dec); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	tarCID, err := h.client.WriteFile(ctx, tarData.Bytes())
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// TODO calculate checksum
+	version.Dist = Dist{
+		Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarCID.String()),
+	}
+
+	versionData, err := json.Marshal(&version)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	versionCID, err := h.client.WriteFile(ctx, versionData)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	release := &types.Release{
+		Tag:        semver,
+		ReleaseCID: tarCID,
+		MetaCID:    versionCID,
+	}
+
+	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+		fmt.Printf("Voted to publish release %s %d/%d\n", release.Tag, vote.SigCount, vote.Threshold)
+	} else {
+		fmt.Printf("Approved release %s\n", release.Tag)
+	}
 }

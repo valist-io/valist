@@ -2,7 +2,6 @@ package docker
 
 import (
 	"context"
-	"fmt"
 	"net/http"
 	"os"
 	"os/exec"

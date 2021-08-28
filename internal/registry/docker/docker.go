@@ -38,7 +38,6 @@ func NewHandler(client types.CoreAPI) http.Handler {
 
 func (h *Handler) getVersion(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
-	return
 }
 
 func (h *Handler) getBlob(w http.ResponseWriter, req *http.Request) {
