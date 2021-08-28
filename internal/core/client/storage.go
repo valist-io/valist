@@ -13,6 +13,20 @@ import (
 	"github.com/ipfs/interface-go-ipfs-core/path"
 )
 
+func (client *Client) GetFile(ctx context.Context, id cid.Cid) (files.File, error) {
+	node, err := client.ipfs.Unixfs().Get(ctx, path.IpfsPath(id))
+	if err != nil {
+		return nil, err
+	}
+
+	file, ok := node.(files.File)
+	if !ok {
+		return nil, fmt.Errorf("invalid file")
+	}
+
+	return file, nil
+}
+
 func (client *Client) WriteFile(ctx context.Context, data []byte) (cid.Cid, error) {
 	path, err := client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(data), options.Unixfs.Pin(true))
 	if err != nil {

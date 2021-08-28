@@ -1,11 +1,11 @@
 package docker
 
 import (
+	"crypto/sha256"
 	"fmt"
 	"io"
 	"net/http"
 	"os"
-	"path/filepath"
 
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
@@ -15,24 +15,21 @@ import (
 
 type Handler struct {
 	client  types.CoreAPI
-	uploads map[string]int64
+	storage *Storage
 }
 
 func NewHandler(client types.CoreAPI) http.Handler {
-	handler := &Handler{
-		client:  client,
-		uploads: make(map[string]int64),
-	}
+	storage := NewStorage(client)
+	handler := &Handler{client, storage}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/v2/", handler.getVersion).Methods(http.MethodGet)
-	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/", handler.getBlob).Methods(http.MethodGet, http.MethodHead)
+	router.HandleFunc("/v2/{org}/{repo}/blobs/{digest}", handler.getBlob).Methods(http.MethodGet, http.MethodHead)
 	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/", handler.postBlob).Methods(http.MethodPost)
 	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/{uuid}", handler.patchBlob).Methods(http.MethodPatch)
 	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/{uuid}", handler.putBlob).Methods(http.MethodPut)
-	router.HandleFunc("/v2/{org}/{repo}/manifests/{ref}", handler.putManifest).Methods(http.MethodPut)
+	router.HandleFunc("/v2/{org}/{repo}/manifests/{reference}", handler.putManifest).Methods(http.MethodPut)
 
-	// HEAD /v2/valist/docker/blobs/sha256:fd3acdcea5682abced546ec19fb6ebee725c5184e5d91614c469c0a79e67f2d0
 	// DELETE /v2/<name>/blobs/uploads/<uuid>
 	// POST /v2/<name>/blobs/uploads/?mount=<digest>&from=<repository name>
 
@@ -45,35 +42,35 @@ func (h *Handler) getVersion(w http.ResponseWriter, req *http.Request) {
 }
 
 func (h *Handler) getBlob(w http.ResponseWriter, req *http.Request) {
-	// ctx := req.Context()
-	// vars := mux.Vars(req)
+	ctx := req.Context()
+	vars := mux.Vars(req)
 
-	// orgName := vars["org"]
-	// repoName := vars["repo"]
+	digest := vars["digest"]
+	orgName := vars["org"]
+	repoName := vars["repo"]
 
-	// orgID, err := h.client.GetOrganizationID(ctx, orgName)
-	// if err == types.ErrOrganizationNotExist {
-	// 	http.NotFound(w, req)
-	// 	return
-	// }
+	file, err := h.storage.GetBlob(ctx, orgName, repoName, digest)
+	if err != nil {
+		http.NotFound(w, req)
+		return
+	}
 
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	size, err := file.Size()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
-	// repo, err := client.GetRepository(ctx, orgID, repoName)
-	// if err == types.ErrRepositoryNotExist {
-	// 	http.NotFound(w, req)
-	// 	return
-	// }
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", size))
+	w.Header().Set("Docker-Content-Digest", digest)
 
-	// if err != nil {
-	// 	http.Error(w, err.Error(), http.StatusBadRequest)
-	// 	return
-	// }
+	if req.Method == http.MethodHead {
+		return
+	}
 
-	return
+	if _, err := io.Copy(w, file); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
 
 func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
@@ -82,14 +79,11 @@ func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	path, err := os.MkdirTemp("", "")
+	uuid, err := h.storage.StartUpload()
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	uuid := filepath.Base(path)
-	h.uploads[uuid] = 0
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.Header().Set("Range", "0-0")
@@ -105,74 +99,68 @@ func (h *Handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 	repoName := vars["repo"]
 
 	// TODO verify Range header is valid and return 416 if not
+	start := h.storage.uploads[uuid]
 
-	path := filepath.Join(os.TempDir(), uuid, "blob")
-	blob, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
+	size, err := h.storage.WriteUpload(uuid, req.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer blob.Close()
-
-	size, err := io.Copy(blob, req.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	start := h.uploads[uuid]
-	h.uploads[uuid] += size
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
-	w.Header().Set("Range", fmt.Sprintf("%d-%d", start, h.uploads[uuid]))
+	w.Header().Set("Range", fmt.Sprintf("%d-%d", start, start+size))
 	w.Header().Set("Docker-Upload-UUID", uuid)
 	w.WriteHeader(http.StatusAccepted)
 }
 
 func (h *Handler) putBlob(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
 	vars := mux.Vars(req)
 
 	uuid := vars["uuid"]
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	// TODO check if multiple digest
-	// TODO check if digest matches
+	// TODO verify Range header is valid and return 416 if not
 	digest := req.URL.Query().Get("digest")
+
+	if _, err := h.storage.WriteUpload(uuid, req.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if err := h.storage.FinishUpload(ctx, uuid, digest); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.Header().Set("Docker-Content-Digest", digest)
-
-	if req.ContentLength == 0 {
-		w.WriteHeader(http.StatusAccepted)
-		return
-	}
-
-	// TODO verify Range header is valid and return 416 if not
-
-	path := filepath.Join(os.TempDir(), uuid, "blob")
-	blob, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-	defer blob.Close()
-
-	_, err = io.Copy(blob, req.Body)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	w.WriteHeader(http.StatusAccepted)
 }
 
 func (h *Handler) putManifest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	vars := mux.Vars(req)
+
+	ref := vars["reference"]
+	orgName := vars["org"]
+	repoName := vars["repo"]
+
 	data, err := io.ReadAll(req.Body)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	fmt.Println(string(data))
+	manifestCID, err := h.client.WriteFile(ctx, data)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+	fmt.Println(manifestCID)
+
+	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/manifests/%s", orgName, repoName, ref))
+	w.Header().Set("Docker-Content-Digest", fmt.Sprintf("sha256:%x", sha256.Sum256(data)))
+	w.WriteHeader(http.StatusAccepted)
 }

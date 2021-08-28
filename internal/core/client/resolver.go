@@ -54,7 +54,7 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 	p = path.IpfsPath(res.Release.ReleaseCID)
 	p = path.Join(p, parts[3])
 
-	res.Node, err = client.ipfs.ResolveNode(ctx, p)
+	res.File, err = client.ipfs.Unixfs().Get(ctx, p)
 	if err != nil {
 		return nil, err
 	}

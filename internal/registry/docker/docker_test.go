@@ -60,8 +60,6 @@ func TestPublish(t *testing.T) {
 	err = exec.Command("docker", "build", "--tag", registryPath, "./testdata/").Run()
 	require.NoError(t, err, "Failed to build docker image")
 
-	cmd := exec.Command("docker", "push", registryPath)
-	out, err := cmd.CombinedOutput()
-	fmt.Println(string(out))
+	err = exec.Command("docker", "push", registryPath).Run()
 	require.NoError(t, err, "Failed to push docker image")
 }

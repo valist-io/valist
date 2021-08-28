@@ -9,7 +9,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	cid "github.com/ipfs/go-cid"
-	ipld "github.com/ipfs/go-ipld-format"
+	files "github.com/ipfs/go-ipfs-files"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 )
@@ -105,6 +105,7 @@ type ReleaseIterator interface {
 }
 
 type StorageAPI interface {
+	GetFile(context.Context, cid.Cid) (files.File, error)
 	// ReadFile returns the contents of the file with the given CID.
 	ReadFile(context.Context, cid.Cid) ([]byte, error)
 	// WriteFile writes the given file contents and returns its CID.
@@ -165,5 +166,5 @@ type ResolvedPath struct {
 	Organization *Organization
 	Repository   *Repository
 	Release      *Release
-	Node         ipld.Node
+	File         files.Node
 }
