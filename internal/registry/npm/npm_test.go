@@ -51,7 +51,10 @@ func TestNpmPublish(t *testing.T) {
 	registryAddr := "localhost:10001"
 	registryPath := "http://localhost:10001"
 
-	go http.ListenAndServe(registryAddr, NewHandler(client)) //nolint:errcheck
+	go func() {
+		err := http.ListenAndServe(registryAddr, NewHandler(client))
+		require.NoError(t, err, "Failed to start http server")
+	}()
 
 	err = exec.Command("npm", "publish", "./testdata/v0", "--registry", registryPath).Run()
 	require.NoError(t, err, "Failed to publish npm package")

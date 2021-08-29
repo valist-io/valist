@@ -31,27 +31,26 @@ func NewHandler(client types.CoreAPI) http.Handler {
 
 func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
 	service := req.URL.Query().Get("service")
-	loader := &loader{}
-	server := server.NewServer(loader)
+	server := server.NewServer(&memLoader{})
 
 	var sess transport.Session
-	var err0 error
+	var err error
 
 	switch service {
 	case transport.UploadPackServiceName:
-		sess, err0 = server.NewUploadPackSession(nil, nil)
+		// TODO load packed-refs into memory storage
+		sess, err = server.NewUploadPackSession(nil, nil)
 	case transport.ReceivePackServiceName:
-		sess, err0 = server.NewReceivePackSession(nil, nil)
+		sess, err = server.NewReceivePackSession(nil, nil)
 	default:
 		http.NotFound(w, req)
 		return
 	}
 
-	if err0 != nil {
-		http.Error(w, err0.Error(), http.StatusInternalServerError)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer os.RemoveAll(loader.tmp)
 
 	refs, err := sess.AdvertisedReferences()
 	if err != nil {
@@ -64,28 +63,32 @@ func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	enc := pktline.NewEncoder(w)
-	enc.EncodeString(fmt.Sprintf("# service=%s\n", service))
-	enc.Flush()
+	enc.EncodeString(fmt.Sprintf("# service=%s\n", service)) //nolint:errcheck
+	enc.Flush()                                              //nolint:errcheck
 
-	refs.Encode(w)
+	refs.Encode(w) //nolint:errcheck
 }
 
 func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
-	// TODO figure out why initial 0000 body is sent
+	ctx := req.Context()
+
 	if req.ContentLength == 4 {
-		return
+		return // figure out why initial 0000 body is sent
 	}
 
-	ctx := req.Context()
-	loader := &loader{}
-	server := server.NewServer(loader)
+	tmp, err := os.MkdirTemp("", "")
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	defer os.RemoveAll(tmp)
 
+	server := server.NewServer(&tmpLoader{tmp})
 	sess, err := server.NewReceivePackSession(nil, nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	defer os.RemoveAll(loader.tmp)
 
 	sessreq := packp.NewReferenceUpdateRequest()
 	if err := sessreq.Decode(req.Body); err != nil {
@@ -99,8 +102,16 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	releaseCID, err := h.client.WriteFilePath(ctx, tmp)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+	fmt.Println(releaseCID.String())
+
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Content-Type", "application/x-git-receive-pack-result")
+	w.WriteHeader(http.StatusOK)
 
-	sessres.Encode(w)
+	sessres.Encode(w) //nolint:errcheck
 }

@@ -51,8 +51,11 @@ func TestGitPush(t *testing.T) {
 	registryAddr := "localhost:10002"
 	registryPath := "http://localhost:10002/valist/sdk"
 
-	go http.ListenAndServe(registryAddr, NewHandler(client)) //nolint:errcheck
+	go func() {
+		err := http.ListenAndServe(registryAddr, NewHandler(client))
+		require.NoError(t, err, "Failed to start http server")
+	}()
 
-	err = exec.Command("git", "push", registryPath).Run()
-	require.NoError(t, err, "Failed to publish npm package")
+	err = exec.Command("git", "push", "--all", registryPath).Run()
+	require.NoError(t, err, "Failed to push git repo")
 }
