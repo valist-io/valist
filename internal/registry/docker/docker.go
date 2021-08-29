@@ -44,18 +44,6 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
-func (h *Handler) startUpload() (string, error) {
-	path, err := os.MkdirTemp("", "")
-	if err != nil {
-		return "", err
-	}
-
-	uuid := filepath.Base(path)
-	h.uploads[uuid] = 0
-
-	return uuid, nil
-}
-
 func (h *Handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 	path := filepath.Join(os.TempDir(), uuid, "blob")
 
@@ -72,21 +60,6 @@ func (h *Handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 
 	h.uploads[uuid] += size
 	return size, nil
-}
-
-func (h *Handler) finalizeUpload(ctx context.Context, uuid, digest string) error {
-	path := filepath.Join(os.TempDir(), uuid, "blob")
-
-	id, err := h.client.WriteFilePath(ctx, path)
-	if err != nil {
-		return err
-	}
-	defer os.RemoveAll(filepath.Dir(path))
-
-	h.blobs[digest] = id
-	delete(h.uploads, uuid)
-
-	return nil
 }
 
 func (h *Handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (files.File, error) {
@@ -150,11 +123,14 @@ func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	uuid, err := h.startUpload()
+	path, err := os.MkdirTemp("", "")
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
+
+	uuid := filepath.Base(path)
+	h.uploads[uuid] = 0
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.Header().Set("Range", "0-0")
@@ -194,16 +170,23 @@ func (h *Handler) putBlob(w http.ResponseWriter, req *http.Request) {
 
 	// TODO verify Range header is valid and return 416 if not
 	digest := req.URL.Query().Get("digest")
+	path := filepath.Join(os.TempDir(), uuid, "blob")
 
-	if _, err := h.writeUpload(uuid, req.Body); err != nil {
+	_, err := h.writeUpload(uuid, req.Body)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	if err := h.finalizeUpload(ctx, uuid, digest); err != nil {
+	id, err := h.client.WriteFilePath(ctx, path)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer os.RemoveAll(filepath.Dir(path))
+
+	h.blobs[digest] = id
+	delete(h.uploads, uuid)
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.Header().Set("Docker-Content-Digest", digest)
