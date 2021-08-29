@@ -17,14 +17,14 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-type Handler struct {
+type handler struct {
 	client  types.CoreAPI
 	blobs   map[string]cid.Cid
 	uploads map[string]int64
 }
 
 func NewHandler(client types.CoreAPI) http.Handler {
-	handler := &Handler{
+	handler := &handler{
 		client:  client,
 		blobs:   make(map[string]cid.Cid),
 		uploads: make(map[string]int64),
@@ -44,7 +44,7 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
-func (h *Handler) writeUpload(uuid string, r io.Reader) (int64, error) {
+func (h *handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 	path := filepath.Join(os.TempDir(), uuid, "blob")
 
 	blob, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
@@ -62,7 +62,7 @@ func (h *Handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 	return size, nil
 }
 
-func (h *Handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (files.File, error) {
+func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (files.File, error) {
 	if id, ok := h.blobs[digest]; ok {
 		return h.client.GetFile(ctx, id)
 	}
@@ -81,11 +81,11 @@ func (h *Handler) loadBlob(ctx context.Context, orgName, repoName, digest string
 	return file, nil
 }
 
-func (h *Handler) getVersion(w http.ResponseWriter, req *http.Request) {
+func (h *handler) getVersion(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
 
-func (h *Handler) getBlob(w http.ResponseWriter, req *http.Request) {
+func (h *handler) getBlob(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	vars := mux.Vars(req)
 
@@ -117,7 +117,7 @@ func (h *Handler) getBlob(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
+func (h *handler) postBlob(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
 	orgName := vars["org"]
@@ -138,7 +138,7 @@ func (h *Handler) postBlob(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (h *Handler) patchBlob(w http.ResponseWriter, req *http.Request) {
+func (h *handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 
 	uuid := vars["uuid"]
@@ -160,7 +160,7 @@ func (h *Handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (h *Handler) putBlob(w http.ResponseWriter, req *http.Request) {
+func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	vars := mux.Vars(req)
 
@@ -193,7 +193,7 @@ func (h *Handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusAccepted)
 }
 
-func (h *Handler) putManifest(w http.ResponseWriter, req *http.Request) {
+func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	vars := mux.Vars(req)
 

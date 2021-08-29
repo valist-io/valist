@@ -1,4 +1,4 @@
-package docker
+package git
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-func TestDockerPush(t *testing.T) {
+func TestGitPush(t *testing.T) {
 	ctx := context.Background()
 
 	tmp, err := os.MkdirTemp("", "test")
@@ -31,9 +31,9 @@ func TestDockerPush(t *testing.T) {
 
 	repoName := "sdk"
 	repoMeta := &types.RepositoryMeta{
-		Name:        "docker",
+		Name:        "sdk",
 		Description: "Valist core sdk.",
-		ProjectType: "docker",
+		ProjectType: "npm",
 		Homepage:    "https://valist.io",
 		Repository:  "https://github.com/valist-io/valist",
 	}
@@ -48,17 +48,11 @@ func TestDockerPush(t *testing.T) {
 	_, err = client.CreateRepository(ctx, orgID, repoName, repoMeta)
 	require.NoError(t, err, "Failed to create repository")
 
-	registryAddr := "valist.local:5000"
-	registryPath := "valist.local:5000/valist/docker"
+	registryAddr := "localhost:10002"
+	registryPath := "http://localhost:10002/valist/sdk"
 
-	go func() {
-		err := http.ListenAndServe(registryAddr, NewHandler(client))
-		require.NoError(t, err, "Failed to start http server")
-	}()
+	go http.ListenAndServe(registryAddr, NewHandler(client)) //nolint:errcheck
 
-	err = exec.Command("docker", "build", "--tag", registryPath, "./testdata/").Run()
-	require.NoError(t, err, "Failed to build docker image")
-
-	err = exec.Command("docker", "push", registryPath).Run()
-	require.NoError(t, err, "Failed to push docker image")
+	err = exec.Command("git", "push", registryPath).Run()
+	require.NoError(t, err, "Failed to publish npm package")
 }

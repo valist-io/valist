@@ -13,7 +13,7 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-func TestPublish(t *testing.T) {
+func TestNpmPublish(t *testing.T) {
 	ctx := context.Background()
 
 	tmp, err := os.MkdirTemp("", "test")

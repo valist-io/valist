@@ -24,12 +24,12 @@ const (
 	DefaultRegistry = "https://registry.npmjs.org"
 )
 
-type Handler struct {
+type handler struct {
 	client types.CoreAPI
 }
 
 func NewHandler(client types.CoreAPI) http.Handler {
-	handler := &Handler{client}
+	handler := &handler{client}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{org}/{repo}", handler.getPackage).Methods(http.MethodGet)
@@ -39,7 +39,7 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
-func (h *Handler) writeAttachment(ctx context.Context, pack *Package, semver string) error {
+func (h *handler) writeAttachment(ctx context.Context, pack *Package, semver string) error {
 	version, ok := pack.Versions[semver]
 	if !ok {
 		return fmt.Errorf("version not found")
@@ -72,7 +72,7 @@ func (h *Handler) writeAttachment(ctx context.Context, pack *Package, semver str
 	return nil
 }
 
-func (h *Handler) getPackage(w http.ResponseWriter, req *http.Request) {
+func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	vars := mux.Vars(req)
 
@@ -119,7 +119,7 @@ func (h *Handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	}
 }
 
-func (h *Handler) putPackage(w http.ResponseWriter, req *http.Request) {
+func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 
 	res, err := h.client.ResolvePath(ctx, req.URL.Path)
