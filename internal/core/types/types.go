@@ -102,17 +102,6 @@ type ReleaseIterator interface {
 	ForEach(context.Context, func(*Release)) error
 }
 
-type StorageAPI interface {
-	// ReadFile returns the contents of the file with the given CID.
-	ReadFile(context.Context, cid.Cid) ([]byte, error)
-	// WriteFile writes the given file contents and returns its CID.
-	WriteFile(context.Context, []byte) (cid.Cid, error)
-	// WriteFilePath writes the contents of the given file path and returns its CID.
-	WriteFilePath(context.Context, string) (cid.Cid, error)
-	// WriteDirEntries writes the given list of files into a directory and returns its CID.
-	WriteDirEntries(context.Context, string, []string) (cid.Cid, error)
-}
-
 type Organization struct {
 	ID            common.Hash
 	Threshold     *big.Int
