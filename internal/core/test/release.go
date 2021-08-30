@@ -30,10 +30,10 @@ func (s *CoreSuite) TestVoteRelease() {
 		Repository:  "https://github.com/valist-io/valist",
 	}
 
-	metaCID, err := s.client.WriteFile(ctx, []byte("hello"))
+	metaCID, err := s.client.Storage().Write(ctx, []byte("hello"))
 	s.Require().NoError(err, "Failed to add meta file")
 
-	releaseCID, err := s.client.WriteFile(ctx, []byte("world"))
+	releaseCID, err := s.client.Storage().Write(ctx, []byte("world"))
 	s.Require().NoError(err, "Failed to add release file")
 
 	release := &types.Release{

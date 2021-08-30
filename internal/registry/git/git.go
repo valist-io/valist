@@ -102,12 +102,12 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releaseCID, err := h.client.WriteFilePath(ctx, tmp)
+	releaseCID, err := h.client.Storage().WriteFile(ctx, tmp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(releaseCID.String())
+	fmt.Println(releaseCID)
 
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Content-Type", "application/x-git-receive-pack-result")

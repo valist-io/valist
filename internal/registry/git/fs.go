@@ -11,7 +11,7 @@ import (
 )
 
 var (
-	_ billy.File = (*file)(nil)
+	_ billy.File       = (*file)(nil)
 	_ billy.Filesystem = (*filesystem)(nil)
 )
 
@@ -45,7 +45,7 @@ func (f *file) Write(p []byte) (n int, err error) {
 	return 0, ErrReadOnly
 }
 
-type filesystem struct {}
+type filesystem struct{}
 
 func (fs *filesystem) Create(filename string) (billy.File, error) {
 	return nil, ErrReadOnly

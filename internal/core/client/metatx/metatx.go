@@ -7,11 +7,10 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/valist-io/gasless"
-
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/registry/internal/core/client"
 )
 
 const (
@@ -34,12 +33,12 @@ const (
 )
 
 type Transactor struct {
-	base   types.TransactorAPI
+	base   client.TransactorAPI
 	meta   gasless.Transactor
 	signer gasless.Signer
 }
 
-func NewTransactor(base types.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) types.TransactorAPI {
+func NewTransactor(base client.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) *Transactor {
 	return &Transactor{base, meta, signer}
 }
 
@@ -48,7 +47,7 @@ func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big
 	return &bind.TransactOpts{
 		From:   common.HexToAddress("0x0"),
 		NoSend: true,
-		Signer: func(address common.Address, tx *ethtypes.Transaction) (*ethtypes.Transaction, error) {
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 			if address != account.Address {
 				return nil, bind.ErrNotAuthorized
 			}

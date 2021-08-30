@@ -59,14 +59,14 @@ func (h *handler) writeAttachment(ctx context.Context, pack *Package, semver str
 		return err
 	}
 
-	tarCID, err := h.client.WriteFile(ctx, tarData.Bytes())
+	tarCID, err := h.client.Storage().Write(ctx, tarData.Bytes())
 	if err != nil {
 		return err
 	}
 
 	// TODO calculate checksum
 	version.Dist = Dist{
-		Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarCID.String()),
+		Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarCID),
 	}
 
 	return nil
@@ -95,7 +95,7 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data, err := h.client.ReadFile(ctx, res.Release.ReleaseCID)
+	data, err := h.client.Storage().ReadFile(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -155,7 +155,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	packCID, err := h.client.WriteFile(ctx, packData)
+	packCID, err := h.client.Storage().Write(ctx, packData)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return

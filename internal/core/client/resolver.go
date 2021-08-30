@@ -3,9 +3,8 @@ package client
 import (
 	"context"
 	"fmt"
+	"path"
 	"strings"
-
-	"github.com/ipfs/interface-go-ipfs-core/path"
 
 	"github.com/valist-io/registry/internal/core/types"
 )
@@ -50,11 +49,8 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 		return &res, nil
 	}
 
-	var p path.Path
-	p = path.IpfsPath(res.Release.ReleaseCID)
-	p = path.Join(p, parts[3])
-
-	res.File, err = client.ipfs.Unixfs().Get(ctx, p)
+	p := path.Join(res.Release.ReleaseCID, parts[3])
+	res.File, err = client.storage.Open(ctx, p)
 	if err != nil {
 		return nil, err
 	}
