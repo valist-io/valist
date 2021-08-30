@@ -18,7 +18,7 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/valist-io/gasless v0.0.4-0.20210826171251-b8c4191291b8
+	github.com/valist-io/gasless v0.0.4-0.20210830235049-b038646134a8
 	gopkg.in/yaml.v3 v3.0.0-20200313102051-9f266ea9e77c
 )
 
