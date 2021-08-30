@@ -7,11 +7,11 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	coreiface "github.com/ipfs/interface-go-ipfs-core"
+	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/registry/internal/storage"
 )
 
 var emptyHash = common.HexToHash("0x0")
@@ -22,9 +22,21 @@ type Close func() error
 // TransactOpts is a function that returns transaction options for an Ethereum transaction.
 type TransactOpts func(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts
 
+// TransactorAPI defines functions to abstract blockchain transactions.
+// TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
+type TransactorAPI interface {
+	CreateOrganizationTx(*bind.TransactOpts, string) (*types.Transaction, error)
+	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
+	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, string, string, string) (*types.Transaction, error)
+	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
+	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
+}
+
 // Options is used to set client options.
 type Options struct {
-	IPFS     coreiface.CoreAPI
+	Storage  storage.Storage
 	Ethereum bind.DeployBackend
 	ChainID  *big.Int
 
@@ -35,7 +47,7 @@ type Options struct {
 	Wallet  accounts.Wallet
 
 	TransactOpts TransactOpts
-	Transactor   types.TransactorAPI
+	Transactor   TransactorAPI
 
 	OnClose []Close
 }
@@ -43,7 +55,7 @@ type Options struct {
 // Client is a Valist SDK client.
 type Client struct {
 	eth     bind.DeployBackend
-	ipfs    coreiface.CoreAPI
+	storage storage.Storage
 	chainID *big.Int
 
 	valist   *valist.Valist
@@ -52,7 +64,7 @@ type Client struct {
 	wallet  accounts.Wallet
 	account accounts.Account
 
-	transactor   types.TransactorAPI
+	transactor   TransactorAPI
 	transactOpts TransactOpts
 
 	onClose []Close
@@ -65,8 +77,8 @@ func NewClient(opts *Options) (*Client, error) {
 		return nil, fmt.Errorf("ethereum client is required")
 	}
 
-	if opts.IPFS == nil {
-		return nil, fmt.Errorf("ipfs client is required")
+	if opts.Storage == nil {
+		return nil, fmt.Errorf("storage is required")
 	}
 
 	if opts.Valist == nil {
@@ -87,7 +99,7 @@ func NewClient(opts *Options) (*Client, error) {
 
 	return &Client{
 		eth:          opts.Ethereum,
-		ipfs:         opts.IPFS,
+		storage:      opts.Storage,
 		chainID:      opts.ChainID,
 		valist:       opts.Valist,
 		registry:     opts.Registry,
@@ -105,4 +117,8 @@ func (client *Client) Close() {
 	for _, close := range client.onClose {
 		close() // nolint:errcheck
 	}
+}
+
+func (client *Client) Storage() storage.Storage {
+	return client.storage
 }

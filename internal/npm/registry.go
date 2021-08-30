@@ -12,7 +12,7 @@ import (
 
 // TODO replace with config
 const (
-	DefaultGateway  = "https://ipfs.io/ipfs"
+	DefaultGateway  = "https://ipfs.io/"
 	DefaultRegistry = "https://registry.npmjs.org"
 )
 
@@ -39,7 +39,7 @@ func (r *Registry) GetScopedPackage(ctx context.Context, orgName, repoName strin
 
 	iter := r.client.ListReleases(orgID, repoName, big.NewInt(1), big.NewInt(10))
 	err0 := iter.ForEach(ctx, func(release *types.Release) {
-		data, err := r.client.ReadFile(ctx, release.MetaCID)
+		data, err := r.client.Storage().ReadFile(ctx, release.MetaCID)
 		if err != nil {
 			log.Printf("Failed to get release meta: %v\n", err)
 		}
@@ -53,7 +53,7 @@ func (r *Registry) GetScopedPackage(ctx context.Context, orgName, repoName strin
 		version.Name = fmt.Sprintf("@%s/%s", orgName, repoName)
 		version.Version = release.Tag
 		version.Dist = Dist{
-			Tarball: fmt.Sprintf("%s/%s", DefaultGateway, release.ReleaseCID.String()),
+			Tarball: fmt.Sprintf("%s/%s", DefaultGateway, release.ReleaseCID),
 		}
 
 		pack.Versions[release.Tag] = version

@@ -6,13 +6,14 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	coreeth "github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ipfs/go-ipfs/core/coreapi"
 	coremock "github.com/ipfs/go-ipfs/core/mock"
 
 	"github.com/valist-io/registry/internal/contract"
 	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/core/client/basetx"
+	"github.com/valist-io/registry/internal/storage/ipfs"
 )
 
 var chainID = big.NewInt(1337)
@@ -36,7 +37,7 @@ func NewClient(ksLocation string) (*client.Client, error) {
 		return nil, err
 	}
 
-	backend := backends.NewSimulatedBackend(coreeth.GenesisAlloc{
+	backend := backends.NewSimulatedBackend(core.GenesisAlloc{
 		account.Address: {Balance: big.NewInt(9223372036854775807)},
 	}, 8000029)
 	onClose = append(onClose, backend.Close)
@@ -69,13 +70,13 @@ func NewClient(ksLocation string) (*client.Client, error) {
 		return nil, err
 	}
 
-	ipfs, err := coreapi.NewCoreAPI(node)
+	ipfsapi, err := coreapi.NewCoreAPI(node)
 	if err != nil {
 		return nil, err
 	}
 
 	return client.NewClient(&client.Options{
-		IPFS:         ipfs,
+		Storage:      ipfs.NewStorage(ipfsapi),
 		Ethereum:     backend,
 		ChainID:      chainID,
 		Valist:       valist,

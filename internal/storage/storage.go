@@ -7,7 +7,7 @@ import (
 
 type Storage interface {
 	// Mkdir returns a new empty directory.
-	Mkdir() (Directory, error)
+	Mkdir() Directory
 	// Open opens the named file.
 	Open(context.Context, string) (fs.File, error)
 	// ReadDir returns a list of files in the given directory path.
@@ -22,7 +22,9 @@ type Storage interface {
 
 type Directory interface {
 	// Add adds the given file to the directory at the given path.
-	Add(context.Context, string, string) (string, error)
+	Add(context.Context, string, string) error
 	// Remove removes the file with the given path from the directory.
-	Remove(context.Context, string) (string, error)
+	Remove(context.Context, string) error
+	// Path returns the directory path.
+	Path() string
 }

@@ -14,10 +14,6 @@ type CoreSuite struct {
 	client types.CoreAPI
 }
 
-func NewCoreSuite(client types.CoreAPI) CoreSuite {
-	return CoreSuite{client: client}
-}
-
 func (s *CoreSuite) SetClient(client types.CoreAPI) {
 	s.client = client
 }

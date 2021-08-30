@@ -5,12 +5,10 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	cid "github.com/ipfs/go-cid"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/registry/internal/storage"
 )
 
 const (
@@ -49,25 +47,13 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
-	StorageAPI
 	Close()
-}
-
-// TransactorAPI defines functions to abstract blockchain transactions.
-// TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
-type TransactorAPI interface {
-	CreateOrganizationTx(*bind.TransactOpts, cid.Cid) (*types.Transaction, error)
-	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
-	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
-	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
+	Storage() storage.Storage
 }
 
 type OrganizationAPI interface {
 	GetOrganization(context.Context, common.Hash) (*Organization, error)
-	GetOrganizationMeta(context.Context, cid.Cid) (*OrganizationMeta, error)
+	GetOrganizationMeta(context.Context, string) (*OrganizationMeta, error)
 	CreateOrganization(context.Context, *OrganizationMeta) (*valist.ValistOrgCreated, error)
 	VoteOrganizationThreshold(context.Context, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
@@ -87,7 +73,7 @@ type ReleaseAPI interface {
 
 type RepositoryAPI interface {
 	GetRepository(context.Context, common.Hash, string) (*Repository, error)
-	GetRepositoryMeta(context.Context, cid.Cid) (*RepositoryMeta, error)
+	GetRepositoryMeta(context.Context, string) (*RepositoryMeta, error)
 	CreateRepository(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
 	SetRepositoryMeta(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistMetaUpdate, error)
 	VoteRepositoryThreshold(context.Context, common.Hash, string, *big.Int) (*valist.ValistVoteThresholdEvent, error)
@@ -106,7 +92,7 @@ type Organization struct {
 	ID            common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	MetaCID       cid.Cid
+	MetaCID       string
 }
 
 type OrganizationMeta struct {
@@ -122,8 +108,8 @@ type LinkOrgNameResult struct {
 
 type Release struct {
 	Tag        string
-	ReleaseCID cid.Cid
-	MetaCID    cid.Cid
+	ReleaseCID string
+	MetaCID    string
 	Signers    []common.Address
 }
 
@@ -131,7 +117,7 @@ type Repository struct {
 	OrgID         common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	MetaCID       cid.Cid
+	MetaCID       string
 }
 
 type RepositoryMeta struct {

@@ -8,13 +8,14 @@ import (
 	"os"
 
 	files "github.com/ipfs/go-ipfs-files"
-	ufsio "github.com/ipfs/go-unixfs/io"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/ipfs/interface-go-ipfs-core/options"
 	"github.com/ipfs/interface-go-ipfs-core/path"
+
+	"github.com/valist-io/registry/internal/storage"
 )
 
-var addopts := []options.UnixfsAddOption{
+var addopts = []options.UnixfsAddOption{
 	options.Unixfs.Pin(true),
 }
 
@@ -22,50 +23,30 @@ type Storage struct {
 	ipfs coreiface.CoreAPI
 }
 
-func NewStorage(ipfs coreiface.CoreApi) {
+func NewStorage(ipfs coreiface.CoreAPI) *Storage {
 	return &Storage{ipfs}
 }
 
-// func (s *Storage) Mkdir(ctx context.Context, entries map[string]string) (string, error) {
-// 	dir := ufsio.NewDirectory(s.ipfs.Dag())
-// 	for name, p := range entries {
-// 		node, err := s.ipfs.ResolveNode(ctx, path.NewPath(p))
-// 		if err != nil {
-// 			return "", err
-// 		}
-// 		if err := dir.AddChild(ctx, name, node); err != nil {
-// 			return "", err
-// 		}
-// 	}
-
-// 	node, err := dir.GetNode()
-// 	if err != nil {
-// 		return "", err
-// 	}
-
-// 	if err := s.ipfs.Dag().Pinning().Add(ctx, node); err != nil {
-// 		return "", err
-// 	}
-
-// 	return path.IpfsPath(node.Cid()).String(), nil
-// }
+func (s *Storage) Mkdir() storage.Directory {
+	return &dir{s.ipfs, emptyDirPath}
+}
 
 func (s *Storage) Open(ctx context.Context, p string) (fs.File, error) {
-	node, err := s.ipfs.Unixfs().Get(ctx, path.NewPath(p))
+	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
 	if err != nil {
 		return nil, err
 	}
 
-	file, ok := node.(files.File)
+	f, ok := node.(files.File)
 	if !ok {
 		return nil, fmt.Errorf("cannot open directory")
 	}
 
-	return &File{"", file}, nil
+	return &file{"", f}, nil
 }
 
 func (s *Storage) ReadDir(ctx context.Context, p string) ([]fs.FileInfo, error) {
-	node, err := s.ipfs.Unixfs().Get(ctx, path.NewPath(p))
+	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
 	if err != nil {
 		return nil, err
 	}
@@ -74,10 +55,11 @@ func (s *Storage) ReadDir(ctx context.Context, p string) ([]fs.FileInfo, error) 
 	if !ok {
 		return nil, fmt.Errorf("file is not a directory")
 	}
+	it := dir.Entries()
 
 	var entries []fs.FileInfo
-	for it := dir.Entries(); it.Next(); {
-		entries = append(entries, &FileInfo{it.Name(), it.Node()})
+	for it.Next() {
+		entries = append(entries, &fileInfo{it.Name(), it.Node()})
 	}
 
 	if err := it.Err(); err != nil {
@@ -97,7 +79,7 @@ func (s *Storage) ReadFile(ctx context.Context, p string) ([]byte, error) {
 }
 
 func (s *Storage) Write(ctx context.Context, b []byte) (string, error) {
-	p, err := client.ipfs.Unixfs().Add(ctx, files.NewBytesFile(b), addopts...)
+	p, err := s.ipfs.Unixfs().Add(ctx, files.NewBytesFile(b), addopts...)
 	if err != nil {
 		return "", err
 	}
@@ -116,7 +98,7 @@ func (s *Storage) WriteFile(ctx context.Context, f string) (string, error) {
 		return "", err
 	}
 
-	p, err := client.ipfs.Unixfs().Add(ctx, node, addopts...)
+	p, err := s.ipfs.Unixfs().Add(ctx, node, addopts...)
 	if err != nil {
 		return "", err
 	}
