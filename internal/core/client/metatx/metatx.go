@@ -48,7 +48,7 @@ func NewTransactor(base types.TransactorAPI, meta gasless.Transactor, eth *ethcl
 // TransactOpts returns transaction options for a meta transcation.
 func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts {
 	return &bind.TransactOpts{
-		// From:   common.HexToAddress("0x0"),
+		From:   account.Address,
 		NoSend: true,
 		Signer: func(address common.Address, tx *ethtypes.Transaction) (*ethtypes.Transaction, error) {
 			// if address != account.Address {

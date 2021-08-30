@@ -1442,8 +1442,6 @@ github.com/urfave/cli v1.22.1/go.mod h1:Gos4lmkARVdJ6EkW0WaNv/tZAAMe9V7XWyB60NtX
 github.com/urfave/cli/v2 v2.0.0/go.mod h1:SE9GqnLQmjVa0iPEY0f1w3ygNIYcIJ0OKPMoW2caLfQ=
 github.com/urfave/cli/v2 v2.3.0 h1:qph92Y649prgesehzOrQjdWyxFOp/QVM+6imKHad91M=
 github.com/urfave/cli/v2 v2.3.0/go.mod h1:LJmUH05zAU44vOAcrfzZQKsZbVcdbOG8rtL3/XcUArI=
-github.com/valist-io/gasless v0.0.3 h1:QkiWB2YLWONonaw7+964TAEzYLDVaLG6yf+WV5tOiFo=
-github.com/valist-io/gasless v0.0.3/go.mod h1:SEaf9Y+e0tekBy1uzx8Y3f43zvtloYd6whB1rD9oUJA=
 github.com/valist-io/gasless v0.0.4-0.20210826171251-b8c4191291b8 h1:tXmZBIX6zB9uUh9RWKlcuoujJ9DYpufdyh1tYnEBtLU=
 github.com/valist-io/gasless v0.0.4-0.20210826171251-b8c4191291b8/go.mod h1:SEaf9Y+e0tekBy1uzx8Y3f43zvtloYd6whB1rD9oUJA=
 github.com/viant/assertly v0.4.8/go.mod h1:aGifi++jvCrUaklKEKT0BU95igDNaqkvz+49uaYMPRU=

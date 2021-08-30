@@ -87,6 +87,8 @@ func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Ha
 	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
 	txopts.Context = ctx
 
+	fmt.Println(txopts)
+
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, "", operation, address)
 	if err != nil {
 		return nil, err

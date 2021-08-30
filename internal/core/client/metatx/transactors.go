@@ -2,6 +2,7 @@ package metatx
 
 import (
 	"math/big"
+	"os"
 	"strings"
 
 	"github.com/ethereum/go-ethereum/accounts/abi"
@@ -11,9 +12,9 @@ import (
 	"github.com/ipfs/go-cid"
 
 	"github.com/valist-io/gasless"
-	"github.com/valist-io/gasless/test"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/registry/internal/core/config"
 	"github.com/valist-io/registry/internal/core/types"
 )
 
@@ -22,8 +23,14 @@ func (t *Transactor) CreateOrganizationTx(txopts *bind.TransactOpts, metaCID cid
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
-	msg, err := builder.Message(txopts.Context, "createOrganization", metaCID)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
+	msg, err := builder.Message(txopts.Context, "createOrganization", metaCID.String())
 	if err != nil {
 		return nil, err
 	}
@@ -36,7 +43,13 @@ func (t *Transactor) LinkOrganizationNameTx(txopts *bind.TransactOpts, orgID com
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.RegistryAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["registry"], t.eth)
 	msg, err := builder.Message(txopts.Context, "linkNameToID", orgID, name)
 	if err != nil {
 		return nil, err
@@ -50,7 +63,13 @@ func (t *Transactor) CreateRepositoryTx(txopts *bind.TransactOpts, orgID common.
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "createRepository", orgID, repoName, repoMeta)
 	if err != nil {
 		return nil, err
@@ -64,7 +83,13 @@ func (t *Transactor) VoteReleaseTx(txopts *bind.TransactOpts, orgID common.Hash,
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "voteRelease", orgID, repoName, release.ReleaseCID, release.MetaCID)
 	if err != nil {
 		return nil, err
@@ -78,7 +103,13 @@ func (t *Transactor) VoteKeyTx(txopts *bind.TransactOpts, orgID common.Hash, rep
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "voteKey", orgID, repoName, operation, address)
 	if err != nil {
 		return nil, err
@@ -92,7 +123,13 @@ func (t *Transactor) SetRepositoryMetaTx(txopts *bind.TransactOpts, orgID common
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "setRepoMeta", orgID, repoName, repoMeta)
 	if err != nil {
 		return nil, err
@@ -105,7 +142,13 @@ func (t *Transactor) VoteRepositoryThresholdTx(txopts *bind.TransactOpts, orgID 
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "voteThreshold", orgID, repoName, threshold)
 	if err != nil {
 		return nil, err
@@ -119,7 +162,13 @@ func (t *Transactor) VoteOrganizationThresholdTx(txopts *bind.TransactOpts, orgI
 	if err != nil {
 		return nil, err
 	}
-	builder := gasless.NewMessageBuilder(parsedABI, test.ValistAddress, t.eth)
+
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return nil, err
+	}
+
+	builder := gasless.NewMessageBuilder(parsedABI, config.Default(home).Ethereum.Contracts["valist"], t.eth)
 	msg, err := builder.Message(txopts.Context, "voteThreshold", orgID, "", threshold)
 	if err != nil {
 		return nil, err
