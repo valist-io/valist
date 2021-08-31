@@ -24,9 +24,10 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	handler := &handler{client}
 
 	router := mux.NewRouter()
+	router.HandleFunc("/{org}/{repo}/{tag}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
-	router.HandleFunc("/{org}/{repo}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
+	router.HandleFunc("/{org}/{repo}/{tag}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
 
 	return handlers.LoggingHandler(os.Stdout, router)
 }
@@ -150,7 +151,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 	}
 
 	release := &types.Release{
-		Tag:        "v0.0.1",
+		Tag:        vars["tag"],
 		ReleaseCID: releaseCID,
 		MetaCID:    releaseCID,
 	}
