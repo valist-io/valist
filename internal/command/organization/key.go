@@ -9,24 +9,25 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/core/config"
 )
 
-func voteOrganizationAdmin(c *cli.Context, operation common.Hash) error {
+func voteOrganizationAdmin(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEvent, error) {
 	if c.NArg() != 2 {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
 
 	home, err := os.UserHomeDir()
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	cfg, err := config.Load(home)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	var account accounts.Account
@@ -38,7 +39,7 @@ func voteOrganizationAdmin(c *cli.Context, operation common.Hash) error {
 
 	valist, err := core.NewClient(c.Context, cfg, account)
 	if err != nil {
-		return err
+		return nil, err
 	}
 	defer valist.Close()
 
@@ -47,27 +48,16 @@ func voteOrganizationAdmin(c *cli.Context, operation common.Hash) error {
 
 	orgID, err := valist.GetOrganizationID(c.Context, orgName)
 	if err != nil {
-		return err
+		return nil, err
 	}
 
 	if !common.IsHexAddress(c.Args().Get(1)) {
-		return fmt.Errorf("Invalid address: %s", c.Args().Get(1))
+		return nil, fmt.Errorf("Invalid address: %s", c.Args().Get(1))
 	}
 
 	address := common.HexToAddress(c.Args().Get(1))
 
-	vote, err := valist.VoteOrganizationAdmin(c.Context, orgID, operation, address)
-	if err != nil {
-		return err
-	}
-
-	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
-		fmt.Printf("Voted to add key, %d/%d\n votes", vote.SigCount, vote.Threshold)
-	} else {
-		fmt.Printf("Approved adding key!")
-	}
-
-	return nil
+	return valist.VoteOrganizationAdmin(c.Context, orgID, operation, address)
 }
 
 func NewKeyCommand() *cli.Command {
@@ -80,7 +70,17 @@ func NewKeyCommand() *cli.Command {
 				Usage: "Add a new key to an organization",
 				Action: func(c *cli.Context) error {
 					fmt.Println("Adding key to organization...")
-					return voteOrganizationAdmin(c, client.ADD_KEY)
+					vote, err := voteOrganizationAdmin(c, client.ADD_KEY)
+					if err != nil {
+						return err
+					}
+
+					if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+						fmt.Printf("Voted to add key, %d/%d\n votes", vote.SigCount, vote.Threshold)
+					} else {
+						fmt.Printf("Key successfully approved!")
+					}
+					return nil
 				},
 			},
 			{
@@ -88,7 +88,17 @@ func NewKeyCommand() *cli.Command {
 				Usage: "Remove a key from an organization",
 				Action: func(c *cli.Context) error {
 					fmt.Println("Removing key to organization...")
-					return voteOrganizationAdmin(c, client.REVOKE_KEY)
+					vote, err := voteOrganizationAdmin(c, client.REVOKE_KEY)
+					if err != nil {
+						return err
+					}
+
+					if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+						fmt.Printf("Voted to remove key, %d/%d\n votes", vote.SigCount, vote.Threshold)
+					} else {
+						fmt.Printf("Key successfully revoked!")
+					}
+					return nil
 				},
 			},
 			{
@@ -96,7 +106,12 @@ func NewKeyCommand() *cli.Command {
 				Usage: "Replace a key on an organization",
 				Action: func(c *cli.Context) error {
 					fmt.Println("Rotating key on organization...")
-					return voteOrganizationAdmin(c, client.ROTATE_KEY)
+					_, err := voteOrganizationAdmin(c, client.ROTATE_KEY)
+					if err != nil {
+						return err
+					}
+					fmt.Printf("Key successfully rotated!")
+					return nil
 				},
 			},
 		},
