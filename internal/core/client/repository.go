@@ -88,6 +88,23 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 	return client.valist.ParseRepoCreated(*logs[0])
 }
 
+func (client *Client) VoteRepoDev(ctx context.Context, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.VoteKeyTx(txopts, orgID, repoName, operation, address)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseVoteKeyEvent(*logs[0])
+}
+
 func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, name string, meta *types.RepositoryMeta) (*valist.ValistMetaUpdate, error) {
 	data, err := json.Marshal(meta)
 	if err != nil {
