@@ -15,6 +15,10 @@ import (
 	"github.com/valist-io/registry/internal/core/config"
 )
 
+func voteInProgress(vote *valist.ValistVoteKeyEvent) bool {
+	return big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1
+}
+
 func voteOrganizationAdmin(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEvent, error) {
 	if c.NArg() != 2 {
 		cli.ShowSubcommandHelpAndExit(c, 1)
@@ -75,7 +79,7 @@ func NewKeyCommand() *cli.Command {
 						return err
 					}
 
-					if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+					if voteInProgress(vote) {
 						fmt.Printf("Voted to add key, %d/%d\n votes", vote.SigCount, vote.Threshold)
 					} else {
 						fmt.Printf("Key successfully approved!")
@@ -93,7 +97,7 @@ func NewKeyCommand() *cli.Command {
 						return err
 					}
 
-					if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+					if voteInProgress(vote) {
 						fmt.Printf("Voted to remove key, %d/%d\n votes", vote.SigCount, vote.Threshold)
 					} else {
 						fmt.Printf("Key successfully revoked!")
