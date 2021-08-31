@@ -59,6 +59,7 @@ type CoreAPI interface {
 // TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
 type TransactorAPI interface {
 	CreateOrganizationTx(*bind.TransactOpts, cid.Cid) (*types.Transaction, error)
+	SetOrganizationMetaTx(*bind.TransactOpts, common.Hash, cid.Cid) (*types.Transaction, error)
 	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
@@ -127,6 +128,7 @@ type Organization struct {
 type OrganizationMeta struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Homepage    string `json:"homepage"`
 }
 
 type LinkOrgNameResult struct {
