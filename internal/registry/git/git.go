@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"math/big"
 	"net/http"
 	"os"
 
@@ -23,6 +24,7 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	handler := &handler{client}
 
 	router := mux.NewRouter()
+	router.HandleFunc("/{org}/{repo}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
 
@@ -30,17 +32,18 @@ func NewHandler(client types.CoreAPI) http.Handler {
 }
 
 func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
+	vars := mux.Vars(req)
 	service := req.URL.Query().Get("service")
-	server := server.NewServer(&memLoader{})
 
 	var sess transport.Session
 	var err error
 
 	switch service {
 	case transport.UploadPackServiceName:
-		// TODO load packed-refs into memory storage
+		server := server.NewServer(&storageLoader{h.client, vars["org"], vars["repo"]})
 		sess, err = server.NewUploadPackSession(nil, nil)
 	case transport.ReceivePackServiceName:
+		server := server.NewServer(&memLoader{})
 		sess, err = server.NewReceivePackSession(nil, nil)
 	default:
 		http.NotFound(w, req)
@@ -69,26 +72,59 @@ func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
 	refs.Encode(w) //nolint:errcheck
 }
 
+func (h *handler) uploadPack(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	vars := mux.Vars(req)
+
+	sessreq := packp.NewUploadPackRequest()
+	if err := sessreq.Decode(req.Body); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	server := server.NewServer(&storageLoader{h.client, vars["org"], vars["repo"]})
+	sess, err := server.NewUploadPackSession(nil, nil)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	sessres, err := sess.UploadPack(ctx, sessreq)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Add("Cache-Control", "no-cache")
+	w.Header().Add("Content-Type", "application/x-git-upload-pack-result")
+	w.WriteHeader(http.StatusOK)
+
+	sessres.Encode(w) //nolint:errcheck
+}
+
 func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
+	vars := mux.Vars(req)
 
 	if req.ContentLength == 4 {
 		return // figure out why initial 0000 body is sent
 	}
 
-	tmp, err := os.MkdirTemp("", "")
+	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s", vars["org"], vars["repo"]))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	defer os.RemoveAll(tmp)
 
-	server := server.NewServer(&tmpLoader{tmp})
+	loader := &tmpLoader{}
+	server := server.NewServer(loader)
+
 	sess, err := server.NewReceivePackSession(nil, nil)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
+	defer os.RemoveAll(loader.tmp)
 
 	sessreq := packp.NewReferenceUpdateRequest()
 	if err := sessreq.Decode(req.Body); err != nil {
@@ -102,12 +138,34 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releaseCID, err := h.client.Storage().WriteFile(ctx, tmp)
+	if err := loader.repo.Storer.PackRefs(); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	releaseCID, err := h.client.Storage().WriteFile(ctx, loader.tmp)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	fmt.Println(releaseCID)
+
+	release := &types.Release{
+		Tag:        "v0.0.1",
+		ReleaseCID: releaseCID,
+		MetaCID:    releaseCID,
+	}
+
+	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+		fmt.Printf("Voted to publish release %s %d/%d\n", release.Tag, vote.SigCount, vote.Threshold)
+	} else {
+		fmt.Printf("Approved release %s\n", release.Tag)
+	}
 
 	w.Header().Add("Cache-Control", "no-cache")
 	w.Header().Add("Content-Type", "application/x-git-receive-pack-result")

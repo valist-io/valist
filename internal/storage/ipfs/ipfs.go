@@ -6,6 +6,7 @@ import (
 	"io"
 	"io/fs"
 	"os"
+	"strings"
 
 	files "github.com/ipfs/go-ipfs-files"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
@@ -31,15 +32,19 @@ func (s *Storage) Mkdir() storage.Directory {
 	return &dir{s.ipfs, emptyDirPath}
 }
 
-func (s *Storage) Open(ctx context.Context, p string) (fs.File, error) {
+func (s *Storage) Open(ctx context.Context, p string) (storage.File, error) {
 	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
+	if IsNotExist(err) {
+		return nil, os.ErrNotExist
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
 	f, ok := node.(files.File)
 	if !ok {
-		return nil, fmt.Errorf("cannot open directory")
+		return nil, fmt.Errorf("cannot open directory: %s", p)
 	}
 
 	return &file{"", f}, nil
@@ -47,6 +52,10 @@ func (s *Storage) Open(ctx context.Context, p string) (fs.File, error) {
 
 func (s *Storage) ReadDir(ctx context.Context, p string) ([]fs.FileInfo, error) {
 	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
+	if IsNotExist(err) {
+		return nil, os.ErrNotExist
+	}
+
 	if err != nil {
 		return nil, err
 	}
@@ -104,4 +113,13 @@ func (s *Storage) WriteFile(ctx context.Context, f string) (string, error) {
 	}
 
 	return p.String(), nil
+}
+
+// IsNotExist returns true if the error is not exists.
+func IsNotExist(err error) bool {
+	if err == nil {
+		return false
+	}
+
+	return strings.HasPrefix(err.Error(), "no link named")
 }

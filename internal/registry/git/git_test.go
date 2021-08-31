@@ -13,7 +13,7 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-func TestGitPush(t *testing.T) {
+func TestGitPushClone(t *testing.T) {
 	ctx := context.Background()
 
 	tmp, err := os.MkdirTemp("", "test")
@@ -56,6 +56,13 @@ func TestGitPush(t *testing.T) {
 		require.NoError(t, err, "Failed to start http server")
 	}()
 
+	clone, err := os.MkdirTemp("", "")
+	require.NoError(t, err, "Failed to create clone dir")
+	defer os.RemoveAll(tmp)
+
 	err = exec.Command("git", "push", "--all", registryPath).Run()
 	require.NoError(t, err, "Failed to push git repo")
+
+	err = exec.Command("git", "clone", registryPath, clone).Run()
+	require.NoError(t, err, "Failed to clone git repo")
 }

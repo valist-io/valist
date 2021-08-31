@@ -2,6 +2,7 @@ package docker
 
 import (
 	"context"
+	"fmt"
 	"net/http"
 	"os"
 	"os/exec"
@@ -29,7 +30,7 @@ func TestDockerPush(t *testing.T) {
 		Description: "Accelerating the transition to web3.",
 	}
 
-	repoName := "sdk"
+	repoName := "docker"
 	repoMeta := &types.RepositoryMeta{
 		Name:        "docker",
 		Description: "Valist core sdk.",
@@ -61,4 +62,7 @@ func TestDockerPush(t *testing.T) {
 
 	err = exec.Command("docker", "push", registryPath).Run()
 	require.NoError(t, err, "Failed to push docker image")
+
+	err = exec.Command("docker", "pull", registryPath).Run()
+	require.NoError(t, err, "Failed to pull docker image")
 }

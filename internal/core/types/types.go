@@ -3,7 +3,6 @@ package types
 import (
 	"context"
 	"errors"
-	"io/fs"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/common"
@@ -138,5 +137,5 @@ type ResolvedPath struct {
 	Organization *Organization
 	Repository   *Repository
 	Release      *Release
-	File         fs.File
+	File         storage.File
 }

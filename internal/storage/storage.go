@@ -2,6 +2,7 @@ package storage
 
 import (
 	"context"
+	"io"
 	"io/fs"
 )
 
@@ -9,7 +10,7 @@ type Storage interface {
 	// Mkdir returns a new empty directory.
 	Mkdir() Directory
 	// Open opens the named file.
-	Open(context.Context, string) (fs.File, error)
+	Open(context.Context, string) (File, error)
 	// ReadDir returns a list of files in the given directory path.
 	ReadDir(context.Context, string) ([]fs.FileInfo, error)
 	// ReadFile reads the file with the given path.
@@ -18,6 +19,14 @@ type Storage interface {
 	Write(context.Context, []byte) (string, error)
 	// WriteFile writes the contents of the given file path.
 	WriteFile(context.Context, string) (string, error)
+}
+
+type File interface {
+	io.Reader
+	io.Closer
+	io.Seeker
+
+	Stat() (fs.FileInfo, error)
 }
 
 type Directory interface {

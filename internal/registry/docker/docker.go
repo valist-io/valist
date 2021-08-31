@@ -3,9 +3,10 @@ package docker
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"io"
-	"io/fs"
+	"math/big"
 	"net/http"
 	"os"
 	"path/filepath"
@@ -14,6 +15,7 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/registry/internal/storage"
 )
 
 type handler struct {
@@ -36,6 +38,7 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/{uuid}", handler.patchBlob).Methods(http.MethodPatch)
 	router.HandleFunc("/v2/{org}/{repo}/blobs/uploads/{uuid}", handler.putBlob).Methods(http.MethodPut)
 	router.HandleFunc("/v2/{org}/{repo}/manifests/{reference}", handler.putManifest).Methods(http.MethodPut)
+	router.HandleFunc("/v2/{org}/{repo}/manifests/{reference}", handler.getManifest).Methods(http.MethodGet, http.MethodHead)
 
 	// DELETE /v2/<name>/blobs/uploads/<uuid>
 	// POST /v2/<name>/blobs/uploads/?mount=<digest>&from=<repository name>
@@ -61,18 +64,47 @@ func (h *handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 	return size, nil
 }
 
-func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (fs.File, error) {
+func (h *handler) moveBlob(ctx context.Context, dir storage.Directory, digest string) error {
+	p, ok := h.blobs[digest]
+	if !ok {
+		return fmt.Errorf("blob not found")
+	}
+
+	if err := dir.Add(ctx, digest, p); err != nil {
+		return err
+	}
+
+	delete(h.blobs, digest)
+	return nil
+}
+
+func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
 	if p, ok := h.blobs[digest]; ok {
 		return h.client.Storage().Open(ctx, p)
 	}
 
-	raw := fmt.Sprintf("%s/%s/latest/blobs/%s", orgName, repoName, digest)
+	raw := fmt.Sprintf("%s/%s/latest/%s", orgName, repoName, digest)
 	res, err := h.client.ResolvePath(ctx, raw)
 	if err != nil {
 		return nil, err
 	}
 
 	return res.File, nil
+}
+
+func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
+	raw := fmt.Sprintf("%s/%s/latest", orgName, repoName)
+	res, err := h.client.ResolvePath(ctx, raw)
+	if err != nil {
+		return nil, err
+	}
+
+	release, err := h.client.GetRelease(ctx, res.Organization.ID, res.Repository.Name, ref)
+	if err == nil {
+		return h.client.Storage().Open(ctx, release.MetaCID)
+	}
+
+	return h.client.Storage().Open(ctx, fmt.Sprintf("%s/%s", res.Release.ReleaseCID, ref))
 }
 
 func (h *handler) getVersion(w http.ResponseWriter, req *http.Request) {
@@ -195,8 +227,23 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
+	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s", orgName, repoName))
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	data, err := io.ReadAll(req.Body)
 	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// TODO use tee reader
+	digest := fmt.Sprintf("sha256:%x", sha256.Sum256(data))
+
+	var manifest Manifest
+	if err := json.Unmarshal(data, &manifest); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
@@ -206,9 +253,84 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-	fmt.Println(manifestCID)
+
+	blobs := h.client.Storage().Mkdir()
+	if err := h.moveBlob(ctx, blobs, manifest.Config.Digest); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := blobs.Add(ctx, digest, manifestCID); err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	for _, layer := range manifest.Layers {
+		if err := h.moveBlob(ctx, blobs, layer.Digest); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+	}
+
+	release := &types.Release{
+		Tag:        ref,
+		ReleaseCID: blobs.Path(),
+		MetaCID:    manifestCID,
+	}
+
+	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
+		fmt.Printf("Voted to publish release %s %d/%d\n", release.Tag, vote.SigCount, vote.Threshold)
+	} else {
+		fmt.Printf("Approved release %s\n", release.Tag)
+	}
 
 	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/manifests/%s", orgName, repoName, ref))
-	w.Header().Set("Docker-Content-Digest", fmt.Sprintf("sha256:%x", sha256.Sum256(data)))
+	w.Header().Set("Docker-Content-Digest", digest)
 	w.WriteHeader(http.StatusAccepted)
+}
+
+func (h *handler) getManifest(w http.ResponseWriter, req *http.Request) {
+	ctx := req.Context()
+	vars := mux.Vars(req)
+
+	ref := vars["reference"]
+	orgName := vars["org"]
+	repoName := vars["repo"]
+
+	file, err := h.loadManifest(ctx, orgName, repoName, ref)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	info, err := file.Stat()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	// TODO write to hash instead of reading
+	data, err := io.ReadAll(file)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	w.Header().Set("Content-Length", fmt.Sprintf("%d", info.Size()))
+	w.Header().Set("Content-Type", "application/vnd.docker.distribution.manifest.v2+json")
+	w.Header().Set("Docker-Content-Digest", fmt.Sprintf("sha256:%x", sha256.Sum256(data)))
+
+	if req.Method == http.MethodHead {
+		return
+	}
+
+	if _, err := w.Write(data); err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+	}
 }
