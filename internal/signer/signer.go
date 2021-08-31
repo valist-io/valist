@@ -27,7 +27,7 @@ func NewSigner(cfg *config.Config) (*core.SignerAPI, *accounts.Manager, error) {
 			return nil, nil, err
 		}
 
-		validator.AddSelector(signature, bytes)
+		err = validator.AddSelector(signature, bytes)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -39,7 +39,7 @@ func NewSigner(cfg *config.Config) (*core.SignerAPI, *accounts.Manager, error) {
 			return nil, nil, err
 		}
 
-		validator.AddSelector(signature, bytes)
+		err = validator.AddSelector(signature, bytes)
 		if err != nil {
 			return nil, nil, err
 		}
