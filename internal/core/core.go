@@ -94,8 +94,13 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	}
 
 	signer := gasless.NewWalletSigner(opts.Account, opts.Wallet)
+	transactor, err := metatx.NewTransactor(meta, signer, eth, cfg)
+	if err != nil {
+		return nil, err
+	}
+
 	opts.TransactOpts = metatx.TransactOpts
-	opts.Transactor = metatx.NewTransactor(opts.Transactor, meta, signer)
+	opts.Transactor = transactor
 
 	return client.NewClient(opts)
 }

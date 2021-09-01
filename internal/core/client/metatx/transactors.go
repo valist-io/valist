@@ -12,65 +12,73 @@ import (
 )
 
 func (t *Transactor) CreateOrganizationTx(txopts *bind.TransactOpts, metaCID cid.Cid) (*ethtypes.Transaction, error) {
-	tx, err := t.base.CreateOrganizationTx(txopts, metaCID)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "createOrganization", metaCID.String())
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, createOrganizationBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, createOrganizationBFID)
 }
 
 func (t *Transactor) LinkOrganizationNameTx(txopts *bind.TransactOpts, orgID common.Hash, name string) (*ethtypes.Transaction, error) {
-	tx, err := t.base.LinkOrganizationNameTx(txopts, orgID, name)
+	msg, err := t.registryBuilder.Message(txopts.Context, txopts.From, "linkNameToID", orgID, name)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, linkNameToIDBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, linkNameToIDBFID)
 }
 
 func (t *Transactor) CreateRepositoryTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*ethtypes.Transaction, error) {
-	tx, err := t.base.CreateRepositoryTx(txopts, orgID, repoName, repoMeta)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "createRepository", orgID, repoName, repoMeta)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, createRepositoryBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, createRepositoryBFID)
 }
 
 func (t *Transactor) VoteReleaseTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, release *types.Release) (*ethtypes.Transaction, error) {
-	tx, err := t.base.VoteReleaseTx(txopts, orgID, repoName, release)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "voteRelease", orgID, repoName, release.ReleaseCID, release.MetaCID)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, voteReleaseBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, voteReleaseBFID)
+}
+
+func (t *Transactor) VoteKeyTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*ethtypes.Transaction, error) {
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "voteKey", orgID, repoName, operation, address)
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(txopts.Context, msg, t.signer, voteKeyBFID)
 }
 
 func (t *Transactor) SetRepositoryMetaTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*ethtypes.Transaction, error) {
-	tx, err := t.base.SetRepositoryMetaTx(txopts, orgID, repoName, repoMeta)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "setRepoMeta", orgID, repoName, repoMeta)
 	if err != nil {
 		return nil, err
 	}
-
-	return t.meta.Transact(txopts.Context, tx, t.signer, setRepoMetaBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, setRepoMetaBFID)
 }
 
 func (t *Transactor) VoteRepositoryThresholdTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, threshold *big.Int) (*ethtypes.Transaction, error) {
-	tx, err := t.base.VoteRepositoryThresholdTx(txopts, orgID, repoName, threshold)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "voteThreshold", orgID, repoName, threshold)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, voteThresholdBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, voteThresholdBFID)
 }
 
 func (t *Transactor) VoteOrganizationThresholdTx(txopts *bind.TransactOpts, orgID common.Hash, threshold *big.Int) (*ethtypes.Transaction, error) {
-	tx, err := t.base.VoteOrganizationThresholdTx(txopts, orgID, threshold)
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "voteThreshold", orgID, "", threshold)
 	if err != nil {
 		return nil, err
 	}
 
-	return t.meta.Transact(txopts.Context, tx, t.signer, voteThresholdBFID)
+	return t.meta.Transact(txopts.Context, msg, t.signer, voteThresholdBFID)
 
 }

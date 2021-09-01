@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -50,6 +51,7 @@ type CoreAPI interface {
 	ReleaseAPI
 	RepositoryAPI
 	StorageAPI
+	SwitchAccount(accounts.Account, accounts.Wallet)
 	Close()
 }
 
@@ -60,6 +62,7 @@ type TransactorAPI interface {
 	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
+	VoteKeyTx(*bind.TransactOpts, common.Hash, string, common.Hash, common.Address) (*types.Transaction, error)
 	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
 	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
@@ -69,6 +72,7 @@ type OrganizationAPI interface {
 	GetOrganization(context.Context, common.Hash) (*Organization, error)
 	GetOrganizationMeta(context.Context, cid.Cid) (*OrganizationMeta, error)
 	CreateOrganization(context.Context, *OrganizationMeta) (*valist.ValistOrgCreated, error)
+	VoteOrganizationAdmin(context.Context, common.Hash, common.Hash, common.Address) (*valist.ValistVoteKeyEvent, error)
 	VoteOrganizationThreshold(context.Context, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
 
