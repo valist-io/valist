@@ -24,6 +24,13 @@ func OrganizationDescription(value string) *promptui.Prompt {
 	}
 }
 
+func OrganizationHomepage(value string) *promptui.Prompt {
+	return &promptui.Prompt{
+		Label:   "Organization homepage",
+		Default: value,
+	}
+}
+
 func RepositoryName(value string) *promptui.Prompt {
 	return &promptui.Prompt{
 		Label:    "Repository name",

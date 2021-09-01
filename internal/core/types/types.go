@@ -5,6 +5,7 @@ import (
 	"errors"
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
@@ -47,6 +48,8 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
+	// SwitchAccount changes the current account and wallet.
+	SwitchAccount(accounts.Account, accounts.Wallet)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(context.Context, string) (*ResolvedPath, error)
 	// Storage returns the underlying storage implementation.
@@ -59,6 +62,7 @@ type OrganizationAPI interface {
 	GetOrganization(context.Context, common.Hash) (*Organization, error)
 	GetOrganizationMeta(context.Context, string) (*OrganizationMeta, error)
 	CreateOrganization(context.Context, *OrganizationMeta) (*valist.ValistOrgCreated, error)
+	VoteOrganizationAdmin(context.Context, common.Hash, common.Hash, common.Address) (*valist.ValistVoteKeyEvent, error)
 	VoteOrganizationThreshold(context.Context, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
 
@@ -80,6 +84,7 @@ type RepositoryAPI interface {
 	GetRepositoryMeta(context.Context, string) (*RepositoryMeta, error)
 	CreateRepository(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
 	SetRepositoryMeta(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistMetaUpdate, error)
+	VoteRepoDev(context.Context, common.Hash, string, common.Hash, common.Address) (*valist.ValistVoteKeyEvent, error)
 	VoteRepositoryThreshold(context.Context, common.Hash, string, *big.Int) (*valist.ValistVoteThresholdEvent, error)
 }
 
@@ -102,6 +107,7 @@ type Organization struct {
 type OrganizationMeta struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
+	Homepage    string `json:"homepage"`
 }
 
 type LinkOrgNameResult struct {

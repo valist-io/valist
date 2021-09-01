@@ -8,9 +8,13 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-
+	"github.com/ethereum/go-ethereum/ethclient"
 	"github.com/valist-io/gasless"
+
+	"github.com/valist-io/registry/internal/contract/registry"
+	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core/client"
+	"github.com/valist-io/registry/internal/core/config"
 )
 
 const (
@@ -33,19 +37,32 @@ const (
 )
 
 type Transactor struct {
-	base   client.TransactorAPI
+	eth    *ethclient.Client
 	meta   gasless.Transactor
 	signer gasless.Signer
+
+	valistBuilder   *gasless.MessageBuilder
+	registryBuilder *gasless.MessageBuilder
 }
 
-func NewTransactor(base client.TransactorAPI, meta gasless.Transactor, signer gasless.Signer) *Transactor {
-	return &Transactor{base, meta, signer}
+func NewTransactor(meta gasless.Transactor, signer gasless.Signer, eth *ethclient.Client, cfg *config.Config) (client.TransactorAPI, error) {
+	valistBuilder, err := gasless.NewMessageBuilder(valist.ValistABI, cfg.Ethereum.Contracts["valist"], eth)
+	if err != nil {
+		return nil, err
+	}
+
+	registryBuilder, err := gasless.NewMessageBuilder(registry.ValistRegistryABI, cfg.Ethereum.Contracts["registry"], eth)
+	if err != nil {
+		return nil, err
+	}
+
+	return &Transactor{eth, meta, signer, valistBuilder, registryBuilder}, nil
 }
 
 // TransactOpts returns transaction options for a meta transcation.
 func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts {
 	return &bind.TransactOpts{
-		From:   common.HexToAddress("0x0"),
+		From:   account.Address,
 		NoSend: true,
 		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 			if address != account.Address {

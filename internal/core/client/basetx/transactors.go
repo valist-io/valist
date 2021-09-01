@@ -12,12 +12,20 @@ func (t *Transactor) CreateOrganizationTx(txopts *bind.TransactOpts, metaCID str
 	return t.valist.CreateOrganization(txopts, metaCID)
 }
 
+func (t *Transactor) SetOrganizationMetaTx(txopts *bind.TransactOpts, orgID common.Hash, metaCID string) (*types.Transaction, error) {
+	return t.valist.SetOrgMeta(txopts, orgID, metaCID)
+}
+
 func (t *Transactor) LinkOrganizationNameTx(txopts *bind.TransactOpts, orgID common.Hash, name string) (*types.Transaction, error) {
 	return t.registry.LinkNameToID(txopts, orgID, name)
 }
 
 func (t *Transactor) CreateRepositoryTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, repoMeta string) (*types.Transaction, error) {
 	return t.valist.CreateRepository(txopts, orgID, repoName, repoMeta)
+}
+
+func (t *Transactor) VoteKeyTx(txopts *bind.TransactOpts, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*types.Transaction, error) {
+	return t.valist.VoteKey(txopts, orgID, repoName, operation, address)
 }
 
 func (t *Transactor) VoteReleaseTx(txopts *bind.TransactOpts, orgID common.Hash, repoName, tag, releaseCID, metaCID string) (*types.Transaction, error) {

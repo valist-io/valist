@@ -10,7 +10,10 @@ func NewCommand() *cli.Command {
 		Aliases: []string{"org"},
 		Usage:   "Create, update, or fetch organizations",
 		Subcommands: []*cli.Command{
+			NewFetchCommand(),
 			NewCreateCommand(),
+			NewUpdateCommand(),
+			NewKeyCommand(),
 			NewThresholdCommand(),
 		},
 	}

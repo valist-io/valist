@@ -8,13 +8,21 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/storage"
 )
 
-var emptyHash = common.HexToHash("0x0")
+var (
+	emptyHash  = common.HexToHash("0x0")
+	ORG_ADMIN  = crypto.Keccak256Hash([]byte("ORG_ADMIN_ROLE"))
+	REPO_DEV   = crypto.Keccak256Hash([]byte("REPO_DEV_ROLE"))
+	ADD_KEY    = crypto.Keccak256Hash([]byte("ADD_KEY_OPERATION"))
+	REVOKE_KEY = crypto.Keccak256Hash([]byte("REVOKE_KEY_OPERATION"))
+	ROTATE_KEY = crypto.Keccak256Hash([]byte("ROTATE_KEY_OPERATION"))
+)
 
 // Close is a callback invoked when the client is closed.
 type Close func() error
@@ -28,7 +36,9 @@ type TransactorAPI interface {
 	CreateOrganizationTx(*bind.TransactOpts, string) (*types.Transaction, error)
 	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteKeyTx(*bind.TransactOpts, common.Hash, string, common.Hash, common.Address) (*types.Transaction, error)
 	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, string, string, string) (*types.Transaction, error)
+	SetOrganizationMetaTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
 	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
 	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
 	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
@@ -121,4 +131,9 @@ func (client *Client) Close() {
 
 func (client *Client) Storage() storage.Storage {
 	return client.storage
+}
+
+func (client *Client) SwitchAccount(account accounts.Account, wallet accounts.Wallet) {
+	client.account = account
+	client.wallet = wallet
 }

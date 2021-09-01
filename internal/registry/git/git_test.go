@@ -20,7 +20,7 @@ func TestGitPushClone(t *testing.T) {
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	client, err := mock.NewClient(tmp)
+	client, _, _, err := mock.NewClient(tmp)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"
@@ -49,7 +49,7 @@ func TestGitPushClone(t *testing.T) {
 	require.NoError(t, err, "Failed to create repository")
 
 	registryAddr := "localhost:10002"
-	registryPath := "http://localhost:10002/valist/sdk"
+	registryPath := "http://localhost:10002/valist/sdk/v0.0.1"
 
 	go func() {
 		err := http.ListenAndServe(registryAddr, NewHandler(client))

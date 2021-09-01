@@ -3,6 +3,7 @@ package mock
 import (
 	"math/big"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
@@ -22,44 +23,52 @@ const (
 	veryLightScryptN = 2
 	veryLightScryptP = 1
 	passphrase       = "secret"
+	testAccounts     = 5
 )
 
-func NewClient(ksLocation string) (*client.Client, error) {
+func NewClient(ksLocation string) (*client.Client, []accounts.Account, []accounts.Wallet, error) {
 	var onClose []client.Close
 
 	signer := keystore.NewKeyStore(ksLocation, veryLightScryptN, veryLightScryptP)
-	account, err := signer.NewAccount(passphrase)
-	if err != nil {
-		return nil, err
+	alloc := make(core.GenesisAlloc)
+
+	var accounts []accounts.Account
+	for i := 0; i < testAccounts; i++ {
+		account, err := signer.NewAccount(passphrase)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		err = signer.Unlock(account, passphrase)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		accounts = append(accounts, account)
+		alloc[account.Address] = core.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
 	}
 
-	if err = signer.Unlock(account, passphrase); err != nil {
-		return nil, err
-	}
-
-	backend := backends.NewSimulatedBackend(core.GenesisAlloc{
-		account.Address: {Balance: big.NewInt(9223372036854775807)},
-	}, 8000029)
+	backend := backends.NewSimulatedBackend(alloc, 8000029)
 	onClose = append(onClose, backend.Close)
 
-	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, account, chainID)
+	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, accounts[0], chainID)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
-	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, account.Address)
+	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, accounts[0].Address)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	_, _, valist, err := contract.DeployValist(opts, backend, forwarderAddress)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	_, _, registry, err := contract.DeployRegistry(opts, backend, forwarderAddress)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	// ensure contracts are deployed
@@ -67,24 +76,31 @@ func NewClient(ksLocation string) (*client.Client, error) {
 
 	node, err := coremock.NewMockNode()
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	ipfsapi, err := coreapi.NewCoreAPI(node)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
-	return client.NewClient(&client.Options{
+	wallets := signer.Wallets()
+	client, err := client.NewClient(&client.Options{
 		Storage:      ipfs.NewStorage(ipfsapi),
 		Ethereum:     backend,
 		ChainID:      chainID,
 		Valist:       valist,
 		Registry:     registry,
-		Account:      account,
-		Wallet:       signer.Wallets()[0],
+		Account:      accounts[0],
+		Wallet:       wallets[0],
 		TransactOpts: basetx.TransactOpts,
 		Transactor:   basetx.NewTransactor(valist, registry),
 		OnClose:      onClose,
 	})
+
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return client, accounts, wallets, nil
 }

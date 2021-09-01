@@ -26,6 +26,7 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	router := mux.NewRouter()
 	router.HandleFunc("/{org}/{repo}/{tag}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
+	router.HandleFunc("/{org}/{repo}/{tag}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
 	router.HandleFunc("/{org}/{repo}/{tag}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
 
@@ -113,6 +114,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s", vars["org"], vars["repo"]))
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

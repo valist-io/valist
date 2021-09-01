@@ -77,6 +77,50 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 	return client.valist.ParseOrgCreated(*logs[0])
 }
 
+func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash, meta *types.OrganizationMeta) (*valist.ValistMetaUpdate, error) {
+	data, err := json.Marshal(meta)
+	if err != nil {
+		return nil, err
+	}
+
+	metaCID, err := client.storage.Write(ctx, data)
+	if err != nil {
+		return nil, err
+	}
+
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.SetOrganizationMetaTx(txopts, orgID, metaCID)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseMetaUpdate(*logs[0])
+}
+
+func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Hash, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
+	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts.Context = ctx
+
+	tx, err := client.transactor.VoteKeyTx(txopts, orgID, "", operation, address)
+	if err != nil {
+		return nil, err
+	}
+
+	logs, err := waitMined(ctx, client.eth, tx)
+	if err != nil {
+		return nil, err
+	}
+
+	return client.valist.ParseVoteKeyEvent(*logs[0])
+}
+
 func (client *Client) VoteOrganizationThreshold(ctx context.Context, orgID common.Hash, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
 	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
 	txopts.Context = ctx
