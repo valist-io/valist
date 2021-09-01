@@ -4,6 +4,7 @@ import (
 	"context"
 	"math/big"
 
+	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/core/types"
 )
 
@@ -47,4 +48,18 @@ func (s *CoreSuite) TestCreateRepository() {
 	s.Assert().Equal(repoMeta.Description, meta.Description)
 	s.Assert().Equal(repoMeta.ProjectType, meta.ProjectType)
 	s.Assert().Equal(repoMeta.Homepage, meta.Homepage)
+
+	_, err = s.client.VoteRepoDev(ctx, orgCreatedEvent.OrgID, "sdk", client.ADD_KEY, s.accounts[1].Address)
+	s.Require().NoError(err, "Failed to add second repo dev key")
+
+	_, err = s.client.VoteRepoDev(ctx, orgCreatedEvent.OrgID, "sdk", client.ADD_KEY, s.accounts[2].Address)
+	s.Require().NoError(err, "Failed to add third repo dev key")
+
+	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
+	s.Require().NoError(err, "Failed to vote for organization threshold")
+
+	s.client.SwitchAccount(s.accounts[1], s.signer.Wallets()[1])
+
+	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
+	s.Require().NoError(err, "Failed to vote for organization threshold")
 }

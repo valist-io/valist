@@ -12,6 +12,7 @@ func NewCommand() *cli.Command {
 		Subcommands: []*cli.Command{
 			NewFetchCommand(),
 			NewCreateCommand(),
+			NewKeyCommand(),
 			NewUpdateCommand(),
 			NewThresholdCommand(),
 		},
