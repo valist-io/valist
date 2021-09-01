@@ -22,38 +22,52 @@ const (
 	veryLightScryptN = 2
 	veryLightScryptP = 1
 	passphrase       = "secret"
+	testAccounts     = 5
 )
 
-func NewClient(signer *keystore.KeyStore, accounts []accounts.Account) (*client.Client, error) {
+func NewClient(ksLocation string) (*client.Client, []accounts.Account, []accounts.Wallet, error) {
 	var onClose []client.Close
 
-	backend := backends.NewSimulatedBackend(coreeth.GenesisAlloc{
-		accounts[0].Address: {Balance: big.NewInt(9223372036854775807)},
-		accounts[1].Address: {Balance: big.NewInt(9223372036854775807)},
-		accounts[2].Address: {Balance: big.NewInt(9223372036854775807)},
-		accounts[3].Address: {Balance: big.NewInt(9223372036854775807)},
-		accounts[4].Address: {Balance: big.NewInt(9223372036854775807)},
-	}, 8000029)
+	signer := keystore.NewKeyStore(ksLocation, veryLightScryptN, veryLightScryptP)
+	alloc := make(coreeth.GenesisAlloc)
+
+	var accounts []accounts.Account
+	for i := 0; i < testAccounts; i++ {
+		account, err := signer.NewAccount(passphrase)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		err = signer.Unlock(account, passphrase)
+		if err != nil {
+			return nil, nil, nil, err
+		}
+
+		accounts = append(accounts, account)
+		alloc[account.Address] = coreeth.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
+	}
+
+	backend := backends.NewSimulatedBackend(alloc, 8000029)
 	onClose = append(onClose, backend.Close)
 
 	opts, err := bind.NewKeyStoreTransactorWithChainID(signer, accounts[0], chainID)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, accounts[0].Address)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	_, _, valist, err := contract.DeployValist(opts, backend, forwarderAddress)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	_, _, registry, err := contract.DeployRegistry(opts, backend, forwarderAddress)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	// ensure contracts are deployed
@@ -61,24 +75,31 @@ func NewClient(signer *keystore.KeyStore, accounts []accounts.Account) (*client.
 
 	node, err := coremock.NewMockNode()
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
 	ipfs, err := coreapi.NewCoreAPI(node)
 	if err != nil {
-		return nil, err
+		return nil, nil, nil, err
 	}
 
-	return client.NewClient(&client.Options{
+	wallets := signer.Wallets()
+	client, err := client.NewClient(&client.Options{
 		IPFS:         ipfs,
 		Ethereum:     backend,
 		ChainID:      chainID,
 		Valist:       valist,
 		Registry:     registry,
 		Account:      accounts[0],
-		Wallet:       signer.Wallets()[0],
+		Wallet:       wallets[0],
 		TransactOpts: basetx.TransactOpts,
 		Transactor:   basetx.NewTransactor(valist, registry),
 		OnClose:      onClose,
 	})
+
+	if err != nil {
+		return nil, nil, nil, err
+	}
+
+	return client, accounts, wallets, nil
 }
