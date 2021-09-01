@@ -33,7 +33,7 @@ By default each organization's and repository's threshold is set to **0**.
 Using the CLI an `Org Admin`  is able to propose a new `Organization` threshold by running:
 
 ```bash
-valist org:threshold <org_name> <threshold_number>
+valist org threshold [org_name] [threshold_number]
 ```
 
 #### Repository Level Threshold
@@ -41,7 +41,7 @@ valist org:threshold <org_name> <threshold_number>
 Using the CLI a `Repo Developer` is able to propose a new `Repository` threshold by running:
 
 ```bash
-valist repo:threshold <org_name> <repo_name> <threshold_number>
+valist repo threshold [org_name] [repo_name] [threshold_number]
 ```
 
 ### Web
