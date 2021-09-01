@@ -20,6 +20,15 @@ func (t *Transactor) CreateOrganizationTx(txopts *bind.TransactOpts, metaCID cid
 	return t.meta.Transact(txopts.Context, msg, t.signer, createOrganizationBFID)
 }
 
+func (t *Transactor) SetOrganizationMetaTx(txopts *bind.TransactOpts, orgID common.Hash, metaCID cid.Cid) (*ethtypes.Transaction, error) {
+	msg, err := t.valistBuilder.Message(txopts.Context, txopts.From, "setOrgMeta", orgID, metaCID.String())
+	if err != nil {
+		return nil, err
+	}
+
+	return t.meta.Transact(txopts.Context, msg, t.signer, setOrgMetaBFID)
+}
+
 func (t *Transactor) LinkOrganizationNameTx(txopts *bind.TransactOpts, orgID common.Hash, name string) (*ethtypes.Transaction, error) {
 	msg, err := t.registryBuilder.Message(txopts.Context, txopts.From, "linkNameToID", orgID, name)
 	if err != nil {

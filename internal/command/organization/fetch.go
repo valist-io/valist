@@ -1,4 +1,4 @@
-package repository
+package organization
 
 import (
 	"fmt"
@@ -15,10 +15,10 @@ import (
 func NewFetchCommand() *cli.Command {
 	return &cli.Command{
 		Name:    "fetch",
-		Usage:   "Fetch repository info",
+		Usage:   "Fetch organization info",
 		Aliases: []string{"get"},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -46,28 +46,27 @@ func NewFetchCommand() *cli.Command {
 			defer client.Close()
 
 			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
 
 			orgID, err := client.GetOrganizationID(c.Context, orgName)
 			if err != nil {
 				return err
 			}
 
-			repo, err := client.GetRepository(c.Context, orgID, repoName)
+			org, err := client.GetOrganization(c.Context, orgID)
 			if err != nil {
 				return err
 			}
 
-			meta, err := client.GetRepositoryMeta(c.Context, repo.MetaCID)
+			meta, err := client.GetOrganizationMeta(c.Context, org.MetaCID)
 			if err != nil {
 				return err
 			}
 
 			fmt.Printf("OrgID: %s\n", orgID.String())
-			fmt.Printf("Repo: %s/%s\n", orgName, repoName)
 			fmt.Printf("Name: %s\n", meta.Name)
+			fmt.Printf("Homepage: %s\n", meta.Homepage)
 			fmt.Printf("Description: %s\n", meta.Description)
-			fmt.Printf("Signature Threshold: %d\n", repo.Threshold)
+			fmt.Printf("Signature Threshold: %d\n", org.Threshold)
 
 			return nil
 		},

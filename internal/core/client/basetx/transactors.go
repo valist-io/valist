@@ -15,6 +15,10 @@ func (t *Transactor) CreateOrganizationTx(txopts *bind.TransactOpts, metaCID cid
 	return t.valist.CreateOrganization(txopts, metaCID.String())
 }
 
+func (t *Transactor) SetOrganizationMetaTx(txopts *bind.TransactOpts, orgID common.Hash, metaCID cid.Cid) (*ethtypes.Transaction, error) {
+	return t.valist.SetOrgMeta(txopts, orgID, metaCID.String())
+}
+
 func (t *Transactor) LinkOrganizationNameTx(txopts *bind.TransactOpts, orgID common.Hash, name string) (*ethtypes.Transaction, error) {
 	return t.registry.LinkNameToID(txopts, orgID, name)
 }

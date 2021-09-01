@@ -1,4 +1,4 @@
-package repository
+package organization
 
 import (
 	"fmt"
@@ -10,15 +10,15 @@ import (
 
 	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/registry/internal/prompt"
 )
 
-func NewFetchCommand() *cli.Command {
+func NewUpdateCommand() *cli.Command {
 	return &cli.Command{
-		Name:    "fetch",
-		Usage:   "Fetch repository info",
-		Aliases: []string{"get"},
+		Name:  "update",
+		Usage: "Update organization metadata",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -46,29 +46,47 @@ func NewFetchCommand() *cli.Command {
 			defer client.Close()
 
 			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
 
 			orgID, err := client.GetOrganizationID(c.Context, orgName)
 			if err != nil {
 				return err
 			}
 
-			repo, err := client.GetRepository(c.Context, orgID, repoName)
+			org, err := client.GetOrganization(c.Context, orgID)
 			if err != nil {
 				return err
 			}
 
-			meta, err := client.GetRepositoryMeta(c.Context, repo.MetaCID)
+			meta, err := client.GetOrganizationMeta(c.Context, org.MetaCID)
 			if err != nil {
 				return err
 			}
 
-			fmt.Printf("OrgID: %s\n", orgID.String())
-			fmt.Printf("Repo: %s/%s\n", orgName, repoName)
-			fmt.Printf("Name: %s\n", meta.Name)
-			fmt.Printf("Description: %s\n", meta.Description)
-			fmt.Printf("Signature Threshold: %d\n", repo.Threshold)
+			name, err := prompt.OrganizationName(meta.Name).Run()
+			if err != nil {
+				return err
+			}
 
+			desc, err := prompt.OrganizationDescription(meta.Description).Run()
+			if err != nil {
+				return err
+			}
+
+			homepage, err := prompt.OrganizationHomepage(meta.Homepage).Run()
+			if err != nil {
+				return err
+			}
+
+			meta.Name = name
+			meta.Description = desc
+			meta.Homepage = homepage
+
+			_, err = client.SetOrganizationMeta(c.Context, orgID, meta)
+			if err != nil {
+				return err
+			}
+
+			fmt.Println("Organization updated!")
 			return nil
 		},
 	}
