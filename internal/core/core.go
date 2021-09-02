@@ -20,6 +20,7 @@ import (
 	"github.com/valist-io/registry/internal/core/client/metatx"
 	"github.com/valist-io/registry/internal/core/config"
 	"github.com/valist-io/registry/internal/signer"
+	"github.com/valist-io/registry/internal/storage/ipfs"
 )
 
 // NewClient builds a client based on the given config.
@@ -52,7 +53,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	ipfs, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
+	ipfsapi, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
 	if err != nil {
 		return nil, err
 	}
@@ -68,11 +69,11 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 			continue
 		}
 
-		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+		go ipfsapi.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
 	}
 
 	opts := &client.Options{
-		IPFS:         ipfs,
+		Storage:      ipfs.NewStorage(ipfsapi),
 		Ethereum:     eth,
 		ChainID:      cfg.Ethereum.ChainID,
 		Valist:       valist,

@@ -14,7 +14,7 @@ import (
 
 	"github.com/valist-io/registry/internal/core"
 	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/http"
+	"github.com/valist-io/registry/internal/registry"
 	"github.com/valist-io/registry/web"
 )
 
@@ -69,14 +69,14 @@ func NewDaemonCommand() *cli.Command {
 			defer client.Close()
 
 			fmt.Println(banner)
-			fmt.Println("Api server running on", cfg.HTTP.ApiAddr)
+			fmt.Println("API server running on", cfg.HTTP.ApiAddr)
 			fmt.Println("Web server running on", cfg.HTTP.WebAddr)
 
-			apiServer := http.NewServer(client, cfg.HTTP.ApiAddr)
+			apiServer := registry.NewServer(client, cfg.HTTP.ApiAddr)
 			webServer := web.NewServer(cfg.HTTP.WebAddr)
 
-			go webServer.ListenAndServe() //nolint:errcheck
 			go apiServer.ListenAndServe() //nolint:errcheck
+			go webServer.ListenAndServe() //nolint:errcheck
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -89,7 +89,6 @@ func NewDaemonCommand() *cli.Command {
 
 			apiServer.Shutdown(ctx) //nolint:errcheck
 			webServer.Shutdown(ctx) //nolint:errcheck
-
 			return nil
 		},
 	}

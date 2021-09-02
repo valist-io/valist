@@ -7,7 +7,6 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ipfs/go-cid"
 
 	"github.com/valist-io/registry/internal/contract/valist"
 	"github.com/valist-io/registry/internal/core/types"
@@ -39,20 +38,10 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 		return nil, types.ErrReleaseNotExist
 	}
 
-	releaseCID, err := cid.Decode(release.ReleaseCID)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get release: %v", err)
-	}
-
-	metaCID, err := cid.Decode(release.MetaCID)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to get release: %v", err)
-	}
-
 	return &types.Release{
 		Tag:        tag,
-		ReleaseCID: releaseCID,
-		MetaCID:    metaCID,
+		ReleaseCID: release.ReleaseCID,
+		MetaCID:    release.MetaCID,
 	}, nil
 }
 
@@ -63,17 +52,7 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 		From:    client.account.Address,
 	}
 
-	tag, release, meta, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
-	if err != nil {
-		return nil, err
-	}
-
-	releaseCID, err := cid.Decode(release)
-	if err != nil {
-		return nil, err
-	}
-
-	metaCID, err := cid.Decode(meta)
+	tag, releaseCID, metaCID, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +70,7 @@ func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoNa
 	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
 	txopts.Context = ctx
 
-	tx, err := client.transactor.VoteReleaseTx(txopts, orgID, repoName, release)
+	tx, err := client.transactor.VoteReleaseTx(txopts, orgID, repoName, release.Tag, release.ReleaseCID, release.MetaCID)
 	if err != nil {
 		return nil, err
 	}

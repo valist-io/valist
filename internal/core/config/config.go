@@ -101,8 +101,8 @@ func Default(rootPath string) Config {
 			IPCAddress:    filepath.Join(rootPath, "signer.ipc"),
 		},
 		HTTP{
-			ApiAddr: "localhost:8080",
-			WebAddr: "localhost:8081",
+			ApiAddr: "localhost:9000",
+			WebAddr: "localhost:9001",
 		},
 	}
 }

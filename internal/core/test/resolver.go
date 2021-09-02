@@ -6,16 +6,10 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
-func (s *CoreSuite) TestGetRelease() {
+func (s *CoreSuite) TestResolvePath() {
 	ctx := context.Background()
 
-	_, err := s.client.GetRelease(ctx, emptyHash, "empty", "empty")
-	s.Assert().Equal(types.ErrReleaseNotExist, err)
-}
-
-func (s *CoreSuite) TestVoteRelease() {
-	ctx := context.Background()
-
+	orgName := "valist"
 	orgMeta := &types.OrganizationMeta{
 		Name:        "Valist, Inc.",
 		Description: "Accelerating the transition to web3.",
@@ -44,19 +38,20 @@ func (s *CoreSuite) TestVoteRelease() {
 
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)
 	s.Require().NoError(err, "Failed to create organization")
+	orgID := orgCreatedEvent.OrgID
 
-	_, err = s.client.CreateRepository(ctx, orgCreatedEvent.OrgID, repoName, repoMeta)
+	_, err = s.client.LinkOrganizationName(ctx, orgID, orgName)
+	s.Require().NoError(err, "Failed to link organization name")
+
+	_, err = s.client.CreateRepository(ctx, orgID, repoName, repoMeta)
 	s.Require().NoError(err, "Failed to create repository")
 
-	_, err = s.client.VoteRelease(ctx, orgCreatedEvent.OrgID, repoName, release)
+	_, err = s.client.VoteRelease(ctx, orgID, repoName, release)
 	s.Require().NoError(err, "Failed to vote release")
 
-	released, err := s.client.GetRelease(ctx, orgCreatedEvent.OrgID, repoName, release.Tag)
-	s.Require().NoError(err, "Failed to get release")
-	s.Assert().Equal(release.ReleaseCID, released.ReleaseCID)
-	s.Assert().Equal(release.MetaCID, released.MetaCID)
-
-	latest, err := s.client.GetLatestRelease(ctx, orgCreatedEvent.OrgID, repoName)
-	s.Require().NoError(err, "Failed to get latest release")
-	s.Assert().Equal(release.Tag, latest.Tag)
+	res, err := s.client.ResolvePath(ctx, "valist/sdk/v0.0.1")
+	s.Require().NoError(err, "Failed to resolve path")
+	s.Require().NotNil(res.Organization)
+	s.Require().NotNil(res.Repository)
+	s.Require().NotNil(res.Release)
 }

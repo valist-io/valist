@@ -6,11 +6,10 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
 )
 
 type Transactor struct {
@@ -18,7 +17,7 @@ type Transactor struct {
 	registry *registry.ValistRegistry
 }
 
-func NewTransactor(valist *valist.Valist, registry *registry.ValistRegistry) types.TransactorAPI {
+func NewTransactor(valist *valist.Valist, registry *registry.ValistRegistry) *Transactor {
 	return &Transactor{valist, registry}
 }
 
@@ -26,7 +25,7 @@ func NewTransactor(valist *valist.Valist, registry *registry.ValistRegistry) typ
 func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts {
 	return &bind.TransactOpts{
 		From: account.Address,
-		Signer: func(address common.Address, tx *ethtypes.Transaction) (*ethtypes.Transaction, error) {
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 			if address != account.Address {
 				return nil, bind.ErrNotAuthorized
 			}

@@ -7,15 +7,14 @@ import (
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	ethtypes "github.com/ethereum/go-ethereum/core/types"
+	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/ethclient"
-
 	"github.com/valist-io/gasless"
 
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/core/types"
 )
 
 const (
@@ -46,7 +45,7 @@ type Transactor struct {
 	registryBuilder *gasless.MessageBuilder
 }
 
-func NewTransactor(meta gasless.Transactor, signer gasless.Signer, eth *ethclient.Client, cfg *config.Config) (types.TransactorAPI, error) {
+func NewTransactor(meta gasless.Transactor, signer gasless.Signer, eth *ethclient.Client, cfg *config.Config) (client.TransactorAPI, error) {
 	valistBuilder, err := gasless.NewMessageBuilder(valist.ValistABI, cfg.Ethereum.Contracts["valist"], eth)
 	if err != nil {
 		return nil, err
@@ -65,7 +64,7 @@ func TransactOpts(account accounts.Account, wallet accounts.Wallet, chainID *big
 	return &bind.TransactOpts{
 		From:   account.Address,
 		NoSend: true,
-		Signer: func(address common.Address, tx *ethtypes.Transaction) (*ethtypes.Transaction, error) {
+		Signer: func(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 			if address != account.Address {
 				return nil, bind.ErrNotAuthorized
 			}

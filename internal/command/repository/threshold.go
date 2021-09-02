@@ -19,7 +19,7 @@ func NewThresholdCommand() *cli.Command {
 		Name:  "threshold",
 		Usage: "Vote for repository threshold",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 3 {
+			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -46,20 +46,17 @@ func NewThresholdCommand() *cli.Command {
 			}
 			defer client.Close()
 
-			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
-
-			threshold, err := strconv.ParseInt(c.Args().Get(2), 10, 64)
+			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {
 				return err
 			}
 
-			orgID, err := client.GetOrganizationID(c.Context, orgName)
+			threshold, err := strconv.ParseInt(c.Args().Get(1), 10, 64)
 			if err != nil {
 				return err
 			}
 
-			vote, err := client.VoteRepositoryThreshold(c.Context, orgID, repoName, big.NewInt(threshold))
+			vote, err := client.VoteRepositoryThreshold(c.Context, res.Organization.ID, res.Repository.Name, big.NewInt(threshold))
 			if err != nil {
 				return err
 			}

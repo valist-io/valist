@@ -6,12 +6,10 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/core/types"
-	cid "github.com/ipfs/go-cid"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/registry/internal/storage"
 )
 
 const (
@@ -50,28 +48,19 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
-	StorageAPI
+	// SwitchAccount changes the current account and wallet.
 	SwitchAccount(accounts.Account, accounts.Wallet)
+	// ResolvePath resolves the organization, repository, release, and node from the given path.
+	ResolvePath(context.Context, string) (*ResolvedPath, error)
+	// Storage returns the underlying storage implementation.
+	Storage() storage.Storage
+	// Close releases resources.
 	Close()
-}
-
-// TransactorAPI defines functions to abstract blockchain transactions.
-// TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
-type TransactorAPI interface {
-	CreateOrganizationTx(*bind.TransactOpts, cid.Cid) (*types.Transaction, error)
-	SetOrganizationMetaTx(*bind.TransactOpts, common.Hash, cid.Cid) (*types.Transaction, error)
-	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, *Release) (*types.Transaction, error)
-	VoteKeyTx(*bind.TransactOpts, common.Hash, string, common.Hash, common.Address) (*types.Transaction, error)
-	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
-	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
 }
 
 type OrganizationAPI interface {
 	GetOrganization(context.Context, common.Hash) (*Organization, error)
-	GetOrganizationMeta(context.Context, cid.Cid) (*OrganizationMeta, error)
+	GetOrganizationMeta(context.Context, string) (*OrganizationMeta, error)
 	CreateOrganization(context.Context, *OrganizationMeta) (*valist.ValistOrgCreated, error)
 	VoteOrganizationAdmin(context.Context, common.Hash, common.Hash, common.Address) (*valist.ValistVoteKeyEvent, error)
 	VoteOrganizationThreshold(context.Context, common.Hash, *big.Int) (*valist.ValistVoteThresholdEvent, error)
@@ -92,7 +81,7 @@ type ReleaseAPI interface {
 
 type RepositoryAPI interface {
 	GetRepository(context.Context, common.Hash, string) (*Repository, error)
-	GetRepositoryMeta(context.Context, cid.Cid) (*RepositoryMeta, error)
+	GetRepositoryMeta(context.Context, string) (*RepositoryMeta, error)
 	CreateRepository(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistRepoCreated, error)
 	SetRepositoryMeta(context.Context, common.Hash, string, *RepositoryMeta) (*valist.ValistMetaUpdate, error)
 	VoteRepoDev(context.Context, common.Hash, string, common.Hash, common.Address) (*valist.ValistVoteKeyEvent, error)
@@ -108,22 +97,11 @@ type ReleaseIterator interface {
 	ForEach(context.Context, func(*Release)) error
 }
 
-type StorageAPI interface {
-	// ReadFile returns the contents of the file with the given CID.
-	ReadFile(context.Context, cid.Cid) ([]byte, error)
-	// WriteFile writes the given file contents and returns its CID.
-	WriteFile(context.Context, []byte) (cid.Cid, error)
-	// WriteFilePath writes the contents of the given file path and returns its CID.
-	WriteFilePath(context.Context, string) (cid.Cid, error)
-	// WriteDirEntries writes the given list of files into a directory and returns its CID.
-	WriteDirEntries(context.Context, string, []string) (cid.Cid, error)
-}
-
 type Organization struct {
 	ID            common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	MetaCID       cid.Cid
+	MetaCID       string
 }
 
 type OrganizationMeta struct {
@@ -140,16 +118,17 @@ type LinkOrgNameResult struct {
 
 type Release struct {
 	Tag        string
-	ReleaseCID cid.Cid
-	MetaCID    cid.Cid
+	ReleaseCID string
+	MetaCID    string
 	Signers    []common.Address
 }
 
 type Repository struct {
+	Name          string
 	OrgID         common.Hash
 	Threshold     *big.Int
 	ThresholdDate *big.Int
-	MetaCID       cid.Cid
+	MetaCID       string
 }
 
 type RepositoryMeta struct {
@@ -158,4 +137,11 @@ type RepositoryMeta struct {
 	ProjectType string `json:"projectType"`
 	Homepage    string `json:"homepage"`
 	Repository  string `json:"repository"`
+}
+
+type ResolvedPath struct {
+	Organization *Organization
+	Repository   *Repository
+	Release      *Release
+	File         storage.File
 }

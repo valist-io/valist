@@ -7,13 +7,14 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
-	coreeth "github.com/ethereum/go-ethereum/core"
+	"github.com/ethereum/go-ethereum/core"
 	"github.com/ipfs/go-ipfs/core/coreapi"
 	coremock "github.com/ipfs/go-ipfs/core/mock"
 
 	"github.com/valist-io/registry/internal/contract"
 	"github.com/valist-io/registry/internal/core/client"
 	"github.com/valist-io/registry/internal/core/client/basetx"
+	"github.com/valist-io/registry/internal/storage/ipfs"
 )
 
 var chainID = big.NewInt(1337)
@@ -29,7 +30,7 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, []account
 	var onClose []client.Close
 
 	signer := keystore.NewKeyStore(ksLocation, veryLightScryptN, veryLightScryptP)
-	alloc := make(coreeth.GenesisAlloc)
+	alloc := make(core.GenesisAlloc)
 
 	var accounts []accounts.Account
 	for i := 0; i < testAccounts; i++ {
@@ -44,7 +45,7 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, []account
 		}
 
 		accounts = append(accounts, account)
-		alloc[account.Address] = coreeth.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
+		alloc[account.Address] = core.GenesisAccount{Balance: big.NewInt(9223372036854775807)}
 	}
 
 	backend := backends.NewSimulatedBackend(alloc, 8000029)
@@ -78,14 +79,14 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, []account
 		return nil, nil, nil, err
 	}
 
-	ipfs, err := coreapi.NewCoreAPI(node)
+	ipfsapi, err := coreapi.NewCoreAPI(node)
 	if err != nil {
 		return nil, nil, nil, err
 	}
 
 	wallets := signer.Wallets()
 	client, err := client.NewClient(&client.Options{
-		IPFS:         ipfs,
+		Storage:      ipfs.NewStorage(ipfsapi),
 		Ethereum:     backend,
 		ChainID:      chainID,
 		Valist:       valist,
