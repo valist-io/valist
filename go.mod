@@ -3,12 +3,11 @@ module github.com/valist-io/registry
 go 1.16
 
 require (
-	github.com/ethereum/go-ethereum v1.10.6
-	github.com/go-git/go-billy/v5 v5.3.1 // indirect
+	github.com/ethereum/go-ethereum v1.10.8
+	github.com/go-git/go-billy/v5 v5.3.1
 	github.com/go-git/go-git/v5 v5.4.2
 	github.com/gorilla/handlers v1.5.1
 	github.com/gorilla/mux v1.8.0
-	github.com/ipfs/go-cid v0.0.7
 	github.com/ipfs/go-ipfs v0.9.1
 	github.com/ipfs/go-ipfs-files v0.0.8
 	github.com/ipfs/go-ipfs-http-client v0.1.0
