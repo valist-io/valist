@@ -1,104 +1,47 @@
 SHELL=/bin/bash
 
-# builds valist npm package
-lib:
-	cd lib && npm run build
+all: install valist
 
-# builds cli
-cli:
-	cd cli && npm run build
+bin:
+	go build -ldflags "-s -w" ./cmd/valist
 
-# builds static frontend
-relay:
-	cd relay && npm run build
+valist: web bin
 
-# runs local typescript compiler in watch mode
-dev-lib:
-	cd lib && npm run dev
-
-# runs local next server
-dev-relay:
-	cd relay && npm run dev
-
-# hot reload docs
-dev-docs:
-	mkdocs serve
-
-# runs both dev servers in parallel, piping output to same shell
-dev:
-	@make -j 2 dev-lib dev-relay
-
-# builds and runs relay in production mode
-start: lib
-	cd relay && npm run start
-
-# build frontend
-frontend: lib relay
-
-# build static site (no APIs) into /relay/out
-static: frontend
-	cd relay && npm run export
-
-# compile contracts
-contracts:
-	cd hardhat && npm run compile
-
-# deploys Solidity contracts via Hardhat
-deploy-%:
-	cd hardhat && npm run deploy:$*
-
-# runs local hardhat chain
-blockchain:
-	cd hardhat && npm run blockchain
-
-# build all artifacts
-all: contracts lib relay
-
-compile: all
-
-build: all
-
-install-hardhat:
-	cd hardhat && npm i
+install: install-lib install-relay
 
 install-lib:
-	cd lib && npm i
-
-install-cli:
-	cd cli && npm i
+	npm install --prefix ./web/lib
 
 install-relay:
-	cd relay && npm i
+	npm install --prefix ./web/relay
 
-install-frontend: install-lib install-relay
+web-lib:
+	npm run build --prefix ./web/lib
 
-install-docs:
-	pip install mkdocs mkdocs-material
+web-relay:
+	npm run build --prefix ./web/relay
+	npm run export --prefix ./web/relay
 
-install-all: install-hardhat install-lib install-cli install-relay
+web: web-lib web-relay
 
-install: install-all
+lint-valist:
+	golangci-lint run
 
-update-all:
-	cd hardhat && npm update
-	cd lib && npm update
-	cd cli && npm update
-	cd relay && npm update
-	make audit-fix
+lint-web-lib:
+	npm run lint --prefix ./web/lib
 
-update: update-all
+lint-web-relay:
+	npm run lint --prefix ./web/relay
 
-audit-fix:
-	cd hardhat && npm audit fix
-	cd lib && npm audit fix
-	cd cli && npm audit fix
-	cd relay && npm audit fix
+lint: lint-valist lint-web-lib lint-web-relay
 
-audit-contracts:
-	slither hardhat --filter-paths "@openzeppelin" --truffle-build-directory "../lib/src/abis" --truffle-ignore-compile
+test-valist:
+	go test ./...
+
+test-web-lib:
+	npm run test --prefix ./web/lib
+
+test: test-valist test-web-lib
 
 docs:
 	mkdocs build
-	cd lib && npm run docs
-
-.PHONY: relay lib contracts docs cli

@@ -1,9 +1,0 @@
-type: node
-org: valist
-repo: cli
-tag: 0.4.1
-install:
-  apt update && apt install libsecret-1-0 -yy
-
-  RUN npm install --registry=https://valist.io/api/npm
-build: npm run build

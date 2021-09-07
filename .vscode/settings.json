@@ -1,14 +1,6 @@
 {
-  "solidity.packageDefaultDependenciesContractsDirectory": "",
-  "solidity.packageDefaultDependenciesDirectory": "hardhat/node_modules",
-  "editor.tabSize": 2,
-  "editor.detectIndentation": false,
-  "eslint.workingDirectories": [
-    "cli/",
-    "lib/",
-    "relay/",
-  ],
-  "cSpell.enableFiletypes": [
-    "solidity"
+  "go.lintTool":"golangci-lint",
+  "go.lintFlags": [
+    "--fast"
   ]
 }
