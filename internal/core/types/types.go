@@ -48,14 +48,12 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
-	// SwitchAccount changes the current account and wallet.
-	SwitchAccount(accounts.Account, accounts.Wallet)
+	// SetAccount sets the current account.
+	SetAccount(accounts.Account)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(context.Context, string) (*ResolvedPath, error)
 	// Storage returns the underlying storage implementation.
 	Storage() storage.Storage
-	// Close releases resources.
-	Close()
 }
 
 type OrganizationAPI interface {

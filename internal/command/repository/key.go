@@ -29,8 +29,8 @@ func voteRepoDev(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEv
 		return nil, err
 	}
 
-	cfg, err := config.Load(home)
-	if err != nil {
+	cfg := config.NewConfig(home)
+	if err := cfg.Load(); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +45,6 @@ func voteRepoDev(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEv
 	if err != nil {
 		return nil, err
 	}
-	defer valist.Close()
 
 	orgName := c.Args().Get(0)
 	repoName := c.Args().Get(1)

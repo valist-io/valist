@@ -28,8 +28,8 @@ func NewThresholdCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -44,7 +44,6 @@ func NewThresholdCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
 			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {

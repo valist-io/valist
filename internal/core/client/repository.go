@@ -66,7 +66,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID)
@@ -83,7 +83,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 }
 
 func (client *Client) VoteRepoDev(ctx context.Context, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, repoName, operation, address)
@@ -110,7 +110,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID)
@@ -127,7 +127,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 }
 
 func (client *Client) VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteRepositoryThresholdTx(txopts, orgID, name, threshold)

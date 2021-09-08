@@ -29,8 +29,8 @@ func voteOrganizationAdmin(c *cli.Context, operation common.Hash) (*valist.Valis
 		return nil, err
 	}
 
-	cfg, err := config.Load(home)
-	if err != nil {
+	cfg := config.NewConfig(home)
+	if err := cfg.Load(); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +45,6 @@ func voteOrganizationAdmin(c *cli.Context, operation common.Hash) (*valist.Valis
 	if err != nil {
 		return nil, err
 	}
-	defer valist.Close()
 
 	// @TODO: Add extra validation here
 	orgName := c.Args().Get(0)

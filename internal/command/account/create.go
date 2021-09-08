@@ -7,7 +7,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/signer"
+	"github.com/valist-io/registry/internal/prompt"
 )
 
 func NewCreateCommand() *cli.Command {
@@ -20,26 +20,26 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
+				return err
+			}
+
+			passphrase, err := prompt.AccountPassphrase().Run()
 			if err != nil {
 				return err
 			}
 
-			api, _, err := signer.NewSigner(cfg)
-			if err != nil {
-				return err
-			}
-
-			address, err := api.New(c.Context)
+			account, err := cfg.KeyStore().NewAccount(passphrase)
 			if err != nil {
 				return err
 			}
 
 			if cfg.Accounts.Default == common.HexToAddress("0x0") {
-				cfg.Accounts.Default = address
+				cfg.Accounts.Default = account.Address
 			}
 
-			cfg.Accounts.Pinned = append(cfg.Accounts.Pinned, address)
+			cfg.Accounts.Pinned = append(cfg.Accounts.Pinned, account.Address)
 			return cfg.Save()
 		},
 	}

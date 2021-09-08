@@ -10,8 +10,10 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
 
+	"github.com/valist-io/gasless"
 	"github.com/valist-io/registry/internal/contract/registry"
 	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/registry/internal/core/signer"
 	"github.com/valist-io/registry/internal/storage"
 )
 
@@ -24,61 +26,46 @@ var (
 	ROTATE_KEY = crypto.Keccak256Hash([]byte("ROTATE_KEY_OPERATION"))
 )
 
-// Close is a callback invoked when the client is closed.
-type Close func() error
-
-// TransactOpts is a function that returns transaction options for an Ethereum transaction.
-type TransactOpts func(account accounts.Account, wallet accounts.Wallet, chainID *big.Int) *bind.TransactOpts
-
 // TransactorAPI defines functions to abstract blockchain transactions.
 // TODO: Maybe this can return []*types.Log instead of *types.Transaction and handle waiting and log parsing?
 type TransactorAPI interface {
-	CreateOrganizationTx(*bind.TransactOpts, string) (*types.Transaction, error)
-	LinkOrganizationNameTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	CreateRepositoryTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteKeyTx(*bind.TransactOpts, common.Hash, string, common.Hash, common.Address) (*types.Transaction, error)
-	VoteReleaseTx(*bind.TransactOpts, common.Hash, string, string, string, string) (*types.Transaction, error)
-	SetOrganizationMetaTx(*bind.TransactOpts, common.Hash, string) (*types.Transaction, error)
-	SetRepositoryMetaTx(*bind.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
-	VoteOrganizationThresholdTx(*bind.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
-	VoteRepositoryThresholdTx(*bind.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
+	CreateOrganizationTx(*gasless.TransactOpts, string) (*types.Transaction, error)
+	LinkOrganizationNameTx(*gasless.TransactOpts, common.Hash, string) (*types.Transaction, error)
+	CreateRepositoryTx(*gasless.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteKeyTx(*gasless.TransactOpts, common.Hash, string, common.Hash, common.Address) (*types.Transaction, error)
+	VoteReleaseTx(*gasless.TransactOpts, common.Hash, string, string, string, string) (*types.Transaction, error)
+	SetOrganizationMetaTx(*gasless.TransactOpts, common.Hash, string) (*types.Transaction, error)
+	SetRepositoryMetaTx(*gasless.TransactOpts, common.Hash, string, string) (*types.Transaction, error)
+	VoteOrganizationThresholdTx(*gasless.TransactOpts, common.Hash, *big.Int) (*types.Transaction, error)
+	VoteRepositoryThresholdTx(*gasless.TransactOpts, common.Hash, string, *big.Int) (*types.Transaction, error)
 }
 
 // Options is used to set client options.
 type Options struct {
 	Storage  storage.Storage
 	Ethereum bind.DeployBackend
-	ChainID  *big.Int
 
 	Valist   *valist.Valist
 	Registry *registry.ValistRegistry
 
-	Account accounts.Account
-	Wallet  accounts.Wallet
-
-	TransactOpts TransactOpts
-	Transactor   TransactorAPI
-
-	OnClose []Close
+	Account    accounts.Account
+	Signer     *signer.Signer
+	Transactor TransactorAPI
 }
 
 // Client is a Valist SDK client.
 type Client struct {
 	eth     bind.DeployBackend
 	storage storage.Storage
-	chainID *big.Int
 
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
 
-	wallet  accounts.Wallet
-	account accounts.Account
+	account    accounts.Account
+	signer     *signer.Signer
+	transactor TransactorAPI
 
-	transactor   TransactorAPI
-	transactOpts TransactOpts
-
-	onClose []Close
-	orgs    map[string]common.Hash
+	orgs map[string]common.Hash
 }
 
 // NewClient create a client from the given options.
@@ -99,41 +86,30 @@ func NewClient(opts *Options) (*Client, error) {
 		return nil, fmt.Errorf("registry contract is required")
 	}
 
-	if opts.TransactOpts == nil {
-		return nil, fmt.Errorf("transact opts is required")
-	}
-
 	if opts.Transactor == nil {
 		return nil, fmt.Errorf("transactor is required")
 	}
 
-	return &Client{
-		eth:          opts.Ethereum,
-		storage:      opts.Storage,
-		chainID:      opts.ChainID,
-		valist:       opts.Valist,
-		registry:     opts.Registry,
-		wallet:       opts.Wallet,
-		account:      opts.Account,
-		transactor:   opts.Transactor,
-		transactOpts: opts.TransactOpts,
-		onClose:      opts.OnClose,
-		orgs:         make(map[string]common.Hash),
-	}, nil
-}
-
-// Close releases all client resources.
-func (client *Client) Close() {
-	for _, close := range client.onClose {
-		close() // nolint:errcheck
+	if opts.Signer == nil {
+		return nil, fmt.Errorf("signer is required")
 	}
+
+	return &Client{
+		eth:        opts.Ethereum,
+		storage:    opts.Storage,
+		valist:     opts.Valist,
+		registry:   opts.Registry,
+		account:    opts.Account,
+		signer:     opts.Signer,
+		transactor: opts.Transactor,
+		orgs:       make(map[string]common.Hash),
+	}, nil
 }
 
 func (client *Client) Storage() storage.Storage {
 	return client.storage
 }
 
-func (client *Client) SwitchAccount(account accounts.Account, wallet accounts.Wallet) {
+func (client *Client) SetAccount(account accounts.Account) {
 	client.account = account
-	client.wallet = wallet
 }

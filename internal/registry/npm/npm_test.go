@@ -20,7 +20,7 @@ func TestNpmPublish(t *testing.T) {
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	client, _, _, err := mock.NewClient(tmp)
+	client, _, err := mock.NewClient(tmp)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"
