@@ -6,7 +6,7 @@ import (
 	"path/filepath"
 	"strings"
 
-	"github.com/valist-io/registry/internal/npm"
+	"github.com/valist-io/valist/internal/registry/npm"
 )
 
 func Run(projectPath string, valistFile Config) ([]string, error) {

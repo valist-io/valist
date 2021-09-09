@@ -6,53 +6,46 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/ethclient"
 	httpapi "github.com/ipfs/go-ipfs-http-client"
 	"github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
-	"github.com/valist-io/gasless"
-	"github.com/valist-io/gasless/mexa"
 
-	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/client/basetx"
-	"github.com/valist-io/registry/internal/core/client/metatx"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/signer"
+	"github.com/valist-io/valist/internal/contract"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/core/client/metatx"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
 // NewClient builds a client based on the given config.
 func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
-	var onClose []client.Close
-
-	listener, _, err := signer.StartIPCEndpoint(cfg)
-	if err != nil {
-		return nil, err
-	}
-	onClose = append(onClose, listener.Close)
-
-	wallet, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
-	if err != nil {
-		return nil, err
-	}
+	valistAddress := cfg.Ethereum.Contracts["valist"]
+	registryAddress := cfg.Ethereum.Contracts["registry"]
 
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
 		return nil, err
 	}
 
-	valist, err := contract.NewValist(cfg.Ethereum.Contracts["valist"], eth)
+	chainID, err := eth.ChainID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize valist contract: %v", err)
 	}
 
-	registry, err := contract.NewRegistry(cfg.Ethereum.Contracts["registry"], eth)
+	registry, err := contract.NewRegistry(registryAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	ipfs, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
+	ipfsapi, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
 	if err != nil {
 		return nil, err
 	}
@@ -68,39 +61,29 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 			continue
 		}
 
-		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+		go ipfsapi.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+	}
+
+	var transactor client.TransactorAPI
+	if cfg.Ethereum.MetaTx {
+		transactor, err = metatx.NewTransactor(eth, valistAddress, registryAddress, cfg.Ethereum.BiconomyApiKey)
+	} else {
+		transactor, err = basetx.NewTransactor(eth, valistAddress, registryAddress)
+	}
+
+	if err != nil {
+		return nil, err
 	}
 
 	opts := &client.Options{
-		IPFS:         ipfs,
-		Ethereum:     eth,
-		ChainID:      cfg.Ethereum.ChainID,
-		Valist:       valist,
-		Registry:     registry,
-		Account:      account,
-		Wallet:       wallet,
-		TransactOpts: basetx.TransactOpts,
-		Transactor:   basetx.NewTransactor(valist, registry),
-		OnClose:      onClose,
+		Storage:    ipfs.NewStorage(ipfsapi),
+		Ethereum:   eth,
+		Valist:     valist,
+		Registry:   registry,
+		Account:    account,
+		Signer:     signer.NewSigner(chainID, cfg.KeyStore()),
+		Transactor: transactor,
 	}
-
-	if !cfg.Ethereum.MetaTx {
-		return client.NewClient(opts)
-	}
-
-	meta, err := mexa.NewMexa(ctx, eth, cfg.Ethereum.BiconomyApiKey)
-	if err != nil {
-		return nil, err
-	}
-
-	signer := gasless.NewWalletSigner(opts.Account, opts.Wallet)
-	transactor, err := metatx.NewTransactor(meta, signer, eth, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	opts.TransactOpts = metatx.TransactOpts
-	opts.Transactor = transactor
 
 	return client.NewClient(opts)
 }

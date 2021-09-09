@@ -4,8 +4,8 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func (s *CoreSuite) TestGetRepository() {
@@ -58,7 +58,7 @@ func (s *CoreSuite) TestCreateRepository() {
 	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
 	s.Require().NoError(err, "Failed to vote for organization threshold")
 
-	s.client.SwitchAccount(s.accounts[1], s.wallets[1])
+	s.client.SetAccount(s.accounts[1])
 
 	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
 	s.Require().NoError(err, "Failed to vote for organization threshold")

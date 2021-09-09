@@ -3,16 +3,14 @@ package client
 import (
 	"context"
 	"encoding/json"
-	"fmt"
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
-	"github.com/ipfs/go-cid"
 
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 // GetRepository returns the repository with the given orgID and name.
@@ -32,22 +30,18 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 		return nil, types.ErrRepositoryNotExist
 	}
 
-	metaCID, err := cid.Decode(repo.MetaCID)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)
-	}
-
 	return &types.Repository{
 		OrgID:         orgID,
+		Name:          repoName,
 		Threshold:     repo.Threshold,
 		ThresholdDate: repo.ThresholdDate,
-		MetaCID:       metaCID,
+		MetaCID:       repo.MetaCID,
 	}, nil
 }
 
 // GetRepositoryMeta returns the repository meta with the given CID.
-func (client *Client) GetRepositoryMeta(ctx context.Context, id cid.Cid) (*types.RepositoryMeta, error) {
-	data, err := client.ReadFile(ctx, id)
+func (client *Client) GetRepositoryMeta(ctx context.Context, p string) (*types.RepositoryMeta, error) {
+	data, err := client.storage.ReadFile(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -67,15 +61,15 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	metaCID, err := client.WriteFile(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
-	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID.String())
+	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID)
 	if err != nil {
 		return nil, err
 	}
@@ -89,7 +83,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 }
 
 func (client *Client) VoteRepoDev(ctx context.Context, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, repoName, operation, address)
@@ -111,15 +105,15 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 		return nil, err
 	}
 
-	metaCID, err := client.WriteFile(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
-	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID.String())
+	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID)
 	if err != nil {
 		return nil, err
 	}
@@ -133,7 +127,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 }
 
 func (client *Client) VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteRepositoryThresholdTx(txopts, orgID, name, threshold)

@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewFetchCommand() *cli.Command {
@@ -18,7 +18,7 @@ func NewFetchCommand() *cli.Command {
 		Usage:   "Fetch repository info",
 		Aliases: []string{"get"},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -27,8 +27,8 @@ func NewFetchCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -43,31 +43,21 @@ func NewFetchCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
-			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
-
-			orgID, err := client.GetOrganizationID(c.Context, orgName)
+			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {
 				return err
 			}
 
-			repo, err := client.GetRepository(c.Context, orgID, repoName)
+			meta, err := client.GetRepositoryMeta(c.Context, res.Repository.MetaCID)
 			if err != nil {
 				return err
 			}
 
-			meta, err := client.GetRepositoryMeta(c.Context, repo.MetaCID)
-			if err != nil {
-				return err
-			}
-
-			fmt.Printf("OrgID: %s\n", orgID.String())
-			fmt.Printf("Repo: %s/%s\n", orgName, repoName)
+			fmt.Printf("OrgID: %s\n", res.Organization.ID.String())
 			fmt.Printf("Name: %s\n", meta.Name)
 			fmt.Printf("Description: %s\n", meta.Description)
-			fmt.Printf("Signature Threshold: %d\n", repo.Threshold)
+			fmt.Printf("Signature Threshold: %d\n", res.Repository.Threshold)
 
 			return nil
 		},

@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewUnpinCommand() *cli.Command {
@@ -24,8 +24,8 @@ func NewUnpinCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 

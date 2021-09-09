@@ -8,13 +8,12 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
-	cid "github.com/ipfs/go-cid"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/build"
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/build"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func NewPublishCommand() *cli.Command {
@@ -33,8 +32,8 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -49,7 +48,6 @@ func NewPublishCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
 			cwd, err := os.Getwd()
 			if err != nil {
@@ -66,23 +64,17 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			artifactPaths, err := build.Run(cwd, valistFile)
+			_, err = build.Run(cwd, valistFile)
 			if err != nil {
 				return err
 			}
 
-			var releaseCID cid.Cid
-			if len(artifactPaths) == 0 {
-				releaseCID, err = client.WriteFilePath(c.Context, artifactPaths[0])
-			} else {
-				releaseCID, err = client.WriteDirEntries(c.Context, cwd, artifactPaths)
-			}
-
+			releaseCID, err := client.Storage().WriteFile(c.Context, valistFile.Out)
 			if err != nil {
 				return err
 			}
 
-			metaCID, err := client.WriteFilePath(c.Context, valistFile.Meta)
+			metaCID, err := client.Storage().WriteFile(c.Context, valistFile.Meta)
 			if err != nil && !os.IsNotExist(err) {
 				return err
 			}
@@ -94,11 +86,8 @@ func NewPublishCommand() *cli.Command {
 			}
 
 			fmt.Println("Tag:", release.Tag)
-			fmt.Println("ReleaseCID:", releaseCID.String())
-
-			if metaCID.Defined() {
-				fmt.Println("MetaCID:", metaCID.String())
-			}
+			fmt.Println("ReleaseCID:", releaseCID)
+			fmt.Println("MetaCID:", metaCID)
 
 			if c.Bool("dryrun") {
 				return nil

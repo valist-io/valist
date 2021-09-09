@@ -8,9 +8,9 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/prompt"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewUpdateCommand() *cli.Command {
@@ -27,8 +27,8 @@ func NewUpdateCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -43,7 +43,6 @@ func NewUpdateCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
 			orgName := c.Args().Get(0)
 			repoName := c.Args().Get(1)

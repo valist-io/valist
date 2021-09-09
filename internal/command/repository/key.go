@@ -9,10 +9,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/config"
 )
 
 func voteInProgress(vote *valist.ValistVoteKeyEvent) bool {
@@ -29,8 +29,8 @@ func voteRepoDev(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEv
 		return nil, err
 	}
 
-	cfg, err := config.Load(home)
-	if err != nil {
+	cfg := config.NewConfig(home)
+	if err := cfg.Load(); err != nil {
 		return nil, err
 	}
 
@@ -45,7 +45,6 @@ func voteRepoDev(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEv
 	if err != nil {
 		return nil, err
 	}
-	defer valist.Close()
 
 	orgName := c.Args().Get(0)
 	repoName := c.Args().Get(1)

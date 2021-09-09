@@ -5,8 +5,17 @@ import (
 
 	"github.com/manifoldco/promptui"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
+
+func AccountPassphrase() *promptui.Prompt {
+	return &promptui.Prompt{
+		Label:       "Account passphrase",
+		Mask:        '*',
+		HideEntered: true,
+		Validate:    ValidateMinLength(5),
+	}
+}
 
 func OrganizationName(value string) *promptui.Prompt {
 	return &promptui.Prompt{

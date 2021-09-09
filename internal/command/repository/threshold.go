@@ -10,8 +10,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewThresholdCommand() *cli.Command {
@@ -19,7 +19,7 @@ func NewThresholdCommand() *cli.Command {
 		Name:  "threshold",
 		Usage: "Vote for repository threshold",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 3 {
+			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
@@ -28,8 +28,8 @@ func NewThresholdCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -44,22 +44,18 @@ func NewThresholdCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
-			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
-
-			threshold, err := strconv.ParseInt(c.Args().Get(2), 10, 64)
+			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {
 				return err
 			}
 
-			orgID, err := client.GetOrganizationID(c.Context, orgName)
+			threshold, err := strconv.ParseInt(c.Args().Get(1), 10, 64)
 			if err != nil {
 				return err
 			}
 
-			vote, err := client.VoteRepositoryThreshold(c.Context, orgID, repoName, big.NewInt(threshold))
+			vote, err := client.VoteRepositoryThreshold(c.Context, res.Organization.ID, res.Repository.Name, big.NewInt(threshold))
 			if err != nil {
 				return err
 			}

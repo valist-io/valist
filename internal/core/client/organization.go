@@ -8,10 +8,9 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/ipfs/go-cid"
 
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 // GetOrganization returns the organization with the given ID.
@@ -28,22 +27,17 @@ func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*typ
 
 	// TODO there's no way to check if an org exists
 
-	metaCID, err := cid.Decode(org.MetaCID)
-	if err != nil {
-		return nil, fmt.Errorf("Failed to parse organization meta CID: %v", err)
-	}
-
 	return &types.Organization{
 		ID:            id,
 		Threshold:     org.Threshold,
 		ThresholdDate: org.ThresholdDate,
-		MetaCID:       metaCID,
+		MetaCID:       org.MetaCID,
 	}, nil
 }
 
 // GetOrganizationMeta returns the organization meta with the given CID.
-func (client *Client) GetOrganizationMeta(ctx context.Context, id cid.Cid) (*types.OrganizationMeta, error) {
-	data, err := client.ReadFile(ctx, id)
+func (client *Client) GetOrganizationMeta(ctx context.Context, p string) (*types.OrganizationMeta, error) {
+	data, err := client.storage.ReadFile(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get organization meta: %v", err)
 	}
@@ -62,12 +56,12 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 		return nil, err
 	}
 
-	metaCID, err := client.WriteFile(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.CreateOrganizationTx(txopts, metaCID)
@@ -89,12 +83,12 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 		return nil, err
 	}
 
-	metaCID, err := client.WriteFile(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.SetOrganizationMetaTx(txopts, orgID, metaCID)
@@ -111,7 +105,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 }
 
 func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Hash, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, "", operation, address)
@@ -128,7 +122,7 @@ func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Ha
 }
 
 func (client *Client) VoteOrganizationThreshold(ctx context.Context, orgID common.Hash, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteOrganizationThresholdTx(txopts, orgID, threshold)
