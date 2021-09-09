@@ -21,7 +21,7 @@ import (
 )
 
 // NewClient builds a client based on the given config.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
+func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account, passphrase string) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
@@ -32,6 +32,11 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 
 	chainID, err := eth.ChainID(ctx)
 	if err != nil {
+		return nil, err
+	}
+
+	signer := signer.NewSigner(chainID, cfg.KeyStore())
+	if err := signer.Unlock(account, passphrase); err != nil {
 		return nil, err
 	}
 
@@ -81,7 +86,7 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		Valist:     valist,
 		Registry:   registry,
 		Account:    account,
-		Signer:     signer.NewSigner(chainID, cfg.KeyStore()),
+		Signer:     signer,
 		Transactor: transactor,
 	}
 

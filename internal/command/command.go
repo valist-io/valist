@@ -22,6 +22,10 @@ func NewApp() *cli.App {
 				Name:  "account",
 				Usage: "Account to transact with",
 			},
+			&cli.StringFlag{
+				Name:  "passphrase",
+				Usage: "Passphrase to unlock account",
+			},
 		},
 		Commands: []*cli.Command{
 			account.NewCommand(),

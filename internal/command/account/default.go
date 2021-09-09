@@ -34,7 +34,9 @@ func NewDefaultCommand() *cli.Command {
 			}
 
 			address := common.HexToAddress(c.Args().Get(0))
-			// TODO do we care if the address is not pinned?
+			if !cfg.KeyStore().HasAddress(address) {
+				return fmt.Errorf("Invalid account address")
+			}
 
 			cfg.Accounts.Default = address
 			return cfg.Save()

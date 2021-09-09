@@ -34,8 +34,6 @@ type IPFS struct {
 }
 
 type Accounts struct {
-	// Pinned is a list of all accounts.
-	Pinned []common.Address `json:"pinned,omitempty"`
 	// Default is the default account.
 	Default common.Address `json:"default,omitempty"`
 }

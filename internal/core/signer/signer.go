@@ -7,6 +7,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/signer/core"
@@ -18,18 +19,20 @@ import (
 type Signer struct {
 	chainID *big.Int
 	manager *accounts.Manager
+	kstore  *keystore.KeyStore
 	cache   map[common.Address]string
 }
 
-func NewSigner(chainID *big.Int, backends ...accounts.Backend) *Signer {
+func NewSigner(chainID *big.Int, kstore *keystore.KeyStore) *Signer {
 	return &Signer{
 		chainID: chainID,
-		manager: accounts.NewManager(&accounts.Config{}, backends...),
+		manager: accounts.NewManager(&accounts.Config{}, kstore),
+		kstore:  kstore,
 		cache:   make(map[common.Address]string),
 	}
 }
 
-func (s *Signer) find(account accounts.Account) (gasless.Wallet, error) {
+func (s *Signer) wallet(account accounts.Account) (gasless.Wallet, error) {
 	wallet, err := s.manager.Find(account)
 	if err != nil {
 		return gasless.Wallet{}, err
@@ -39,16 +42,26 @@ func (s *Signer) find(account accounts.Account) (gasless.Wallet, error) {
 }
 
 func (s *Signer) passphrase(account accounts.Account) (string, error) {
-	if passphrase, ok := s.cache[account.Address]; ok {
+	passphrase, ok := s.cache[account.Address]
+	if ok {
 		return passphrase, nil
 	}
 
 	return prompt.AccountPassphrase().Run()
 }
 
+// Unlock decrypts the account using the given passphrase.
+func (s *Signer) Unlock(account accounts.Account, passphrase string) error {
+	if len(passphrase) == 0 {
+		return nil
+	}
+
+	return s.kstore.Unlock(account, passphrase)
+}
+
 // SignTx signs the given transaction using the given account's wallet.
 func (s *Signer) SignTx(account accounts.Account, tx *types.Transaction) (*types.Transaction, error) {
-	wallet, err := s.find(account)
+	wallet, err := s.wallet(account)
 	if err != nil {
 		return nil, err
 	}
@@ -77,7 +90,7 @@ func (s *Signer) SignTx(account accounts.Account, tx *types.Transaction) (*types
 
 // SignTypedData signs the given typedData using the given account's wallet.
 func (s *Signer) SignTypedData(account accounts.Account, typedData core.TypedData) ([]byte, error) {
-	wallet, err := s.find(account)
+	wallet, err := s.wallet(account)
 	if err != nil {
 		return nil, err
 	}

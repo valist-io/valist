@@ -39,7 +39,7 @@ func NewFetchCommand() *cli.Command {
 				account.Address = cfg.Accounts.Default
 			}
 
-			client, err := core.NewClient(c.Context, cfg, account)
+			client, err := core.NewClient(c.Context, cfg, account, c.String("passphrase"))
 			if err != nil {
 				return err
 			}

@@ -41,7 +41,7 @@ func voteRepoDev(c *cli.Context, operation common.Hash) (*valist.ValistVoteKeyEv
 		account.Address = cfg.Accounts.Default
 	}
 
-	valist, err := core.NewClient(c.Context, cfg, account)
+	valist, err := core.NewClient(c.Context, cfg, account, c.String("passphrase"))
 	if err != nil {
 		return nil, err
 	}

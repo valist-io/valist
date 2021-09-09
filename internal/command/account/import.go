@@ -1,20 +1,26 @@
 package account
 
 import (
+	"fmt"
 	"os"
 
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/registry/internal/core/config"
 	"github.com/valist-io/registry/internal/prompt"
 )
 
-func NewCreateCommand() *cli.Command {
+func NewImportCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "create",
-		Usage: "Create an account",
+		Name:  "import",
+		Usage: "Import an account",
 		Action: func(c *cli.Context) error {
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
 			home, err := os.UserHomeDir()
 			if err != nil {
 				return err
@@ -25,12 +31,17 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			passphrase, err := prompt.NewAccountPassphrase().Run()
+			private, err := crypto.HexToECDSA(c.Args().Get(0))
 			if err != nil {
 				return err
 			}
 
-			account, err := cfg.KeyStore().NewAccount(passphrase)
+			passphrase, err := prompt.AccountPassphrase().RunFlag(c, "passphrase")
+			if err != nil {
+				return err
+			}
+
+			account, err := cfg.KeyStore().ImportECDSA(private, passphrase)
 			if err != nil {
 				return err
 			}
@@ -39,6 +50,7 @@ func NewCreateCommand() *cli.Command {
 				cfg.Accounts.Default = account.Address
 			}
 
+			fmt.Println("Successfully imported", account.Address)
 			return cfg.Save()
 		},
 	}

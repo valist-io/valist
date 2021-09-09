@@ -24,11 +24,11 @@ func NewListCommand() *cli.Command {
 				return err
 			}
 
-			for _, account := range cfg.Accounts.Pinned {
-				if cfg.Accounts.Default == account {
-					fmt.Printf("%s (default)\n", account)
+			for _, account := range cfg.KeyStore().Accounts() {
+				if cfg.Accounts.Default == account.Address {
+					fmt.Printf("%s (default)\n", account.Address)
 				} else {
-					fmt.Printf("%s\n", account)
+					fmt.Printf("%s\n", account.Address)
 				}
 			}
 
