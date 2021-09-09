@@ -26,12 +26,11 @@ Documentation for how to get started with Valist can be found at [https://docs.v
 
 ## Building
 
-### System Requirements:
+#### System Requirements:
 
-* Go 1.16
+* Go >= 1.16
 * node >= 14.17
 * npm >= 6.14
-* Docker Engine (for reproducible builds)
 
 
 ```bash
