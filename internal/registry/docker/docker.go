@@ -14,8 +14,8 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
-	"github.com/valist-io/registry/internal/core/types"
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/storage"
 )
 
 type handler struct {

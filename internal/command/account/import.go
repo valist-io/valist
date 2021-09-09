@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/crypto"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/prompt"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewImportCommand() *cli.Command {

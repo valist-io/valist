@@ -11,13 +11,13 @@ import (
 	"github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
 
-	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/client/basetx"
-	"github.com/valist-io/registry/internal/core/client/metatx"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/core/signer"
-	"github.com/valist-io/registry/internal/storage/ipfs"
+	"github.com/valist-io/valist/internal/contract"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/core/client/metatx"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
 // NewClient builds a client based on the given config.

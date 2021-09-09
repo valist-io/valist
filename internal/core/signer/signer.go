@@ -13,7 +13,7 @@ import (
 	"github.com/ethereum/go-ethereum/signer/core"
 
 	"github.com/valist-io/gasless"
-	"github.com/valist-io/registry/internal/prompt"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 type Signer struct {

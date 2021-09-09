@@ -6,7 +6,7 @@ import (
 	"path"
 	"strings"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.ResolvedPath, error) {

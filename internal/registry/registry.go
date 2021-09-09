@@ -5,10 +5,10 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/valist-io/registry/internal/core/types"
-	"github.com/valist-io/registry/internal/registry/docker"
-	"github.com/valist-io/registry/internal/registry/git"
-	"github.com/valist-io/registry/internal/registry/npm"
+	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/registry/docker"
+	"github.com/valist-io/valist/internal/registry/git"
+	"github.com/valist-io/valist/internal/registry/npm"
 )
 
 func NewServer(client types.CoreAPI, addr string) *http.Server {
