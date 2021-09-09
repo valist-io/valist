@@ -9,7 +9,7 @@ import (
 
 	billy "github.com/go-git/go-billy/v5"
 
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/storage"
 )
 
 var (

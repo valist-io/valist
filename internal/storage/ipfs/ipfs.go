@@ -13,7 +13,7 @@ import (
 	"github.com/ipfs/interface-go-ipfs-core/options"
 	"github.com/ipfs/interface-go-ipfs-core/path"
 
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/storage"
 )
 
 var addopts = []options.UnixfsAddOption{

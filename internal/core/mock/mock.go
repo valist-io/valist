@@ -11,11 +11,11 @@ import (
 	"github.com/ipfs/go-ipfs/core/coreapi"
 	coremock "github.com/ipfs/go-ipfs/core/mock"
 
-	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/client/basetx"
-	"github.com/valist-io/registry/internal/core/signer"
-	"github.com/valist-io/registry/internal/storage/ipfs"
+	"github.com/valist-io/valist/internal/contract"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
 var chainID = big.NewInt(1337)

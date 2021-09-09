@@ -10,9 +10,9 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
-	"github.com/valist-io/registry/internal/contract/metatx"
-	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/valist/internal/contract/metatx"
+	"github.com/valist-io/valist/internal/contract/registry"
+	"github.com/valist-io/valist/internal/contract/valist"
 )
 
 func NewValist(address common.Address, backend bind.ContractBackend) (*valist.Valist, error) {

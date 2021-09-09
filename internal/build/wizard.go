@@ -3,7 +3,7 @@ package build
 import (
 	"fmt"
 
-	"github.com/valist-io/registry/internal/prompt"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 // ConfigWizard runs an interactive configurator.

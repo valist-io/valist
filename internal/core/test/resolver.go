@@ -3,7 +3,7 @@ package test
 import (
 	"context"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func (s *CoreSuite) TestResolvePath() {

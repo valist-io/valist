@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/test"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/test"
 )
 
 type ClientSuite struct {
