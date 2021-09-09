@@ -9,9 +9,9 @@ import (
 	"github.com/ethereum/go-ethereum/core/types"
 
 	"github.com/valist-io/gasless"
-	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/contract/valist"
+	"github.com/valist-io/valist/internal/contract"
+	"github.com/valist-io/valist/internal/contract/registry"
+	"github.com/valist-io/valist/internal/contract/valist"
 )
 
 type Transactor struct {

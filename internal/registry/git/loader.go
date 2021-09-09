@@ -12,7 +12,7 @@ import (
 	"github.com/go-git/go-git/v5/storage/filesystem"
 	"github.com/go-git/go-git/v5/storage/memory"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 type memLoader struct{}

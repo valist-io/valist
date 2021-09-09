@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/valist-io/registry/internal/core/mock"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func TestGitPushClone(t *testing.T) {

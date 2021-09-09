@@ -5,7 +5,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 var emptyHash = common.HexToHash("0x0")

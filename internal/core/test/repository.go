@@ -4,8 +4,8 @@ import (
 	"context"
 	"math/big"
 
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func (s *CoreSuite) TestGetRepository() {

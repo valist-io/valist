@@ -7,7 +7,7 @@ import (
 	coremock "github.com/ipfs/go-ipfs/core/mock"
 	"github.com/stretchr/testify/suite"
 
-	"github.com/valist-io/registry/internal/storage/test"
+	"github.com/valist-io/valist/internal/storage/test"
 )
 
 type StorageSuite struct {
