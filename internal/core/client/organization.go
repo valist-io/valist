@@ -61,7 +61,7 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.CreateOrganizationTx(txopts, metaCID)
@@ -88,7 +88,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.SetOrganizationMetaTx(txopts, orgID, metaCID)
@@ -105,7 +105,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 }
 
 func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Hash, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, "", operation, address)
@@ -122,7 +122,7 @@ func (client *Client) VoteOrganizationAdmin(ctx context.Context, orgID common.Ha
 }
 
 func (client *Client) VoteOrganizationThreshold(ctx context.Context, orgID common.Hash, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteOrganizationThresholdTx(txopts, orgID, threshold)

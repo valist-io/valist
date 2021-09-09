@@ -67,7 +67,7 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
 func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *types.Release) (*valist.ValistVoteReleaseEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor(client.account)
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteReleaseTx(txopts, orgID, repoName, release.Tag, release.ReleaseCID, release.MetaCID)

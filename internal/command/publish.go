@@ -32,8 +32,8 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -48,7 +48,6 @@ func NewPublishCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
 			cwd, err := os.Getwd()
 			if err != nil {

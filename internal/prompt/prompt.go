@@ -8,6 +8,15 @@ import (
 	"github.com/valist-io/registry/internal/core/types"
 )
 
+func AccountPassphrase() *promptui.Prompt {
+	return &promptui.Prompt{
+		Label:       "Account passphrase",
+		Mask:        '*',
+		HideEntered: true,
+		Validate:    ValidateMinLength(5),
+	}
+}
+
 func OrganizationName(value string) *promptui.Prompt {
 	return &promptui.Prompt{
 		Label:    "Organization name or username",

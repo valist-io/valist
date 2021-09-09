@@ -14,7 +14,6 @@ func NewCommand() *cli.Command {
 			NewDefaultCommand(),
 			NewPinCommand(),
 			NewUnpinCommand(),
-			NewSignerCommand(),
 		},
 	}
 }

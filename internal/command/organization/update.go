@@ -27,8 +27,8 @@ func NewUpdateCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -43,7 +43,6 @@ func NewUpdateCommand() *cli.Command {
 			if err != nil {
 				return err
 			}
-			defer client.Close()
 
 			orgName := c.Args().Get(0)
 
