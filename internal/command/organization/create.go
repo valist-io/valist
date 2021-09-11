@@ -2,53 +2,35 @@ package organization
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
 	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewCreateCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "create",
-		Usage: "Create an organization",
+		Name:      "create",
+		Usage:     "Create an organization",
+		ArgsUsage: "[org-name]",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account)
-			if err != nil {
-				return err
-			}
-
+			client := c.Context.Value(core.ClientKey).(*client.Client)
 			orgName := c.Args().Get(0)
-			_, err = client.GetOrganizationID(c.Context, orgName)
+
+			_, err := client.GetOrganizationID(c.Context, orgName)
 			if err == nil {
 				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
+			}
+
+			if err != nil {
+				return err
 			}
 
 			name, err := prompt.OrganizationName("").Run()
