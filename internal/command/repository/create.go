@@ -2,54 +2,32 @@ package repository
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
 	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewCreateCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "create",
-		Usage: "Create a repository",
+		Name:      "create",
+		Usage:     "Create a repository",
+		ArgsUsage: "[repo-path]",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
+			client := c.Context.Value(core.ClientKey).(*client.Client)
+			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
+			if err == nil {
+				return fmt.Errorf("Repository already exists")
 			}
 
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account)
-			if err != nil {
-				return err
-			}
-
-			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
-
-			orgID, err := client.GetOrganizationID(c.Context, orgName)
-			if err != nil {
+			if err != types.ErrRepositoryNotExist {
 				return err
 			}
 
@@ -86,7 +64,7 @@ func NewCreateCommand() *cli.Command {
 				Repository:  url,
 			}
 
-			_, err = client.CreateRepository(c.Context, orgID, repoName, &meta)
+			_, err = client.CreateRepository(c.Context, res.OrgID, res.RepoName, &meta)
 			if err != nil {
 				return err
 			}

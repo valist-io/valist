@@ -139,7 +139,14 @@ type RepositoryMeta struct {
 
 type ResolvedPath struct {
 	Organization *Organization
-	Repository   *Repository
-	Release      *Release
-	File         storage.File
+	OrgID        common.Hash
+
+	Repository *Repository
+	RepoName   string
+
+	Release    *Release
+	ReleaseTag string
+
+	File     storage.File
+	FilePath string
 }
