@@ -12,10 +12,9 @@ import (
 )
 
 const (
-	rootDir        = ".valist"
-	configFile     = "config"
-	keystoreDir    = "keystore"
-	keystoreDirTmp = "keystore_tmp"
+	rootDir     = ".valist"
+	configFile  = "config"
+	keystoreDir = "keystore"
 )
 
 type Ethereum struct {
@@ -130,7 +129,7 @@ func (c *Config) Save() error {
 func (c *Config) KeyStore() *keystore.KeyStore {
 	var keystorePath string
 	if os.Getenv("VALIST_SIGNER") != "" {
-		keystorePath = filepath.Join(os.TempDir(), keystoreDirTmp, fmt.Sprintf("%v", time.Now().UnixNano()))
+		keystorePath = filepath.Join(os.TempDir(), keystoreDir, fmt.Sprintf("%v", time.Now().UnixNano()))
 	} else {
 		keystorePath = keystoreDir
 	}
