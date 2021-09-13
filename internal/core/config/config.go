@@ -2,17 +2,20 @@ package config
 
 import (
 	"encoding/json"
+	"fmt"
 	"os"
 	"path/filepath"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
-	rootDir     = ".valist"
-	configFile  = "config"
-	keystoreDir = "keystore"
+	rootDir        = ".valist"
+	configFile     = "config"
+	keystoreDir    = "keystore"
+	keystoreDirTmp = "keystore_tmp"
 )
 
 type Ethereum struct {
@@ -125,6 +128,12 @@ func (c *Config) Save() error {
 
 // KeyStore returns the config keystore.
 func (c *Config) KeyStore() *keystore.KeyStore {
-	path := filepath.Join(c.rootPath, keystoreDir)
+	var keystorePath string
+	if os.Getenv("VALIST_SIGNER") != "" {
+		keystorePath = filepath.Join(os.TempDir(), keystoreDirTmp, fmt.Sprintf("%v", time.Now().UnixNano()))
+	} else {
+		keystorePath = keystoreDir
+	}
+	path := filepath.Join(c.rootPath, keystorePath)
 	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
 }
