@@ -127,12 +127,11 @@ func (c *Config) Save() error {
 
 // KeyStore returns the config keystore.
 func (c *Config) KeyStore() *keystore.KeyStore {
-	var keystorePath string
+	var path string
 	if os.Getenv("VALIST_SIGNER") != "" {
-		keystorePath = filepath.Join(os.TempDir(), keystoreDir, fmt.Sprintf("%v", time.Now().UnixNano()))
+		path = filepath.Join(os.TempDir(), keystoreDir, fmt.Sprintf("%v", time.Now().UnixNano()))
 	} else {
-		keystorePath = keystoreDir
+		path = filepath.Join(c.rootPath, keystoreDir)
 	}
-	path := filepath.Join(c.rootPath, keystorePath)
 	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
 }
