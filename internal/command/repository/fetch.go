@@ -2,48 +2,25 @@ package repository
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/client"
 )
 
 func NewFetchCommand() *cli.Command {
 	return &cli.Command{
-		Name:    "fetch",
-		Usage:   "Fetch repository info",
-		Aliases: []string{"get"},
+		Name:      "fetch",
+		Usage:     "Fetch repository info",
+		Aliases:   []string{"get"},
+		ArgsUsage: "[repo-path]",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account, c.String("passphrase"))
-			if err != nil {
-				return err
-			}
-
+			client := c.Context.Value(core.ClientKey).(*client.Client)
 			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {
 				return err

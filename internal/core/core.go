@@ -20,6 +20,13 @@ import (
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
+type contextKey string
+
+const (
+	ClientKey = contextKey("client")
+	ConfigKey = contextKey("config")
+)
+
 // NewClient builds a client based on the given config.
 func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account, passphrase string) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]

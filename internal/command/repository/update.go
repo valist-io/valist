@@ -2,62 +2,31 @@ package repository
 
 import (
 	"fmt"
-	"os"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewUpdateCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "update",
-		Usage: "Update repository metadata",
+		Name:      "update",
+		Usage:     "Update repository metadata",
+		ArgsUsage: "[repo-path]",
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 2 {
+			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			home, err := os.UserHomeDir()
+			client := c.Context.Value(core.ClientKey).(*client.Client)
+			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
 			if err != nil {
 				return err
 			}
 
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account, c.String("passphrase"))
-			if err != nil {
-				return err
-			}
-
-			orgName := c.Args().Get(0)
-			repoName := c.Args().Get(1)
-
-			orgID, err := client.GetOrganizationID(c.Context, orgName)
-			if err != nil {
-				return err
-			}
-
-			repo, err := client.GetRepository(c.Context, orgID, repoName)
-			if err != nil {
-				return err
-			}
-
-			meta, err := client.GetRepositoryMeta(c.Context, repo.MetaCID)
+			meta, err := client.GetRepositoryMeta(c.Context, res.Repository.MetaCID)
 			if err != nil {
 				return err
 			}
@@ -87,7 +56,7 @@ func NewUpdateCommand() *cli.Command {
 			meta.Homepage = homepage
 			meta.Repository = url
 
-			_, err = client.SetRepositoryMeta(c.Context, orgID, repoName, meta)
+			_, err = client.SetRepositoryMeta(c.Context, res.OrgID, res.RepoName, meta)
 			if err != nil {
 				return err
 			}

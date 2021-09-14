@@ -1,11 +1,10 @@
 package account
 
 import (
-	"os"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/prompt"
 )
@@ -15,31 +14,24 @@ func NewCreateCommand() *cli.Command {
 		Name:  "create",
 		Usage: "Create an account",
 		Action: func(c *cli.Context) error {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
+			config := c.Context.Value(core.ConfigKey).(*config.Config)
 
 			passphrase, err := prompt.NewAccountPassphrase().Run()
 			if err != nil {
 				return err
 			}
 
-			account, err := cfg.KeyStore().NewAccount(passphrase)
+			account, err := config.KeyStore().NewAccount(passphrase)
 			if err != nil {
 				return err
 			}
 
-			if cfg.Accounts.Default == common.HexToAddress("0x0") {
-				cfg.Accounts.Default = account.Address
+			if config.Accounts.Default == common.HexToAddress("0x0") {
+				config.Accounts.Default = account.Address
 			}
 
-			return cfg.Save()
+			config.Accounts.Pinned = append(config.Accounts.Pinned, account.Address)
+			return config.Save()
 		},
 	}
 }

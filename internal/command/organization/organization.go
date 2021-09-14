@@ -2,6 +2,8 @@ package organization
 
 import (
 	"github.com/urfave/cli/v2"
+
+	"github.com/valist-io/valist/internal/command/organization/key"
 )
 
 func NewCommand() *cli.Command {
@@ -13,8 +15,8 @@ func NewCommand() *cli.Command {
 			NewFetchCommand(),
 			NewCreateCommand(),
 			NewUpdateCommand(),
-			NewKeyCommand(),
 			NewThresholdCommand(),
+			key.NewCommand(),
 		},
 	}
 }
