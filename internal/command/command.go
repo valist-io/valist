@@ -1,19 +1,12 @@
 package command
 
 import (
-	"context"
-	"os"
-
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/command/account"
 	"github.com/valist-io/valist/internal/command/organization"
 	"github.com/valist-io/valist/internal/command/repository"
-	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/prompt"
+	"github.com/valist-io/valist/internal/command/utils/flags"
 )
 
 func NewApp() *cli.App {
@@ -23,14 +16,8 @@ func NewApp() *cli.App {
 		Usage:       "Valist command line interface",
 		Description: `Universal package repository.`,
 		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "account",
-				Usage: "Account to transact with",
-			},
-			&cli.StringFlag{
-				Name:  "passphrase",
-				Usage: "Passphrase to unlock account",
-			},
+			flags.Account(),
+			flags.AccountPassphrase(),
 		},
 		Commands: []*cli.Command{
 			account.NewCommand(),
@@ -40,42 +27,6 @@ func NewApp() *cli.App {
 			NewBuildCommand(),
 			NewInitCommand(),
 			NewPublishCommand(),
-		},
-		Before: func(c *cli.Context) error {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			if err := config.Initialize(home); err != nil {
-				return err
-			}
-
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			passphrase, err := prompt.AccountPassphrase().RunFlag(c, "passphrase")
-			if err != nil {
-				return err
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account, passphrase)
-			if err != nil {
-				return err
-			}
-
-			c.Context = context.WithValue(c.Context, core.ClientKey, client)
-			c.Context = context.WithValue(c.Context, core.ConfigKey, cfg)
-			return nil
 		},
 	}
 }

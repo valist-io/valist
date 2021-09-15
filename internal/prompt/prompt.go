@@ -45,6 +45,15 @@ func NewAccountPassphrase() Prompt {
 	}}
 }
 
+func AccountPrivateKey() Prompt {
+	return Prompt{promptui.Prompt{
+		Label:       "Hex-encoded ECDSA private key",
+		Mask:        '*',
+		HideEntered: true,
+		Validate:    ValidateMinLength(32),
+	}}
+}
+
 func AccountPassphrase() Prompt {
 	return Prompt{promptui.Prompt{
 		Label:       "Account passphrase",
