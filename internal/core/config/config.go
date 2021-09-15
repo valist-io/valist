@@ -17,6 +17,8 @@ const (
 	keystoreDir = "keystore"
 )
 
+var timestamp string
+
 type Ethereum struct {
 	// BiconomyApiKey is the mexa public api key.
 	BiconomyApiKey string `json:"biconomy_api_key"`
@@ -128,10 +130,19 @@ func (c *Config) Save() error {
 // KeyStore returns the config keystore.
 func (c *Config) KeyStore() *keystore.KeyStore {
 	var path string
+
+	// set timestamp once per process
+	if timestamp == "" {
+		timestamp = fmt.Sprintf("%v", time.Now().UnixNano())
+	}
+
+	// use temporary keystore when VALIST_SIGNER is set
+	// otherwise, use default ~/.valist/keystore path
 	if os.Getenv("VALIST_SIGNER") != "" {
-		path = filepath.Join(os.TempDir(), keystoreDir, fmt.Sprintf("%v", time.Now().UnixNano()))
+		path = filepath.Join(os.TempDir(), keystoreDir, timestamp)
 	} else {
 		path = filepath.Join(c.rootPath, keystoreDir)
 	}
+
 	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
 }
