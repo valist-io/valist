@@ -5,6 +5,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
@@ -16,6 +17,7 @@ func NewCreateCommand() *cli.Command {
 		Name:      "create",
 		Usage:     "Create an organization",
 		ArgsUsage: "[org-name]",
+		Before:    lifecycle.UnlockAccount,
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
@@ -27,10 +29,6 @@ func NewCreateCommand() *cli.Command {
 			_, err := client.GetOrganizationID(c.Context, orgName)
 			if err == nil {
 				return fmt.Errorf("Namespace '%v' taken. Please try another orgName/username.", orgName)
-			}
-
-			if err != nil {
-				return err
 			}
 
 			name, err := prompt.OrganizationName("").Run()

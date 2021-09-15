@@ -16,7 +16,7 @@ func NewCreateCommand() *cli.Command {
 		Action: func(c *cli.Context) error {
 			config := c.Context.Value(core.ConfigKey).(*config.Config)
 
-			passphrase, err := prompt.AccountPassphrase().Run()
+			passphrase, err := prompt.NewAccountPassphrase().Run()
 			if err != nil {
 				return err
 			}

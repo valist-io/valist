@@ -110,6 +110,14 @@ func (client *Client) Storage() storage.Storage {
 	return client.storage
 }
 
+func (client *Client) Account() accounts.Account {
+	return client.account
+}
+
+func (client *Client) Signer() *signer.Signer {
+	return client.signer
+}
+
 func (client *Client) SetAccount(account accounts.Account) {
 	client.account = account
 }
