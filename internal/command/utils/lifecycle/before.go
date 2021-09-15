@@ -91,7 +91,10 @@ func UnlockAccount(c *cli.Context) error {
 		return err
 	}
 
-	client.Signer().Unlock(client.Account(), passphrase)
+	err = client.Signer().Unlock(client.Account(), passphrase)
+	if err != nil {
+		return err
+	}
 
 	return nil
 }
