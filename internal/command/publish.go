@@ -9,6 +9,7 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/build"
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
@@ -24,6 +25,7 @@ func NewPublishCommand() *cli.Command {
 				Usage: "Build and skip publish",
 			},
 		},
+		Before: lifecycle.SetupClientWithPassphrase,
 		Action: func(c *cli.Context) error {
 			client := c.Context.Value(core.ClientKey).(*client.Client)
 

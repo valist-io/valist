@@ -2,10 +2,10 @@ package account
 
 import (
 	"fmt"
+	"os"
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/config"
 )
 
@@ -14,13 +14,21 @@ func NewListCommand() *cli.Command {
 		Name:  "list",
 		Usage: "List all accounts",
 		Action: func(c *cli.Context) error {
-			config := c.Context.Value(core.ConfigKey).(*config.Config)
+			home, err := os.UserHomeDir()
+			if err != nil {
+				return err
+			}
 
-			for _, account := range config.Accounts.Pinned {
-				if config.Accounts.Default == account {
-					fmt.Printf("%s (default)\n", account)
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
+				return err
+			}
+
+			for _, account := range cfg.KeyStore().Accounts() {
+				if cfg.Accounts.Default == account.Address {
+					fmt.Printf("%s (default)\n", account.Address)
 				} else {
-					fmt.Printf("%s\n", account)
+					fmt.Printf("%s\n", account.Address)
 				}
 			}
 

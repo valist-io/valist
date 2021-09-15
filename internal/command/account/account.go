@@ -12,8 +12,8 @@ func NewCommand() *cli.Command {
 			NewCreateCommand(),
 			NewListCommand(),
 			NewDefaultCommand(),
-			NewPinCommand(),
-			NewUnpinCommand(),
+			NewImportCommand(),
+			NewExportCommand(),
 		},
 	}
 }
