@@ -17,7 +17,9 @@ import (
 	"github.com/valist-io/valist/internal/prompt"
 )
 
-const passphraseKey = "passphrase"
+type contextKey string
+
+const passphraseKey contextKey = "passphrase"
 
 func loadConfig() (*config.Config, error) {
 	home, err := os.UserHomeDir()
@@ -84,7 +86,7 @@ func UnlockAccount(c *cli.Context) error {
 	passphrase := c.Context.Value(passphraseKey).(string)
 
 	if passphrase == "" {
-		pass, err := prompt.AccountPassphrase().RunFlag(c, passphraseKey)
+		pass, err := prompt.AccountPassphrase().RunFlag(c, "passphrase")
 		if err != nil {
 			return err
 		}
