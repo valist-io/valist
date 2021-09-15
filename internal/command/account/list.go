@@ -6,13 +6,15 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewListCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "list",
-		Usage: "List all accounts",
+		Name:   "list",
+		Usage:  "List all accounts",
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
 			home, err := os.UserHomeDir()
 			if err != nil {
