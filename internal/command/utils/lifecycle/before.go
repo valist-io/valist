@@ -83,7 +83,10 @@ func UnlockAccount(c *cli.Context) error {
 	client := c.Context.Value(core.ClientKey).(*client.Client)
 
 	// check for ephemeral encryption key (will be set if using VALIST_SIGNER env var)
-	passphrase := c.Context.Value(passphraseKey).(string)
+	passphrase, ok := c.Context.Value(passphraseKey).(string)
+	if !ok {
+		return fmt.Errorf("Passphrase not set in context")
+	}
 
 	if passphrase == "" {
 		pass, err := prompt.AccountPassphrase().RunFlag(c, "passphrase")
