@@ -48,6 +48,23 @@ func getAccount(c *cli.Context, cfg *config.Config) (accounts.Account, error) {
 		account.Address = cfg.Accounts.Default
 	}
 
+	// if no account found, prompt to create one
+	if cfg.Accounts.Default == common.HexToAddress("0x0") {
+		fmt.Println("No accounts found. Generating new keypair...")
+		passphrase, err := prompt.NewAccountPassphrase().Run()
+		if err != nil {
+			return accounts.Account{}, err
+		}
+
+		account, err := cfg.KeyStore().NewAccount(passphrase)
+		if err != nil {
+			return accounts.Account{}, err
+		}
+
+		cfg.Accounts.Default = account.Address
+		c.Context = context.WithValue(c.Context, passphraseKey, passphrase)
+	}
+
 	// use env variable VALIST_SIGNER as signing key when set
 	if os.Getenv("VALIST_SIGNER") != "" {
 		// generate cryptographically secure, ephemeral encryption key that will clear when program halts
@@ -83,10 +100,7 @@ func UnlockAccount(c *cli.Context) error {
 	client := c.Context.Value(core.ClientKey).(*client.Client)
 
 	// check for ephemeral encryption key (will be set if using VALIST_SIGNER env var)
-	passphrase, ok := c.Context.Value(passphraseKey).(string)
-	if !ok {
-		return fmt.Errorf("Passphrase not set in context")
-	}
+	passphrase, _ := c.Context.Value(passphraseKey).(string)
 
 	if passphrase == "" {
 		pass, err := prompt.AccountPassphrase().RunFlag(c, "passphrase")
