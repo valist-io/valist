@@ -53,7 +53,7 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			fmt.Printf("Linking name '%v' to orgID 0x'%x'...\n", orgName, create.OrgID)
+			fmt.Printf("Linking name '%v' to orgID '0x%x'...\n", orgName, create.OrgID)
 			_, err = client.LinkOrganizationName(c.Context, create.OrgID, orgName)
 			if err != nil {
 				return err
