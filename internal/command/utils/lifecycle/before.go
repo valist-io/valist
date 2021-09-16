@@ -62,6 +62,10 @@ func getAccount(c *cli.Context, cfg *config.Config) (accounts.Account, error) {
 		}
 
 		cfg.Accounts.Default = account.Address
+		if err = cfg.Save(); err != nil {
+			return accounts.Account{}, err
+		}
+
 		c.Context = context.WithValue(c.Context, passphraseKey, passphrase)
 	}
 
