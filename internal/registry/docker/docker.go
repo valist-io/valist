@@ -64,10 +64,33 @@ func (h *handler) writeUpload(uuid string, r io.Reader) (int64, error) {
 	return size, nil
 }
 
-func (h *handler) moveBlob(ctx context.Context, dir storage.Directory, digest string) error {
-	p, ok := h.blobs[digest]
-	if !ok {
-		return fmt.Errorf("blob not found")
+func (h *handler) findBlob(ctx context.Context, orgName, repoName, digest string) (string, error) {
+	if p, ok := h.blobs[digest]; ok {
+		return p, nil
+	}
+
+	raw := fmt.Sprintf("%s/%s/latest", orgName, repoName)
+	res, err := h.client.ResolvePath(ctx, raw)
+	if err != nil {
+		return "", err
+	}
+
+	return fmt.Sprintf("%s/%s", res.Release.ReleaseCID, digest), nil
+}
+
+func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
+	p, err := h.findBlob(ctx, orgName, repoName, digest)
+	if err != nil {
+		return nil, err
+	}
+
+	return h.client.Storage().Open(ctx, p)
+}
+
+func (h *handler) moveBlob(ctx context.Context, dir storage.Directory, orgName, repoName, digest string) error {
+	p, err := h.findBlob(ctx, orgName, repoName, digest)
+	if err != nil {
+		return err
 	}
 
 	if err := dir.Add(ctx, digest, p); err != nil {
@@ -76,20 +99,6 @@ func (h *handler) moveBlob(ctx context.Context, dir storage.Directory, digest st
 
 	delete(h.blobs, digest)
 	return nil
-}
-
-func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
-	if p, ok := h.blobs[digest]; ok {
-		return h.client.Storage().Open(ctx, p)
-	}
-
-	raw := fmt.Sprintf("%s/%s/latest/%s", orgName, repoName, digest)
-	res, err := h.client.ResolvePath(ctx, raw)
-	if err != nil {
-		return nil, err
-	}
-
-	return res.File, nil
 }
 
 func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
@@ -254,19 +263,26 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	blobs := h.client.Storage().Mkdir()
-	if err := h.moveBlob(ctx, blobs, manifest.Config.Digest); err != nil {
+	dir, err := h.client.Storage().Mkdir(ctx)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := blobs.Add(ctx, digest, manifestCID); err != nil {
+	err = h.moveBlob(ctx, dir, orgName, repoName, manifest.Config.Digest)
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	if err := dir.Add(ctx, digest, manifestCID); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	for _, layer := range manifest.Layers {
-		if err := h.moveBlob(ctx, blobs, layer.Digest); err != nil {
+		err := h.moveBlob(ctx, dir, orgName, repoName, layer.Digest)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
@@ -274,7 +290,7 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	release := &types.Release{
 		Tag:        ref,
-		ReleaseCID: blobs.Path(),
+		ReleaseCID: dir.Path(),
 		MetaCID:    manifestCID,
 	}
 
