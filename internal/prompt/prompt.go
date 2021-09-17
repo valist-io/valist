@@ -8,8 +8,6 @@ import (
 
 	"github.com/manifoldco/promptui"
 	"github.com/urfave/cli/v2"
-
-	"github.com/valist-io/valist/internal/core/types"
 )
 
 var ErrNonInteractive = errors.New("prompt in non-interactive environment")
@@ -105,7 +103,17 @@ func RepositoryDescription(value string) Prompt {
 func RepositoryProjectType() *promptui.Select {
 	return &promptui.Select{
 		Label: "Repository project type",
-		Items: types.ProjectTypes,
+		Items: []string{
+			"binary",
+			"node",
+			"npm",
+			"go",
+			"rust",
+			"python",
+			"docker",
+			"c++",
+			"static",
+		},
 	}
 }
 

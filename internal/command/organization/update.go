@@ -5,7 +5,6 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/prompt"
@@ -16,7 +15,6 @@ func NewUpdateCommand() *cli.Command {
 		Name:      "update",
 		Usage:     "Update organization metadata",
 		ArgsUsage: "[org-name]",
-		Before:    lifecycle.UnlockAccount,
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)

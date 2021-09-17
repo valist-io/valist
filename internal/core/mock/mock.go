@@ -4,7 +4,6 @@ import (
 	"math/big"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/core"
@@ -14,7 +13,7 @@ import (
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
-	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
@@ -38,8 +37,7 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, error) {
 			return nil, nil, err
 		}
 
-		err = kstore.Unlock(account, passphrase)
-		if err != nil {
+		if err := kstore.Unlock(account, passphrase); err != nil {
 			return nil, nil, err
 		}
 
@@ -48,23 +46,23 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, error) {
 	}
 
 	backend := backends.NewSimulatedBackend(galloc, 8000029)
-
-	opts, err := bind.NewKeyStoreTransactorWithChainID(kstore, accounts[0], chainID)
+	signer, err := signer.NewSigner(accounts[0], chainID, kstore)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	forwarderAddress, _, _, err := contract.DeployForwarder(opts, backend, accounts[0].Address)
+	txopts := signer.NewTransactor()
+	forwarderAddress, _, _, err := contract.DeployForwarder(&txopts.TransactOpts, backend, accounts[0].Address)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	valistAddress, _, valist, err := contract.DeployValist(opts, backend, forwarderAddress)
+	valistAddress, _, valist, err := contract.DeployValist(&txopts.TransactOpts, backend, forwarderAddress)
 	if err != nil {
 		return nil, nil, err
 	}
 
-	registryAddress, _, registry, err := contract.DeployRegistry(opts, backend, forwarderAddress)
+	registryAddress, _, registry, err := contract.DeployRegistry(&txopts.TransactOpts, backend, forwarderAddress)
 	if err != nil {
 		return nil, nil, err
 	}
@@ -87,13 +85,12 @@ func NewClient(ksLocation string) (*client.Client, []accounts.Account, error) {
 		return nil, nil, err
 	}
 
-	client, err := client.NewClient(&client.Options{
+	client, err := client.NewClient(client.Options{
 		Storage:    ipfs.NewStorage(ipfsapi),
 		Ethereum:   backend,
 		Valist:     valist,
 		Registry:   registry,
-		Account:    accounts[0],
-		Signer:     signer.NewSigner(chainID, kstore),
+		Signer:     signer,
 		Transactor: transactor,
 	})
 

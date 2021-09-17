@@ -2,10 +2,8 @@ package config
 
 import (
 	"encoding/json"
-	"fmt"
 	"os"
 	"path/filepath"
-	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
@@ -50,19 +48,17 @@ type HTTP struct {
 }
 
 type Config struct {
-	rootPath     string
-	keystorePath string
-	Accounts     Accounts `json:"accounts"`
-	Ethereum     Ethereum `json:"ethereum"`
-	IPFS         IPFS     `json:"ipfs"`
-	HTTP         HTTP     `json:"http"`
+	rootPath string
+	Accounts Accounts `json:"accounts"`
+	Ethereum Ethereum `json:"ethereum"`
+	IPFS     IPFS     `json:"ipfs"`
+	HTTP     HTTP     `json:"http"`
 }
 
 // NewConfig returns a config with default settings.
 func NewConfig(rootPath string) *Config {
 	return &Config{
 		filepath.Join(rootPath, rootDir),
-		filepath.Join(rootPath, rootDir, keystoreDir),
 		Accounts{},
 		Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
@@ -112,17 +108,7 @@ func (c *Config) Load() error {
 		return err
 	}
 
-	err = json.Unmarshal(data, c)
-	if err != nil {
-		return err
-	}
-
-	// use temporary keystore when VALIST_SIGNER is set
-	// otherwise, use default ~/.valist/keystore path
-	if os.Getenv("VALIST_SIGNER") != "" && c.keystorePath == filepath.Join(c.rootPath, keystoreDir) {
-		c.keystorePath = filepath.Join(os.TempDir(), keystoreDir, fmt.Sprintf("%v", time.Now().UnixNano()))
-	}
-	return nil
+	return json.Unmarshal(data, c)
 }
 
 // Save writes the config to the root path.
@@ -139,5 +125,6 @@ func (c *Config) Save() error {
 
 // KeyStore returns the config keystore.
 func (c *Config) KeyStore() *keystore.KeyStore {
-	return keystore.NewKeyStore(c.keystorePath, keystore.StandardScryptN, keystore.StandardScryptP)
+	path := filepath.Join(c.rootPath, keystoreDir)
+	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
 }
