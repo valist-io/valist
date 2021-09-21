@@ -41,7 +41,7 @@ func (it *ReleaseTagIterator) paginate(ctx context.Context) error {
 	selector := crypto.Keccak256Hash(it.orgID[:], []byte(it.repoName))
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    it.client.account.Address,
+		From:    it.client.signer.Account().Address,
 	}
 
 	tags, err := it.client.valist.GetReleaseTags(&callopts, selector, it.page, it.limit)

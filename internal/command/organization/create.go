@@ -5,7 +5,6 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
@@ -17,7 +16,6 @@ func NewCreateCommand() *cli.Command {
 		Name:      "create",
 		Usage:     "Create an organization",
 		ArgsUsage: "[org-name]",
-		Before:    lifecycle.UnlockAccount,
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
@@ -53,7 +51,7 @@ func NewCreateCommand() *cli.Command {
 				return err
 			}
 
-			fmt.Printf("Linking name '%v' to orgID 0x'%x'...\n", orgName, create.OrgID)
+			fmt.Printf("Linking name '%v' to orgID '0x%x'...\n", orgName, create.OrgID)
 			_, err = client.LinkOrganizationName(c.Context, create.OrgID, orgName)
 			if err != nil {
 				return err

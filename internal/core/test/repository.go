@@ -58,7 +58,7 @@ func (s *CoreSuite) TestCreateRepository() {
 	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
 	s.Require().NoError(err, "Failed to vote for organization threshold")
 
-	s.client.SetAccount(s.accounts[1])
+	s.client.Signer().SetAccount(s.accounts[1])
 
 	_, err = s.client.VoteRepositoryThreshold(ctx, orgCreatedEvent.OrgID, "sdk", big.NewInt(2))
 	s.Require().NoError(err, "Failed to vote for organization threshold")

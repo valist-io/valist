@@ -16,7 +16,7 @@ import (
 	"github.com/valist-io/valist/internal/core/client/basetx"
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
@@ -27,7 +27,14 @@ const (
 	ConfigKey = contextKey("config")
 )
 
-func newClientOpts(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Options, error) {
+type Options struct {
+	// Account is the default account.
+	Account accounts.Account
+	// Passphrase is the account passphrase.
+	Passphrase string
+}
+
+func NewClient(ctx context.Context, cfg *config.Config, opts Options) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
@@ -41,7 +48,13 @@ func newClientOpts(ctx context.Context, cfg *config.Config, account accounts.Acc
 		return nil, err
 	}
 
-	signer := signer.NewSigner(chainID, cfg.KeyStore())
+	signer, err := signer.NewSigner(opts.Account, chainID, cfg.KeyStore())
+	if err != nil {
+		return nil, err
+	}
+
+	// unlock the default account if a password is provided for non-interactive environments
+	signer.Unlock(opts.Account, opts.Passphrase)
 
 	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {
@@ -83,34 +96,12 @@ func newClientOpts(ctx context.Context, cfg *config.Config, account accounts.Acc
 		return nil, err
 	}
 
-	return &client.Options{
+	return client.NewClient(client.Options{
 		Storage:    ipfs.NewStorage(ipfsapi),
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,
-		Account:    account,
 		Signer:     signer,
 		Transactor: transactor,
-	}, nil
-}
-
-// NewClient builds a client based on the given config.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
-	opts, err := newClientOpts(ctx, cfg, account)
-	if err != nil {
-		return nil, err
-	}
-	return client.NewClient(opts)
-}
-
-// NewClientWithPassphrase builds a client based on the given config and unlocks the signer.
-func NewClientWithPassphrase(ctx context.Context, cfg *config.Config, account accounts.Account, passphrase string) (*client.Client, error) {
-	opts, err := newClientOpts(ctx, cfg, account)
-	if err != nil {
-		return nil, err
-	}
-	if err := opts.Signer.Unlock(account, passphrase); err != nil {
-		return nil, err
-	}
-	return client.NewClient(opts)
+	})
 }

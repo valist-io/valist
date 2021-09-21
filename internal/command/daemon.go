@@ -37,7 +37,7 @@ func NewDaemonCommand() *cli.Command {
 	return &cli.Command{
 		Name:   "daemon",
 		Usage:  "Runs a relay node",
-		Before: lifecycle.SetupClientWithPassphrase,
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
 			config := c.Context.Value(core.ConfigKey).(*config.Config)
 			client := c.Context.Value(core.ClientKey).(*client.Client)

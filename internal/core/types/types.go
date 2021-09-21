@@ -5,10 +5,10 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
 
@@ -48,11 +48,11 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
-	// SetAccount sets the current account.
-	SetAccount(accounts.Account)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(context.Context, string) (*ResolvedPath, error)
-	// Storage returns the underlying storage implementation.
+	// Signer returns the signer.
+	Signer() *signer.Signer
+	// Storage returns the storage interface.
 	Storage() storage.Storage
 }
 

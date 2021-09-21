@@ -25,7 +25,7 @@ func NewPublishCommand() *cli.Command {
 				Usage: "Build and skip publish",
 			},
 		},
-		Before: lifecycle.SetupClientWithPassphrase,
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
 			client := c.Context.Value(core.ClientKey).(*client.Client)
 

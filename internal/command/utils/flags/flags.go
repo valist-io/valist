@@ -20,7 +20,7 @@ func AccountPassphrase() *cli.StringFlag {
 
 func AccountPrivateKey() *cli.StringFlag {
 	return &cli.StringFlag{
-		Name:  "key",
+		Name:  "privatekey",
 		Usage: "Hex-encoded ECDSA private key",
 	}
 }

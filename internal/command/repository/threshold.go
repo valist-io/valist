@@ -7,7 +7,6 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 )
@@ -17,7 +16,6 @@ func NewThresholdCommand() *cli.Command {
 		Name:      "threshold",
 		Usage:     "Vote for repository threshold",
 		ArgsUsage: "[repo-path] [threshold]",
-		Before:    lifecycle.UnlockAccount,
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
