@@ -16,12 +16,25 @@ import (
 	"github.com/valist-io/valist/internal/core/client/basetx"
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
-// NewClient builds a client based on the given config.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
+type contextKey string
+
+const (
+	ClientKey = contextKey("client")
+	ConfigKey = contextKey("config")
+)
+
+type Options struct {
+	// Account is the default account.
+	Account accounts.Account
+	// Passphrase is the account passphrase.
+	Passphrase string
+}
+
+func NewClient(ctx context.Context, cfg *config.Config, opts Options) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
@@ -34,6 +47,14 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 	if err != nil {
 		return nil, err
 	}
+
+	signer, err := signer.NewSigner(opts.Account, chainID, cfg.KeyStore())
+	if err != nil {
+		return nil, err
+	}
+
+	// unlock the default account if a password is provided for non-interactive environments
+	signer.Unlock(opts.Account, opts.Passphrase)
 
 	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {
@@ -75,15 +96,12 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		return nil, err
 	}
 
-	opts := &client.Options{
+	return client.NewClient(client.Options{
 		Storage:    ipfs.NewStorage(ipfsapi),
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,
-		Account:    account,
-		Signer:     signer.NewSigner(chainID, cfg.KeyStore()),
+		Signer:     signer,
 		Transactor: transactor,
-	}
-
-	return client.NewClient(opts)
+	})
 }

@@ -3,48 +3,25 @@ package organization
 import (
 	"fmt"
 	"math/big"
-	"os"
 	"strconv"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/client"
 )
 
 func NewThresholdCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "threshold",
-		Usage: "Vote for organization threshold",
+		Name:      "threshold",
+		Usage:     "Vote for organization threshold",
+		ArgsUsage: "[org-name] [threshold]",
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg := config.NewConfig(home)
-			if err := cfg.Load(); err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account)
-			if err != nil {
-				return err
-			}
-
+			client := c.Context.Value(core.ClientKey).(*client.Client)
 			orgName := c.Args().Get(0)
 
 			threshold, err := strconv.ParseInt(c.Args().Get(1), 10, 64)

@@ -20,7 +20,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    client.account.Address,
+		From:    client.signer.Account().Address,
 	}
 
 	orgID, err := client.registry.NameToID(&callopts, name)
@@ -38,7 +38,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
 func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (*registry.ValistRegistryMappingEvent, error) {
-	txopts := client.signer.NewTransactor(client.account)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.LinkOrganizationNameTx(txopts, orgID, name)

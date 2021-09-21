@@ -6,13 +6,15 @@ import (
 
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewListCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "list",
-		Usage: "List all accounts",
+		Name:   "list",
+		Usage:  "List all accounts",
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
 			home, err := os.UserHomeDir()
 			if err != nil {
@@ -24,11 +26,11 @@ func NewListCommand() *cli.Command {
 				return err
 			}
 
-			for _, account := range cfg.Accounts.Pinned {
-				if cfg.Accounts.Default == account {
-					fmt.Printf("%s (default)\n", account)
+			for _, account := range cfg.KeyStore().Accounts() {
+				if cfg.Accounts.Default == account.Address {
+					fmt.Printf("%s (default)\n", account.Address)
 				} else {
-					fmt.Printf("%s\n", account)
+					fmt.Printf("%s\n", account.Address)
 				}
 			}
 

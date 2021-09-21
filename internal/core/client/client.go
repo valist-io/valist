@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -13,7 +12,7 @@ import (
 	"github.com/valist-io/gasless"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
-	"github.com/valist-io/valist/internal/core/signer"
+	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
 
@@ -48,7 +47,6 @@ type Options struct {
 	Valist   *valist.Valist
 	Registry *registry.ValistRegistry
 
-	Account    accounts.Account
 	Signer     *signer.Signer
 	Transactor TransactorAPI
 }
@@ -61,7 +59,6 @@ type Client struct {
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
 
-	account    accounts.Account
 	signer     *signer.Signer
 	transactor TransactorAPI
 
@@ -69,7 +66,7 @@ type Client struct {
 }
 
 // NewClient create a client from the given options.
-func NewClient(opts *Options) (*Client, error) {
+func NewClient(opts Options) (*Client, error) {
 	if opts.Ethereum == nil {
 		return nil, fmt.Errorf("ethereum client is required")
 	}
@@ -99,7 +96,6 @@ func NewClient(opts *Options) (*Client, error) {
 		storage:    opts.Storage,
 		valist:     opts.Valist,
 		registry:   opts.Registry,
-		account:    opts.Account,
 		signer:     opts.Signer,
 		transactor: opts.Transactor,
 		orgs:       make(map[string]common.Hash),
@@ -110,6 +106,6 @@ func (client *Client) Storage() storage.Storage {
 	return client.storage
 }
 
-func (client *Client) SetAccount(account accounts.Account) {
-	client.account = account
+func (client *Client) Signer() *signer.Signer {
+	return client.signer
 }
