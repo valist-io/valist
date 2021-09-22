@@ -72,8 +72,8 @@ type RegistryAPI interface {
 type ReleaseAPI interface {
 	GetRelease(context.Context, common.Hash, string, string) (*Release, error)
 	GetLatestRelease(context.Context, common.Hash, string) (*Release, error)
-	ListReleaseTags(common.Hash, string, *big.Int, *big.Int) ReleaseTagIterator
-	ListReleases(common.Hash, string, *big.Int, *big.Int) ReleaseIterator
+	ListReleaseTags(common.Hash, string) ReleaseTagIterator
+	ListReleases(common.Hash, string) ReleaseIterator
 	VoteRelease(context.Context, common.Hash, string, *Release) (*valist.ValistVoteReleaseEvent, error)
 }
 
@@ -88,6 +88,7 @@ type RepositoryAPI interface {
 
 type ReleaseTagIterator interface {
 	Next(context.Context) (string, error)
+	ForEach(context.Context, func(string)) error
 }
 
 type ReleaseIterator interface {

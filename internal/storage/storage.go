@@ -7,8 +7,8 @@ import (
 )
 
 type Storage interface {
-	// Mkdir returns a new empty directory.
-	Mkdir() Directory
+	// Mkdir creates a new empty directory.
+	Mkdir(context.Context) (Directory, error)
 	// Open opens the named file.
 	Open(context.Context, string) (File, error)
 	// ReadDir returns a list of files in the given directory path.

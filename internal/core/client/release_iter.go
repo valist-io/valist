@@ -23,13 +23,13 @@ type ReleaseTagIterator struct {
 }
 
 // ListReleaseTags returns a new ReleaseTagIterator.
-func (client *Client) ListReleaseTags(orgID common.Hash, repoName string, page, limit *big.Int) types.ReleaseTagIterator {
+func (client *Client) ListReleaseTags(orgID common.Hash, repoName string) types.ReleaseTagIterator {
 	return &ReleaseTagIterator{
 		client:   client,
 		orgID:    orgID,
 		repoName: repoName,
-		page:     page,
-		limit:    limit,
+		page:     big.NewInt(1),
+		limit:    big.NewInt(10),
 	}
 }
 
@@ -70,6 +70,22 @@ func (it *ReleaseTagIterator) Next(ctx context.Context) (string, error) {
 	return tag, nil
 }
 
+// ForEach calls the given callback for each release tag.
+func (it *ReleaseTagIterator) ForEach(ctx context.Context, cb func(string)) error {
+	for {
+		tag, err := it.Next(ctx)
+		if err == io.EOF {
+			return nil
+		}
+
+		if err != nil {
+			return err
+		}
+
+		cb(tag)
+	}
+}
+
 // ReleaseIterator is used to iterate releases.
 type ReleaseIterator struct {
 	client   *Client
@@ -79,12 +95,12 @@ type ReleaseIterator struct {
 }
 
 // ListReleases returns a new ReleaseIterator.
-func (client *Client) ListReleases(orgID common.Hash, repoName string, page, limit *big.Int) types.ReleaseIterator {
+func (client *Client) ListReleases(orgID common.Hash, repoName string) types.ReleaseIterator {
 	return &ReleaseIterator{
 		client:   client,
 		orgID:    orgID,
 		repoName: repoName,
-		tags:     client.ListReleaseTags(orgID, repoName, page, limit),
+		tags:     client.ListReleaseTags(orgID, repoName),
 	}
 }
 

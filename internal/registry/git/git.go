@@ -24,11 +24,9 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	handler := &handler{client}
 
 	router := mux.NewRouter()
-	router.HandleFunc("/{org}/{repo}/{tag}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
+	router.HandleFunc("/{org}/{repo}/git-receive-pack", handler.receivePack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
-	router.HandleFunc("/{org}/{repo}/{tag}/git-upload-pack", handler.uploadPack).Methods(http.MethodPost)
 	router.HandleFunc("/{org}/{repo}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
-	router.HandleFunc("/{org}/{repo}/{tag}/info/refs", handler.advertisedRefs).Methods(http.MethodGet)
 
 	return handlers.LoggingHandler(os.Stdout, router)
 }
@@ -141,6 +139,29 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	count, err := loader.repo.Storer.CountLooseRefs()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	if count != 1 {
+		http.Error(w, "cannot push more than one ref", http.StatusInternalServerError)
+		return
+	}
+
+	refs, err := loader.repo.References()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	tag, err := refs.Next()
+	if err != nil {
+		http.Error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
 	if err := loader.repo.Storer.PackRefs(); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -153,7 +174,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 	}
 
 	release := &types.Release{
-		Tag:        vars["tag"],
+		Tag:        tag.Name().Short(),
 		ReleaseCID: releaseCID,
 		MetaCID:    releaseCID,
 	}

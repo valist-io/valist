@@ -6,12 +6,9 @@ import (
 	"time"
 
 	files "github.com/ipfs/go-ipfs-files"
-	unixfs "github.com/ipfs/go-unixfs"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/ipfs/interface-go-ipfs-core/path"
 )
-
-var emptyDirPath = path.IpfsPath(unixfs.EmptyDirNode().Cid())
 
 type file struct {
 	name string

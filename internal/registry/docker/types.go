@@ -12,3 +12,12 @@ type Manifest struct {
 	Config        Descriptor   `json:"config"`
 	Layers        []Descriptor `json:"layers"`
 }
+
+// Digests returns a list of layer and config digests.
+func (m *Manifest) Digests() []string {
+	digests := []string{m.Config.Digest}
+	for _, layer := range m.Layers {
+		digests = append(digests, layer.Digest)
+	}
+	return digests
+}
