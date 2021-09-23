@@ -16,45 +16,48 @@ export const GetActions = (location:string) => {
     npmInstall: {
       description: (<div>Npm packages can be <b>installed</b> by using the registry flag or by url.</div>),
       code: `# Install a package via registry
-npm i --registry=${location}api/npm @valist/sdk
+npm i --registry=http://${location}/npm [org]/[repo]
       
 # Install a package via IPFS gateway
-npm i ${location}api/npm/valist/sdk`,
+npm i http://${location}/npm/[org]/[repo]`,
     },
     npmPublish: {
       description: (<div>
         Npm packages can be <b>published</b> by using the registry flag or by setting your NPM registry.
       </div>),
       code: `# Publish a package to registry
-npm publish --registry=${location}api/npm`,
+npm publish --registry=http://${location}/npm`,
     },
     dockerPush: {
       description: (<div>Docker images can be <b>tagged</b> and <b>pushed</b> with the docker pull command.</div>),
       code: `# Tag the Image
-docker image tag [image_name]:latest ${location}api/oci/[org][repo]:latest
+docker image tag [image_name]:latest ${location}/[org]/[repo]:[tag]
   
 # Push the Image
-docker image push ${location}api/oci/[org][repo]:latest`,
+docker image push ${location}/[org]/[repo]:[tag]`,
     },
     dockerPull: {
       description: (<div> Docker images can be <b>pulled</b> using docker push command.</div>),
       code: `# Pull container image
-docker pull ${location}api/oci/[org][repo]:latest`,
+docker pull ${location}/[org]/[repo]:[tag]`,
     },
     gitPush: {
       description: (<div> Project source code can be committed and <b>pushed</b> using the git push command.</div>),
       code: `# Push to remote
-git push ${location}api/git/[org][repo]`,
+git push http://${location}/git/[org]/[repo] [tag]`,
     },
-    gitPull: {
-      description: (<div> Project source can be <b>pulled</b> using the git push command.</div>),
-      code: `# Pull from remote
-git pull ${location}api/git/[org][repo]`,
+    gitClone: {
+      description: (<div> Project source can be <b>cloned</b> using the git clone command.</div>),
+      code: `# Clone from remote
+git clone http://${location}/git/[org]/[repo]/[tag]`,
     },
     goGet: {
       description: (<div> Go Modules can be <b>installed</b> with the go get command.</div>),
-      code: `# Installs package from remote
-go get ${location}api/git/[org][repo]`,
+      code: `# Allow installs from valist
+go env -w GOINSECURE=valist.local GOPRIVATE=valist.local
+
+# Installs package from remote
+go get valist.io/[org]/[repo]`,
     },
   };
 
@@ -79,7 +82,7 @@ export const integrations: Integration[] = [
   {
     name: 'Source Control',
     image: '/images/git-logo.png',
-    actions: ['gitPush', 'gitPull'],
+    actions: ['gitPush', 'gitClone'],
     docs: 'https://docs.valist.io/fetching-and-installing-software/',
     code: 'https://github.com/valist-io/example-projects',
   },
