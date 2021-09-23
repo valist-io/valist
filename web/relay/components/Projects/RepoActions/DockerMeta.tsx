@@ -12,7 +12,6 @@ const DockerMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
 
   return (
         <div>
-            <div className="lg:w-80">
                 {projectMeta
                     && <div>
                         {projectMeta.homepage
@@ -30,7 +29,7 @@ const DockerMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
                         }
                     </div>
                 }
-                <div className="pt-6 pb-2">
+                <div className="pt-6 pb-2 mb-2">
                     <h1 className="flex-1 text-lg leading-7 font-medium">Load Container from Url</h1>
                 </div>
                 <div ref={curlRef} onClick={() => copyToCB(curlRef)}
@@ -44,7 +43,6 @@ const DockerMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
                     </svg>
                     <p>curl -L {origin}/api/{orgName}/{repoName}/latest | docker load</p>
                 </div>
-            </div>
         </div>
   );
 };

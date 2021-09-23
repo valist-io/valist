@@ -2,7 +2,7 @@ import React from 'react';
 import Link from 'next/link';
 
 const NavTree = ({ orgName = '', repoName = '' }: { orgName?: string, repoName?: string }) => (
-    <nav className="flex" aria-label="Breadcrumb">
+    <nav className="flex divide-y" aria-label="Breadcrumb">
         <ol className="flex items-center space-x-4">
             <li>
                 <div>
@@ -49,6 +49,7 @@ const NavTree = ({ orgName = '', repoName = '' }: { orgName?: string, repoName?:
             </li>}
 
         </ol>
+        <div className="border-b-2 border-fuchsia-600" style={{ width: '100%' }}></div>
     </nav>
 );
 

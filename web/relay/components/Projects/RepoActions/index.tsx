@@ -4,17 +4,17 @@ import NpmMeta from './NpmMeta';
 import PipMeta from './PipMeta';
 import DockerMeta from './DockerMeta';
 
-interface ProjectMetaBarProps {
+interface RepoActionsProps {
   orgName: string,
   repoName: string,
   repoMeta: RepoMeta
 }
 
-export default function ProjectMetaBar(props: ProjectMetaBarProps): JSX.Element {
+export default function RepoActions(props: RepoActionsProps): JSX.Element {
   const getProjectType = (projectType: ProjectType) => {
     switch (projectType) {
       case 'node':
-        return NpmMeta(props.orgName, props.repoName, props.repoMeta);
+        return NpmMeta(props.orgName, props.repoName);
       case 'python':
         return PipMeta(props.orgName, props.repoName, props.repoMeta);
       case 'docker':
@@ -25,7 +25,7 @@ export default function ProjectMetaBar(props: ProjectMetaBarProps): JSX.Element 
   };
 
   return (
-      <div className="rounded-lg bg-white overflow-hidden shadow p-6">
+      <div className="p-8">
         { getProjectType(props.repoMeta.projectType) }
       </div>
   );

@@ -12,12 +12,11 @@ const BinaryMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
 
   return (
         <div>
-            <div className="lg:w-80">
                 {projectMeta
                     && <div>
                         {projectMeta.homepage
                             && <div className="pb-2">
-                                <h1 className="flex-1 text-lg leading-7 font-medium">Homepage</h1>
+                                <h1 className="flex-1 text-xl">Homepage</h1>
                                 <a className="text-blue-600" href={projectMeta.homepage}>{projectMeta.homepage}</a>
                             </div>
                         }
@@ -30,11 +29,12 @@ const BinaryMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
                         }
                     </div>
                 }
-                <div className="pb-2">
-                    <h1 className="flex-1 text-lg leading-7 font-medium">Download (GET) from Url</h1>
+                <div className="pb-2 mb-2">
+                    <h2 className="flex-1 text-xl">Download (GET) from Url</h2>
                 </div>
                 <div ref={curlRef} onClick={() => copyToCB(curlRef)}
-                className="border-2 border-solid border-black-200 rounded-lg p-2 bg-gray-200 cursor-pointer break-all">
+                    className="border-2 border-solid border-indigo-50 rounded-lg
+                    p-2 bg-indigo-50 cursor-pointer break-all">
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 float-right" fill="none"
                     viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
@@ -44,7 +44,6 @@ const BinaryMeta = (orgName = 'organization', repoName = 'repo', projectMeta: an
                     <p>curl -L -o {repoName} {origin}/api/{orgName}/{repoName}/latest</p>
                     <p>chmod +x {repoName}</p>
                 </div>
-            </div>
         </div>
   );
 };

@@ -1,13 +1,11 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
-import { Repository } from 'valist/dist/types';
+import { Repository, Release } from 'valist/dist/types';
 import Layout from '../../../components/Layouts/DashboardLayout';
-import ReleaseList from '../../../components/Releases/ReleaseList';
+import RepoContent from '../../../components/Projects/RepoContent';
 import ProjectProfileCard from '../../../components/Projects/ProjectProfileCard';
-import ReleaseMetaCard from '../../../components/Releases/ReleaseMetaCard';
-import ManageProjectCard from '../../../components/AccessControl/ManageProjectCard';
+import RepoMetaCard from '../../../components/Projects/RepoMeta';
 import ValistContext from '../../../components/Valist/ValistContext';
-import LoadingDialog from '../../../components/Dialog/LoadingDialog';
 import ErrorDialog from '../../../components/Dialog/ErrorDialog';
 
 export default function Dashboard() {
@@ -16,39 +14,25 @@ export default function Dashboard() {
   const orgName = `${router.query.orgName}`;
   const repoName = `${router.query.repoName}`;
 
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error>();
   const [repo, setRepo] = useState<Repository>();
-  const [repoTags, setRepoTags] = useState<string[]>([]);
   const [repoDevs, setRepoDevs] = useState<string[]>([]);
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
+  const [repoReleases, setRepoReleases] = useState<Release[]>([]);
+  const [repoView, setRepoView] = useState<string>('meta');
 
   const fetchAll = () => Promise.all([
     valist.getRepository(orgName, repoName).then(setRepo),
-    valist.getReleaseTags(orgName, repoName).then(setRepoTags),
+    valist.getReleases(orgName, repoName, 1, 10).then(setRepoReleases),
     valist.getRepoDevs(orgName, repoName).then(setRepoDevs),
     valist.getOrgAdmins(orgName).then(setOrgAdmins),
   ]);
 
-  const getRelease = async (tag: string) => {
-    try {
-      const { releaseCID } = await valist.getReleaseByTag(orgName, repoName, tag);
-      window.location.assign(`https://gateway.valist.io/ipfs/${releaseCID}`);
-    } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   const getData = async () => {
     try {
-      setLoading(true);
       await fetchAll();
     } catch (e) {
-      setError(e);
-    } finally {
-      setLoading(false);
+      setError(e as any);
     }
   };
 
@@ -60,17 +44,27 @@ export default function Dashboard() {
     <Layout>
         <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
           <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-            { repo && <ProjectProfileCard orgName={orgName} repoName={repoName} repoMeta={repo.meta} /> }
+            { repo && <ProjectProfileCard
+                        setRepoView={setRepoView}
+                        orgName={orgName}
+                        repoName={repoName}
+                        repoMeta={repo.meta} />
+            }
             <section className="rounded-lg bg-white overflow-hidden shadow">
-              <ReleaseList orgName={orgName} repoName={repoName} repoTags={repoTags} getRelease={getRelease} />
+              {repo && <RepoContent
+                repoReleases={repoReleases}
+                view={repoView}
+                orgName={orgName}
+                repoName={repoName}
+                repoMeta={repo.meta}
+                repoDevs={repoDevs}
+                orgAdmins={orgAdmins}/>}
             </section>
           </div>
           <div className="grid grid-cols-1 gap-4">
-            { repo && <ReleaseMetaCard orgName={orgName} repoName={repoName} repoMeta={repo.meta} /> }
-            <ManageProjectCard orgName={orgName} repoName={repoName} repoDevs={repoDevs} orgAdmins={orgAdmins} />
+            { repo && <RepoMetaCard repoMeta={repo.meta} /> }
           </div>
       </div>
-      {loading && <LoadingDialog>Loading...</LoadingDialog>}
       {error && <ErrorDialog error={error} close={() => setError(undefined)} />}
     </Layout>
   );

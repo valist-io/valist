@@ -5,6 +5,7 @@ export type OrgName = string;
 export type OrgMeta = {
   name: string,
   description: string
+  homepage?: string
 };
 
 export type BinaryTypes = 'binary' | 'go' | 'rust' | 'c++';

@@ -19,6 +19,9 @@ let moduleExports = {
     MAGIC_PUBKEY: 'pk_test_54C6079CBEF87272',
     METATX_ENABLED: process.env.METATX_ENABLED || true,
   },
+  experimental: {
+		esmExternals: "loose",
+	},
   webpack5: true,
   webpack: function (config, options) {
     if (!options.isServer) {
