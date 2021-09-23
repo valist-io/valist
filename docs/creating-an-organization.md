@@ -4,11 +4,15 @@ Creating an organization is the first step to publishing software on Valist! Org
 
 ## CLI
 
-To create an organization from the CLI it's as simple as running `valist org:new` and passing it the name of the organization that you would like to create.
+To create an organization from the CLI it's as simple as running `valist org create` and passing it the name of the organization that you would like to create.
 
 ```bash
-  valist org:new exampleOrg
+  valist org create [organization-name]
 ```
+
+You will then be prompted to enter some additional metadata about the organization.
+
+![cli-create-org-metadata](img/cli-org-create-metadata.png)
 
 ## Web
 

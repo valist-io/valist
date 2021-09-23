@@ -49,7 +49,7 @@ To publish a binary from the Valist SDK, create and run the following javascript
 
 ### CLI
 
-To publish an NPM package from the Valist CLI create a new `valist.yml` within your project with a project type of `node`. Or run a `valist init` to generate a new `valist.yaml`.
+To publish an NPM package from the Valist CLI create a new `valist.yml` within your project with a project type of `npm`. Or run a `valist init` to generate a new `valist.yaml`.
 
 ```yaml
 type: node

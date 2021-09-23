@@ -4,10 +4,10 @@ After you have created an organization, you are ready to create a repository. Cr
 
 ## CLI
 
-To create a new repository on from the CLI, call `valist repo:new` and pass it your `organization` and your `repository name`.
+To create a new repository on from the CLI, call `valist repo create` and pass it your `organization` and your `repository name`.
 
 ```bash
-valist repo:new orgName repoName
+valist repo create [org-name] [repo-name]
 ```
 
 ## Web
