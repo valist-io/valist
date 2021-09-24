@@ -4,11 +4,14 @@ import (
 	"context"
 	"os"
 
+	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func SetupClient(c *cli.Context) error {
@@ -26,20 +29,28 @@ func SetupClient(c *cli.Context) error {
 		return err
 	}
 
-	var opts core.Options
-	if c.IsSet("account") {
-		opts.Account.Address = common.HexToAddress(c.String("account"))
+	var client types.CoreAPI
+	if c.Bool("mock") {
+		client, err = mock.NewClient(cfg.KeyStore())
 	} else {
-		opts.Account.Address = cfg.Accounts.Default
+		client, err = core.NewClient(c.Context, cfg)
+	}
+
+	if err != nil {
+		return err
+	}
+
+	var account accounts.Account
+	if c.IsSet("account") {
+		account.Address = common.HexToAddress(c.String("account"))
+	} else {
+		account.Address = cfg.Accounts.Default
 	}
 
 	if c.IsSet("passphrase") {
-		opts.Passphrase = c.String("passphrase")
-	}
-
-	client, err := core.NewClient(c.Context, cfg, opts)
-	if err != nil {
-		return err
+		client.Signer().SetAccountWithPassphrase(account, c.String("passphrase"))
+	} else {
+		client.Signer().SetAccount(account)
 	}
 
 	c.Context = context.WithValue(c.Context, core.ClientKey, client)
