@@ -1,4 +1,5 @@
 import { Release } from 'valist/dist/types';
+import { parseCID } from 'valist/dist/utils';
 
 interface ReleaseListProps {
   repoReleases: Release[],
@@ -38,16 +39,18 @@ export default function ReleaseList(props: ReleaseListProps): JSX.Element {
               </tr>
             </thead>
             <tbody className="bg-white divide-y divide-gray-200">
-              {[...props.repoReleases].reverse().map((release) => (
+              {props.repoReleases.map((release) => (
                   <tr key={release.releaseCID}>
                     <td className="px-6 py-4 whitespace-nowrap text-left text-sm font-medium text-gray-900">
                       {release.tag}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-left text-sm text-gray-500">
-                      {release.releaseCID}
+                      {parseCID(release.releaseCID)}
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                      <a href={`https://gateway.valist.io/ipfs/${release.releaseCID}`}
+                      <a href={
+                        `https://gateway.valist.io/ipfs/${parseCID(release.releaseCID)}?filename=${props.orgName}-${props.repoName}-${release.tag}`
+                      }
                       className="text-indigo-600 hover:text-indigo-900">
                         Download
                       </a>

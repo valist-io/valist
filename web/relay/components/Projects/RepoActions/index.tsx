@@ -16,11 +16,11 @@ export default function RepoActions(props: RepoActionsProps): JSX.Element {
       case 'node':
         return NpmMeta(props.orgName, props.repoName);
       case 'python':
-        return PipMeta(props.orgName, props.repoName, props.repoMeta);
+        return PipMeta(props.orgName, props.repoName);
       case 'docker':
         return DockerMeta(props.orgName, props.repoName, props.repoMeta);
       default:
-        return BinaryMeta(props.orgName, props.repoName, props.repoMeta);
+        return BinaryMeta(props.orgName, props.repoName);
     }
   };
 

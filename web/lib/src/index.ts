@@ -439,9 +439,9 @@ class Valist {
         // eslint-disable-next-line no-await-in-loop
         const release = await this.contract.methods.releases(releaseSelector).call();
         releases.push({
-          tag: tags[i],
-          releaseCID: release.releaseCID,
-          metaCID: release.metaCID,
+          tag: tags[i] || '',
+          releaseCID: release.releaseCID || '',
+          metaCID: release.metaCID || '',
         });
       }
 
@@ -462,9 +462,9 @@ class Valist {
       const release = await this.contract.methods.releases(releaseSelector).call();
       return {
         tag,
-        releaseCID: release.releaseCID,
-        metaCID: release.metaCID,
-        signers: release.signers,
+        releaseCID: release.releaseCID  || '',
+        metaCID: release.metaCID  || '',
+        signers: release.signers  || '',
       };
     } catch (e) {
       const msg = 'Could not get release by tag';

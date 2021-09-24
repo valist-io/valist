@@ -7,6 +7,7 @@ import PublishReleaseSteps from '../Releases/PublishReleaseSteps';
 
 interface ReleaseListProps {
   repoReleases: Release[]
+  repoReadme: string,
   view: string,
   orgName: string,
   repoMeta: RepoMeta
@@ -24,7 +25,7 @@ export default function RepoContent(props: ReleaseListProps): JSX.Element {
 
     switch (currentView) {
       case 'readme':
-        return <RepoReadme />;
+        return <RepoReadme repoReadme={props.repoReadme} />;
       case 'install':
         return (<RepoActions
           orgName={props.orgName}
@@ -44,7 +45,7 @@ export default function RepoContent(props: ReleaseListProps): JSX.Element {
       case 'releaseSteps':
         return <PublishReleaseSteps />;
       default:
-        return <RepoReadme />;
+        return <RepoReadme repoReadme={props.repoReadme} />;
     }
   };
 
