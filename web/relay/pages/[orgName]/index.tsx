@@ -14,7 +14,17 @@ export default function Dashboard() {
   const orgName = `${router.query.orgName}`;
 
   const [error, setError] = useState<Error>();
-  const [org, setOrg] = useState<Organization>();
+  const [org, setOrg] = useState<Organization>({
+    orgID: 'Loading',
+    threshold: 0,
+    thresholdDate: 0,
+    meta: {
+      name: 'Loading',
+      description: 'Loading',
+    },
+    metaCID: 'Loading',
+    repoNames: [],
+  });
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
   const [repoNames, setRepoNames] = useState<string[]>([]);
 
@@ -42,7 +52,7 @@ export default function Dashboard() {
     <Layout>
         <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-3 lg:gap-8">
         <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-          { org && <OrgProfileCard orgName={orgName} orgMeta={org.meta} /> }
+          <OrgProfileCard orgName={orgName} orgMeta={org.meta} />
           <section className="rounded-lg bg-white overflow-hidden shadow">
             <ProjectList orgName={orgName} repoNames={repoNames} />
           </section>

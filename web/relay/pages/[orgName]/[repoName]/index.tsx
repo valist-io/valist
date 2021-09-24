@@ -15,7 +15,18 @@ export default function Dashboard() {
   const repoName = `${router.query.repoName}`;
 
   const [error, setError] = useState<Error>();
-  const [repo, setRepo] = useState<Repository>();
+  const [repo, setRepo] = useState<Repository>({
+    orgID: 'Loading',
+    threshold: 0,
+    thresholdDate: 0,
+    meta: {
+      projectType: 'binary',
+      description: 'Loading',
+      name: 'Loading',
+    },
+    metaCID: 'Loading',
+    tags: [],
+  });
   const [repoDevs, setRepoDevs] = useState<string[]>([]);
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
   const [repoReleases, setRepoReleases] = useState<Release[]>([]);
@@ -55,17 +66,15 @@ export default function Dashboard() {
     getData();
   }, [valist, orgName, repoName]);
 
-  console.log('Repo', repo);
   return (
     <Layout>
         <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-6 lg:gap-8">
           <div className="grid grid-cols-1 gap-4 lg:col-span-4">
-            { repo && <ProjectProfileCard
-                        setRepoView={setRepoView}
-                        orgName={orgName}
-                        repoName={repoName}
-                        repoMeta={repo.meta} />
-            }
+            <ProjectProfileCard
+              setRepoView={setRepoView}
+              orgName={orgName}
+              repoName={repoName}
+              repoMeta={repo.meta} />
             <section className="rounded-lg bg-white overflow-hidden shadow">
               {repo && <RepoContent
                 repoReleases={repoReleases}
@@ -79,11 +88,10 @@ export default function Dashboard() {
             </section>
           </div>
           <div className="grid grid-cols-1 gap-4 lg:col-span-2">
-            { repo && <RepoMetaCard
+            <RepoMetaCard
             repoMeta={repo.meta}
             orgName={orgName}
             repoName={repoName} />
-            }
           </div>
       </div>
       {error && <ErrorDialog error={error} close={() => setError(undefined)} />}

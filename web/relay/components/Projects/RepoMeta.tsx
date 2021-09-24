@@ -17,7 +17,8 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
 
   return (
         <div className="rounded-lg bg-white overflow-hidden shadow p-6">
-          {projectTypes[repoMeta.projectType].default && Object.keys(actions).length && <div className="pb-4">
+          {(repoMeta.name !== 'Loading') && projectTypes[repoMeta.projectType].default && Object.keys(actions).length
+          && <div className="pb-4">
               <h1 className="text-xl text-gray-900 mb-2">
                 {actions[projectTypes[repoMeta.projectType].default].description}
               </h1>
@@ -29,7 +30,7 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
                   </pre>
               </div>
           </div>}
-          {props.repoMeta.repository
+          {repoMeta.repository
               && <div className="pb-4">
                   <h1 className="text-xl text-gray-900 mb-1">Repository</h1>
                   <a className="text-blue-600" href={repoMeta.repository}>{repoMeta.repository}</a>
@@ -52,12 +53,6 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
               && <div className="pb-4">
               <h1 className="text-base font-medium text-gray-900">License</h1>
               <div className="text-gray-600">{'MPL-2.0'}</div>
-          </div>}
-
-          {repoMeta.published
-              && <div className="pb-4">
-              <h1 className="text-base font-medium text-gray-900">Last Publish</h1>
-              <div className="text-gray-600">{'a month ago'}</div>
           </div>}
         </div>
   );
