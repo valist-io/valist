@@ -3,7 +3,7 @@ import { useRouter } from 'next/router';
 import { Organization } from 'valist/dist/types';
 import ValistContext from '../../components/Valist/ValistContext';
 import Layout from '../../components/Layouts/DashboardLayout';
-import ProjectList from '../../components/Projects/ProjectList';
+import ProjectList from '../../components/Repositories/ProjectList';
 import OrgProfileCard from '../../components/Organizations/OrgProfileCard';
 import ManageOrgCard from '../../components/AccessControl/ManageOrgCard';
 import ErrorDialog from '../../components/Dialog/ErrorDialog';

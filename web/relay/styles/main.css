@@ -41,3 +41,15 @@
 .markdown p {
   margin-bottom: 16px;
 }
+
+.loading {
+  width: 200px;
+  color: rgba(0, 0, 0, 0) !important;
+  background: rgba(190, 190, 190, 0.2) !important;
+}
+
+.triangle {
+    background-image: url('/images/triangle.png');
+    background-position: center center;
+    background-size: cover;
+}

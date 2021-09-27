@@ -2,9 +2,9 @@ import React, { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import { Repository, Release } from 'valist/dist/types';
 import Layout from '../../../components/Layouts/DashboardLayout';
-import RepoContent from '../../../components/Projects/RepoContent';
-import ProjectProfileCard from '../../../components/Projects/ProjectProfileCard';
-import RepoMetaCard from '../../../components/Projects/RepoMeta';
+import RepoContent from '../../../components/Repositories/RepoContent';
+import ProjectProfileCard from '../../../components/Repositories/ProjectProfileCard';
+import RepoMetaCard from '../../../components/Repositories/RepoMeta';
 import ValistContext from '../../../components/Valist/ValistContext';
 import ErrorDialog from '../../../components/Dialog/ErrorDialog';
 
