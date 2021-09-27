@@ -12,14 +12,16 @@ import (
 //go:embed relay/out/_next/static/*/*.js
 var valistFS embed.FS
 
-func NewServer(bindAddr string) *http.Server {
+var httpFS http.FileSystem
+
+func init() {
 	subFS, err := fs.Sub(valistFS, "relay/out")
 	if err != nil {
 		panic("failed to get valist.io sub fs")
 	}
+	httpFS = http.FS(subFS)
+}
 
-	return &http.Server{
-		Addr:    bindAddr,
-		Handler: http.FileServer(http.FS(subFS)),
-	}
+func NewHandler() http.Handler {
+	return http.FileServer(httpFS)
 }

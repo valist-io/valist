@@ -15,18 +15,18 @@ export const GetActions = (location:string) => {
   const actions: Record<string, Action> = {
     npmInstall: {
       description: (<div>Npm packages can be <b>installed</b> by using the registry flag or by url.</div>),
-      code: `# Install a package via registry
-npm i --registry=http://${location}/npm [org]/[repo]
-      
+      code: `# Add registry to .npmrc
+@[org]:registry=https://${location}/api/npm
+
 # Install a package via IPFS gateway
-npm i http://${location}/npm/[org]/[repo]`,
+npm i https://${location}/api/npm/[org]/[repo]`,
     },
     npmPublish: {
       description: (<div>
         Npm packages can be <b>published</b> by using the registry flag or by setting your NPM registry.
       </div>),
       code: `# Publish a package to registry
-npm publish --registry=http://${location}/npm`,
+npm publish --registry=https://${location}/api/npm`,
     },
     dockerPush: {
       description: (<div>Docker images can be <b>tagged</b> and <b>pushed</b> with the docker pull command.</div>),
@@ -44,20 +44,17 @@ docker pull ${location}/[org]/[repo]:[tag]`,
     gitPush: {
       description: (<div> Project source code can be committed and <b>pushed</b> using the git push command.</div>),
       code: `# Push to remote
-git push http://${location}/git/[org]/[repo] [tag]`,
+git push https://${location}/api/git/[org]/[repo] [tag]`,
     },
     gitClone: {
       description: (<div> Project source can be <b>cloned</b> using the git clone command.</div>),
       code: `# Clone from remote
-git clone http://${location}/git/[org]/[repo]/[tag]`,
+git clone https://${location}/api/git/[org]/[repo]/[tag]`,
     },
     goGet: {
       description: (<div> Go Modules can be <b>installed</b> with the go get command.</div>),
-      code: `# Allow installs from valist
-go env -w GOINSECURE=valist.local GOPRIVATE=valist.local
-
-# Installs package from remote
-go get valist.io/[org]/[repo]`,
+      code: `# Installs package from remote
+go get ${location}/[org]/[repo]`,
     },
   };
 

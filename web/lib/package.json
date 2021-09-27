@@ -1,5 +1,5 @@
 {
-  "name": "valist",
+  "name": "@demo5/valist",
   "version": "0.4.0",
   "description": "A decentralized binary data notary and global repository, allowing developers and organizations to register public credentials to securely publish and distribute software/firmware/arbitrary data to users.",
   "author": "Valist, Inc.",

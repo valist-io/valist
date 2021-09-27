@@ -41,10 +41,8 @@ type Accounts struct {
 }
 
 type HTTP struct {
-	// ApiAddr is the api server address to use
-	ApiAddr string `json:"api_address"`
-	// WebAddr is the static web server address to use
-	WebAddr string `json:"web_address"`
+	// BindAddr is the http server address to bind to
+	BindAddr string `json:"api_address"`
 }
 
 type Config struct {
@@ -76,8 +74,7 @@ func NewConfig(rootPath string) *Config {
 			},
 		},
 		HTTP{
-			ApiAddr: "localhost:9000",
-			WebAddr: "localhost:9001",
+			BindAddr: "localhost:9000",
 		},
 	}
 }

@@ -6,7 +6,7 @@ export default function Dashboard() {
   const [actions, setActions] = useState({} as Record<string, any>);
 
   useEffect(() => {
-    setActions(GetActions(String('valist.local:9000')));
+    setActions(GetActions('app.valist.io'));
   }, []);
 
   return (

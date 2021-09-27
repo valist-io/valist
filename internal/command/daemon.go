@@ -3,6 +3,7 @@ package command
 import (
 	"context"
 	"fmt"
+	"net/http"
 	"os"
 	"os/signal"
 	"syscall"
@@ -44,24 +45,23 @@ func NewDaemonCommand() *cli.Command {
 
 			fmt.Println(banner)
 
-			apiAddr := os.Getenv("VALIST_API_ADDR")
-			if apiAddr == "" {
-				apiAddr = config.HTTP.ApiAddr
+			addr := os.Getenv("VALIST_HTTP_ADDR")
+			if addr == "" {
+				addr = config.HTTP.BindAddr
 			}
 
-			webAddr := os.Getenv("VALIST_WEB_ADDR")
-			if webAddr == "" {
-				webAddr = config.HTTP.WebAddr
+			handler := http.NewServeMux()
+			handler.Handle("/api/", registry.NewHandler(client))
+			handler.Handle("/", web.NewHandler())
+
+			server := &http.Server{
+				Addr:    addr,
+				Handler: handler,
 			}
 
-			apiServer := registry.NewServer(client, apiAddr)
-			webServer := web.NewServer(webAddr)
+			go server.ListenAndServe() //nolint:errcheck
 
-			go apiServer.ListenAndServe() //nolint:errcheck
-			go webServer.ListenAndServe() //nolint:errcheck
-
-			fmt.Println("API server running on", apiAddr)
-			fmt.Println("Web server running on", webAddr)
+			fmt.Println("HTTP server running on", addr)
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
@@ -72,8 +72,7 @@ func NewDaemonCommand() *cli.Command {
 			ctx, cancel := context.WithTimeout(c.Context, 30*time.Second)
 			defer cancel()
 
-			apiServer.Shutdown(ctx) //nolint:errcheck
-			webServer.Shutdown(ctx) //nolint:errcheck
+			server.Shutdown(ctx) //nolint:errcheck
 			return nil
 		},
 	}

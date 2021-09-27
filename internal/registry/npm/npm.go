@@ -87,11 +87,6 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	}
 
 	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s/%s", orgName, repoName, tag))
-	if err == types.ErrOrganizationNotExist {
-		http.Redirect(w, req, DefaultRegistry+req.URL.Path, http.StatusSeeOther)
-		return
-	}
-
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
