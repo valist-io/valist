@@ -22,7 +22,7 @@ import (
 )
 
 const (
-	DefaultGateway  = "https://ipfs.io/"
+	DefaultGateway  = "https://ipfs.io"
 	DefaultRegistry = "https://registry.npmjs.org"
 )
 
@@ -70,6 +70,7 @@ func (h *handler) writeAttachment(ctx context.Context, dir storage.Directory, pa
 	version.Dist = Dist{
 		Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarPath),
 	}
+	pack.Versions[semver] = version
 
 	return dir.Add(ctx, filepath.Base(attachName), tarPath)
 }
@@ -108,8 +109,8 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 
 	// TODO is this secure?
-	pack.ID = req.URL.Path
-	pack.Name = req.URL.Path
+	//pack.ID = req.URL.Path
+	//pack.Name = req.URL.Path
 
 	if err := json.NewEncoder(w).Encode(pack); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
