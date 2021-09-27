@@ -119,14 +119,14 @@ func RepositoryProjectType() *promptui.Select {
 
 func RepositoryHomepage(value string) Prompt {
 	return Prompt{promptui.Prompt{
-		Label:   "Repository homepage",
+		Label:   "Homepage",
 		Default: value,
 	}}
 }
 
 func RepositoryURL(value string) Prompt {
 	return Prompt{promptui.Prompt{
-		Label:   "Repository url",
+		Label:   "Source code repository url",
 		Default: value,
 	}}
 }
