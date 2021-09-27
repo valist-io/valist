@@ -49,6 +49,7 @@ export default function ReleaseList(props: ReleaseListProps): JSX.Element {
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
                       <a href={
+                        // eslint-disable-next-line max-len
                         `https://gateway.valist.io/ipfs/${parseCID(release.releaseCID)}?filename=${props.orgName}-${props.repoName}-${release.tag}`
                       }
                       className="text-indigo-600 hover:text-indigo-900">

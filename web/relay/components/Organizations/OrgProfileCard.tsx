@@ -1,5 +1,6 @@
 import { OrgMeta } from 'valist/dist/types';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
+import setLoading from '../../utils/loading';
 
 interface OrgProfileCardProps {
   orgName: string,
@@ -19,9 +20,13 @@ export default function OrgProfileCard(props: OrgProfileCardProps): JSX.Element 
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600"></p>
-                <p className="text-xl font-bold text-gray-900 sm:text-2xl">{props.orgMeta.name}</p>
-                <p className="text-sm font-medium text-gray-600">{props.orgMeta.description}</p>
-                { props.orgMeta.homepage && <a href={props.orgMeta.homepage}
+                <p className={`text-xl mb-1 font-bold text-gray-900 sm:text-2xl ${setLoading(props.orgMeta.name)}`}>
+                  {props.orgMeta.name}
+                </p>
+                <p className={`text-sm font-medium text-gray-600 ${setLoading(props.orgMeta.description)}`}>
+                  {props.orgMeta.description}
+                </p>
+                  { props.orgMeta.homepage && <a href={props.orgMeta.homepage}
                   className="text-sm font-medium text-gray-600">{props.orgMeta.homepage}</a>}
               </div>
             </div>

@@ -1,6 +1,4 @@
-import Link from 'next/link';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
-import useOrgAdmin from '../../hooks/useOrgAdmin';
 
 interface OrgAccessCardListItemProps {
   address: string
@@ -29,7 +27,6 @@ interface ManageAccessCardProps {
 }
 
 export default function ManageAccessCard(props: ManageAccessCardProps): JSX.Element {
-  const isOrgAdmin = useOrgAdmin(props.orgName);
   return (
     <section aria-labelledby="recent-hires-title">
       <div className="rounded-lg bg-white overflow-hidden shadow">
@@ -40,15 +37,6 @@ export default function ManageAccessCard(props: ManageAccessCardProps): JSX.Elem
               { props.orgAdmins.map((address) => <OrgAccessCardListItem key={address} address={address} />)}
             </ul>
           </div>
-          { isOrgAdmin && <div className="mt-6">
-            <Link href={`/v/${props.orgName}/edit`}>
-              <a className="w-full flex justify-center items-center px-4 py-2 border
-              border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
-              bg-white hover:bg-gray-50">
-                Manage Access
-              </a>
-            </Link>
-          </div> }
         </div>
       </div>
     </section>
