@@ -1,7 +1,6 @@
 package docker
 
 import (
-	"context"
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
@@ -14,8 +13,7 @@ import (
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
-	"github.com/valist-io/registry/internal/core/types"
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 type handler struct {
@@ -44,67 +42,6 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	// POST /v2/<name>/blobs/uploads/?mount=<digest>&from=<repository name>
 
 	return handlers.LoggingHandler(os.Stdout, router)
-}
-
-func (h *handler) writeUpload(uuid string, r io.Reader) (int64, error) {
-	path := filepath.Join(os.TempDir(), uuid, "blob")
-
-	blob, err := os.OpenFile(path, os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
-	if err != nil {
-		return 0, err
-	}
-	defer blob.Close()
-
-	size, err := io.Copy(blob, r)
-	if err != nil {
-		return 0, err
-	}
-
-	h.uploads[uuid] += size
-	return size, nil
-}
-
-func (h *handler) moveBlob(ctx context.Context, dir storage.Directory, digest string) error {
-	p, ok := h.blobs[digest]
-	if !ok {
-		return fmt.Errorf("blob not found")
-	}
-
-	if err := dir.Add(ctx, digest, p); err != nil {
-		return err
-	}
-
-	delete(h.blobs, digest)
-	return nil
-}
-
-func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
-	if p, ok := h.blobs[digest]; ok {
-		return h.client.Storage().Open(ctx, p)
-	}
-
-	raw := fmt.Sprintf("%s/%s/latest/%s", orgName, repoName, digest)
-	res, err := h.client.ResolvePath(ctx, raw)
-	if err != nil {
-		return nil, err
-	}
-
-	return res.File, nil
-}
-
-func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
-	raw := fmt.Sprintf("%s/%s/latest", orgName, repoName)
-	res, err := h.client.ResolvePath(ctx, raw)
-	if err != nil {
-		return nil, err
-	}
-
-	release, err := h.client.GetRelease(ctx, res.Organization.ID, res.Repository.Name, ref)
-	if err == nil {
-		return h.client.Storage().Open(ctx, release.MetaCID)
-	}
-
-	return h.client.Storage().Open(ctx, fmt.Sprintf("%s/%s", res.Release.ReleaseCID, ref))
 }
 
 func (h *handler) getVersion(w http.ResponseWriter, req *http.Request) {
@@ -171,18 +108,15 @@ func (h *handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	// TODO verify Range header is valid and return 416 if not
 	start := h.uploads[uuid]
-
-	size, err := h.writeUpload(uuid, req.Body)
-	if err != nil {
+	if err := h.writeBlob(uuid, req.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
-	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
-	w.Header().Set("Range", fmt.Sprintf("%d-%d", start, start+size))
 	w.Header().Set("Docker-Upload-UUID", uuid)
+	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
+	w.Header().Set("Range", fmt.Sprintf("%d-%d", start, h.uploads[uuid]))
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -194,12 +128,11 @@ func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	orgName := vars["org"]
 	repoName := vars["repo"]
 
-	// TODO verify Range header is valid and return 416 if not
+	// TODO calculate and compare digest
 	digest := req.URL.Query().Get("digest")
 	path := filepath.Join(os.TempDir(), uuid, "blob")
 
-	_, err := h.writeUpload(uuid, req.Body)
-	if err != nil {
+	if err := h.writeBlob(uuid, req.Body); err != nil {
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -214,8 +147,8 @@ func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	h.blobs[digest] = p
 	delete(h.uploads, uuid)
 
-	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.Header().Set("Docker-Content-Digest", digest)
+	w.Header().Set("Location", fmt.Sprintf("/v2/%s/%s/blobs/uploads/%s", orgName, repoName, uuid))
 	w.WriteHeader(http.StatusAccepted)
 }
 
@@ -254,27 +187,37 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	blobs := h.client.Storage().Mkdir()
-	if err := h.moveBlob(ctx, blobs, manifest.Config.Digest); err != nil {
+	dir, err := h.client.Storage().Mkdir(ctx)
+	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	if err := blobs.Add(ctx, digest, manifestCID); err != nil {
+	// add manifest to release directory
+	if err := dir.Add(ctx, digest, manifestCID); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	for _, layer := range manifest.Layers {
-		if err := h.moveBlob(ctx, blobs, layer.Digest); err != nil {
+	// add layers and config to release directory
+	for _, digest := range manifest.Digests() {
+		p, err := h.findBlob(ctx, orgName, repoName, digest)
+		if err != nil {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+
+		if err := dir.Add(ctx, digest, p); err != nil {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		delete(h.blobs, digest)
 	}
 
 	release := &types.Release{
 		Tag:        ref,
-		ReleaseCID: blobs.Path(),
+		ReleaseCID: dir.Path(),
 		MetaCID:    manifestCID,
 	}
 

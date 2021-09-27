@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/valist-io/registry/internal/command"
+	"github.com/valist-io/valist/internal/command"
 )
 
 // version is set by goreleaser

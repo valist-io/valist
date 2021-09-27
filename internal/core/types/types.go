@@ -5,11 +5,11 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/common"
-	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/contract/registry"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/signer"
+	"github.com/valist-io/valist/internal/storage"
 )
 
 const (
@@ -48,14 +48,12 @@ type CoreAPI interface {
 	RegistryAPI
 	ReleaseAPI
 	RepositoryAPI
-	// SwitchAccount changes the current account and wallet.
-	SwitchAccount(accounts.Account, accounts.Wallet)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(context.Context, string) (*ResolvedPath, error)
-	// Storage returns the underlying storage implementation.
+	// Signer returns the signer.
+	Signer() *signer.Signer
+	// Storage returns the storage interface.
 	Storage() storage.Storage
-	// Close releases resources.
-	Close()
 }
 
 type OrganizationAPI interface {
@@ -74,8 +72,8 @@ type RegistryAPI interface {
 type ReleaseAPI interface {
 	GetRelease(context.Context, common.Hash, string, string) (*Release, error)
 	GetLatestRelease(context.Context, common.Hash, string) (*Release, error)
-	ListReleaseTags(common.Hash, string, *big.Int, *big.Int) ReleaseTagIterator
-	ListReleases(common.Hash, string, *big.Int, *big.Int) ReleaseIterator
+	ListReleaseTags(common.Hash, string) ReleaseTagIterator
+	ListReleases(common.Hash, string) ReleaseIterator
 	VoteRelease(context.Context, common.Hash, string, *Release) (*valist.ValistVoteReleaseEvent, error)
 }
 
@@ -90,6 +88,7 @@ type RepositoryAPI interface {
 
 type ReleaseTagIterator interface {
 	Next(context.Context) (string, error)
+	ForEach(context.Context, func(string)) error
 }
 
 type ReleaseIterator interface {
@@ -141,7 +140,14 @@ type RepositoryMeta struct {
 
 type ResolvedPath struct {
 	Organization *Organization
-	Repository   *Repository
-	Release      *Release
-	File         storage.File
+	OrgID        common.Hash
+
+	Repository *Repository
+	RepoName   string
+
+	Release    *Release
+	ReleaseTag string
+
+	File     storage.File
+	FilePath string
 }

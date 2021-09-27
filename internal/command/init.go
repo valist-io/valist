@@ -5,7 +5,7 @@ import (
 	"path/filepath"
 
 	"github.com/urfave/cli/v2"
-	"github.com/valist-io/registry/internal/build"
+	"github.com/valist-io/valist/internal/build"
 )
 
 func NewInitCommand() *cli.Command {

@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 // GetRelease returns the release with the given tag in the repository with the given name and orgID.
@@ -26,7 +26,7 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 	selector := crypto.Keccak256Hash(packed)
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    client.account.Address,
+		From:    client.signer.Account().Address,
 	}
 
 	release, err := client.valist.Releases(&callopts, selector)
@@ -49,7 +49,7 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, repoName string) (*types.Release, error) {
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    client.account.Address,
+		From:    client.signer.Account().Address,
 	}
 
 	tag, releaseCID, metaCID, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
@@ -67,7 +67,7 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 
 // VoteRelease votes on a release in the given organization's repository with the given release and meta CIDs.
 func (client *Client) VoteRelease(ctx context.Context, orgID common.Hash, repoName string, release *types.Release) (*valist.ValistVoteReleaseEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteReleaseTx(txopts, orgID, repoName, release.Tag, release.ReleaseCID, release.MetaCID)

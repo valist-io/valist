@@ -8,8 +8,8 @@ import (
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 
-	"github.com/valist-io/registry/internal/contract/registry"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/contract/registry"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 // GetOrganizationID returns the ID of the organization with the given name.
@@ -20,7 +20,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    client.account.Address,
+		From:    client.signer.Account().Address,
 	}
 
 	orgID, err := client.registry.NameToID(&callopts, name)
@@ -38,7 +38,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 
 // LinkOrganizationName creates a link from the given orgID to the given name.
 func (client *Client) LinkOrganizationName(ctx context.Context, orgID common.Hash, name string) (*registry.ValistRegistryMappingEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.LinkOrganizationNameTx(txopts, orgID, name)

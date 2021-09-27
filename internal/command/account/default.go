@@ -7,7 +7,7 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core/config"
+	"github.com/valist-io/valist/internal/core/config"
 )
 
 func NewDefaultCommand() *cli.Command {
@@ -24,8 +24,8 @@ func NewDefaultCommand() *cli.Command {
 				return err
 			}
 
-			cfg, err := config.Load(home)
-			if err != nil {
+			cfg := config.NewConfig(home)
+			if err := cfg.Load(); err != nil {
 				return err
 			}
 
@@ -34,7 +34,9 @@ func NewDefaultCommand() *cli.Command {
 			}
 
 			address := common.HexToAddress(c.Args().Get(0))
-			// TODO do we care if the address is not pinned?
+			if !cfg.KeyStore().HasAddress(address) {
+				return fmt.Errorf("Invalid account address")
+			}
 
 			cfg.Accounts.Default = address
 			return cfg.Save()

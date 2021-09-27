@@ -8,14 +8,14 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/registry"
-	"github.com/valist-io/registry/web"
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/registry"
+	"github.com/valist-io/valist/web"
 )
 
 const banner = `
@@ -35,45 +35,19 @@ const banner = `
 
 func NewDaemonCommand() *cli.Command {
 	return &cli.Command{
-		Name:  "daemon",
-		Usage: "Runs a relay node",
-		Flags: []cli.Flag{
-			&cli.StringFlag{
-				Name:  "account",
-				Value: "default",
-				Usage: "Account to authenticate with",
-			},
-		},
+		Name:   "daemon",
+		Usage:  "Runs a relay node",
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg, err := config.Load(home)
-			if err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account)
-			if err != nil {
-				return err
-			}
-			defer client.Close()
+			config := c.Context.Value(core.ConfigKey).(*config.Config)
+			client := c.Context.Value(core.ClientKey).(*client.Client)
 
 			fmt.Println(banner)
-			fmt.Println("API server running on", cfg.HTTP.ApiAddr)
-			fmt.Println("Web server running on", cfg.HTTP.WebAddr)
+			fmt.Println("API server running on", config.HTTP.ApiAddr)
+			fmt.Println("Web server running on", config.HTTP.WebAddr)
 
-			apiServer := registry.NewServer(client, cfg.HTTP.ApiAddr)
-			webServer := web.NewServer(cfg.HTTP.WebAddr)
+			apiServer := registry.NewServer(client, config.HTTP.ApiAddr)
+			webServer := web.NewServer(config.HTTP.WebAddr)
 
 			go apiServer.ListenAndServe() //nolint:errcheck
 			go webServer.ListenAndServe() //nolint:errcheck

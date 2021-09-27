@@ -13,7 +13,7 @@ import (
 	"github.com/ipfs/interface-go-ipfs-core/options"
 	"github.com/ipfs/interface-go-ipfs-core/path"
 
-	"github.com/valist-io/registry/internal/storage"
+	"github.com/valist-io/valist/internal/storage"
 )
 
 var addopts = []options.UnixfsAddOption{
@@ -28,8 +28,13 @@ func NewStorage(ipfs coreiface.CoreAPI) *Storage {
 	return &Storage{ipfs}
 }
 
-func (s *Storage) Mkdir() storage.Directory {
-	return &dir{s.ipfs, emptyDirPath}
+func (s *Storage) Mkdir(ctx context.Context) (storage.Directory, error) {
+	node, err := s.ipfs.Object().New(ctx, options.Object.Type("unixfs-dir"))
+	if err != nil {
+		return nil, err
+	}
+
+	return &dir{s.ipfs, path.IpfsPath(node.Cid())}, nil
 }
 
 func (s *Storage) Open(ctx context.Context, p string) (storage.File, error) {

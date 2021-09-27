@@ -4,7 +4,6 @@ import (
 	"os"
 	"testing"
 
-	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
 )
 
@@ -13,13 +12,9 @@ func TestConfig(t *testing.T) {
 	require.NoError(t, err, "Failed to create tmp dir")
 	defer os.RemoveAll(dir)
 
-	exists, err := Exists(dir)
-	require.NoError(t, err, "Failed to check if config exists")
-	assert.False(t, exists)
+	err = Initialize(dir)
+	require.NoError(t, err, "Failed to initialize config")
 
-	err = Init(dir)
-	require.NoError(t, err, "Failed to init config")
-
-	_, err = Load(dir)
+	err = NewConfig(dir).Load()
 	require.NoError(t, err, "Failed to load config")
 }

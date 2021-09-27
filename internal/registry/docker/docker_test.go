@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/valist-io/registry/internal/core/mock"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func TestDockerPush(t *testing.T) {
@@ -20,7 +20,7 @@ func TestDockerPush(t *testing.T) {
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	client, _, _, err := mock.NewClient(tmp)
+	client, _, err := mock.NewClient(tmp)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"

@@ -6,14 +6,13 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/build"
-	"github.com/valist-io/registry/internal/core"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/build"
+	"github.com/valist-io/valist/internal/command/utils/lifecycle"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func NewPublishCommand() *cli.Command {
@@ -26,29 +25,9 @@ func NewPublishCommand() *cli.Command {
 				Usage: "Build and skip publish",
 			},
 		},
+		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
-			home, err := os.UserHomeDir()
-			if err != nil {
-				return err
-			}
-
-			cfg, err := config.Load(home)
-			if err != nil {
-				return err
-			}
-
-			var account accounts.Account
-			if c.IsSet("account") {
-				account.Address = common.HexToAddress(c.String("account"))
-			} else {
-				account.Address = cfg.Accounts.Default
-			}
-
-			client, err := core.NewClient(c.Context, cfg, account)
-			if err != nil {
-				return err
-			}
-			defer client.Close()
+			client := c.Context.Value(core.ClientKey).(*client.Client)
 
 			cwd, err := os.Getwd()
 			if err != nil {

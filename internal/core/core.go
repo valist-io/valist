@@ -6,49 +6,62 @@ import (
 	"net/http"
 
 	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/external"
 	"github.com/ethereum/go-ethereum/ethclient"
 	httpapi "github.com/ipfs/go-ipfs-http-client"
 	"github.com/libp2p/go-libp2p-core/peer"
 	ma "github.com/multiformats/go-multiaddr"
-	"github.com/valist-io/gasless"
-	"github.com/valist-io/gasless/mexa"
 
-	"github.com/valist-io/registry/internal/contract"
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/client/basetx"
-	"github.com/valist-io/registry/internal/core/client/metatx"
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/signer"
-	"github.com/valist-io/registry/internal/storage/ipfs"
+	"github.com/valist-io/valist/internal/contract"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/core/client/metatx"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/signer"
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
-// NewClient builds a client based on the given config.
-func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account) (*client.Client, error) {
-	var onClose []client.Close
+type contextKey string
 
-	listener, _, err := signer.StartIPCEndpoint(cfg)
-	if err != nil {
-		return nil, err
-	}
-	onClose = append(onClose, listener.Close)
+const (
+	ClientKey = contextKey("client")
+	ConfigKey = contextKey("config")
+)
 
-	wallet, err := external.NewExternalSigner(cfg.Signer.IPCAddress)
-	if err != nil {
-		return nil, err
-	}
+type Options struct {
+	// Account is the default account.
+	Account accounts.Account
+	// Passphrase is the account passphrase.
+	Passphrase string
+}
+
+func NewClient(ctx context.Context, cfg *config.Config, opts Options) (*client.Client, error) {
+	valistAddress := cfg.Ethereum.Contracts["valist"]
+	registryAddress := cfg.Ethereum.Contracts["registry"]
 
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
 		return nil, err
 	}
 
-	valist, err := contract.NewValist(cfg.Ethereum.Contracts["valist"], eth)
+	chainID, err := eth.ChainID(ctx)
+	if err != nil {
+		return nil, err
+	}
+
+	signer, err := signer.NewSigner(opts.Account, chainID, cfg.KeyStore())
+	if err != nil {
+		return nil, err
+	}
+
+	// unlock the default account if a password is provided for non-interactive environments
+	signer.Unlock(opts.Account, opts.Passphrase)
+
+	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize valist contract: %v", err)
 	}
 
-	registry, err := contract.NewRegistry(cfg.Ethereum.Contracts["registry"], eth)
+	registry, err := contract.NewRegistry(registryAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
@@ -72,36 +85,23 @@ func NewClient(ctx context.Context, cfg *config.Config, account accounts.Account
 		go ipfsapi.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
 	}
 
-	opts := &client.Options{
-		Storage:      ipfs.NewStorage(ipfsapi),
-		Ethereum:     eth,
-		ChainID:      cfg.Ethereum.ChainID,
-		Valist:       valist,
-		Registry:     registry,
-		Account:      account,
-		Wallet:       wallet,
-		TransactOpts: basetx.TransactOpts,
-		Transactor:   basetx.NewTransactor(valist, registry),
-		OnClose:      onClose,
+	var transactor client.TransactorAPI
+	if cfg.Ethereum.MetaTx {
+		transactor, err = metatx.NewTransactor(eth, valistAddress, registryAddress, cfg.Ethereum.BiconomyApiKey)
+	} else {
+		transactor, err = basetx.NewTransactor(eth, valistAddress, registryAddress)
 	}
 
-	if !cfg.Ethereum.MetaTx {
-		return client.NewClient(opts)
-	}
-
-	meta, err := mexa.NewMexa(ctx, eth, cfg.Ethereum.BiconomyApiKey)
 	if err != nil {
 		return nil, err
 	}
 
-	signer := gasless.NewWalletSigner(opts.Account, opts.Wallet)
-	transactor, err := metatx.NewTransactor(meta, signer, eth, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	opts.TransactOpts = metatx.TransactOpts
-	opts.Transactor = transactor
-
-	return client.NewClient(opts)
+	return client.NewClient(client.Options{
+		Storage:    ipfs.NewStorage(ipfsapi),
+		Ethereum:   eth,
+		Valist:     valist,
+		Registry:   registry,
+		Signer:     signer,
+		Transactor: transactor,
+	})
 }

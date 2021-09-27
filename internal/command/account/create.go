@@ -1,13 +1,12 @@
 package account
 
 import (
-	"os"
-
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/registry/internal/core/config"
-	"github.com/valist-io/registry/internal/signer"
+	"github.com/valist-io/valist/internal/core"
+	"github.com/valist-io/valist/internal/core/config"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewCreateCommand() *cli.Command {
@@ -15,32 +14,24 @@ func NewCreateCommand() *cli.Command {
 		Name:  "create",
 		Usage: "Create an account",
 		Action: func(c *cli.Context) error {
-			home, err := os.UserHomeDir()
+			config := c.Context.Value(core.ConfigKey).(*config.Config)
+
+			passphrase, err := prompt.NewAccountPassphrase().Run()
 			if err != nil {
 				return err
 			}
 
-			cfg, err := config.Load(home)
+			account, err := config.KeyStore().NewAccount(passphrase)
 			if err != nil {
 				return err
 			}
 
-			api, _, err := signer.NewSigner(cfg)
-			if err != nil {
-				return err
+			if config.Accounts.Default == common.HexToAddress("0x0") {
+				config.Accounts.Default = account.Address
 			}
 
-			address, err := api.New(c.Context)
-			if err != nil {
-				return err
-			}
-
-			if cfg.Accounts.Default == common.HexToAddress("0x0") {
-				cfg.Accounts.Default = address
-			}
-
-			cfg.Accounts.Pinned = append(cfg.Accounts.Pinned, address)
-			return cfg.Save()
+			config.Accounts.Pinned = append(config.Accounts.Pinned, account.Address)
+			return config.Save()
 		},
 	}
 }

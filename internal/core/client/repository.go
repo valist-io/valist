@@ -9,8 +9,8 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
-	"github.com/valist-io/registry/internal/contract/valist"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 // GetRepository returns the repository with the given orgID and name.
@@ -18,7 +18,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 	selector := crypto.Keccak256Hash(orgID[:], []byte(repoName))
 	callopts := bind.CallOpts{
 		Context: ctx,
-		From:    client.account.Address,
+		From:    client.signer.Account().Address,
 	}
 
 	repo, err := client.valist.Repos(&callopts, selector)
@@ -66,7 +66,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID)
@@ -83,7 +83,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 }
 
 func (client *Client) VoteRepoDev(ctx context.Context, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteKeyTx(txopts, orgID, repoName, operation, address)
@@ -110,7 +110,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 		return nil, err
 	}
 
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID)
@@ -127,7 +127,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 }
 
 func (client *Client) VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, name string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error) {
-	txopts := client.transactOpts(client.account, client.wallet, client.chainID)
+	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
 	tx, err := client.transactor.VoteRepositoryThresholdTx(txopts, orgID, name, threshold)

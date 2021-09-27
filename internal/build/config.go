@@ -5,7 +5,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 var DefaultImages = map[string]string{

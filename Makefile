@@ -15,6 +15,21 @@ install-lib:
 install-relay:
 	npm install --prefix ./web/relay
 
+install-docs:
+	pip install mkdocs mkdocs-material
+
+dev-lib:
+	npm run dev --prefix ./web/lib
+
+dev-relay:
+	npm run dev --prefix ./web/relay
+
+dev-docs:
+	mkdocs serve
+
+dev:
+	@make -j 2 dev-lib dev-relay
+
 web-lib:
 	npm run build --prefix ./web/lib
 
@@ -61,3 +76,5 @@ dev-docs:
 # runs both dev servers in parallel, piping output to same shell
 dev:
 	@make -j 2 dev-lib dev-relay
+
+.PHONY: web docs

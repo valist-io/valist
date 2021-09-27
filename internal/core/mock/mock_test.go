@@ -6,8 +6,8 @@ import (
 
 	"github.com/stretchr/testify/suite"
 
-	"github.com/valist-io/registry/internal/core/client"
-	"github.com/valist-io/registry/internal/core/test"
+	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/test"
 )
 
 type ClientSuite struct {
@@ -21,18 +21,16 @@ func (s *ClientSuite) SetupTest() {
 	s.Require().NoError(err, "Failed to create temp dir")
 	s.tmp = tmp
 
-	client, accounts, wallets, err := NewClient(tmp)
+	client, accounts, err := NewClient(tmp)
 	s.Require().NoError(err, "Failed to create mock client")
 
 	s.client = client
 	s.CoreSuite.SetClient(client)
 	s.CoreSuite.SetAccounts(accounts)
-	s.CoreSuite.SetWallets(wallets)
 }
 
 func (s *ClientSuite) TearDownTest() {
 	os.RemoveAll(s.tmp)
-	s.client.Close()
 }
 
 func TestClientSuite(t *testing.T) {

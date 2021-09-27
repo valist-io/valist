@@ -9,8 +9,8 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/valist-io/registry/internal/core/mock"
-	"github.com/valist-io/registry/internal/core/types"
+	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 func TestGitPushClone(t *testing.T) {
@@ -20,7 +20,7 @@ func TestGitPushClone(t *testing.T) {
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	client, _, _, err := mock.NewClient(tmp)
+	client, _, err := mock.NewClient(tmp)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"
@@ -49,7 +49,7 @@ func TestGitPushClone(t *testing.T) {
 	require.NoError(t, err, "Failed to create repository")
 
 	registryAddr := "localhost:10002"
-	registryPath := "http://localhost:10002/valist/sdk/v0.0.1"
+	registryPath := "http://localhost:10002/valist/sdk"
 
 	go func() {
 		err := http.ListenAndServe(registryAddr, NewHandler(client))
@@ -60,7 +60,7 @@ func TestGitPushClone(t *testing.T) {
 	require.NoError(t, err, "Failed to create clone dir")
 	defer os.RemoveAll(tmp)
 
-	err = exec.Command("git", "push", "--all", registryPath).Run()
+	err = exec.Command("git", "push", registryPath, "main").Run()
 	require.NoError(t, err, "Failed to push git repo")
 
 	err = exec.Command("git", "clone", registryPath, clone).Run()

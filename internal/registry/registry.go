@@ -5,21 +5,21 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/valist-io/registry/internal/core/types"
-	"github.com/valist-io/registry/internal/registry/docker"
-	"github.com/valist-io/registry/internal/registry/git"
-	"github.com/valist-io/registry/internal/registry/npm"
+	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/registry/docker"
+	"github.com/valist-io/valist/internal/registry/git"
+	"github.com/valist-io/valist/internal/registry/npm"
 )
 
 func NewServer(client types.CoreAPI, addr string) *http.Server {
 	dockerHandler := docker.NewHandler(client)
-	npmHandler := npm.NewHandler(client)
 	gitHandler := git.NewHandler(client)
+	npmHandler := npm.NewHandler(client)
 
 	router := mux.NewRouter()
-	router.PathPrefix("/docker/").Handler(http.StripPrefix("/docker", dockerHandler))
-	router.PathPrefix("/npm/").Handler(http.StripPrefix("/npm", npmHandler))
+	router.PathPrefix("/v2/").Handler(dockerHandler)
 	router.PathPrefix("/git/").Handler(http.StripPrefix("/git", gitHandler))
+	router.PathPrefix("/npm/").Handler(http.StripPrefix("/npm", npmHandler))
 
 	return &http.Server{
 		Addr:    addr,
