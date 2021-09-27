@@ -2,7 +2,6 @@ package client
 
 import (
 	"context"
-	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -26,7 +25,7 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 	res := types.ResolvedPath{OrgID: orgID}
 	res.Organization, err = client.GetOrganization(ctx, res.OrgID)
 	if err != nil {
-		return nil, err
+		return &res, err
 	}
 
 	if len(parts) < 2 {
@@ -35,8 +34,8 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 
 	res.RepoName = parts[1]
 	res.Repository, err = client.GetRepository(ctx, orgID, res.RepoName)
-	if err != nil && !errors.Is(err, types.ErrRepositoryNotExist) {
-		return nil, err
+	if err != nil {
+		return &res, err
 	}
 
 	if len(parts) < 3 {
@@ -45,8 +44,8 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 
 	res.ReleaseTag = parts[2]
 	res.Release, err = client.GetRelease(ctx, orgID, res.RepoName, res.ReleaseTag)
-	if err != nil && !errors.Is(err, types.ErrReleaseNotExist) {
-		return nil, err
+	if err != nil {
+		return &res, err
 	}
 
 	if len(parts) < 4 {
@@ -56,7 +55,7 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 	res.FilePath = path.Join(res.Release.ReleaseCID, parts[3])
 	res.File, err = client.storage.Open(ctx, res.FilePath)
 	if err != nil {
-		return nil, err
+		return &res, err
 	}
 
 	return &res, nil
