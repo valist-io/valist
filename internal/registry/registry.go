@@ -11,18 +11,18 @@ import (
 	"github.com/valist-io/valist/internal/registry/npm"
 )
 
-func NewHandler(client types.CoreAPI) http.Handler {
+func NewServer(client types.CoreAPI, addr string) *http.Server {
 	dockerHandler := docker.NewHandler(client)
 	gitHandler := git.NewHandler(client)
 	npmHandler := npm.NewHandler(client)
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-	})
 	router.PathPrefix("/v2/").Handler(dockerHandler)
 	router.PathPrefix("/api/git/").Handler(http.StripPrefix("/api/git", gitHandler))
 	router.PathPrefix("/api/npm/").Handler(http.StripPrefix("/api/npm", npmHandler))
 
-	return router
+	return &http.Server{
+		Addr:    addr,
+		Handler: router,
+	}
 }
