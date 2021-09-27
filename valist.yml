@@ -7,7 +7,7 @@ install:
   curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
 
   RUN apt install -yy nodejs
-build: make clean install bin-multi
+build: make clean install web bin-multi
 out: dist
 platforms:
   linux/amd64: linux-amd64/valist
