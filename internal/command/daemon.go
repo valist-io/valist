@@ -43,14 +43,25 @@ func NewDaemonCommand() *cli.Command {
 			client := c.Context.Value(core.ClientKey).(*client.Client)
 
 			fmt.Println(banner)
-			fmt.Println("API server running on", config.HTTP.ApiAddr)
-			fmt.Println("Web server running on", config.HTTP.WebAddr)
 
-			apiServer := registry.NewServer(client, config.HTTP.ApiAddr)
-			webServer := web.NewServer(config.HTTP.WebAddr)
+			apiAddr := os.Getenv("VALIST_API_ADDR")
+			if apiAddr == "" {
+				apiAddr = config.HTTP.ApiAddr
+			}
+
+			webAddr := os.Getenv("VALIST_WEB_ADDR")
+			if webAddr == "" {
+				webAddr = config.HTTP.WebAddr
+			}
+
+			apiServer := registry.NewServer(client, apiAddr)
+			webServer := web.NewServer(webAddr)
 
 			go apiServer.ListenAndServe() //nolint:errcheck
 			go webServer.ListenAndServe() //nolint:errcheck
+
+			fmt.Println("API server running on", apiAddr)
+			fmt.Println("Web server running on", webAddr)
 
 			quit := make(chan os.Signal, 1)
 			signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
