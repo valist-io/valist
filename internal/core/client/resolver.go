@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path"
 	"strings"
@@ -34,7 +35,7 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 
 	res.RepoName = parts[1]
 	res.Repository, err = client.GetRepository(ctx, orgID, res.RepoName)
-	if err != nil {
+	if err != nil && !errors.Is(err, types.ErrRepositoryNotExist) {
 		return nil, err
 	}
 
@@ -43,8 +44,8 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 	}
 
 	res.ReleaseTag = parts[2]
-	res.Release, err = client.GetRelease(ctx, orgID, parts[1], res.ReleaseTag)
-	if err != nil {
+	res.Release, err = client.GetRelease(ctx, orgID, res.RepoName, res.ReleaseTag)
+	if err != nil && !errors.Is(err, types.ErrReleaseNotExist) {
 		return nil, err
 	}
 
