@@ -23,11 +23,7 @@ func NewCreateCommand() *cli.Command {
 
 			client := c.Context.Value(core.ClientKey).(*client.Client)
 			res, err := client.ResolvePath(c.Context, c.Args().Get(0))
-			if err == nil {
-				return fmt.Errorf("Repository already exists")
-			}
-
-			if err != types.ErrRepositoryNotExist {
+			if err != nil {
 				return err
 			}
 
