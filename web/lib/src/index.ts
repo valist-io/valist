@@ -33,6 +33,7 @@ import {
   sendMetaTransaction,
   getValistRegistry,
   stripParentFolderFromPath,
+  parseCID,
 } from './utils';
 
 import { ValistSDKError } from './errors';
@@ -969,7 +970,7 @@ class Valist {
   // eslint-disable-next-line class-methods-use-this
   async fetchJSONfromIPFS(ipfsHash: string): Promise<any> {
     try {
-      const response = await fetch(`${this.gatewayHost}/ipfs/${ipfsHash}`);
+      const response = await fetch(`${this.gatewayHost}/ipfs/${parseCID(ipfsHash)}`);
       const json = await response.json();
       return json;
     } catch (e) {

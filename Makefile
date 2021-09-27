@@ -48,11 +48,11 @@ docs:
 
 # runs local typescript compiler in watch mode
 dev-lib:
-	cd web/lib && npm run dev
+	npm run dev --prefix ./web/lib
 
 # runs local next server
 dev-relay:
-	cd web/relay && npm run dev
+	npm run dev --prefix ./web/relay
 
 # hot reload docs
 dev-docs:
