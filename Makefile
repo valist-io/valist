@@ -5,6 +5,23 @@ all: install valist
 bin:
 	go build ./cmd/valist
 
+bin-linux-amd64:
+	GOOS=linux   GOARCH=amd64 go build -o dist/linux-amd64/valist   ./cmd/valist
+
+bin-linux-arm64:
+	GOOS=linux   GOARCH=arm64 go build -o dist/linux-arm64/valist   ./cmd/valist
+
+bin-darwin-amd64:
+	GOOS=darwin  GOARCH=amd64 go build -o dist/darwin-amd64/valist  ./cmd/valist
+
+bin-darwin-arm64:
+	GOOS=darwin  GOARCH=arm64 go build -o dist/darwin-arm64/valist  ./cmd/valist
+
+bin-windows-amd64:
+	GOOS=windows GOARCH=amd64 go build -o dist/windows-amd64/valist ./cmd/valist
+
+bin-multi: bin-linux-amd64 bin-linux-arm64 bin-darwin-amd64 bin-darwin-arm64 bin-windows-amd64
+
 valist: web bin
 
 install: install-lib install-relay
@@ -60,21 +77,5 @@ test: test-valist test-web-lib
 
 docs:
 	mkdocs build
-
-# runs local typescript compiler in watch mode
-dev-lib:
-	npm run dev --prefix ./web/lib
-
-# runs local next server
-dev-relay:
-	npm run dev --prefix ./web/relay
-
-# hot reload docs
-dev-docs:
-	mkdocs serve
-
-# runs both dev servers in parallel, piping output to same shell
-dev:
-	@make -j 2 dev-lib dev-relay
 
 .PHONY: web docs
