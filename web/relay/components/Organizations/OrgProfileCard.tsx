@@ -1,7 +1,6 @@
-import Link from 'next/link';
 import { OrgMeta } from 'valist/dist/types';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
-import IsOrgAdmin from '../AccessControl/IsOrgAdmin';
+import setLoading from '../../utils/loading';
 
 interface OrgProfileCardProps {
   orgName: string,
@@ -21,29 +20,15 @@ export default function OrgProfileCard(props: OrgProfileCardProps): JSX.Element 
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600"></p>
-                <p className="text-xl font-bold text-gray-900 sm:text-2xl">{props.orgMeta.name}</p>
-                <p className="text-sm font-medium text-gray-600">{props.orgMeta.description}</p>
+                <p className={`text-xl mb-1 font-bold text-gray-900 sm:text-2xl ${setLoading(props.orgMeta.name)}`}>
+                  {props.orgMeta.name}
+                </p>
+                <p className={`text-sm font-medium text-gray-600 ${setLoading(props.orgMeta.description)}`}>
+                  {props.orgMeta.description}
+                </p>
+                  { props.orgMeta.homepage && <a href={props.orgMeta.homepage}
+                  className="text-sm font-medium text-gray-600">{props.orgMeta.homepage}</a>}
               </div>
-            </div>
-            <div className="mt-5 flex justify-center sm:mt-0">
-              <IsOrgAdmin orgName={props.orgName}>
-                <Link href={`/v/${props.orgName}/edit/`}>
-                  <a className="flex justify-center items-center px-4 py-2 border
-                  border-gray-300 shadow-sm text-sm font-medium rounded-md text-gray-700
-                  bg-white hover:bg-gray-50">
-                    Manage Organization
-                  </a>
-                </Link>
-
-                <Link href={`/v/${props.orgName}/create/`}>
-                  <a className="ml-2 flex justify-center items-center px-4 py-2 border
-                  border-transparent text-sm leading-5 font-medium rounded-md text-white
-                  bg-indigo-600 hover:bg-indigo-500 focus:outline-none focus:border-indigo-700
-                  focus:shadow-outline-indigo active:bg-indigo-700 transition ease-in-out duration-150">
-                    New Project
-                  </a>
-                </Link>
-              </IsOrgAdmin>
             </div>
           </div>
         </div>

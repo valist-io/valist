@@ -48,3 +48,5 @@ export const stripParentFolderFromPath = (filePath: string, parent: string): str
   new RegExp(`^.+?${parent.replace(/\/|\\$/, '')}`),
   '',
 );
+
+export const parseCID = (url: string) => url.replace('/ipfs/', '');

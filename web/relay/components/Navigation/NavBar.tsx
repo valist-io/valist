@@ -1,7 +1,5 @@
 import { useState, useContext } from 'react';
 import Link from 'next/link';
-// import Image from 'next/image';
-// import Logo from '../../public/images/ValistLogo128.png';
 import LoginContext from '../Login/LoginContext';
 import AddressIdenticon from '../Identicons/AddressIdenticon';
 import ValistContext from '../Valist/ValistContext';
@@ -42,9 +40,6 @@ export const Nav = () => {
                   </a>
                 </nav>
               </div>
-              {/* @TODO figure out a way to right align login button without dynamic js below, and without breaking
-                the width of the identicon + address div when logged in
-              */}
               <div className={`hidden lg:block ${!login.loggedIn ? 'justify-self-end' : ''}`}>
                 <div className="flex-grow">
                   {login.loggedIn
@@ -59,7 +54,7 @@ export const Nav = () => {
                     className="inline-flex items-center px-6 py-1.5 border border-transparent
                     text-xs font-medium rounded-md shadow-sm text-indigo-700 bg-white hover:bg-gray-50
                     focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 cursor-pointer p-3 m-3">
-                          Login
+                          Change RPC Provider (Read-Only)
                       </button>)}
                   {menuVisible && <div className="origin-top-right z-40 absolute right-0 mt-2 w-48 rounded-md
                                           shadow-lg py-1 bg-white ring-1 ring-black ring-opacity-5 focus:outline-none"
@@ -67,34 +62,14 @@ export const Nav = () => {
                                         aria-labelledby="user-menu">
                     <a onClick={() => { login.logOut(); setMenuVisible(!menuVisible); }}
                     className="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 cursor-pointer"
-                    role="menuitem">Sign out</a>
+                    role="menuitem">Switch RPC Provider</a>
                   </div>}
                 </div>
-                {/* <div className="max-w-xs mx-auto w-full lg:max-w-md">
-                  <label htmlFor="search" className="sr-only">Search</label>
-                  <div className="relative text-white focus-within:text-gray-600">
-                    <div className="pointer-events-none absolute inset-y-0 left-0 pl-3 flex items-center">
-                      <svg className="h-5 w-5" xmlns="http://www.w3.org/2000/svg"
-                      viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                        <path fillRule="evenodd" d="M8 4a4 4 0 100 8 4 4 0 000-8zM2
-                        8a6 6 0 1110.89 3.476l4.817 4.817a1 1 0 01-1.414 1.414l-4.816-4.816A6
-                        6 0 012 8z" clipRule="evenodd" />
-                      </svg>
-                    </div>
-                    <input id="search" onClick={() => alert('Search is disabled for this account')}
-                      className="block w-full text-white bg-white bg-opacity-20
-                      py-2 pl-10 pr-3 border border-transparent rounded-md leading-5
-                      focus:text-gray-900 placeholder-white focus:outline-none
-                      focus:bg-opacity-100 focus:border-transparent focus:placeholder-gray-500
-                      focus:ring-0 sm:text-sm" placeholder="Search" type="search" name="search" />
-                  </div>
-                </div> */}
               </div>
             </div>
           </div>
 
           <div className="absolute right-0 flex-shrink-0 lg:hidden">
-
             <button onClick={() => setMenuVisible(!menuVisible)} type="button"
             className="bg-transparent p-2 rounded-md inline-flex items-center
             justify-center text-violet-200 hover:text-white hover:bg-white
@@ -165,10 +140,6 @@ export const Nav = () => {
                 </div>
               </div>
               <div className="mt-3 px-2 space-y-1">
-                {/* <Link href="/dashboard/settings">
-                  <a className="block rounded-md px-3 py-2 text-base text-gray-900
-                  font-medium hover:bg-gray-100 hover:text-gray-800">Settings</a>
-                </Link> */}
                 <a href="#" className="block rounded-md px-3 py-2 text-base text-gray-900
                 font-medium hover:bg-gray-100 hover:text-gray-800">Sign out</a>
               </div>

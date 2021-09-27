@@ -33,6 +33,7 @@ import {
   sendMetaTransaction,
   getValistRegistry,
   stripParentFolderFromPath,
+  parseCID,
 } from './utils';
 
 import { ValistSDKError } from './errors';
@@ -439,9 +440,9 @@ class Valist {
         // eslint-disable-next-line no-await-in-loop
         const release = await this.contract.methods.releases(releaseSelector).call();
         releases.push({
-          tag: tags[i],
-          releaseCID: release.releaseCID,
-          metaCID: release.metaCID,
+          tag: tags[i] || '',
+          releaseCID: release.releaseCID || '',
+          metaCID: release.metaCID || '',
         });
       }
 
@@ -462,9 +463,9 @@ class Valist {
       const release = await this.contract.methods.releases(releaseSelector).call();
       return {
         tag,
-        releaseCID: release.releaseCID,
-        metaCID: release.metaCID,
-        signers: release.signers,
+        releaseCID: release.releaseCID  || '',
+        metaCID: release.metaCID  || '',
+        signers: release.signers  || '',
       };
     } catch (e) {
       const msg = 'Could not get release by tag';
@@ -969,7 +970,7 @@ class Valist {
   // eslint-disable-next-line class-methods-use-this
   async fetchJSONfromIPFS(ipfsHash: string): Promise<any> {
     try {
-      const response = await fetch(`${this.gatewayHost}/ipfs/${ipfsHash}`);
+      const response = await fetch(`${this.gatewayHost}/ipfs/${parseCID(ipfsHash)}`);
       const json = await response.json();
       return json;
     } catch (e) {

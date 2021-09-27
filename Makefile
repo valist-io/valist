@@ -60,6 +60,21 @@ test: test-valist test-web-lib
 
 docs:
 	mkdocs build
-	npm run docs --prefix ./web/lib
+
+# runs local typescript compiler in watch mode
+dev-lib:
+	npm run dev --prefix ./web/lib
+
+# runs local next server
+dev-relay:
+	npm run dev --prefix ./web/relay
+
+# hot reload docs
+dev-docs:
+	mkdocs serve
+
+# runs both dev servers in parallel, piping output to same shell
+dev:
+	@make -j 2 dev-lib dev-relay
 
 .PHONY: web docs

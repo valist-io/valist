@@ -6,3 +6,50 @@
 @import "tailwindcss/base";
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
+
+.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
+    padding: 0;
+    font-weight: bold;
+    -webkit-font-smoothing: antialiased;
+    cursor: text;
+    position: relative;
+    margin-bottom: 16px;
+    border-bottom: 1px solid rgba(0, 0, 0, .1);
+}
+
+.markdown h1 {
+  font-size: 2em;
+}
+
+.markdown h2 {
+  font-size: 25px;
+}
+
+.markdown h3 {
+  font-size: 20px;
+}
+
+.markdown h4 {
+  font-size: 15px;
+}
+
+.markdown ul {
+  list-style-type: circle;
+  margin-left: 20px;
+}
+
+.markdown p {
+  margin-bottom: 16px;
+}
+
+.loading {
+  width: 200px;
+  color: rgba(0, 0, 0, 0) !important;
+  background: rgba(190, 190, 190, 0.2) !important;
+}
+
+.triangle {
+    background-image: url('/images/triangle.png');
+    background-position: center center;
+    background-size: cover;
+}
