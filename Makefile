@@ -3,7 +3,7 @@ SHELL=/bin/bash
 all: install valist
 
 bin:
-	go build -ldflags "-s -w" ./cmd/valist
+	go build ./cmd/valist
 
 valist: web bin
 
