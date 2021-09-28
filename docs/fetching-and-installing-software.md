@@ -38,9 +38,3 @@ echo @acme-co:registry=https://valist.io/api/npm >> .npmrc
 
 npm i @acme-co/npm-example
 ```
-
-Or set a Valist relay as your default **NPM registry**:
-
-```bash
-npm config set registry https://valist.io/api/npm
-```
