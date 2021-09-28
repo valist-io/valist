@@ -1,5 +1,6 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
+import Head from 'next/head';
 import { Repository, Release } from 'valist/dist/types';
 import Layout from '../../../components/Layouts/DashboardLayout';
 import RepoContent from '../../../components/Repositories/RepoContent';
@@ -68,6 +69,11 @@ export default function Dashboard() {
 
   return (
     <Layout>
+        <Head>
+          <meta name="go-import" content={
+            `app.valist.io/${orgName}/${repoName} git https://app.valist.io/api/git/${orgName}/${repoName}`
+          } />
+        </Head>
         <div className="grid grid-cols-1 gap-4 items-start lg:grid-cols-6 lg:gap-8">
           <div className="grid grid-cols-1 gap-4 lg:col-span-4">
             <ProjectProfileCard

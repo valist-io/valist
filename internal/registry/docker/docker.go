@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"net/http"
 	"os"
@@ -44,6 +45,11 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
+func (h *handler) error(w http.ResponseWriter, msg string, status int) {
+	log.Println(msg)
+	http.Error(w, msg, status)
+}
+
 func (h *handler) getVersion(w http.ResponseWriter, req *http.Request) {
 	w.WriteHeader(http.StatusOK)
 }
@@ -64,7 +70,7 @@ func (h *handler) getBlob(w http.ResponseWriter, req *http.Request) {
 
 	info, err := file.Stat()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -76,7 +82,7 @@ func (h *handler) getBlob(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if _, err := io.Copy(w, file); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -88,7 +94,7 @@ func (h *handler) postBlob(w http.ResponseWriter, req *http.Request) {
 
 	path, err := os.MkdirTemp("", "")
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -110,7 +116,7 @@ func (h *handler) patchBlob(w http.ResponseWriter, req *http.Request) {
 
 	start := h.uploads[uuid]
 	if err := h.writeBlob(uuid, req.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -133,13 +139,13 @@ func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 	path := filepath.Join(os.TempDir(), uuid, "blob")
 
 	if err := h.writeBlob(uuid, req.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	p, err := h.client.Storage().WriteFile(ctx, path)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer os.RemoveAll(filepath.Dir(path))
@@ -162,13 +168,13 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s", orgName, repoName))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	data, err := io.ReadAll(req.Body)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -177,25 +183,25 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	var manifest Manifest
 	if err := json.Unmarshal(data, &manifest); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	manifestCID, err := h.client.Storage().Write(ctx, data)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	dir, err := h.client.Storage().Mkdir(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// add manifest to release directory
 	if err := dir.Add(ctx, digest, manifestCID); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -203,12 +209,12 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 	for _, digest := range manifest.Digests() {
 		p, err := h.findBlob(ctx, orgName, repoName, digest)
 		if err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		if err := dir.Add(ctx, digest, p); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
@@ -223,7 +229,7 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -248,20 +254,20 @@ func (h *handler) getManifest(w http.ResponseWriter, req *http.Request) {
 
 	file, err := h.loadManifest(ctx, orgName, repoName, ref)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	info, err := file.Stat()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	// TODO write to hash instead of reading
 	data, err := io.ReadAll(file)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -274,6 +280,6 @@ func (h *handler) getManifest(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if _, err := w.Write(data); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 	}
 }

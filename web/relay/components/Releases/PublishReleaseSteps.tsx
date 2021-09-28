@@ -1,8 +1,5 @@
 export default function PublishReleaseSteps() {
-  const example = `# Install the Valist CLI
-npm i -g @valist/cli --registry=https://valist.io/api/npm
-  
-# Initialize your project
+  const example = `# Initialize your project
 valist init
   
 # Publish a release

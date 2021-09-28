@@ -10,7 +10,7 @@ export type OrgMeta = {
 
 export type BinaryTypes = 'binary' | 'go' | 'rust' | 'c++';
 
-export type ProjectType = BinaryTypes | 'node' | 'python' | 'docker' | 'static';
+export type ProjectType = BinaryTypes | 'node' | 'npm' | 'python' | 'docker' | 'static';
 
 export type RepoMeta = {
   name: string,

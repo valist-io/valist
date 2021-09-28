@@ -11,8 +11,12 @@ export type ProjectType = {
 export const GetActions = (location:string, orgName:string, repoName:string) => {
   const actions: Record<string, Action> = {
     npmInstallFromRegistry: {
-      description: 'Install with Registry Flag',
-      command: `npm i ${orgName}/${repoName} --registry=http://${location}/api/`,
+      description: 'Install from Registry',
+      command: `# Link Namespace to Registry
+echo @${orgName}:registry=${location}/api/npm >> .npmrc
+
+# Install from Registry
+npm i ${orgName}/${repoName}`,
     },
     curlBinary: {
       description: 'Download (GET) from Url',

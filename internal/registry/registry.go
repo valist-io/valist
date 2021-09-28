@@ -21,8 +21,8 @@ func NewServer(client types.CoreAPI, addr string) *http.Server {
 		w.WriteHeader(200)
 	})
 	router.PathPrefix("/v2/").Handler(dockerHandler)
-	router.PathPrefix("/git/").Handler(http.StripPrefix("/git", gitHandler))
-	router.PathPrefix("/npm/").Handler(http.StripPrefix("/npm", npmHandler))
+	router.PathPrefix("/api/git/").Handler(http.StripPrefix("/api/git", gitHandler))
+	router.PathPrefix("/api/npm/").Handler(http.StripPrefix("/api/npm", npmHandler))
 
 	return &http.Server{
 		Addr:    addr,
