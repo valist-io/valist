@@ -18,13 +18,11 @@ func NewServer(client types.CoreAPI, addr string) *http.Server {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
- 		w.WriteHeader(200)
- 	})
+		w.WriteHeader(200)
+	})
 	router.PathPrefix("/v2/").Handler(dockerHandler)
 	router.PathPrefix("/api/git/").Handler(http.StripPrefix("/api/git", gitHandler))
 	router.PathPrefix("/api/npm/").Handler(http.StripPrefix("/api/npm", npmHandler))
-
-
 
 	return &http.Server{
 		Addr:    addr,

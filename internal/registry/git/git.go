@@ -2,6 +2,7 @@ package git
 
 import (
 	"fmt"
+	"log"
 	"math/big"
 	"net/http"
 	"os"
@@ -31,6 +32,11 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
+func (h *handler) error(w http.ResponseWriter, msg string, status int) {
+	log.Println(msg)
+	http.Error(w, msg, status)
+}
+
 func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
 	vars := mux.Vars(req)
 	service := req.URL.Query().Get("service")
@@ -51,13 +57,13 @@ func (h *handler) advertisedRefs(w http.ResponseWriter, req *http.Request) {
 	}
 
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	refs, err := sess.AdvertisedReferences()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -78,20 +84,20 @@ func (h *handler) uploadPack(w http.ResponseWriter, req *http.Request) {
 
 	sessreq := packp.NewUploadPackRequest()
 	if err := sessreq.Decode(req.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	server := server.NewServer(&storageLoader{h.client, vars["org"], vars["repo"]})
 	sess, err := server.NewUploadPackSession(nil, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	sessres, err := sess.UploadPack(ctx, sessreq)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -113,7 +119,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s", vars["org"], vars["repo"]))
 	if err != nil {
 		fmt.Println(err)
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -122,54 +128,54 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	sess, err := server.NewReceivePackSession(nil, nil)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer os.RemoveAll(loader.tmp)
 
 	sessreq := packp.NewReferenceUpdateRequest()
 	if err := sessreq.Decode(req.Body); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	sessres, err := sess.ReceivePack(ctx, sessreq)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	count, err := loader.repo.Storer.CountLooseRefs()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if count != 1 {
-		http.Error(w, "cannot push more than one ref", http.StatusInternalServerError)
+		h.error(w, "cannot push more than one ref", http.StatusInternalServerError)
 		return
 	}
 
 	refs, err := loader.repo.References()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	tag, err := refs.Next()
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	if err := loader.repo.Storer.PackRefs(); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
 	releaseCID, err := h.client.Storage().WriteFile(ctx, loader.tmp)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 
@@ -181,7 +187,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
