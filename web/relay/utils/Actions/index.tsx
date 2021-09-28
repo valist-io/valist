@@ -16,25 +16,35 @@ export const GetActions = (location:string, orgName:string, repoName:string) => 
 echo @${orgName}:registry=${location}/api/npm >> .npmrc
 
 # Install from Registry
-npm i ${orgName}/${repoName}`,
+npm i @${orgName}/${repoName}`,
     },
     curlBinary: {
       description: 'Download (GET) from Url',
-      command: `curl -L -o ${repoName} ${location}/api/${orgName}/${repoName}/latest`,
+      command: `curl -L -o ${repoName} ${location}/api/${orgName}/${repoName}/latest
+
+      `,
     },
     pipInstall: {
       description: 'Pip Install From Url',
-      command: `pip install ${location}/api/${orgName}/${repoName}/latest`,
+      command: `pip install ${location}/api/${orgName}/${repoName}/latest
+
+      `,
     },
     dockerLoad: {
       description: 'Load Container from Url',
-      command: `curl -L ${location}/api/${orgName}/${repoName}/latest | docker load`,
+      command: `curl -L ${location}/api/${orgName}/${repoName}/latest | docker load
+
+      `,
     },
   };
   return actions;
 };
 
 export const projectTypes: Record<string, ProjectType> = {
+  binary: {
+    actions: ['curlBinary'],
+    default: 'curlBinary',
+  },
   npm: {
     actions: ['installUrl', 'npmInstallFromRegistry'],
     default: 'npmInstallFromRegistry',
