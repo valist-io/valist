@@ -4,17 +4,31 @@
 
 ### CLI
 
-The Valist-CLI can be globally installed by running the following commands:
+You can download the latest version of the Valist CLI from app.valist.io/valist/cli -- You'll be able to select your os and architecture from the IPFS folder.
+
+Or, you can use the following script to install the binary globally:
 
 ```bash
-# Or, run the following (based on your os/arch):
 mkdir -p ~/.local/bin
-curl https://gateway.valist.io/ipfs/QmebByjWtVazSsyvhmFQQGpA5aeNYkbFKFWkZPi3Sqtmw6/linux-amd64/valist --output ~/.local/bin/
-
-# Add valist to your $PATH
-export PATH="$PATH:$HOME/.local/bin"
-echo PATH="$PATH:$HOME/.local/bin" >> ~/.zshrc
+curl https://gateway.valist.io/ipfs/QmZ9T6H7WTb6VrNaqFEwo7Mqj6jGxMe4vpR6srxsjy3otz/linux-amd64/valist -o ~/.local/bin/valist
 ```
+
+Please note, you'll need to replace `linux-amd64` with your os and architecture. The following options are available:
+
+* linux-amd64
+* linux-arm64
+* darwin-amd64
+* darwin-arm64
+* windows-amd64
+
+Finally, ensure your PATH includes the ~/.local/bin folder:
+
+```
+export PATH="$PATH:$HOME/.local/bin"
+echo PATH=\"\$PATH:$HOME/.local/bin\" >> ~/.zshrc # or .bashrc
+```
+
+> Installing from package managers coming soon!
 
 ### SDK
 
