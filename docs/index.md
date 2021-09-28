@@ -52,4 +52,4 @@ The Valist-SDK reference implementation is currently written in TypeScript, usin
 
 The following diagram is a visualization of the current implementation:
 
-![Valist Architecture](img/current-implementation.png){width=600px}
+![Valist Architecture](img/current-implementation.png){width=300px}
