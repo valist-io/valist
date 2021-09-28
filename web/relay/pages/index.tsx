@@ -85,7 +85,9 @@ export default function Dashboard() {
                   </div>)}
                 <div className="flex">
                   <a href={integration.docs} className="underline p-2 text-blue-500">Documentation</a>
-                  <a href={integration.code} className="underline p-2 text-blue-500">Example Code</a>
+                  {(integration.code !== '')
+                    && <a href={integration.code} className="underline p-2 text-blue-500">Example Code</a>
+                  }
                 </div>
               </div>
             </div>

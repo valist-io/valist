@@ -2,7 +2,7 @@
 
 ## Web
 
-To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and then choose your desired release from the release list.
+To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and click `versions`, then choose your desired release from the release list.
 
 ![valist-release-page](img/valist-release-page.png){width="600px"}
 
@@ -25,20 +25,20 @@ const Valist = require('@valist/sdk');
 })();
 ```
 
-Check out our [example repo here](https://github.com/valist-io/example-projects/tree/main/cli-publish-binary) for more!
+[Example Node SDK Project](https://github.com/valist-io/example-projects/tree/main/sdk-node)
 
 ## NPM Registry
 
-Every **node** repo type published on Valist is accessible via the relay API at [https://valist.io/api/npm](https://valist.io/api/npm).
+Every **npm** repo type published on Valist is accessible via the relay API at [https://valist.io/api/npm](https://valist.io/api/npm).
 
-To install a package directly from a repository simply append the `npm --registry` flag:
+To install an npm package, you'll need to link your organization to the Valist registry, then install!
 
 ```bash
-npm install <examplePackage> --registry=https://valist.io/api/npm
+echo @acme-co:registry=https://valist.io/api/npm >> .npmrc
 ```
 
 Or set a Valist relay as your default **NPM registry**:
 
 ```bash
-npm config set registry https://valist.io/api/npm
+npm i @acme-co/npm-example
 ```

@@ -14,8 +14,10 @@ A repository developer is the default role for managing the releases under a rep
 
 ### CLI
 
-The Valist CLI leverages the [keytar](https://www.npmjs.com/package/keytar) library for secure, cross-platform storage of keys in the device's keystore.
+The Valist CLI leverages the [Web3 Storage Definition](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) to store encrypted keystore files in `~/.valist/keystore`.
+
+These keystore files are compatible with common Ethereum wallets like MetaMask, Geth/Clef, and MyCrypto.
 
 ### Web
 
-In browser, the Valist relay frontend interacts with `MetaMask`, `WalletConnect` and/or `Magic` for key management.
+In browser, the Valist relay frontend interacts with `MetaMask` or `WalletConnect` for key management.

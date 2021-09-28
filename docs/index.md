@@ -10,17 +10,9 @@ The Valist-CLI can be globally installed by running the following command:
 npm install -g @valist/cli --registry=https://valist.io/api/npm
 ```
 
-### Relay (Webapp + API)
-
-The Valist Relay can be installed using the following command:
-
-```bash
-npm install @valist/relay --registry=https://valist.io/api/npm
-```
-
 ### SDK
 
-The Valist-sdk can be installed by running the following command:
+The Valist JS-SDK can be installed by running the following command:
 
 ```bash
 npm install @valist/sdk --registry=https://valist.io/api/npm

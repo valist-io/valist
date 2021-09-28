@@ -16,7 +16,7 @@ export default function OrgProfileCard(props: OrgProfileCardProps): JSX.Element 
           <div className="sm:flex sm:items-center sm:justify-between">
             <div className="sm:flex sm:space-x-5">
               <div className="flex-shrink-0">
-                <AddressIdenticon address={props.orgMeta.name} height={20}/>
+                <AddressIdenticon address={props.orgMeta.name} height={56}/>
               </div>
               <div>
                 <p className="text-sm font-medium text-gray-600"></p>
