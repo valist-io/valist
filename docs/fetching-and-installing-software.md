@@ -2,7 +2,7 @@
 
 ## Web
 
-To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and then choose your desired release from the release list.
+To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and click `versions`, then choose your desired release from the release list.
 
 ![valist-release-page](img/valist-release-page.png){width="600px"}
 
@@ -25,7 +25,7 @@ const Valist = require('@valist/sdk');
 })();
 ```
 
-Check out our [example repo here](https://github.com/valist-io/example-projects/tree/main/cli-publish-binary) for more!
+Check out our [example repo here](https://github.com/valist-io/example-projects/) for more!
 
 ## NPM Registry
 
