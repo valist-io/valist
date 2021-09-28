@@ -4,7 +4,7 @@
 
 ### CLI
 
-To publish a binary from the Valist CLI create a new `valist.yml` within your project folder containing one of supported binary project types `binary` or `go`. Or, run `valist init` to generate a new `valist.yaml`.
+To publish a binary from the Valist CLI create a new `valist.yml` within your project folder containing one of the supported binary project types `binary` or `go`. Or, run `valist init` to generate a new `valist.yaml`.
 
 ```yaml
 type: go
@@ -49,20 +49,43 @@ To publish a binary from the Valist SDK, create and run the following javascript
 
 ### CLI
 
-To publish an NPM package from the Valist CLI create a new `valist.yml` within your project with a project type of `npm`. Or run a `valist init` to generate a new `valist.yaml`.
+To publish an NPM package from the Valist CLI, create a new `package.json` with the name structured as `@orgName/repoName` and the `version` as the current version to be published.
 
-```yaml
-type: node
-org: playground
-repo: node-project
-tag: 0.0.1
-install: npm install
-build: npm run build
-out: dist
+
+```json
+{
+  "name": "@acme-co/npm-example",
+  "version": "0.0.1-rc.0",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "build": "tsc",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "ACME",
+  "license": "MIT",
+  "dependencies": {
+    "typescript": "^4.3.4"
+  }
+}
 ```
+
+Next just run an npm publish!
 
 ```bash
 valist publish
+```
+
+In a new terminal window start the valist daemon
+
+```bash
+valist daemon
+```
+
+Now just publish to the registry using the npm publish command and the registry flag.
+
+```bash
+npm publish --registry=http://localhost:9000/api/npm
 ```
 
 ### SDK

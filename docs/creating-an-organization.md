@@ -14,22 +14,6 @@ You will then be prompted to enter some additional metadata about the organizati
 
 ![cli-create-org-metadata](img/cli-org-create-metadata.png)
 
-## Web
-
-To create a new organization from the web interface navigate to the [Valist dashboard](https://app.valist.io) and login.
-
-Upon successful login, you will be greeted by the following welcome message displaying your current address and a new button, `Create Organization`.
-
-![create-organization-button](img/valist-create-org-button.png){ width=600px }
-
-After clicking `Create Organization` you will be navigated to the create organization page.
-
-![create-org-page](img/valist-create-org-form.png){ width=600px }
-
-Fill out your organization's `Shortname`, `Full Name`, and `Description` and click `Create Organization`.
-
-Keep in mind if you are logged in with `MetaMask`, you will be prompted for two signature confirmations -- one to create the ID, and another to link it to your shortname.
-
 ## SDK
 
 To create a new organization using the Valist SDK, create a new javascript file containing the following:
