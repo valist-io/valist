@@ -8,42 +8,19 @@ To publish a binary from the Valist CLI create a new `valist.yml` within your pr
 
 ```yaml
 type: go
-org: test
-repo: testProject
-tag: 0.0.1
-out: dist
+org: acme-co
+repo: go-example
+tag: 0.1.6-rc.0
+meta: README.md
+build: go build -o ./dist/hello src/main.go 
+out: dist/hello
 ```
 
 ```bash
 valist publish
 ```
 
-### SDK
-
-To publish a binary from the Valist SDK, create and run the following javascript:
-
-```javascript
-  import Valist from '@valist/sdk';
-  const HDWalletProvider = require('@truffle/hdwallet-provider');
-
-  const key = "<key>";
-  const orgName = "<orgName";
-  const repoName = "<repoName>";
-  const metaData = "<orgMeta>";
-
-  const web3Provider = new HDWalletProvider({
-    privateKeys: [key],
-    providerOrUrl: 'https://rpc.valist.io',
-  });
-
-  const valist = new Valist({web3Provider});
-
-  (async () => {
-    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
-
-    console.log(transactionHash);
-  })();
-```
+[Example Go Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-go-project)
 
 ## NPM Packages
 
@@ -70,25 +47,48 @@ To publish an NPM package from the Valist CLI, create a new `package.json` with 
 }
 ```
 
-Next just run an npm publish!
-
-```bash
-valist publish
-```
-
 In a new terminal window start the valist daemon
 
 ```bash
 valist daemon
 ```
 
-Now just publish to the registry using the npm publish command and the registry flag.
+Now just publish to the registry using the npm publish command and the registry flag!
 
 ```bash
 npm publish --registry=http://localhost:9000/api/npm
 ```
 
-### SDK
+[Example NPM Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-npm-package)
+
+<!-- ### SDK
+
+To publish a binary from the Valist SDK, create and run the following javascript:
+
+```javascript
+  import Valist from '@valist/sdk';
+  const HDWalletProvider = require('@truffle/hdwallet-provider');
+
+  const key = "<key>";
+  const orgName = "<orgName";
+  const repoName = "<repoName>";
+  const metaData = "<orgMeta>";
+
+  const web3Provider = new HDWalletProvider({
+    privateKeys: [key],
+    providerOrUrl: 'https://rpc.valist.io',
+  });
+
+  const valist = new Valist({web3Provider});
+
+  (async () => {
+    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
+
+    console.log(transactionHash);
+  })();
+``` -->
+
+<!-- ### SDK
 
 To publish a binary from the Valist SDK create and run the following javascript:
 
@@ -113,7 +113,7 @@ To publish a binary from the Valist SDK create and run the following javascript:
 
     console.log(transactionHash);
   })();
-```
+``` -->
 <!--
 ## Python Packages
 

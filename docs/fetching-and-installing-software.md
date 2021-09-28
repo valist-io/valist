@@ -25,20 +25,20 @@ const Valist = require('@valist/sdk');
 })();
 ```
 
-Check out our [example repo here](https://github.com/valist-io/example-projects/) for more!
+[Example Node SDK Project](https://github.com/valist-io/example-projects/tree/main/sdk-node)
 
 ## NPM Registry
 
-Every **node** repo type published on Valist is accessible via the relay API at [https://valist.io/api/npm](https://valist.io/api/npm).
+Every **npm** repo type published on Valist is accessible via the relay API at [https://valist.io/api/npm](https://valist.io/api/npm).
 
-To install a package directly from a repository simply append the `npm --registry` flag:
+To install an npm package, you'll need to link your organization to the Valist registry, then install!
 
 ```bash
-npm install <examplePackage> --registry=https://valist.io/api/npm
+echo @acme-co:registry=https://valist.io/api/npm >> .npmrc
 ```
 
 Or set a Valist relay as your default **NPM registry**:
 
 ```bash
-npm config set registry https://valist.io/api/npm
+npm i @acme-co/npm-example
 ```
