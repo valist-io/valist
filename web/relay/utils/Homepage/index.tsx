@@ -19,7 +19,7 @@ export const GetActions = (location:string) => {
 @[org]:registry=https://${location}/api/npm
 
 # Install a package via IPFS gateway
-npm i https://${location}/api/npm/[org]/[repo]`,
+npm i @[org]/[repo]`,
     },
     npmPublish: {
       description: (<div>
