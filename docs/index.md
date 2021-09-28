@@ -30,6 +30,34 @@ echo PATH=\"\$PATH:$HOME/.local/bin\" >> ~/.zshrc # or .bashrc
 
 > Installing from package managers coming soon!
 
+#### Running the daemon
+
+After you have valist installed, simply run the following:
+
+```
+valist daemon
+```
+
+This will start the universal package registry API and web server:
+
+```
+
+@@@  @@@   @@@@@@   @@@       @@@   @@@@@@   @@@@@@@
+@@@  @@@  @@@@@@@@  @@@       @@@  @@@@@@@   @@@@@@@
+@@!  @@@  @@!  @@@  @@!       @@!  !@@         @@!
+!@!  @!@  !@!  @!@  !@!       !@!  !@!         !@!
+@!@  !@!  @!@!@!@!  @!!       !!@  !!@@!!      @!!
+!@!  !!!  !!!@!!!!  !!!       !!!   !!@!!!     !!!
+:!:  !!:  !!:  !!!  !!:       !!:       !:!    !!:
+ ::!!:!   :!:  !:!   :!:      :!:      !:!     :!:
+  ::::    ::   :::   :: ::::   ::  :::: ::      ::
+   :       :   : :  : :: : :  :    :: : :       :
+
+
+API server running on localhost:9000
+Web server running on localhost:9001
+```
+
 ### SDK
 
 The Valist JS-SDK can be installed by running the following command:
