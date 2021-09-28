@@ -4,10 +4,16 @@
 
 ### CLI
 
-The Valist-CLI can be globally installed by running the following command:
+The Valist-CLI can be globally installed by running the following commands:
 
 ```bash
-npm install -g @valist/cli --registry=https://valist.io/api/npm
+# Or, run the following (based on your os/arch):
+mkdir -p ~/.local/bin
+curl https://gateway.valist.io/ipfs/QmebByjWtVazSsyvhmFQQGpA5aeNYkbFKFWkZPi3Sqtmw6/linux-amd64/valist --output ~/.local/bin/
+
+# Add valist to your $PATH
+export PATH="$PATH:$HOME/.local/bin"
+echo PATH="$PATH:$HOME/.local/bin" >> ~/.zshrc
 ```
 
 ### SDK
