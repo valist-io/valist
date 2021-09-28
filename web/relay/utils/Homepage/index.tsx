@@ -80,15 +80,15 @@ export const integrations: Integration[] = [
     name: 'Source Control',
     image: '/images/git-logo.png',
     actions: ['gitPush', 'gitClone'],
-    docs: 'https://docs.valist.io/fetching-and-installing-software/',
+    docs: 'https://docs.valist.io/fetching-and-installing-software',
     code: '',
   },
   {
-    name: 'Go Packages',
+    name: 'Go Packages & Binaries',
     image: '/images/go-logo.png',
     actions: ['goGet'],
-    docs: 'https://github.com/valist-io/example-projects/tree/main/cli-publish-go-project',
-    code: 'https://github.com/valist-io/example-projects',
+    docs: 'https://docs.valist.io/fetching-and-installing-software/',
+    code: 'https://github.com/valist-io/example-projects/tree/main/cli-publish-go-project',
   },
 ];
 

@@ -40,7 +40,7 @@ const LoginForm = ({ handleLogin, setShowLogin }: { handleLogin: any, setEmail: 
                     <div className="bg-gray-50 flex flex-col justify-center py-28 sm:px-6 lg:px-8">
                         <div className="sm:mx-auto sm:w-full sm:max-w-md">
                             <button onClick={async () => loginReadOnly()} type="button"
-                                className="bg-white inline-flex justify-center py-2 px-4 border
+                                className="bg-white inline-flex justify-center py-4 px-4 border
                                 rounded-md text-sm leading-5 font-medium
                                 text-gray-500 hover:text-gray-400 focus:outline-none
                                 focus:border-blue-300 focus:shadow-outline-blue transition

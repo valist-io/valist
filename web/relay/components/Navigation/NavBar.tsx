@@ -47,7 +47,7 @@ export const Nav = () => {
                         className="bg-white rounded-md flex items-center text-sm p-3 cursor-pointer"
                         id="user-menu" aria-expanded="false" aria-haspopup="true">
                           <span className="sr-only">Open user menu</span>
-                            <AddressIdenticon address={valist.defaultAccount} height={8}/>
+                            <AddressIdenticon address={valist.defaultAccount} height={25}/>
                             <span className="p-2 text-xs font-mono truncate">{valist.defaultAccount}</span>
                       </div>)
                     : (<button onClick={() => login.setShowLogin(true)} type="button"

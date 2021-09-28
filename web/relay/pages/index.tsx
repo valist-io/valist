@@ -30,8 +30,8 @@ export default function Dashboard() {
                         Welcome to Valist
                       </p>
                       <p className="text-md font-medium text-gray-600">
-                        Universal package repository, code-signing, and CDN system.
-                        Reproducibly build, sign, and distribute any software/firmware globally in just a few steps.
+                        Universal package repository, code-signing, and CDN system.<br/>
+                        Build, sign, and distribute any software/firmware globally in just a few steps.
                         Powered by Ethereum, IPFS, and Filecoin.
                       </p>
                     </div>

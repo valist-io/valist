@@ -1,5 +1,6 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { projectTypes, GetActions } from '../../utils/Actions';
+import copyToCB from '../../utils/clipboard';
 
 interface RepoMetaCardProps {
   repoMeta: any,
@@ -10,6 +11,7 @@ interface RepoMetaCardProps {
 const RepoMetaCard = (props:RepoMetaCardProps) => {
   const [actions, setActions] = useState({} as Record<string, any>);
   const { repoMeta } = props;
+  const installRef = useRef(null);
 
   useEffect(() => {
     let { origin } = window.location;
@@ -26,12 +28,22 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
               <h1 className="text-xl text-gray-900 mb-2">
                 {actions[projectTypes[repoMeta.projectType].default].description}
               </h1>
-              <div className="lg:col-span-8 col-span-12">
+              <div ref={installRef} className="lg:col-span-8 col-span-12 relative">
                   <pre style={{ overflow: 'scroll' }} className="p-2 bg-indigo-50 rounded-lg">
-                  <code>
-                    {actions[projectTypes[repoMeta.projectType].default].command}
-                  </code>
+                    <code>
+                      {actions[projectTypes[repoMeta.projectType].default].command}
+                    </code>
                   </pre>
+                  <svg onClick={() => copyToCB(installRef)}
+                      xmlns="http://www.w3.org/2000/svg"
+                      className="h-6 w-6 float-right cursor-pointer absolute bottom-5 right-5"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                      stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                        d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2
+                        2 0 00-2 2v8a2 2 0 002 2z" />
+                    </svg>
               </div>
           </div>}
           {repoMeta.repository
