@@ -12,7 +12,11 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
   const { repoMeta } = props;
 
   useEffect(() => {
-    setActions(GetActions(String(window.location), props.orgName, props.repoName));
+    let origin = window.location.origin;
+    if (origin == 'http://localhost:3000') {
+      origin = 'http://localhost:9000'
+    }
+    setActions(GetActions(origin, props.orgName, props.repoName));
   }, []);
 
   return (

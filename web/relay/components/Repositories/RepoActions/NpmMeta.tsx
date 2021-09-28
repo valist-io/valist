@@ -4,17 +4,22 @@ import copyToCB from '../../../utils/clipboard';
 
 const NpmMeta = (orgName: string, repoName: string) => {
   const registryRef = useRef(null);
-  const installRef = useRef(null);
+  // const installRef = useRef(null);
   const installFromRegistryRef = useRef(null);
 
   const [origin, setOrigin] = useState('https://app.valist.io');
   useEffect(() => {
-    setOrigin(window.location.origin);
+    // @TODO respect local config here
+    if (window.location.origin === 'http://localhost:3000') {
+      setOrigin('http://localhost:9000')
+    } else {
+      setOrigin(window.location.origin);
+    }
   });
 
   return (
             <div>
-                <div className="pb-2">
+                {/* <div className="pb-2">
                     <h2 className="text-xl text-gray-900 mt-2">NPM Direct Install From Url</h2>
                 </div>
                 <div ref={installRef} onClick={() => copyToCB(installRef)}
@@ -27,9 +32,9 @@ const NpmMeta = (orgName: string, repoName: string) => {
                         2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
                     <p>npm i {origin}/api/{orgName}/{repoName}/latest</p>
-                </div>
+                </div> */}
                 <div className="pb-2">
-                    <h2 className="text-xl text-gray-900 mt-2">Set Package Registry</h2>
+                    <h2 className="text-xl text-gray-900 mt-2">Link Namespace to Registry</h2>
                 </div>
                 <div ref={registryRef} onClick={() => copyToCB(registryRef)}
                   className="border-2 border-solid border-indigo-50 rounded-lg
@@ -40,10 +45,10 @@ const NpmMeta = (orgName: string, repoName: string) => {
                         d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2
                         2 0 00-2 2v8a2 2 0 002 2z" />
                     </svg>
-                    <p>npm config set registry {origin}/api/npm</p>
+                    <p>echo @{orgName}:registry={origin}/api/npm &gt;&gt; .npmrc</p>
                 </div>
                 <div className="pb-2">
-                    <h2 className="text-xl text-gray-900 mt-2" >Install From Registry</h2>
+                    <h2 className="text-xl text-gray-900 mt-2" >Install from Registry</h2>
                 </div>
                 <div ref={installFromRegistryRef} onClick={() => copyToCB(installFromRegistryRef)}
                   className="border-2 border-solid border-indigo-50 rounded-lg

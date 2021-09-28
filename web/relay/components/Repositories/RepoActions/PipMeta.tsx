@@ -7,7 +7,12 @@ const PipMeta = (orgName = 'organization', repoName = 'repo') => {
 
   const [origin, setOrigin] = useState('https://app.valist.io');
   useEffect(() => {
-    setOrigin(window.location.origin);
+    // @TODO respect local config here
+    if (window.location.origin === 'http://localhost:3000') {
+      setOrigin('http://localhost:9000')
+    } else {
+      setOrigin(window.location.origin);
+    }
   });
 
   return (

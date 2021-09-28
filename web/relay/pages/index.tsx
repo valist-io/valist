@@ -6,7 +6,11 @@ export default function Dashboard() {
   const [actions, setActions] = useState({} as Record<string, any>);
 
   useEffect(() => {
-    setActions(GetActions('app.valist.io'));
+    let origin = window.location.origin;
+    if (origin == 'http://localhost:3000') {
+      origin = 'http://localhost:9000'
+    }
+    setActions(GetActions(origin));
   }, []);
 
   return (

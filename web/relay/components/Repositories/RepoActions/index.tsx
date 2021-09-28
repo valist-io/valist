@@ -15,6 +15,8 @@ export default function RepoActions(props: RepoActionsProps): JSX.Element {
     switch (projectType) {
       case 'node':
         return NpmMeta(props.orgName, props.repoName);
+      case 'npm':
+        return NpmMeta(props.orgName, props.repoName);
       case 'python':
         return PipMeta(props.orgName, props.repoName);
       case 'docker':
