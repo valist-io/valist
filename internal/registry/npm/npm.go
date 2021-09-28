@@ -9,6 +9,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"math/big"
 	"net/http"
 	"os"
@@ -39,6 +40,11 @@ func NewHandler(client types.CoreAPI) http.Handler {
 	router.HandleFunc("/{org}/{repo}", handler.putPackage).Methods(http.MethodPut)
 
 	return handlers.LoggingHandler(os.Stdout, router)
+}
+
+func (h *handler) error(w http.ResponseWriter, msg string, status int) {
+	log.Println(msg)
+	http.Error(w, msg, status)
 }
 
 func (h *handler) writeAttachment(ctx context.Context, dir storage.Directory, pack *Package, semver string) error {
@@ -89,19 +95,19 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 
 	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s/%s", orgName, repoName, tag))
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	data, err := h.client.Storage().ReadFile(ctx, res.Release.MetaCID)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var pack Package
 	if err := json.Unmarshal(data, &pack); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -113,7 +119,7 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	//pack.Name = req.URL.Path
 
 	if err := json.NewEncoder(w).Encode(pack); err != nil {
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		h.error(w, err.Error(), http.StatusInternalServerError)
 	}
 }
 
@@ -122,31 +128,31 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 
 	res, err := h.client.ResolvePath(ctx, req.URL.Path)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	var pack Package
 	if err := json.NewDecoder(req.Body).Decode(&pack); err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	tag, ok := pack.DistTags["latest"]
 	if !ok {
-		http.Error(w, "latest tag required", http.StatusBadRequest)
+		h.error(w, "latest tag required", http.StatusBadRequest)
 		return
 	}
 
 	dir, err := h.client.Storage().Mkdir(ctx)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	for _, semver := range pack.DistTags {
 		if err := h.writeAttachment(ctx, dir, &pack, semver); err != nil {
-			http.Error(w, err.Error(), http.StatusBadRequest)
+			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}
@@ -154,13 +160,13 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 	pack.Attachments = nil
 	packData, err := json.Marshal(&pack)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
 	packPath, err := h.client.Storage().Write(ctx, packData)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
@@ -172,7 +178,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 
 	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)
 	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
+		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
