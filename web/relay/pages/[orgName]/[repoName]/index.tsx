@@ -41,7 +41,9 @@ export default function Dashboard() {
       try {
         const req = await fetch(`https://gateway.valist.io/ipfs/${release.metaCID.replace('/ipfs/', '')}`);
         markdown = await req.text();
-      } catch (e) {}
+      } catch (e) {
+        // noop
+      }
     }
     setRepoReadme(markdown);
   };
