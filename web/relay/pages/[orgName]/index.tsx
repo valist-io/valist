@@ -39,8 +39,6 @@ export default function Dashboard() {
       await fetchAll();
     } catch (e) {
       setError(e as any);
-    } finally {
-      console.log('Data');
     }
   };
 

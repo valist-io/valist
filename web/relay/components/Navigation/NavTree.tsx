@@ -27,7 +27,7 @@ const NavTree = ({ orgName = '', repoName = '' }: { orgName?: string, repoName?:
                     <path d="M5.555 17.776l8-16 .894.448-8 16-.894-.448z" />
                     </svg>
                     <Link href={`/${orgName}`}>
-                        <a className="text-sm leading-5 font-medium text-gray-500 hover:text-gray-700
+                        <a className="w-24 min-w-full text-sm leading-5 font-medium text-gray-500 hover:text-gray-700
                         transition duration-150 ease-in-out">{orgName}</a>
                     </Link>
                 </div>
