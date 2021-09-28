@@ -16,7 +16,7 @@ export const GetActions = (location:string) => {
     npmInstall: {
       description: (<div>Npm packages can be <b>installed</b> by using the registry flag or by url.</div>),
       code: `# Add registry to .npmrc
-@[org]:registry=https://${location}/api/npm
+@[org]:registry=${location}/api/npm
 
 # Install a package via IPFS gateway
 npm i @[org]/[repo]`,
@@ -26,7 +26,7 @@ npm i @[org]/[repo]`,
         Npm packages can be <b>published</b> by using the registry flag or by setting your NPM registry.
       </div>),
       code: `# Publish a package to registry
-npm publish --registry=https://${location}/api/npm`,
+npm publish --registry=${location}/api/npm`,
     },
     dockerPush: {
       description: (<div>Docker images can be <b>tagged</b> and <b>pushed</b> with the docker pull command.</div>),
@@ -44,12 +44,12 @@ docker pull ${location}/[org]/[repo]:[tag]`,
     gitPush: {
       description: (<div> Project source code can be committed and <b>pushed</b> using the git push command.</div>),
       code: `# Push to remote
-git push https://${location}/api/git/[org]/[repo] [tag]`,
+git push ${location}/api/git/[org]/[repo] [tag]`,
     },
     gitClone: {
       description: (<div> Project source can be <b>cloned</b> using the git clone command.</div>),
       code: `# Clone from remote
-git clone https://${location}/api/git/[org]/[repo]/[tag]`,
+git clone ${location}/api/git/[org]/[repo]/[tag]`,
     },
     goGet: {
       description: (<div> Go Modules can be <b>installed</b> with the go get command.</div>),
