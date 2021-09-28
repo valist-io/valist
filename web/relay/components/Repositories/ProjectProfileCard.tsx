@@ -19,7 +19,7 @@ export default function ProjectProfileCard(props: ProjectProfileCardProps): JSX.
           <div className="sm:flex sm:items-center">
             <div className="sm:flex sm:space-x-5">
               <div className="flex-shrink-0 lg:ml-4">
-                <AddressIdenticon address={props.repoMeta.name} height={14}/>
+                <AddressIdenticon address={props.repoMeta.name} height={56}/>
               </div>
               <div>
                 <p className={`text-2xl font-bold text-gray-900 sm:text-2xl ${setLoading(props.repoName)}`}>
