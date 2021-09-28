@@ -35,10 +35,6 @@ To install an npm package, you'll need to link your organization to the Valist r
 
 ```bash
 echo @acme-co:registry=https://valist.io/api/npm >> .npmrc
-```
 
-Or set a Valist relay as your default **NPM registry**:
-
-```bash
 npm i @acme-co/npm-example
 ```
