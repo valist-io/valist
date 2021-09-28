@@ -3,7 +3,24 @@ SHELL=/bin/bash
 all: install valist
 
 bin:
-	go build ./cmd/valist
+	go build -ldflags "-s -w" ./cmd/valist
+
+bin-linux-amd64:
+	GOOS=linux   GOARCH=amd64 go build -ldflags "-s -w" -o dist/linux-amd64/valist       ./cmd/valist
+
+bin-linux-arm64:
+	GOOS=linux   GOARCH=arm64 go build -ldflags "-s -w" -o dist/linux-arm64/valist       ./cmd/valist
+
+bin-darwin-amd64:
+	GOOS=darwin  GOARCH=amd64 go build -ldflags "-s -w" -o dist/darwin-amd64/valist      ./cmd/valist
+
+bin-darwin-arm64:
+	GOOS=darwin  GOARCH=arm64 go build -ldflags "-s -w" -o dist/darwin-arm64/valist      ./cmd/valist
+
+bin-windows-amd64:
+	GOOS=windows GOARCH=amd64 go build -ldflags "-s -w" -o dist/windows-amd64/valist.exe ./cmd/valist
+
+bin-multi: bin-linux-amd64 bin-linux-arm64 bin-darwin-amd64 bin-darwin-arm64 bin-windows-amd64
 
 valist: web bin
 
@@ -34,6 +51,7 @@ web-lib:
 	npm run build --prefix ./web/lib
 
 web-relay:
+	rm -rf ./web/relay/out
 	npm run build --prefix ./web/relay
 	npm run export --prefix ./web/relay
 
@@ -61,20 +79,12 @@ test: test-valist test-web-lib
 docs:
 	mkdocs build
 
-# runs local typescript compiler in watch mode
-dev-lib:
-	npm run dev --prefix ./web/lib
-
-# runs local next server
-dev-relay:
-	npm run dev --prefix ./web/relay
-
-# hot reload docs
-dev-docs:
-	mkdocs serve
-
-# runs both dev servers in parallel, piping output to same shell
-dev:
-	@make -j 2 dev-lib dev-relay
+clean:
+	rm -rf ./web/relay/.next
+	rm -rf ./web/relay/out
+	rm -rf ./web/relay/node_modules
+	rm -rf ./web/lib/node_modules
+	rm -rf ./web/lib/dist
+	rm -rf dist site
 
 .PHONY: web docs
