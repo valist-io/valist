@@ -9,7 +9,7 @@ const BinaryMeta = (orgName = 'organization', repoName = 'repo') => {
   useEffect(() => {
     // @TODO respect local config here
     if (window.location.origin === 'http://localhost:3000') {
-      setOrigin('http://localhost:9000')
+      setOrigin('http://localhost:9000');
     } else {
       setOrigin(window.location.origin);
     }

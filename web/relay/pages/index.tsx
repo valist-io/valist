@@ -6,9 +6,9 @@ export default function Dashboard() {
   const [actions, setActions] = useState({} as Record<string, any>);
 
   useEffect(() => {
-    let origin = window.location.origin;
-    if (origin == 'http://localhost:3000') {
-      origin = 'http://localhost:9000'
+    let { origin } = window.location;
+    if (origin === 'http://localhost:3000') {
+      origin = 'http://localhost:9000';
     }
     setActions(GetActions(origin));
   }, []);
