@@ -3,6 +3,7 @@ import { projectTypes, GetActions } from '../../utils/Actions';
 import copyToCB from '../../utils/clipboard';
 
 interface RepoMetaCardProps {
+  releaseMeta: any,
   repoMeta: any,
   orgName: string,
   repoName: string
@@ -10,8 +11,17 @@ interface RepoMetaCardProps {
 
 const RepoMetaCard = (props:RepoMetaCardProps) => {
   const [actions, setActions] = useState({} as Record<string, any>);
-  const { repoMeta } = props;
+  const { repoMeta, releaseMeta } = props;
   const installRef = useRef(null);
+  let repoLicense;
+
+  console.log('ReleaseMeta', releaseMeta);
+
+  if (repoMeta.projectType === 'npm' && releaseMeta) {
+    repoLicense = releaseMeta.license;
+  } else {
+    repoLicense = repoMeta.license;
+  }
 
   useEffect(() => {
     let { origin } = window.location;
@@ -65,10 +75,10 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
               <div className="text-gray-600">{'0.0.4'}</div>
           </div>}
 
-          {repoMeta.License
+          {repoLicense
               && <div className="pb-4">
               <h1 className="text-base font-medium text-gray-900">License</h1>
-              <div className="text-gray-600">{'MPL-2.0'}</div>
+              <div className="text-gray-600">{repoLicense}</div>
           </div>}
         </div>
   );
