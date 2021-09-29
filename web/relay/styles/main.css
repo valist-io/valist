@@ -7,7 +7,16 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.markdown h1, .markdown h2, .markdown h3, .markdown h4, .markdown h5, .markdown h6 {
+.markdown>*:first-child {
+  margin-top: 0 !important;
+}
+
+.markdown h1, 
+.markdown h2, 
+.markdown h3, 
+.markdown h4, 
+.markdown h5, 
+.markdown h6 {
     padding: 0;
     font-weight: 600;
     -webkit-font-smoothing: antialiased;
