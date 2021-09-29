@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"os"
 
+	"github.com/go-git/go-git/v5/plumbing"
 	"github.com/go-git/go-git/v5/plumbing/format/pktline"
 	"github.com/go-git/go-git/v5/plumbing/protocol/packp"
 	"github.com/go-git/go-git/v5/plumbing/transport"
@@ -164,6 +165,12 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	tag, err := refs.Next()
 	if err != nil {
+		h.error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	head := plumbing.NewHashReference(plumbing.HEAD, tag.Hash())
+	if err := loader.repo.Storer.SetReference(head); err != nil {
 		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
