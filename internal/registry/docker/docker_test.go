@@ -20,7 +20,10 @@ func TestDockerPush(t *testing.T) {
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	client, _, err := mock.NewClient(tmp)
+	kstore, err := mock.NewKeyStore(tmp, 1)
+	require.NoError(t, err, "Failed to create keystore")
+
+	client, err := mock.NewClient(kstore)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"

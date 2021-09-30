@@ -29,43 +29,48 @@ type Signer struct {
 
 // NewSigner returns a signer that uses the given backends to sign transactions.
 // If VALIST_SIGNER env is set, an ephemeral keystore is created and the default account is set.
-func NewSigner(account accounts.Account, chainID *big.Int, backends ...accounts.Backend) (*Signer, error) {
-	if signer := os.Getenv("VALIST_SIGNER"); signer != "" {
-		private, err := crypto.HexToECDSA(signer)
-		if err != nil {
-			return nil, err
-		}
-
-		randBytes := make([]byte, 32)
-		if _, err := rand.Read(randBytes); err != nil {
-			return nil, err
-		}
-
-		tmp, err := os.MkdirTemp("", "")
-		if err != nil {
-			return nil, err
-		}
-
-		kstore := keystore.NewKeyStore(tmp, keystore.StandardScryptN, keystore.StandardScryptP)
-		backends = append(backends, kstore)
-
-		passphrase := fmt.Sprintf("%x", randBytes)
-		account, err = kstore.ImportECDSA(private, passphrase)
-		if err != nil {
-			return nil, err
-		}
-
-		if err := kstore.Unlock(account, passphrase); err != nil {
-			return nil, err
-		}
-	}
-
-	return &Signer{
-		account: account,
+func NewSigner(chainID *big.Int, backends ...accounts.Backend) (*Signer, error) {
+	signer := &Signer{
 		chainID: chainID,
 		manager: accounts.NewManager(&accounts.Config{}, backends...),
 		cache:   make(map[common.Address]string),
-	}, nil
+	}
+
+	privatekey := os.Getenv("VALIST_SIGNER")
+	if privatekey == "" {
+		return signer, nil
+	}
+
+	private, err := crypto.HexToECDSA(privatekey)
+	if err != nil {
+		return nil, err
+	}
+
+	randBytes := make([]byte, 32)
+	if _, err := rand.Read(randBytes); err != nil {
+		return nil, err
+	}
+
+	tmp, err := os.MkdirTemp("", "")
+	if err != nil {
+		return nil, err
+	}
+
+	kstore := keystore.NewKeyStore(tmp, keystore.StandardScryptN, keystore.StandardScryptP)
+	signer.manager.AddBackend(kstore)
+
+	passphrase := fmt.Sprintf("%x", randBytes)
+	account, err := kstore.ImportECDSA(private, passphrase)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := kstore.Unlock(account, passphrase); err != nil {
+		return nil, err
+	}
+
+	signer.account = account
+	return signer, nil
 }
 
 // Account returns the default signer account.
@@ -78,8 +83,9 @@ func (s *Signer) SetAccount(account accounts.Account) {
 	s.account = account
 }
 
-// Unlock caches the account passphrase for future transactions.
-func (s *Signer) Unlock(account accounts.Account, passphrase string) {
+// SetAccountWithPassphrase sets the default signer account and passphrase to unlock the account.
+func (s *Signer) SetAccountWithPassphrase(account accounts.Account, passphrase string) {
+	s.account = account
 	s.cache[account.Address] = passphrase
 }
 
