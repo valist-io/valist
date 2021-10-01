@@ -5,7 +5,6 @@ import (
 	"fmt"
 	"net/http"
 
-	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/ethclient"
 	httpapi "github.com/ipfs/go-ipfs-http-client"
 	"github.com/libp2p/go-libp2p-core/peer"
@@ -27,14 +26,7 @@ const (
 	ConfigKey = contextKey("config")
 )
 
-type Options struct {
-	// Account is the default account.
-	Account accounts.Account
-	// Passphrase is the account passphrase.
-	Passphrase string
-}
-
-func NewClient(ctx context.Context, cfg *config.Config, opts Options) (*client.Client, error) {
+func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
@@ -48,13 +40,12 @@ func NewClient(ctx context.Context, cfg *config.Config, opts Options) (*client.C
 		return nil, err
 	}
 
-	signer, err := signer.NewSigner(opts.Account, chainID, cfg.KeyStore())
+	signer, err := signer.NewSigner(chainID, cfg.KeyStore())
 	if err != nil {
 		return nil, err
 	}
 
 	// unlock the default account if a password is provided for non-interactive environments
-	signer.Unlock(opts.Account, opts.Passphrase)
 
 	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {

@@ -18,6 +18,7 @@ func NewApp() *cli.App {
 		Flags: []cli.Flag{
 			flags.Account(),
 			flags.AccountPassphrase(),
+			flags.Mock(),
 		},
 		Commands: []*cli.Command{
 			account.NewCommand(),
