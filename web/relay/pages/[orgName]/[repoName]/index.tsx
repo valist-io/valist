@@ -53,8 +53,8 @@ export default function Dashboard() {
     if (repo.meta.projectType === 'npm') {
       try {
         const packageJSON = JSON.parse(repoReadme);
-        setReleaseMeta(packageJSON);
         setRepoReadme(packageJSON.readme);
+        setReleaseMeta(packageJSON);
       } catch (e) {
         // noop
       }
@@ -107,6 +107,7 @@ export default function Dashboard() {
             <section className="rounded-lg bg-white overflow-hidden shadow">
               {repo && <RepoContent
                 repoReleases={repoReleases}
+                releaseMeta={releaseMeta}
                 repoReadme={repoReadme}
                 view={repoView}
                 orgName={orgName}
