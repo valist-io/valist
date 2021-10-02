@@ -141,6 +141,7 @@ type RepositoryMeta struct {
 type ResolvedPath struct {
 	Organization *Organization
 	OrgID        common.Hash
+	OrgName      string
 
 	Repository *Repository
 	RepoName   string
