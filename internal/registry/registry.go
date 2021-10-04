@@ -15,7 +15,7 @@ func NewServer(client types.CoreAPI, addr string) *http.Server {
 	dockerHandler := docker.NewHandler(client)
 	gitHandler := git.NewHandler(client)
 	npmHandler := npm.NewHandler(client)
-	npmProxy := npm.NewProxy(client, addr)
+	npmProxy := npm.NewProxy(client, addr+"/proxy/npm")
 
 	router := mux.NewRouter()
 	router.PathPrefix("/v2/").Handler(dockerHandler)

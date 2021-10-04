@@ -8,6 +8,7 @@ import (
 	"net/http"
 	"os"
 	"path"
+	"strings"
 	"time"
 
 	"github.com/dgraph-io/badger/v3"
@@ -30,9 +31,9 @@ func NewProxy(client types.CoreAPI, host string) http.Handler {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{name}", proxy.getMetadata).Methods(http.MethodGet)
-	router.HandleFunc("/{name}/{version}.tar", proxy.getTarball).Methods(http.MethodGet)
 	router.HandleFunc("/{scope}/{name}", proxy.getMetadata).Methods(http.MethodGet)
-	router.HandleFunc("/{scope}/{name}/{version}.tar", proxy.getTarball).Methods(http.MethodGet)
+	router.HandleFunc("/-/{name}/{version}", proxy.getTarball).Methods(http.MethodGet)
+	router.HandleFunc("/-/{scope}/{name}/{version}", proxy.getTarball).Methods(http.MethodGet)
 
 	return handlers.LoggingHandler(os.Stdout, router)
 }
@@ -185,7 +186,8 @@ func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
 	}
 
 	for semver, version := range meta.Versions {
-		version.Dist.Tarball = fmt.Sprintf("%s/%s/%s.tar", p.host, meta.Name, semver)
+		version.Dist.Tarball = fmt.Sprintf("http://%s/-/%s/%s", p.host, meta.Name, semver)
+		meta.Versions[semver] = version
 	}
 
 	if err := json.NewEncoder(w).Encode(meta); err != nil {
@@ -195,7 +197,7 @@ func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
 }
 
 func (p *proxy) getTarball(w http.ResponseWriter, req *http.Request) {
-	file, err := p.fetchTarball(req.Context(), req.URL.Path)
+	file, err := p.fetchTarball(req.Context(), strings.TrimPrefix(req.URL.Path, "/-"))
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
