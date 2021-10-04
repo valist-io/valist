@@ -22,22 +22,11 @@ const DefaultRegistry = "https://registry.npmjs.org"
 
 type proxy struct {
 	client types.CoreAPI
-	db     *badger.DB
 	host   string
 }
 
-// /npm/@valist/sdk -> metadata.json
-// /npm/@valist/sdk/v0.0.1.tar -> tarball
-
-func NewProxy(client types.CoreAPI, dbPath string) http.Handler {
-	// TODO get database from client
-	db, err := badger.Open(badger.DefaultOptions(dbPath))
-	if err != nil {
-		panic(err)
-	}
-
-	// TODO replace with host URL from config
-	proxy := &proxy{client, db, "http://localhost:10006"}
+func NewProxy(client types.CoreAPI, host string) http.Handler {
+	proxy := &proxy{client, host}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{name}", proxy.getMetadata).Methods(http.MethodGet)
@@ -49,7 +38,7 @@ func NewProxy(client types.CoreAPI, dbPath string) http.Handler {
 }
 
 func (p *proxy) cacheMetadata(id string) (*Metadata, error) {
-	txn := p.db.NewTransaction(false)
+	txn := p.client.Database().NewTransaction(false)
 	defer txn.Discard()
 
 	item, err := txn.Get([]byte(id))
@@ -71,7 +60,7 @@ func (p *proxy) cacheMetadata(id string) (*Metadata, error) {
 }
 
 func (p *proxy) cacheTarball(ctx context.Context, id string) (storage.File, error) {
-	txn := p.db.NewTransaction(false)
+	txn := p.client.Database().NewTransaction(false)
 	defer txn.Discard()
 
 	item, err := txn.Get([]byte(id))
@@ -117,7 +106,7 @@ func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
 		return nil, err
 	}
 
-	txn := p.db.NewTransaction(true)
+	txn := p.client.Database().NewTransaction(true)
 	defer txn.Discard()
 
 	entry := badger.NewEntry([]byte(id), body)
@@ -174,7 +163,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	txn := p.db.NewTransaction(true)
+	txn := p.client.Database().NewTransaction(true)
 	defer txn.Discard()
 
 	if err := txn.Set([]byte(id), []byte(tar)); err != nil {

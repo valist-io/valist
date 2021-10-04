@@ -26,7 +26,7 @@ func TestNpmProxy(t *testing.T) {
 	registryPath := "http://localhost:10006"
 
 	go func() {
-		err := http.ListenAndServe(registryAddr, NewProxy(client, tmp))
+		err := http.ListenAndServe(registryAddr, NewProxy(client, registryPath))
 		require.NoError(t, err, "Failed to start http server")
 	}()
 

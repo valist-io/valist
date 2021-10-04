@@ -30,6 +30,11 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
+	db, err := cfg.Database()
+	if err != nil {
+		return nil, err
+	}
+
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
 		return nil, err
@@ -44,8 +49,6 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	if err != nil {
 		return nil, err
 	}
-
-	// unlock the default account if a password is provided for non-interactive environments
 
 	valist, err := contract.NewValist(valistAddress, eth)
 	if err != nil {
@@ -88,6 +91,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	return client.NewClient(client.Options{
+		Database:   db,
 		Storage:    ipfs.NewStorage(ipfsapi),
 		Ethereum:   eth,
 		Valist:     valist,
