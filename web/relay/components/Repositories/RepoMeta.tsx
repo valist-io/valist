@@ -3,6 +3,7 @@ import { projectTypes, GetActions } from '../../utils/Actions';
 import copyToCB from '../../utils/clipboard';
 
 interface RepoMetaCardProps {
+  releaseMeta: any,
   repoMeta: any,
   orgName: string,
   repoName: string
@@ -10,8 +11,19 @@ interface RepoMetaCardProps {
 
 const RepoMetaCard = (props:RepoMetaCardProps) => {
   const [actions, setActions] = useState({} as Record<string, any>);
-  const { repoMeta } = props;
+  const { repoMeta, releaseMeta } = props;
   const installRef = useRef(null);
+  let repoLicense;
+  let version;
+
+  if (repoMeta.projectType === 'npm' && releaseMeta && repoMeta.versions) {
+    const currentVersion = releaseMeta.versions[Object.keys(releaseMeta.versions)[0]];
+    repoLicense = currentVersion.license;
+    version = currentVersion.version;
+  } else {
+    repoLicense = repoMeta.license;
+    version = repoMeta.version;
+  }
 
   useEffect(() => {
     let { origin } = window.location;
@@ -53,22 +65,22 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
               </div>
           }
 
-          {props.repoMeta.homepage
+          {repoMeta.homepage
               && <div className="pb-4">
                   <h1 className="text-xl text-gray-900 mb-1">Homepage</h1>
                   <a className="text-blue-600" href={repoMeta.homepage}>{repoMeta.homepage}</a>
               </div>
           }
-          {repoMeta.version
+          {version
               && <div className="pb-4">
-              <h1 className="text-base font-medium text-gray-900">Version</h1>
-              <div className="text-gray-600">{'0.0.4'}</div>
+              <h1 className="text-xl text-gray-900 mb-1">Version</h1>
+              <div className="text-gray-600">{version}</div>
           </div>}
 
-          {repoMeta.License
+          {repoLicense
               && <div className="pb-4">
-              <h1 className="text-base font-medium text-gray-900">License</h1>
-              <div className="text-gray-600">{'MPL-2.0'}</div>
+              <h1 className="text-xl text-gray-900 mb-1">License</h1>
+              <div className="text-gray-600">{repoLicense}</div>
           </div>}
         </div>
   );

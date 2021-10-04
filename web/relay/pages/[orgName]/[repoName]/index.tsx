@@ -33,6 +33,7 @@ export default function Dashboard() {
   const [repoReleases, setRepoReleases] = useState<Release[]>([]);
   const [repoView, setRepoView] = useState<string>('meta');
   const [repoReadme, setRepoReadme] = useState<string>('');
+  const [releaseMeta, setReleaseMeta] = useState<any>({});
 
   const fetchReadme = async () => {
     const release = repoReleases[0];
@@ -53,6 +54,7 @@ export default function Dashboard() {
       try {
         const packageJSON = JSON.parse(repoReadme);
         setRepoReadme(packageJSON.readme);
+        setReleaseMeta(packageJSON);
       } catch (e) {
         // noop
       }
@@ -105,6 +107,7 @@ export default function Dashboard() {
             <section className="rounded-lg bg-white overflow-hidden shadow">
               {repo && <RepoContent
                 repoReleases={repoReleases}
+                releaseMeta={releaseMeta}
                 repoReadme={repoReadme}
                 view={repoView}
                 orgName={orgName}
@@ -116,6 +119,7 @@ export default function Dashboard() {
           </div>
           <div className="grid grid-cols-1 gap-4 lg:col-span-2">
             <RepoMetaCard
+            releaseMeta={releaseMeta}
             repoMeta={repo.meta}
             orgName={orgName}
             repoName={repoName} />

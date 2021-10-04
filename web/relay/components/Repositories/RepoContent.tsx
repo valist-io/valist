@@ -4,10 +4,12 @@ import RepoMemberList from './RepoMemberList';
 import ReleaseList from '../Releases/ReleaseList';
 import RepoReadme from './RepoReadme';
 import PublishReleaseSteps from '../Releases/PublishReleaseSteps';
+import RepoDependencies from './RepoDependencies';
 
 interface ReleaseListProps {
   repoReleases: Release[]
   repoReadme: string,
+  releaseMeta: any,
   view: string,
   orgName: string,
   repoMeta: RepoMeta
@@ -39,6 +41,13 @@ export default function RepoContent(props: ReleaseListProps): JSX.Element {
       case 'versions':
         return (<ReleaseList
           repoReleases={props.repoReleases}
+          orgName={props.orgName}
+          repoName={props.repoName}
+          />);
+      case 'dependencies':
+        return (<RepoDependencies
+          repoMeta={props.repoMeta}
+          releaseMeta={props.releaseMeta}
           orgName={props.orgName}
           repoName={props.repoName}
           />);
