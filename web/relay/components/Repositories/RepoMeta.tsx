@@ -16,7 +16,7 @@ const RepoMetaCard = (props:RepoMetaCardProps) => {
   let repoLicense;
   let version;
 
-  if (repoMeta.projectType === 'npm' && releaseMeta && repoMeta.versions) {
+  if (repoMeta.projectType === 'npm' && releaseMeta && releaseMeta.versions) {
     const currentVersion = releaseMeta.versions[Object.keys(releaseMeta.versions)[0]];
     repoLicense = currentVersion.license;
     version = currentVersion.version;
