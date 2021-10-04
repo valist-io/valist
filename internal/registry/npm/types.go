@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type Package struct {
+type Metadata struct {
 	// the package name
 	ID string `json:"_id"`
 	// latest revision id
@@ -17,7 +17,7 @@ type Package struct {
 	// an object with at least one key, latest, representing dist-tags
 	DistTags map[string]string `json:"dist-tags"`
 	// a List of all Version objects for the Package
-	Versions map[string]Version `json:"versions"`
+	Versions map[string]Package `json:"versions"`
 	// full text of the latest version's README
 	Readme string `json:"readme"`
 	// an object containing a created and modified time stamp
@@ -30,7 +30,7 @@ type Package struct {
 	Attachments map[string]Attachment `json:"_attachments"`
 }
 
-type Version struct {
+type Package struct {
 	// <name>@<version>
 	ID string `json:"_id"`
 	// package name
@@ -94,31 +94,31 @@ type Dist struct {
 	Tarball string `json:"tarball"`
 }
 
-func NewPackage() Package {
-	return Package{
+func NewMetadata() Metadata {
+	return Metadata{
 		DistTags: make(map[string]string),
-		Versions: make(map[string]Version),
+		Versions: make(map[string]Package),
 	}
 }
 
-func NewVersion() Version {
-	return Version{
+func NewPackage() Package {
+	return Package{
 		Dependencies:    make(map[string]string),
 		DevDependencies: make(map[string]string),
 		Scripts:         make(map[string]string),
 	}
 }
 
-func ParsePackageJSON(path string) (*Version, error) {
+func ParsePackageJSON(path string) (*Package, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var version Version
-	if err := json.Unmarshal(data, &version); err != nil {
+	var pack Package
+	if err := json.Unmarshal(data, &pack); err != nil {
 		return nil, err
 	}
 
-	return &version, nil
+	return &pack, nil
 }
