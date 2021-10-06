@@ -22,10 +22,7 @@ import (
 	"github.com/valist-io/valist/internal/storage"
 )
 
-const (
-	DefaultGateway  = "https://ipfs.io"
-	DefaultRegistry = "https://registry.npmjs.org"
-)
+const DefaultGateway = "https://ipfs.io"
 
 type handler struct {
 	client types.CoreAPI
@@ -36,7 +33,6 @@ func NewHandler(client types.CoreAPI) http.Handler {
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{org}/{repo}", handler.getPackage).Methods(http.MethodGet)
-	router.HandleFunc("/{org}/{repo}/{tag}", handler.getPackage).Methods(http.MethodGet)
 	router.HandleFunc("/{org}/{repo}", handler.putPackage).Methods(http.MethodPut)
 
 	return handlers.LoggingHandler(os.Stdout, router)
@@ -47,14 +43,14 @@ func (h *handler) error(w http.ResponseWriter, msg string, status int) {
 	http.Error(w, msg, status)
 }
 
-func (h *handler) writeAttachment(ctx context.Context, dir storage.Directory, pack *Package, semver string) error {
-	version, ok := pack.Versions[semver]
+func (h *handler) writeAttachment(ctx context.Context, dir storage.Directory, meta *Metadata, semver string) error {
+	version, ok := meta.Versions[semver]
 	if !ok {
 		return fmt.Errorf("version not found")
 	}
 
-	attachName := fmt.Sprintf("%s-%s.tgz", pack.Name, semver)
-	attach, ok := pack.Attachments[attachName]
+	attachName := fmt.Sprintf("%s-%s.tgz", meta.Name, semver)
+	attach, ok := meta.Attachments[attachName]
 	if !ok {
 		return fmt.Errorf("attachment not found")
 	}
@@ -76,7 +72,7 @@ func (h *handler) writeAttachment(ctx context.Context, dir storage.Directory, pa
 	version.Dist = Dist{
 		Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarPath),
 	}
-	pack.Versions[semver] = version
+	meta.Versions[semver] = version
 
 	return dir.Add(ctx, filepath.Base(attachName), tarPath)
 }
@@ -99,27 +95,19 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	data, err := h.client.Storage().ReadFile(ctx, res.Release.MetaCID)
+	file, err := h.client.Storage().Open(ctx, res.Release.MetaCID)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
-
-	var pack Package
-	if err := json.Unmarshal(data, &pack); err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
+	defer file.Close()
 
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	// TODO is this secure?
-	//pack.ID = req.URL.Path
-	//pack.Name = req.URL.Path
-
-	if err := json.NewEncoder(w).Encode(pack); err != nil {
-		h.error(w, err.Error(), http.StatusInternalServerError)
+	if _, err := io.Copy(w, file); err != nil {
+		h.error(w, err.Error(), http.StatusBadRequest)
+		return
 	}
 }
 
@@ -132,13 +120,13 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	var pack Package
-	if err := json.NewDecoder(req.Body).Decode(&pack); err != nil {
+	var meta Metadata
+	if err := json.NewDecoder(req.Body).Decode(&meta); err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	tag, ok := pack.DistTags["latest"]
+	tag, ok := meta.DistTags["latest"]
 	if !ok {
 		h.error(w, "latest tag required", http.StatusBadRequest)
 		return
@@ -150,15 +138,15 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	for _, semver := range pack.DistTags {
-		if err := h.writeAttachment(ctx, dir, &pack, semver); err != nil {
+	for _, semver := range meta.DistTags {
+		if err := h.writeAttachment(ctx, dir, &meta, semver); err != nil {
 			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 	}
 
-	pack.Attachments = nil
-	packData, err := json.Marshal(&pack)
+	meta.Attachments = nil
+	packData, err := json.Marshal(&meta)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return

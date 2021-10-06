@@ -5,7 +5,7 @@ import (
 	"os"
 )
 
-type Package struct {
+type Metadata struct {
 	// the package name
 	ID string `json:"_id"`
 	// latest revision id
@@ -17,20 +17,20 @@ type Package struct {
 	// an object with at least one key, latest, representing dist-tags
 	DistTags map[string]string `json:"dist-tags"`
 	// a List of all Version objects for the Package
-	Versions map[string]Version `json:"versions"`
+	Versions map[string]Package `json:"versions"`
 	// full text of the latest version's README
 	Readme string `json:"readme"`
 	// an object containing a created and modified time stamp
 	Time Time `json:"time"`
 	// object with name, email, and or url of author as listed in package.json
-	Author Author `json:"author"`
+	// Author Author `json:"author"`
 	// object with type and url of package repository as listed in package.json
-	Repository Repository `json:"repository"`
+	// Repository Repository `json:"repository"`
 	// http://docs.couchdb.org/en/2.0.0/intro/api.html#attachments
 	Attachments map[string]Attachment `json:"_attachments"`
 }
 
-type Version struct {
+type Package struct {
 	// <name>@<version>
 	ID string `json:"_id"`
 	// package name
@@ -40,9 +40,9 @@ type Version struct {
 	// version number
 	Version string `json:"version"`
 	// homepage listed in the package.json
-	Homepage string `json:"homepage"`
+	// Homepage string `json:"homepage"`
 	// object with type and url of package repository as listed in package.json
-	Repository Repository `json:"repository"`
+	// Repository Repository `json:"repository"`
 	// object with dependencies and versions as listed in package.json
 	Dependencies map[string]string `json:"dependencies"`
 	// object with devDependencies and versions as listed in package.json
@@ -50,9 +50,9 @@ type Version struct {
 	// object with scripts as listed in package.json
 	Scripts map[string]string `json:"scripts"`
 	// object with name, email, and or url of author as listed in package.json
-	Author Author `json:"author"`
+	// Author Author `json:"author"`
 	// as listed in package.json
-	License string `json:"license"`
+	// License string `json:"license"`
 	// full text of README file as pointed to in package.json
 	Readme string `json:"readme"`
 	// name of README file
@@ -62,9 +62,9 @@ type Version struct {
 	// version of npm the package@version was published with
 	NpmVersion string `json:"_npmVersion"`
 	// an object containing the name and email of the npm user who published the package@version
-	NpmUser Author `json:"_npmUser"`
+	// NpmUser Author `json:"_npmUser"`
 	// an array of objects containing author objects as listed in package.json
-	Maintainers []Author `json:"maintainers"`
+	// Maintainers []Author `json:"maintainers"`
 }
 
 type Attachment struct {
@@ -94,31 +94,31 @@ type Dist struct {
 	Tarball string `json:"tarball"`
 }
 
-func NewPackage() Package {
-	return Package{
+func NewMetadata() Metadata {
+	return Metadata{
 		DistTags: make(map[string]string),
-		Versions: make(map[string]Version),
+		Versions: make(map[string]Package),
 	}
 }
 
-func NewVersion() Version {
-	return Version{
+func NewPackage() Package {
+	return Package{
 		Dependencies:    make(map[string]string),
 		DevDependencies: make(map[string]string),
 		Scripts:         make(map[string]string),
 	}
 }
 
-func ParsePackageJSON(path string) (*Version, error) {
+func ParsePackageJSON(path string) (*Package, error) {
 	data, err := os.ReadFile(path)
 	if err != nil {
 		return nil, err
 	}
 
-	var version Version
-	if err := json.Unmarshal(data, &version); err != nil {
+	var pack Package
+	if err := json.Unmarshal(data, &pack); err != nil {
 		return nil, err
 	}
 
-	return &version, nil
+	return &pack, nil
 }
