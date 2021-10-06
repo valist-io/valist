@@ -1,10 +1,14 @@
 package command
 
 import (
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 
@@ -49,25 +53,74 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			releaseCID, err := client.Storage().WriteFile(c.Context, valistFile.Out)
+			var readme string
+			readmeBytes, err := ioutil.ReadFile("README.md")
+
+			if err != nil {
+				fmt.Println("Readme not found")
+			} else {
+				readme = string(readmeBytes)
+			}
+
+			releaseName := fmt.Sprintf("%s/%s/%s",
+				strings.ToLower(valistFile.Org),
+				strings.ToLower(valistFile.Repo),
+				strings.ToLower(valistFile.Tag),
+			)
+
+			MetaFile := &types.ReleaseMeta{
+				Name:      releaseName,
+				Readme:    readme,
+				Platforms: make(map[string]types.ReleasePlatform),
+			}
+
+			for platform, artifact := range valistFile.Platforms {
+				currentFilePath := filepath.Join(cwd, valistFile.Out, artifact)
+
+				fileData, err := ioutil.ReadFile(currentFilePath)
+				if err != nil {
+					return err
+				}
+
+				cid, err := client.Storage().WriteFile(c.Context, currentFilePath)
+				if err != nil {
+					return err
+				}
+
+				hash := fmt.Sprintf("%x", sha256.Sum256(fileData))
+				storageProviders := []string{cid}
+
+				releaseProvider := types.ReleasePlatform{
+					SHA256:           hash,
+					StorageProviders: storageProviders,
+				}
+
+				MetaFile.Platforms[platform] = releaseProvider
+			}
+
+			file, err := json.Marshal(MetaFile)
 			if err != nil {
 				return err
 			}
 
-			metaCID, err := client.Storage().WriteFile(c.Context, valistFile.Meta)
-			if err != nil && !os.IsNotExist(err) {
+			err = ioutil.WriteFile(filepath.Join(cwd, filepath.Dir(valistFile.Out), "meta.json"), file, 0644)
+			if err != nil {
+				return err
+			}
+
+			releaseCID, err := client.Storage().WriteFile(c.Context, filepath.Dir(valistFile.Out))
+			if err != nil {
 				return err
 			}
 
 			release := &types.Release{
 				Tag:        valistFile.Tag,
 				ReleaseCID: releaseCID,
-				MetaCID:    metaCID,
+				MetaCID:    "QmRBwMae3Skqzc1GmAKBdcnFFPnHeD585MwYtVZzfh9Tkh", // Deprecation notice
 			}
 
 			fmt.Println("Tag:", release.Tag)
 			fmt.Println("ReleaseCID:", releaseCID)
-			fmt.Println("MetaCID:", metaCID)
 
 			if c.Bool("dryrun") {
 				return nil

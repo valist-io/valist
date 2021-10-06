@@ -1,18 +1,19 @@
 package command
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
-	"io/ioutil"
 	"os"
-	"os/exec"
 	"path"
 	"strings"
 
+	"github.com/matishsiao/goInfo"
 	"github.com/urfave/cli/v2"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
+	"github.com/valist-io/valist/internal/core/types"
 )
 
 const (
@@ -59,7 +60,17 @@ func action(c *cli.Context) error {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
 
+	platforms := map[string]string{
+		"x86_64": "amd64",
+		"386":    "386",
+	}
+
 	client := c.Context.Value(core.ClientKey).(*client.Client)
+
+	hostInfo, err := goInfo.GetInfo()
+	if err != nil {
+		return nil
+	}
 
 	home, err := os.UserHomeDir()
 	if err != nil {
@@ -85,37 +96,36 @@ func action(c *cli.Context) error {
 	}
 
 	if meta.ProjectType == "npm" {
-		npmrcContent := "@" + res.OrgName + ":registry=http://localhost:9000/api/npm" + "\n"
-
-		file, err := ioutil.ReadFile(".npmrc")
-		if err != nil && !errors.Is(err, os.ErrNotExist) {
-			return err
-		}
-		fileText := string(file)
-		stringSet := strings.Contains(fileText, npmrcContent)
-
-		if !stringSet {
-			fileText = fileText + "\n" + npmrcContent
-			if err := os.WriteFile(".npmrc", []byte(fileText), 0644); err != nil {
-				return err
-			}
-		}
-
-		npmPackageName := "@" + res.OrgName + "/" + res.RepoName + "@" + res.ReleaseTag
-		cmd := exec.Command("npm", "i", npmPackageName)
-		cmd.Stdout = os.Stdout
-		cmd.Stderr = os.Stderr
-
-		if err := cmd.Run(); err != nil {
-			return err
-		}
-		return nil
+		return errors.New("For NPM packages please run valist daemon and install using the NPM registry.")
 	}
 
 	valistBinDir := path.Join(home, rootDir, binDir)
 	installPath := path.Join(valistBinDir, res.RepoName)
 
-	data, err := client.Storage().ReadFile(c.Context, res.Release.ReleaseCID)
+	metaPath := res.Release.ReleaseCID + "/meta.json"
+
+	releaseData, err := client.Storage().ReadFile(c.Context, metaPath)
+	if err != nil {
+		return err
+	}
+
+	targetPlatform := strings.ToLower(hostInfo.OS) + "/" + platforms[hostInfo.Platform]
+	releaseMeta := &types.ReleaseMeta{}
+	json.Unmarshal(releaseData, releaseMeta)
+
+	var targetCID string
+	if _, ok := releaseMeta.Platforms[targetPlatform]; ok {
+		if releaseMeta.Platforms[targetPlatform].StorageProviders == nil {
+			return errors.New("Missing storage providers")
+		}
+		targetCID = releaseMeta.Platforms[targetPlatform].StorageProviders[0]
+	} else {
+		return errors.New("Target platform not found in release")
+	}
+
+	fmt.Println("Installing for target platform: ", targetPlatform)
+
+	targetData, err := client.Storage().ReadFile(c.Context, targetCID)
 	if err != nil {
 		return err
 	}
@@ -127,7 +137,7 @@ func action(c *cli.Context) error {
 		}
 	}
 
-	if err := os.WriteFile(installPath, data, 0744); err != nil {
+	if err := os.WriteFile(installPath, targetData, 0744); err != nil {
 		return err
 	}
 
