@@ -14,6 +14,7 @@ require (
 	github.com/ipfs/interface-go-ipfs-core v0.4.0
 	github.com/libp2p/go-libp2p-core v0.8.5
 	github.com/manifoldco/promptui v0.8.0
+	github.com/matishsiao/goInfo v0.0.0-20210923090445-da2e3fa8d45f // indirect
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/multiformats/go-multiaddr v0.3.3
 	github.com/otiai10/copy v1.6.0
