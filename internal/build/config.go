@@ -5,6 +5,7 @@ import (
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/valist-io/valist/internal/core/types"
 )
 
@@ -58,21 +59,54 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type"`
-	Org       string            `yaml:"org"`
-	Repo      string            `yaml:"repo"`
-	Tag       string            `yaml:"tag"`
-	Meta      string            `yaml:"meta,omitempty"`
-	Image     string            `yaml:"image,omitempty"`
-	Build     string            `yaml:"build,omitempty"`
-	Install   string            `yaml:"install,omitempty"`
-	Out       string            `yaml:"out,omitempty"`
-	Platforms map[string]string `yaml:"platforms,omitempty"`
+	Type      string            `yaml:"type" validate:"required,alphanum"`
+	Org       string            `yaml:"org" validate:"required,alphanum"`
+	Repo      string            `yaml:"repo" validate:"required,alphanum"`
+	Tag       string            `yaml:"tag" validate:"required,printascii"`
+	Meta      string            `yaml:"meta,omitempty" validate:"printascii"`
+	Image     string            `yaml:"image,omitempty" validate:"printascii"`
+	Build     string            `yaml:"build,omitempty" validate:"printascii"`
+	Install   string            `yaml:"install,omitempty" validate:"printascii"`
+	Out       string            `yaml:"out,omitempty" validate:"printascii"`
+	Platforms map[string]string `yaml:"platforms,omitempty" validate:"printascii"`
+}
+
+var validate *validator.Validate
+
+func (c Config) Validate() error {
+	if validate == nil {
+		validate = validator.New()
+		validate.RegisterValidation("platforms", ValidatePlatforms)
+	}
+	return validate.Struct(c)
+}
+
+func ValidatePlatforms(fl validator.FieldLevel) bool {
+	iter := fl.Field().MapRange()
+	for iter.Next() {
+		key := iter.Key()
+		value := iter.Value()
+
+		err := validate.Var(key, "required,printascii")
+		if err != nil {
+			return false
+		}
+
+		err = validate.Var(value, "required,printascii")
+		if err != nil {
+			return false
+		}
+	}
+	return true
 }
 
 func (c Config) Save(path string) error {
 	yamlData, err := yaml.Marshal(c)
 	if err != nil {
+		return err
+	}
+
+	if err = c.Validate(); err != nil {
 		return err
 	}
 
@@ -85,5 +119,10 @@ func (c *Config) Load(path string) error {
 		return err
 	}
 
-	return yaml.Unmarshal(yamlFile, c)
+	yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		return err
+	}
+
+	return c.Validate()
 }
