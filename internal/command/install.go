@@ -60,11 +60,6 @@ func action(c *cli.Context) error {
 		cli.ShowSubcommandHelpAndExit(c, 1)
 	}
 
-	platforms := map[string]string{
-		"x86_64": "amd64",
-		"386":    "386",
-	}
-
 	client := c.Context.Value(core.ClientKey).(*client.Client)
 
 	hostInfo, err := goInfo.GetInfo()
@@ -109,7 +104,12 @@ func action(c *cli.Context) error {
 		return err
 	}
 
-	targetPlatform := strings.ToLower(hostInfo.OS) + "/" + platforms[hostInfo.Platform]
+	targetOs := strings.ToLower(hostInfo.OS)
+	targetArch := strings.ToLower(hostInfo.Platform)
+	if targetArch == "x86_64" {
+		targetArch = "amd64"
+	}
+	targetPlatform := targetOs + "/" + targetArch
 	releaseMeta := &types.ReleaseMeta{}
 	json.Unmarshal(releaseData, releaseMeta)
 
