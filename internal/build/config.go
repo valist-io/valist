@@ -1,7 +1,9 @@
 package build
 
 import (
+	"fmt"
 	"os"
+	"regexp"
 
 	"gopkg.in/yaml.v3"
 
@@ -59,16 +61,16 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"required,alphanum"`
-	Org       string            `yaml:"org" validate:"required,alphanum"`
-	Repo      string            `yaml:"repo" validate:"required,alphanum"`
+	Type      string            `yaml:"type" validate:"required,alphanum,lowercase"`
+	Org       string            `yaml:"org" validate:"required,alphanum,lowercase"`
+	Repo      string            `yaml:"repo" validate:"required,alphanum,lowercase"`
 	Tag       string            `yaml:"tag" validate:"required,printascii"`
-	Meta      string            `yaml:"meta,omitempty" validate:"printascii"`
-	Image     string            `yaml:"image,omitempty" validate:"printascii"`
+	Meta      string            `yaml:"meta,omitempty" validate:"url_encoded"`
+	Image     string            `yaml:"image,omitempty" validate:"url_encoded"`
 	Build     string            `yaml:"build,omitempty" validate:"printascii"`
 	Install   string            `yaml:"install,omitempty" validate:"printascii"`
-	Out       string            `yaml:"out,omitempty" validate:"printascii"`
-	Platforms map[string]string `yaml:"platforms,omitempty" validate:"printascii"`
+	Out       string            `yaml:"out,omitempty" validate:"required_unless=Type npm,url_encoded"`
+	Platforms map[string]string `yaml:"platforms,omitempty" validate:"required_with=Out,platforms"`
 }
 
 var validate *validator.Validate
@@ -83,21 +85,24 @@ func (c Config) Validate() error {
 
 func ValidatePlatforms(fl validator.FieldLevel) bool {
 	iter := fl.Field().MapRange()
+	valid := true
 	for iter.Next() {
 		key := iter.Key()
 		value := iter.Value()
 
-		err := validate.Var(key, "required,printascii")
-		if err != nil {
-			return false
+		valid, _ = regexp.MatchString("[0-z\\-]+\\/[0-z\\-]+", key.String()) // linux/amd64
+		if !valid {
+			fmt.Println("Invalid os/arch in platforms")
+			break
 		}
 
-		err = validate.Var(value, "required,printascii")
-		if err != nil {
-			return false
+		valid, _ = regexp.MatchString("[0-z\\-\\/\\.]+", value.String()) // bin/linux/amd64/valist
+		if !valid {
+			fmt.Println("Invalid path to artifact")
+			break
 		}
 	}
-	return true
+	return valid
 }
 
 func (c Config) Save(path string) error {

@@ -1,5 +1,5 @@
-org: goTest
-repo: goExample
+org: acme-co
+repo: go-example
 tag: 0.0.1
 
 # The project type
