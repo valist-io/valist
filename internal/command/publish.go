@@ -43,6 +43,13 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
+			var outDir string
+			if filepath.Dir(valistFile.Out) == "." {
+				outDir = valistFile.Out
+			} else {
+				outDir = filepath.Dir(valistFile.Out)
+			}
+
 			orgID, err := client.GetOrganizationID(c.Context, valistFile.Org)
 			if err != nil {
 				return err
@@ -103,12 +110,12 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			err = ioutil.WriteFile(filepath.Join(cwd, filepath.Dir(valistFile.Out), "meta.json"), file, 0644)
+			err = ioutil.WriteFile(filepath.Join(cwd, outDir, "meta.json"), file, 0644)
 			if err != nil {
 				return err
 			}
 
-			releaseCID, err := client.Storage().WriteFile(c.Context, filepath.Dir(valistFile.Out))
+			releaseCID, err := client.Storage().WriteFile(c.Context, outDir)
 			if err != nil {
 				return err
 			}
