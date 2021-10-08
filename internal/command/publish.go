@@ -1,10 +1,13 @@
 package command
 
 import (
+	"crypto/sha256"
+	"encoding/json"
 	"fmt"
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 
@@ -49,25 +52,62 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			releaseCID, err := client.Storage().WriteFile(c.Context, valistFile.Out)
+			var readme string
+			readmeBytes, err := os.ReadFile("README.md")
+
+			if err != nil {
+				fmt.Println("Readme not found")
+			} else {
+				readme = string(readmeBytes)
+			}
+
+			releaseName := fmt.Sprintf("%s/%s/%s",
+				strings.ToLower(valistFile.Org),
+				strings.ToLower(valistFile.Repo),
+				strings.ToLower(valistFile.Tag),
+			)
+
+			releaseMeta := &types.ReleaseMeta{
+				Name:      releaseName,
+				Readme:    readme,
+				Artifacts: make(map[string]types.Artifact),
+			}
+
+			for platform, artifact := range valistFile.Platforms {
+				fileData, err := os.ReadFile(filepath.Join(cwd, valistFile.Out, artifact))
+				if err != nil {
+					return err
+				}
+
+				path, err := client.Storage().Write(c.Context, fileData)
+				if err != nil {
+					return err
+				}
+
+				releaseMeta.Artifacts[platform] = types.Artifact{
+					SHA256:    fmt.Sprintf("%x", sha256.Sum256(fileData)),
+					Providers: []string{path},
+				}
+			}
+
+			releaseData, err := json.Marshal(releaseMeta)
 			if err != nil {
 				return err
 			}
 
-			metaCID, err := client.Storage().WriteFile(c.Context, valistFile.Meta)
-			if err != nil && !os.IsNotExist(err) {
+			releaseCID, err := client.Storage().Write(c.Context, releaseData)
+			if err != nil {
 				return err
 			}
 
 			release := &types.Release{
 				Tag:        valistFile.Tag,
 				ReleaseCID: releaseCID,
-				MetaCID:    metaCID,
+				MetaCID:    "QmRBwMae3Skqzc1GmAKBdcnFFPnHeD585MwYtVZzfh9Tkh", // Deprecation notice
 			}
 
 			fmt.Println("Tag:", release.Tag)
 			fmt.Println("ReleaseCID:", releaseCID)
-			fmt.Println("MetaCID:", metaCID)
 
 			if c.Bool("dryrun") {
 				return nil

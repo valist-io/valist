@@ -22,7 +22,11 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 		return nil, err
 	}
 
-	res := types.ResolvedPath{OrgID: orgID}
+	res := types.ResolvedPath{
+		OrgID:   orgID,
+		OrgName: parts[0],
+	}
+
 	res.Organization, err = client.GetOrganization(ctx, res.OrgID)
 	if err != nil {
 		return &res, err

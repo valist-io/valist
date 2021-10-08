@@ -27,6 +27,7 @@ func NewApp() *cli.App {
 			NewBuildCommand(),
 			NewInitCommand(),
 			NewPublishCommand(),
+			NewInstallCommand(),
 		},
 	}
 }
