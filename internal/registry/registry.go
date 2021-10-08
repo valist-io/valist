@@ -15,14 +15,18 @@ func NewServer(client types.CoreAPI, addr string) *http.Server {
 	dockerHandler := docker.NewHandler(client)
 	gitHandler := git.NewHandler(client)
 	npmHandler := npm.NewHandler(client)
+	npmProxy := npm.NewProxy(client, addr+"/proxy/npm")
 
 	router := mux.NewRouter()
-	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(200)
-	})
 	router.PathPrefix("/v2/").Handler(dockerHandler)
 	router.PathPrefix("/api/git/").Handler(http.StripPrefix("/api/git", gitHandler))
 	router.PathPrefix("/api/npm/").Handler(http.StripPrefix("/api/npm", npmHandler))
+	router.PathPrefix("/proxy/npm/").Handler(http.StripPrefix("/proxy/npm", npmProxy))
+
+	// health check route always returns 200
+	router.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+		w.WriteHeader(200)
+	})
 
 	return &http.Server{
 		Addr:    addr,

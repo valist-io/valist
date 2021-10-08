@@ -5,6 +5,7 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -14,6 +15,9 @@ const (
 	configFile  = "config"
 	keystoreDir = "keystore"
 	storageDir  = "storage"
+	databaseDir = "database"
+	scryptN     = keystore.StandardScryptN
+	scryptP     = keystore.StandardScryptP
 )
 
 type Ethereum struct {
@@ -112,8 +116,11 @@ func (c *Config) Save() error {
 
 // KeyStore returns the config keystore.
 func (c *Config) KeyStore() *keystore.KeyStore {
-	path := filepath.Join(c.rootPath, keystoreDir)
-	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
+	return keystore.NewKeyStore(filepath.Join(c.rootPath, keystoreDir), scryptN, scryptP)
+}
+
+func (c *Config) Database() (*badger.DB, error) {
+	return badger.Open(badger.DefaultOptions(filepath.Join(c.rootPath, databaseDir)))
 }
 
 func (c *Config) StoragePath() string {

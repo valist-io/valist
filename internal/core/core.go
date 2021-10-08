@@ -28,6 +28,11 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
 
+	db, err := cfg.Database()
+	if err != nil {
+		return nil, err
+	}
+
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
 		return nil, err
@@ -78,6 +83,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 
 	return client.NewClient(client.Options{
 		Storage:    storage,
+		Database:   db,
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,
