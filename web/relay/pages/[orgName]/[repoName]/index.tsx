@@ -39,7 +39,7 @@ export default function Dashboard() {
     const release = repoReleases[0];
     let metaJson;
     if (release && release.releaseCID !== '') {
-      let requestURL = `https://gateway.valist.io/ipfs/${release.releaseCID.replace('/ipfs/', '')}/meta.json`;
+      let requestURL = `https://gateway.valist.io/ipfs/${release.releaseCID.replace('/ipfs/', '')}`;
       if (repo.meta.projectType === 'npm') {
         requestURL = `https://gateway.valist.io/ipfs/${release.metaCID.replace('/ipfs/', '')}`;
       }
