@@ -13,6 +13,9 @@ import (
 	"github.com/valist-io/valist/internal/storage"
 )
 
+// DeprecationNotice contains a deprecation notice in plain text
+const DeprecationNotice = "QmRBwMae3Skqzc1GmAKBdcnFFPnHeD585MwYtVZzfh9Tkh"
+
 const (
 	ProjectTypeBinary = "binary"
 	ProjectTypeNode   = "node"

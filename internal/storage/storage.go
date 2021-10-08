@@ -38,48 +38,69 @@ func (s *Storage) Provider(prefix string) (Provider, error) {
 }
 
 // Open returns the named file.
-func (s *Storage) Open(ctx context.Context, fpath string) (File, error) {
-	parts := strings.Split(fpath, "/")
-	if len(parts) < 2 {
-		return nil, ErrInvalidPath
+func (s *Storage) Open(ctx context.Context, fpaths ...string) (File, error) {
+	for _, fpath := range fpaths {
+		parts := strings.Split(fpath, "/")
+		if len(parts) < 2 {
+			continue
+		}
+
+		provider, err := s.Provider(parts[1])
+		if err != nil {
+			continue
+		}
+
+		file, err := provider.Open(ctx, fpath)
+		if err == nil {
+			return file, err
+		}
 	}
 
-	provider, err := s.Provider(parts[1])
-	if err != nil {
-		return nil, err
-	}
-
-	return provider.Open(ctx, fpath)
+	return nil, ErrInvalidPath
 }
 
 // ReadDir returns a list of files in the given directory path.
-func (s *Storage) ReadDir(ctx context.Context, fpath string) ([]fs.FileInfo, error) {
-	parts := strings.Split(fpath, "/")
-	if len(parts) < 2 {
-		return nil, ErrInvalidPath
+func (s *Storage) ReadDir(ctx context.Context, fpaths ...string) ([]fs.FileInfo, error) {
+	for _, fpath := range fpaths {
+		parts := strings.Split(fpath, "/")
+		if len(parts) < 2 {
+			continue
+		}
+
+		provider, err := s.Provider(parts[1])
+		if err != nil {
+			continue
+		}
+
+		info, err := provider.ReadDir(ctx, fpath)
+		if err == nil {
+			return info, nil
+		}
 	}
 
-	provider, err := s.Provider(parts[1])
-	if err != nil {
-		return nil, err
-	}
-
-	return provider.ReadDir(ctx, fpath)
+	return nil, ErrInvalidPath
 }
 
 // ReadFile returns the contents of the file with the given path.
-func (s *Storage) ReadFile(ctx context.Context, fpath string) ([]byte, error) {
-	parts := strings.Split(fpath, "/")
-	if len(parts) < 2 {
-		return nil, ErrInvalidPath
+func (s *Storage) ReadFile(ctx context.Context, fpaths ...string) ([]byte, error) {
+	for _, fpath := range fpaths {
+		parts := strings.Split(fpath, "/")
+		if len(parts) < 2 {
+			return nil, ErrInvalidPath
+		}
+
+		provider, err := s.Provider(parts[1])
+		if err != nil {
+			return nil, err
+		}
+
+		data, err := provider.ReadFile(ctx, fpath)
+		if err == nil {
+			return data, err
+		}
 	}
 
-	provider, err := s.Provider(parts[1])
-	if err != nil {
-		return nil, err
-	}
-
-	return provider.ReadFile(ctx, fpath)
+	return nil, ErrInvalidPath
 }
 
 // WriteFile writes the contents of the given file path for all providers.
