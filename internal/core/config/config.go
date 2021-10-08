@@ -11,6 +11,7 @@ import (
 
 const (
 	rootDir     = ".valist"
+	installDir  = "bin"
 	configFile  = "config"
 	keystoreDir = "keystore"
 )
@@ -127,4 +128,9 @@ func (c *Config) Save() error {
 func (c *Config) KeyStore() *keystore.KeyStore {
 	path := filepath.Join(c.rootPath, keystoreDir)
 	return keystore.NewKeyStore(path, keystore.StandardScryptN, keystore.StandardScryptP)
+}
+
+// InstallPath returns the path to install binaries.
+func (c *Config) InstallPath() string {
+	return filepath.Join(c.rootPath, installDir)
 }

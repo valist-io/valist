@@ -122,16 +122,16 @@ type Release struct {
 	Signers    []common.Address
 }
 
-type ReleasePlatform struct {
-	SHA256           string   `json:"sha256"`
-	StorageProviders []string `json:"storageProviders"` // provider/CID
+type Artifact struct {
+	SHA256    string   `json:"sha256"`
+	Providers []string `json:"providers"`
 }
 
 type ReleaseMeta struct {
-	Name      string                     `json:"name"`
-	Readme    string                     `json:"readme"`
-	License   string                     `json:"license"`
-	Platforms map[string]ReleasePlatform `json:"platforms"` // os/arch -> ReleaseArtifact
+	Name      string              `json:"name"`
+	Readme    string              `json:"readme"`
+	License   string              `json:"license"`
+	Artifacts map[string]Artifact `json:"artifacts"`
 }
 
 type Repository struct {

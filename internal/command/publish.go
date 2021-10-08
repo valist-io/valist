@@ -4,7 +4,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
 	"math/big"
 	"os"
 	"path/filepath"
@@ -43,13 +42,6 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			var outDir string
-			if filepath.Dir(valistFile.Out) == "." {
-				outDir = valistFile.Out
-			} else {
-				outDir = filepath.Dir(valistFile.Out)
-			}
-
 			orgID, err := client.GetOrganizationID(c.Context, valistFile.Org)
 			if err != nil {
 				return err
@@ -61,7 +53,7 @@ func NewPublishCommand() *cli.Command {
 			}
 
 			var readme string
-			readmeBytes, err := ioutil.ReadFile("README.md")
+			readmeBytes, err := os.ReadFile("README.md")
 
 			if err != nil {
 				fmt.Println("Readme not found")
@@ -75,47 +67,35 @@ func NewPublishCommand() *cli.Command {
 				strings.ToLower(valistFile.Tag),
 			)
 
-			MetaFile := &types.ReleaseMeta{
+			releaseMeta := &types.ReleaseMeta{
 				Name:      releaseName,
 				Readme:    readme,
-				Platforms: make(map[string]types.ReleasePlatform),
+				Artifacts: make(map[string]types.Artifact),
 			}
 
 			for platform, artifact := range valistFile.Platforms {
-				currentFilePath := filepath.Join(cwd, valistFile.Out, artifact)
-
-				fileData, err := ioutil.ReadFile(currentFilePath)
+				fileData, err := os.ReadFile(filepath.Join(cwd, valistFile.Out, artifact))
 				if err != nil {
 					return err
 				}
 
-				cid, err := client.Storage().WriteFile(c.Context, currentFilePath)
+				path, err := client.Storage().Write(c.Context, fileData)
 				if err != nil {
 					return err
 				}
 
-				hash := fmt.Sprintf("%x", sha256.Sum256(fileData))
-				storageProviders := []string{cid}
-
-				releaseProvider := types.ReleasePlatform{
-					SHA256:           hash,
-					StorageProviders: storageProviders,
+				releaseMeta.Artifacts[platform] = types.Artifact{
+					SHA256:    fmt.Sprintf("%x", sha256.Sum256(fileData)),
+					Providers: []string{path},
 				}
-
-				MetaFile.Platforms[platform] = releaseProvider
 			}
 
-			file, err := json.Marshal(MetaFile)
+			releaseData, err := json.Marshal(releaseMeta)
 			if err != nil {
 				return err
 			}
 
-			err = ioutil.WriteFile(filepath.Join(cwd, outDir, "meta.json"), file, 0644)
-			if err != nil {
-				return err
-			}
-
-			releaseCID, err := client.Storage().WriteFile(c.Context, outDir)
+			releaseCID, err := client.Storage().Write(c.Context, releaseData)
 			if err != nil {
 				return err
 			}
