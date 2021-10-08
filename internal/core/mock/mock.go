@@ -1,14 +1,15 @@
 package mock
 
 import (
+	"context"
 	"fmt"
 	"math/big"
+	"os"
+	"path/filepath"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/core"
-	"github.com/ipfs/go-ipfs/core/coreapi"
-	coremock "github.com/ipfs/go-ipfs/core/mock"
 
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
@@ -46,7 +47,12 @@ func NewKeyStore(ksLocation string, numAccounts int) (*keystore.KeyStore, error)
 	return kstore, nil
 }
 
-func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
+func NewClient(ctx context.Context, kstore *keystore.KeyStore) (*client.Client, error) {
+	tmp, err := os.MkdirTemp("", "")
+	if err != nil {
+		return nil, err
+	}
+
 	accounts := kstore.Accounts()
 	if len(accounts) == 0 {
 		return nil, fmt.Errorf("cannot create mock client with empty keystore")
@@ -88,12 +94,7 @@ func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
 	// ensure contracts are deployed
 	backend.Commit()
 
-	node, err := coremock.NewMockNode()
-	if err != nil {
-		return nil, err
-	}
-
-	ipfsapi, err := coreapi.NewCoreAPI(node)
+	ipfs, err := ipfs.NewProvider(ctx, filepath.Join(tmp, "storage"))
 	if err != nil {
 		return nil, err
 	}

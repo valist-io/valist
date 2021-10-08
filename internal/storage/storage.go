@@ -2,38 +2,128 @@ package storage
 
 import (
 	"context"
-	"io"
+	"errors"
 	"io/fs"
+	"strings"
 )
 
-type Storage interface {
-	// Mkdir creates a new empty directory.
-	Mkdir(context.Context) (Directory, error)
-	// Open opens the named file.
-	Open(context.Context, string) (File, error)
-	// ReadDir returns a list of files in the given directory path.
-	ReadDir(context.Context, string) ([]fs.FileInfo, error)
-	// ReadFile reads the file with the given path.
-	ReadFile(context.Context, string) ([]byte, error)
-	// Write writes the given contents to a file.
-	Write(context.Context, []byte) (string, error)
-	// WriteFile writes the contents of the given file path.
-	WriteFile(context.Context, string) (string, error)
+var (
+	ErrInvalidPath = errors.New("invalid storage path")
+	ErrNoProvider  = errors.New("storage provider not found")
+)
+
+type Storage struct {
+	providers []Provider
 }
 
-type File interface {
-	io.Reader
-	io.Closer
-	io.Seeker
+// NewStorage returns a new storage manager with the given providers.
+// Providers are priority sorted in the given order.
+func NewStorage(providers ...Provider) (*Storage, error) {
+	if len(providers) == 0 {
+		return nil, ErrNoProvider
+	}
 
-	Stat() (fs.FileInfo, error)
+	return &Storage{providers}, nil
 }
 
-type Directory interface {
-	// Add adds the given file to the directory at the given path.
-	Add(context.Context, string, string) error
-	// Remove removes the file with the given path from the directory.
-	Remove(context.Context, string) error
-	// Path returns the directory path.
-	Path() string
+// Provider returns the provider with the matching prefix.
+func (s *Storage) Provider(prefix string) (Provider, error) {
+	for _, provider := range s.providers {
+		if provider.Prefix() == prefix {
+			return provider, nil
+		}
+	}
+
+	return nil, ErrNoProvider
+}
+
+// Open returns the named file.
+func (s *Storage) Open(ctx context.Context, fpath string) (File, error) {
+	parts := strings.Split(fpath, "/")
+	if len(parts) < 2 {
+		return nil, ErrInvalidPath
+	}
+
+	provider, err := s.Provider(parts[1])
+	if err != nil {
+		return nil, err
+	}
+
+	return provider.Open(ctx, fpath)
+}
+
+// ReadDir returns a list of files in the given directory path.
+func (s *Storage) ReadDir(ctx context.Context, fpath string) ([]fs.FileInfo, error) {
+	parts := strings.Split(fpath, "/")
+	if len(parts) < 2 {
+		return nil, ErrInvalidPath
+	}
+
+	provider, err := s.Provider(parts[1])
+	if err != nil {
+		return nil, err
+	}
+
+	return provider.ReadDir(ctx, fpath)
+}
+
+// ReadFile returns the contents of the file with the given path.
+func (s *Storage) ReadFile(ctx context.Context, fpath string) ([]byte, error) {
+	parts := strings.Split(fpath, "/")
+	if len(parts) < 2 {
+		return nil, ErrInvalidPath
+	}
+
+	provider, err := s.Provider(parts[1])
+	if err != nil {
+		return nil, err
+	}
+
+	return provider.ReadFile(ctx, fpath)
+}
+
+// WriteFile writes the contents of the given file path for all providers.
+func (s *Storage) WriteFile(ctx context.Context, fpath string) ([]string, error) {
+	if len(s.providers) == 0 {
+		return nil, ErrNoProvider
+	}
+
+	set := make(map[string]bool)
+	for _, provider := range s.providers {
+		path, err := provider.WriteFile(ctx, fpath)
+		if err != nil {
+			return nil, err
+		}
+		set[path] = true
+	}
+
+	var paths []string
+	for path := range set {
+		paths = append(paths, path)
+	}
+
+	return paths, nil
+}
+
+// Write writes the given contents to a file for all providers.
+func (s *Storage) Write(ctx context.Context, data []byte) ([]string, error) {
+	if len(s.providers) == 0 {
+		return nil, ErrNoProvider
+	}
+
+	set := make(map[string]bool)
+	for _, provider := range s.providers {
+		path, err := provider.Write(ctx, data)
+		if err != nil {
+			return nil, err
+		}
+		set[path] = true
+	}
+
+	var paths []string
+	for path := range set {
+		paths = append(paths, path)
+	}
+
+	return paths, nil
 }

@@ -1,13 +1,10 @@
 package ipfs
 
 import (
-	"context"
 	"io/fs"
 	"time"
 
 	files "github.com/ipfs/go-ipfs-files"
-	coreiface "github.com/ipfs/interface-go-ipfs-core"
-	"github.com/ipfs/interface-go-ipfs-core/path"
 )
 
 type file struct {
@@ -60,33 +57,4 @@ func (fi *fileInfo) IsDir() bool {
 
 func (fi *fileInfo) Sys() interface{} {
 	return nil
-}
-
-type dir struct {
-	ipfs coreiface.CoreAPI
-	path path.Path
-}
-
-func (d *dir) Add(ctx context.Context, name string, child string) error {
-	p, err := d.ipfs.Object().AddLink(ctx, d.path, name, path.New(child))
-	if err != nil {
-		return err
-	}
-
-	d.path = p
-	return nil
-}
-
-func (d *dir) Remove(ctx context.Context, name string) error {
-	p, err := d.ipfs.Object().RmLink(ctx, d.path, name)
-	if err != nil {
-		return err
-	}
-
-	d.path = p
-	return nil
-}
-
-func (d *dir) Path() string {
-	return d.path.String()
 }

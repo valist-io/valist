@@ -53,7 +53,7 @@ type CoreAPI interface {
 	// Signer returns the signer.
 	Signer() *signer.Signer
 	// Storage returns the storage interface.
-	Storage() storage.Storage
+	Storage() *storage.Storage
 }
 
 type OrganizationAPI interface {

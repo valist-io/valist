@@ -61,7 +61,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	paths, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -69,7 +69,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
-	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, metaCID)
+	tx, err := client.transactor.CreateRepositoryTx(txopts, orgID, name, paths[0])
 	if err != nil {
 		return nil, err
 	}
@@ -105,7 +105,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	paths, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -113,7 +113,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
-	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, metaCID)
+	tx, err := client.transactor.SetRepositoryMetaTx(txopts, orgID, name, paths[0])
 	if err != nil {
 		return nil, err
 	}
