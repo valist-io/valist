@@ -23,9 +23,9 @@ type Metadata struct {
 	// an object containing a created and modified time stamp
 	Time Time `json:"time"`
 	// object with name, email, and or url of author as listed in package.json
-	// Author Author `json:"author"`
+	Author interface{} `json:"author"`
 	// object with type and url of package repository as listed in package.json
-	// Repository Repository `json:"repository"`
+	Repository interface{} `json:"repository"`
 	// http://docs.couchdb.org/en/2.0.0/intro/api.html#attachments
 	Attachments map[string]Attachment `json:"_attachments"`
 }
@@ -40,9 +40,9 @@ type Package struct {
 	// version number
 	Version string `json:"version"`
 	// homepage listed in the package.json
-	// Homepage string `json:"homepage"`
+	Homepage interface{} `json:"homepage"`
 	// object with type and url of package repository as listed in package.json
-	// Repository Repository `json:"repository"`
+	Repository interface{} `json:"repository"`
 	// object with dependencies and versions as listed in package.json
 	Dependencies map[string]string `json:"dependencies"`
 	// object with devDependencies and versions as listed in package.json
@@ -50,9 +50,9 @@ type Package struct {
 	// object with scripts as listed in package.json
 	Scripts map[string]string `json:"scripts"`
 	// object with name, email, and or url of author as listed in package.json
-	// Author Author `json:"author"`
+	Author interface{} `json:"author"`
 	// as listed in package.json
-	// License string `json:"license"`
+	License interface{} `json:"license"`
 	// full text of README file as pointed to in package.json
 	Readme string `json:"readme"`
 	// name of README file
@@ -62,9 +62,9 @@ type Package struct {
 	// version of npm the package@version was published with
 	NpmVersion string `json:"_npmVersion"`
 	// an object containing the name and email of the npm user who published the package@version
-	// NpmUser Author `json:"_npmUser"`
+	NpmUser interface{} `json:"_npmUser"`
 	// an array of objects containing author objects as listed in package.json
-	// Maintainers []Author `json:"maintainers"`
+	Maintainers interface{} `json:"maintainers"`
 }
 
 type Attachment struct {
