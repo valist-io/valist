@@ -16,14 +16,7 @@ import (
 func TestGitPushClone(t *testing.T) {
 	ctx := context.Background()
 
-	tmp, err := os.MkdirTemp("", "test")
-	require.NoError(t, err, "Failed to create temp dir")
-	defer os.RemoveAll(tmp)
-
-	kstore, err := mock.NewKeyStore(tmp, 1)
-	require.NoError(t, err, "Failed to create keystore")
-
-	client, err := mock.NewClient(kstore)
+	client, err := mock.NewClient(ctx)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"
@@ -61,7 +54,7 @@ func TestGitPushClone(t *testing.T) {
 
 	clone, err := os.MkdirTemp("", "")
 	require.NoError(t, err, "Failed to create clone dir")
-	defer os.RemoveAll(tmp)
+	defer os.RemoveAll(clone)
 
 	err = exec.Command("git", "push", registryPath, "main").Run()
 	require.NoError(t, err, "Failed to push git repo")

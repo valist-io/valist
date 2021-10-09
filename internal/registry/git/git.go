@@ -1,6 +1,7 @@
 package git
 
 import (
+	"encoding/json"
 	"fmt"
 	"log"
 	"math/big"
@@ -16,6 +17,10 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist/internal/core/types"
+)
+
+const (
+	GitDirName = ".git"
 )
 
 type handler struct {
@@ -180,7 +185,29 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releaseCID, err := h.client.Storage().WriteFile(ctx, loader.tmp)
+	dir, err := h.client.Storage().WriteFile(ctx, loader.tmp)
+	if err != nil {
+		h.error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	releaseMeta := &types.ReleaseMeta{
+		Name:      fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, tag.Name().String()),
+		Artifacts: make(map[string]types.Artifact),
+	}
+
+	// TODO calculate shasum
+	releaseMeta.Artifacts[GitDirName] = types.Artifact{
+		Providers: dir,
+	}
+
+	releaseData, err := json.Marshal(releaseMeta)
+	if err != nil {
+		h.error(w, err.Error(), http.StatusInternalServerError)
+		return
+	}
+
+	releasePaths, err := h.client.Storage().Write(ctx, releaseData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -188,8 +215,8 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	release := &types.Release{
 		Tag:        tag.Name().Short(),
-		ReleaseCID: releaseCID,
-		MetaCID:    releaseCID,
+		ReleaseCID: releasePaths[0],
+		MetaCID:    types.DeprecationNotice,
 	}
 
 	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)

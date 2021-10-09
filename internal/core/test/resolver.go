@@ -32,8 +32,8 @@ func (s *CoreSuite) TestResolvePath() {
 
 	release := &types.Release{
 		Tag:        "v0.0.1",
-		ReleaseCID: releaseCID,
-		MetaCID:    metaCID,
+		ReleaseCID: releaseCID[0],
+		MetaCID:    metaCID[0],
 	}
 
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)

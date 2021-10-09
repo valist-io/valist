@@ -65,7 +65,7 @@ func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string
 		return nil, err
 	}
 
-	return h.client.Storage().Open(ctx, p...)
+	return h.client.Storage().Open(ctx, p[0])
 }
 
 func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
@@ -90,5 +90,5 @@ func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref strin
 		return nil, fmt.Errorf("artifact not found")
 	}
 
-	return h.client.Storage().Open(ctx, artifact.Providers...)
+	return h.client.Storage().Open(ctx, artifact.Providers[0])
 }

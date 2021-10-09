@@ -121,7 +121,7 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	file, err := h.client.Storage().Open(ctx, artifact.Providers...)
+	file, err := h.client.Storage().Open(ctx, artifact.Providers[0])
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return

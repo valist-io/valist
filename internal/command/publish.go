@@ -95,19 +95,19 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			releaseCID, err := client.Storage().Write(c.Context, releaseData)
+			releasePaths, err := client.Storage().Write(c.Context, releaseData)
 			if err != nil {
 				return err
 			}
 
 			release := &types.Release{
 				Tag:        valistFile.Tag,
-				ReleaseCID: releaseCID,
+				ReleaseCID: releasePaths[0],
 				MetaCID:    types.DeprecationNotice,
 			}
 
 			fmt.Println("Tag:", release.Tag)
-			fmt.Println("ReleaseCID:", releaseCID)
+			fmt.Println("ReleasePaths:", releasePaths)
 
 			if c.Bool("dryrun") {
 				return nil

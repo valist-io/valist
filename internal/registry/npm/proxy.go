@@ -175,7 +175,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	return p.client.Storage().Open(ctx, tarPaths...)
+	return p.client.Storage().Open(ctx, tarPaths[0])
 }
 
 func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
