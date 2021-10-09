@@ -230,8 +230,6 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	fmt.Println(string(releaseData))
-
 	releasePaths, err := h.client.Storage().Write(ctx, releaseData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
