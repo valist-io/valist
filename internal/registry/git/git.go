@@ -198,7 +198,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	// TODO calculate shasum
 	releaseMeta.Artifacts[GitDirName] = types.Artifact{
-		Providers: dir,
+		Provider: dir,
 	}
 
 	releaseData, err := json.Marshal(releaseMeta)
@@ -207,7 +207,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releasePaths, err := h.client.Storage().Write(ctx, releaseData)
+	releasePath, err := h.client.Storage().Write(ctx, releaseData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
@@ -215,7 +215,7 @@ func (h *handler) receivePack(w http.ResponseWriter, req *http.Request) {
 
 	release := &types.Release{
 		Tag:        tag.Name().Short(),
-		ReleaseCID: releasePaths[0],
+		ReleaseCID: releasePath,
 		MetaCID:    types.DeprecationNotice,
 	}
 

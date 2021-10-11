@@ -15,8 +15,6 @@ type File interface {
 }
 
 type Provider interface {
-	// Prefix returns the provider prefix used to identify itself.
-	Prefix() string
 	// Open returns the named file.
 	Open(context.Context, string) (File, error)
 	// ReadDir returns a list of files in the given directory path.

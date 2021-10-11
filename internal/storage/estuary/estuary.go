@@ -11,14 +11,14 @@ import (
 	"net/http"
 	"os"
 
-	"github.com/ipfs/interface-go-ipfs-core/path"
-
 	"github.com/valist-io/valist/internal/storage"
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
 type Provider struct {
 	host  string
 	token string
+	ipfs  *ipfs.Provider
 	http  *http.Client
 }
 
@@ -28,28 +28,25 @@ type addFileResponse struct {
 	Providers []string `json:"providers"`
 }
 
-func NewProvider(host string, token string) *Provider {
+func NewProvider(host, token string, ipfs *ipfs.Provider) *Provider {
 	return &Provider{
 		host:  host,
 		token: token,
+		ipfs:  ipfs,
 		http:  &http.Client{},
 	}
 }
 
-func (prov *Provider) Prefix() string {
-	return "estuary"
-}
-
 func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, error) {
-	return nil, fmt.Errorf("estuary provider: read not supported")
+	return prov.ipfs.Open(ctx, fpath)
 }
 
 func (prov *Provider) ReadDir(ctx context.Context, fpath string) ([]fs.FileInfo, error) {
-	return nil, fmt.Errorf("estuary provider: read not supported")
+	return prov.ipfs.ReadDir(ctx, fpath)
 }
 
 func (prov *Provider) ReadFile(ctx context.Context, fpath string) ([]byte, error) {
-	return nil, fmt.Errorf("estuary provider: read not supported")
+	return prov.ipfs.ReadFile(ctx, fpath)
 }
 
 func (prov *Provider) WriteFile(ctx context.Context, fpath string) (string, error) {
@@ -106,5 +103,10 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 		return "", fmt.Errorf("failed to add to estuary: status=%s body=%s", res.Status, resBody)
 	}
 
-	return path.New(reply.Cid).String(), nil
+	p := fmt.Sprintf("/ipfs/%s", reply.Cid)
+	if err := prov.ipfs.Pin(ctx, p); err != nil {
+		return "", err
+	}
+
+	return p, nil
 }

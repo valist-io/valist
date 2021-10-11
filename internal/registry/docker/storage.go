@@ -2,13 +2,11 @@ package docker
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"io"
 	"os"
 	"path/filepath"
 
-	"github.com/valist-io/valist/internal/core/types"
 	"github.com/valist-io/valist/internal/storage"
 )
 
@@ -30,7 +28,7 @@ func (h *handler) writeBlob(uuid string, r io.Reader) error {
 	return nil
 }
 
-func (h *handler) findBlob(ctx context.Context, orgName, repoName, digest string) ([]string, error) {
+func (h *handler) findBlob(ctx context.Context, orgName, repoName, digest string) (string, error) {
 	if p, ok := h.blobs[digest]; ok {
 		return p, nil
 	}
@@ -38,25 +36,20 @@ func (h *handler) findBlob(ctx context.Context, orgName, repoName, digest string
 	raw := fmt.Sprintf("%s/%s/latest", orgName, repoName)
 	res, err := h.client.ResolvePath(ctx, raw)
 	if err != nil {
-		return nil, err
+		return "", err
 	}
 
-	data, err := h.client.Storage().ReadFile(ctx, res.Release.ReleaseCID)
+	meta, err := h.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
-		return nil, err
-	}
-
-	var meta types.ReleaseMeta
-	if err := json.Unmarshal(data, &meta); err != nil {
-		return nil, err
+		return "", err
 	}
 
 	artifact, ok := meta.Artifacts[digest]
 	if !ok {
-		return nil, fmt.Errorf("artifact not found")
+		return "", fmt.Errorf("artifact not found")
 	}
 
-	return artifact.Providers, nil
+	return artifact.Provider, nil
 }
 
 func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
@@ -65,7 +58,7 @@ func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string
 		return nil, err
 	}
 
-	return h.client.Storage().Open(ctx, p[0])
+	return h.client.Storage().Open(ctx, p)
 }
 
 func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
@@ -75,13 +68,8 @@ func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref strin
 		return nil, err
 	}
 
-	data, err := h.client.Storage().ReadFile(ctx, res.Release.ReleaseCID)
+	meta, err := h.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
-		return nil, err
-	}
-
-	var meta types.ReleaseMeta
-	if err := json.Unmarshal(data, &meta); err != nil {
 		return nil, err
 	}
 
@@ -90,5 +78,5 @@ func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref strin
 		return nil, fmt.Errorf("artifact not found")
 	}
 
-	return h.client.Storage().Open(ctx, artifact.Providers[0])
+	return h.client.Storage().Open(ctx, artifact.Provider)
 }

@@ -2,9 +2,12 @@ package estuary
 
 import (
 	"context"
+	"os"
 	"testing"
 
 	"github.com/stretchr/testify/require"
+
+	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
 const (
@@ -13,11 +16,16 @@ const (
 )
 
 func TestWrite(t *testing.T) {
-	provider := NewProvider(host, token)
+	tmp, err := os.MkdirTemp("", "")
+	require.NoError(t, err, "Failed to MkdirTemp")
 
 	ctx := context.Background()
 	data := []byte("hello")
 
-	_, err := provider.Write(ctx, data)
+	ipfs, err := ipfs.NewProvider(ctx, tmp)
+	require.NoError(t, err, "Failed to write file")
+
+	provider := NewProvider(host, token, ipfs)
+	_, err = provider.Write(ctx, data)
 	require.NoError(t, err, "Failed to write file")
 }

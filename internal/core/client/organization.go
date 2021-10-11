@@ -56,7 +56,7 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 		return nil, err
 	}
 
-	paths, err := client.storage.Write(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -64,7 +64,7 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
-	tx, err := client.transactor.CreateOrganizationTx(txopts, paths[0])
+	tx, err := client.transactor.CreateOrganizationTx(txopts, metaCID)
 	if err != nil {
 		return nil, err
 	}
@@ -83,7 +83,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 		return nil, err
 	}
 
-	paths, err := client.storage.Write(ctx, data)
+	metaCID, err := client.storage.Write(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -91,7 +91,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 	txopts := client.signer.NewTransactor()
 	txopts.Context = ctx
 
-	tx, err := client.transactor.SetOrganizationMetaTx(txopts, orgID, paths[0])
+	tx, err := client.transactor.SetOrganizationMetaTx(txopts, orgID, metaCID)
 	if err != nil {
 		return nil, err
 	}

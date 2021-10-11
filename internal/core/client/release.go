@@ -2,6 +2,7 @@ package client
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
@@ -45,6 +46,21 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 	}, nil
 }
 
+// GetReleaseMeta returns the release meta with the given CID.
+func (client *Client) GetReleaseMeta(ctx context.Context, p string) (*types.ReleaseMeta, error) {
+	releaseData, err := client.Storage().ReadFile(ctx, p)
+	if err != nil {
+		return nil, err
+	}
+
+	var meta types.ReleaseMeta
+	if err := json.Unmarshal(releaseData, &meta); err != nil {
+		return nil, err
+	}
+
+	return &meta, nil
+}
+
 // GetLatestRelease returns the latest release from the repository with the given name and orgID.
 func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, repoName string) (*types.Release, error) {
 	callopts := bind.CallOpts{
@@ -53,6 +69,10 @@ func (client *Client) GetLatestRelease(ctx context.Context, orgID common.Hash, r
 	}
 
 	tag, releaseCID, metaCID, signers, err := client.valist.GetLatestRelease(&callopts, orgID, repoName)
+	if err != nil && err.Error() == "execution reverted" {
+		return nil, types.ErrReleaseNotExist
+	}
+
 	if err != nil {
 		return nil, err
 	}

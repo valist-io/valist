@@ -64,13 +64,9 @@ func NewInstallCommand() *cli.Command {
 				return errors.New("Target platform not found in release")
 			}
 
-			if len(artifact.Providers) == 0 {
-				return errors.New("Missing storage providers")
-			}
-
 			fmt.Println("Installing for target platform: ", targetPlatform)
 
-			targetData, err := client.Storage().ReadFile(c.Context, artifact.Providers[0])
+			targetData, err := client.Storage().ReadFile(c.Context, artifact.Provider)
 			if err != nil {
 				return err
 			}

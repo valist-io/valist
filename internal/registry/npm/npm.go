@@ -3,9 +3,6 @@
 package npm
 
 import (
-	"bytes"
-	"context"
-	"encoding/base64"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -20,10 +17,7 @@ import (
 	"github.com/valist-io/valist/internal/core/types"
 )
 
-const (
-	DefaultGateway = "https://ipfs.io"
-	MetaFileName   = "doc.json"
-)
+const DefaultGateway = "https://ipfs.io"
 
 type handler struct {
 	client types.CoreAPI
@@ -44,84 +38,16 @@ func (h *handler) error(w http.ResponseWriter, msg string, status int) {
 	http.Error(w, msg, status)
 }
 
-func (h *handler) writeAttachments(ctx context.Context, release *types.ReleaseMeta, meta *Metadata) error {
-	for _, semver := range meta.DistTags {
-		version, ok := meta.Versions[semver]
-		if !ok {
-			return fmt.Errorf("version not found")
-		}
-
-		attachName := fmt.Sprintf("%s-%s.tgz", meta.Name, semver)
-		attach, ok := meta.Attachments[attachName]
-		if !ok {
-			return fmt.Errorf("attachment not found")
-		}
-
-		var tarData bytes.Buffer
-		buf := bytes.NewBufferString(attach.Data)
-		dec := base64.NewDecoder(base64.StdEncoding, buf)
-
-		if _, err := io.Copy(&tarData, dec); err != nil {
-			return err
-		}
-
-		tarPaths, err := h.client.Storage().Write(ctx, tarData.Bytes())
-		if err != nil {
-			return err
-		}
-
-		// TODO calculate checksum
-		version.Dist = Dist{
-			Tarball: fmt.Sprintf("%s/%s", DefaultGateway, tarPaths[0]),
-		}
-
-		release.Artifacts[attachName] = types.Artifact{
-			Providers: tarPaths,
-		}
-
-		meta.Versions[semver] = version
-	}
-
-	return nil
-}
-
 func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
 	vars := mux.Vars(req)
 
 	tag := vars["tag"]
-	orgName := vars["org"]
-	repoName := vars["repo"]
-
 	if tag == "" {
 		tag = "latest"
 	}
 
-	res, err := h.client.ResolvePath(ctx, fmt.Sprintf("%s/%s/%s", orgName, repoName, tag))
-	if err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	releaseData, err := h.client.Storage().ReadFile(ctx, res.Release.ReleaseCID)
-	if err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	var release types.ReleaseMeta
-	if err := json.Unmarshal(releaseData, &release); err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
-	artifact, ok := release.Artifacts[MetaFileName]
-	if !ok {
-		h.error(w, "artifact not found", http.StatusBadRequest)
-		return
-	}
-
-	file, err := h.client.Storage().Open(ctx, artifact.Providers[0])
+	file, err := h.loadPackage(ctx, vars["org"], vars["repo"], tag)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -133,12 +59,12 @@ func (h *handler) getPackage(w http.ResponseWriter, req *http.Request) {
 
 	if _, err := io.Copy(w, file); err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
-		return
 	}
 }
 
 func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 	ctx := req.Context()
+	vars := mux.Vars(req)
 
 	res, err := h.client.ResolvePath(ctx, req.URL.Path)
 	if err != nil {
@@ -158,19 +84,47 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	versions, err := h.latestVersions(ctx, vars["org"], vars["repo"])
+	if err != nil {
+		h.error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	releaseMeta := &types.ReleaseMeta{
 		Name:      fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, tag),
 		Artifacts: make(map[string]types.Artifact),
 	}
 
-	if err := h.writeAttachments(ctx, releaseMeta, &meta); err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
+	// add all new versions to the existing versions
+	// each new version will be a release artifact
+	for semver, version := range meta.Versions {
+		attachName := fmt.Sprintf("%s-%s.tgz", meta.Name, semver)
+		attach, ok := meta.Attachments[attachName]
+		if !ok {
+			h.error(w, "attachment not found", http.StatusBadRequest)
+			return
+		}
+
+		attachPath, err := h.writeAttachment(ctx, attach.Data)
+		if err != nil {
+			h.error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+
+		// TODO calculate checksum
+		version.Dist = Dist{
+			Tarball: fmt.Sprintf("%s/%s", DefaultGateway, attachPath),
+		}
+
+		releaseMeta.Artifacts[attachName] = types.Artifact{
+			Provider: attachPath,
+		}
+
+		versions[semver] = version
 	}
 
-	// TODO include attachments from previous latest release
-	// remove attachments before encoding
 	meta.Attachments = nil
+	meta.Versions = versions
 
 	packData, err := json.Marshal(&meta)
 	if err != nil {
@@ -178,7 +132,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	packPaths, err := h.client.Storage().Write(ctx, packData)
+	packPath, err := h.client.Storage().Write(ctx, packData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -186,7 +140,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 
 	// TODO calculate shasum
 	releaseMeta.Artifacts[MetaFileName] = types.Artifact{
-		Providers: packPaths,
+		Provider: packPath,
 	}
 
 	releaseData, err := json.Marshal(releaseMeta)
@@ -195,7 +149,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releasePaths, err := h.client.Storage().Write(ctx, releaseData)
+	releasePath, err := h.client.Storage().Write(ctx, releaseData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -203,7 +157,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 
 	release := &types.Release{
 		Tag:        tag,
-		ReleaseCID: releasePaths[0],
+		ReleaseCID: releasePath,
 		MetaCID:    types.DeprecationNotice,
 	}
 

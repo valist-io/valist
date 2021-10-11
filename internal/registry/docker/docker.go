@@ -19,14 +19,14 @@ import (
 
 type handler struct {
 	client  types.CoreAPI
-	blobs   map[string][]string
+	blobs   map[string]string
 	uploads map[string]int64
 }
 
 func NewHandler(client types.CoreAPI) http.Handler {
 	handler := &handler{
 		client:  client,
-		blobs:   make(map[string][]string),
+		blobs:   make(map[string]string),
 		uploads: make(map[string]int64),
 	}
 
@@ -143,14 +143,14 @@ func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	paths, err := h.client.Storage().WriteFile(ctx, path)
+	blob, err := h.client.Storage().WriteFile(ctx, path)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer os.RemoveAll(filepath.Dir(path))
 
-	h.blobs[digest] = paths
+	h.blobs[digest] = blob
 	delete(h.uploads, uuid)
 
 	w.Header().Set("Docker-Content-Digest", digest)
@@ -188,7 +188,7 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	manifestPaths, err := h.client.Storage().Write(ctx, data)
+	manifestPath, err := h.client.Storage().Write(ctx, data)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -200,8 +200,8 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 	}
 
 	releaseArtifact := types.Artifact{
-		SHA256:    shasum,
-		Providers: manifestPaths,
+		SHA256:   shasum,
+		Provider: manifestPath,
 	}
 
 	// add manifest to artifacts with ref and digest
@@ -210,15 +210,15 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	// add layers and config to release artifacts
 	for _, digest := range manifest.Digests() {
-		paths, err := h.findBlob(ctx, orgName, repoName, digest)
+		blob, err := h.findBlob(ctx, orgName, repoName, digest)
 		if err != nil {
 			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
 		releaseMeta.Artifacts[digest] = types.Artifact{
-			SHA256:    digest,
-			Providers: paths,
+			SHA256:   digest,
+			Provider: blob,
 		}
 
 		delete(h.blobs, digest)
@@ -230,7 +230,7 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	releasePaths, err := h.client.Storage().Write(ctx, releaseData)
+	releasePath, err := h.client.Storage().Write(ctx, releaseData)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -238,7 +238,7 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 
 	release := &types.Release{
 		Tag:        ref,
-		ReleaseCID: releasePaths[0],
+		ReleaseCID: releasePath,
 		MetaCID:    types.DeprecationNotice,
 	}
 

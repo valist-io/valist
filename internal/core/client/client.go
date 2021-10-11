@@ -43,7 +43,7 @@ type TransactorAPI interface {
 
 // Options is used to set client options.
 type Options struct {
-	Storage  *storage.Storage
+	Storage  storage.Provider
 	Database *badger.DB
 	Ethereum bind.DeployBackend
 
@@ -58,7 +58,7 @@ type Options struct {
 type Client struct {
 	db      *badger.DB
 	eth     bind.DeployBackend
-	storage *storage.Storage
+	storage storage.Provider
 
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
@@ -132,7 +132,7 @@ func NewClient(opts Options) (*Client, error) {
 	}, nil
 }
 
-func (client *Client) Storage() *storage.Storage {
+func (client *Client) Storage() storage.Provider {
 	return client.storage
 }
 

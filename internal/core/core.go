@@ -12,7 +12,6 @@ import (
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/signer"
-	"github.com/valist-io/valist/internal/storage"
 	"github.com/valist-io/valist/internal/storage/estuary"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
@@ -64,11 +63,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	// TODO move to config once URL is proxied
-	estuary := estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "")
-	storage, err := storage.NewStorage(estuary, ipfs)
-	if err != nil {
-		return nil, err
-	}
+	estuary := estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "", ipfs)
 
 	var transactor client.TransactorAPI
 	if cfg.Ethereum.MetaTx {
@@ -82,7 +77,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	return client.NewClient(client.Options{
-		Storage:    storage,
+		Storage:    estuary,
 		Database:   db,
 		Ethereum:   eth,
 		Valist:     valist,

@@ -38,8 +38,8 @@ func (s *CoreSuite) TestVoteRelease() {
 
 	release := &types.Release{
 		Tag:        "v0.0.1",
-		ReleaseCID: releaseCID[0],
-		MetaCID:    metaCID[0],
+		ReleaseCID: releaseCID,
+		MetaCID:    metaCID,
 	}
 
 	orgCreatedEvent, err := s.client.CreateOrganization(ctx, orgMeta)

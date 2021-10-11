@@ -15,7 +15,6 @@ import (
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
 	"github.com/valist-io/valist/internal/signer"
-	"github.com/valist-io/valist/internal/storage"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
@@ -95,11 +94,6 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 		return nil, err
 	}
 
-	storage, err := storage.NewStorage(ipfs)
-	if err != nil {
-		return nil, err
-	}
-
 	transactor, err := basetx.NewTransactor(backend, valistAddress, registryAddress)
 	if err != nil {
 		return nil, err
@@ -112,7 +106,7 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 
 	return client.NewClient(client.Options{
 		Database:   db,
-		Storage:    storage,
+		Storage:    ipfs,
 		Ethereum:   backend,
 		Valist:     valist,
 		Registry:   registry,

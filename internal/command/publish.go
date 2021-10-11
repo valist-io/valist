@@ -79,14 +79,14 @@ func NewPublishCommand() *cli.Command {
 					return err
 				}
 
-				paths, err := client.Storage().Write(c.Context, fileData)
+				path, err := client.Storage().Write(c.Context, fileData)
 				if err != nil {
 					return err
 				}
 
 				releaseMeta.Artifacts[platform] = types.Artifact{
-					SHA256:    fmt.Sprintf("%x", sha256.Sum256(fileData)),
-					Providers: paths,
+					SHA256:   fmt.Sprintf("%x", sha256.Sum256(fileData)),
+					Provider: path,
 				}
 			}
 
@@ -95,19 +95,19 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			releasePaths, err := client.Storage().Write(c.Context, releaseData)
+			releasePath, err := client.Storage().Write(c.Context, releaseData)
 			if err != nil {
 				return err
 			}
 
 			release := &types.Release{
 				Tag:        valistFile.Tag,
-				ReleaseCID: releasePaths[0],
+				ReleaseCID: releasePath,
 				MetaCID:    types.DeprecationNotice,
 			}
 
 			fmt.Println("Tag:", release.Tag)
-			fmt.Println("ReleasePaths:", releasePaths)
+			fmt.Println("ReleasePath:", releasePath)
 
 			if c.Bool("dryrun") {
 				return nil

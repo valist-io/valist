@@ -2,7 +2,6 @@ package git
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"os"
 
@@ -63,23 +62,18 @@ func (l *storageLoader) Load(ep *transport.Endpoint) (storer.Storer, error) {
 		return nil, err
 	}
 
-	releaseData, err := l.client.Storage().ReadFile(ctx, res.Release.ReleaseCID)
+	meta, err := l.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return nil, err
 	}
 
-	var release types.ReleaseMeta
-	if err := json.Unmarshal(releaseData, &release); err != nil {
-		return nil, err
-	}
-
-	artifact, ok := release.Artifacts[GitDirName]
+	artifact, ok := meta.Artifacts[GitDirName]
 	if !ok {
 		return nil, fmt.Errorf("artifact not found")
 	}
 
 	storage := l.client.Storage()
-	root := artifact.Providers[0]
+	root := artifact.Provider
 
 	fs := &storageFS{storage, root}
 	cache := cache.NewObjectLRUDefault()

@@ -54,10 +54,10 @@ type CoreAPI interface {
 	RepositoryAPI
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(context.Context, string) (*ResolvedPath, error)
-	// Signer returns the signer.
+	// Signer returns the transaction signer.
 	Signer() *signer.Signer
-	// Storage returns the storage interface.
-	Storage() *storage.Storage
+	// Storage returns the storage provider.
+	Storage() storage.Provider
 	// Database returns the local database.
 	Database() *badger.DB
 }
@@ -77,6 +77,7 @@ type RegistryAPI interface {
 
 type ReleaseAPI interface {
 	GetRelease(context.Context, common.Hash, string, string) (*Release, error)
+	GetReleaseMeta(context.Context, string) (*ReleaseMeta, error)
 	GetLatestRelease(context.Context, common.Hash, string) (*Release, error)
 	ListReleaseTags(common.Hash, string) ReleaseTagIterator
 	ListReleases(common.Hash, string) ReleaseIterator
@@ -129,8 +130,8 @@ type Release struct {
 }
 
 type Artifact struct {
-	SHA256    string   `json:"sha256"`
-	Providers []string `json:"providers"`
+	SHA256   string `json:"sha256"`
+	Provider string `json:"provider"`
 }
 
 type ReleaseMeta struct {
@@ -166,7 +167,4 @@ type ResolvedPath struct {
 
 	Release    *Release
 	ReleaseTag string
-
-	File     storage.File
-	FilePath string
 }

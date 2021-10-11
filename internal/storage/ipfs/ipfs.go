@@ -9,12 +9,6 @@ import (
 	"strings"
 
 	files "github.com/ipfs/go-ipfs-files"
-	httpapi "github.com/ipfs/go-ipfs-http-client"
-	"github.com/ipfs/go-ipfs/core"
-	"github.com/ipfs/go-ipfs/core/coreapi"
-	"github.com/ipfs/go-ipfs/core/node/libp2p"
-	"github.com/ipfs/go-ipfs/plugin/loader"
-	"github.com/ipfs/go-ipfs/repo/fsrepo"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/ipfs/interface-go-ipfs-core/options"
 	"github.com/ipfs/interface-go-ipfs-core/path"
@@ -26,46 +20,16 @@ var addopts = []options.UnixfsAddOption{
 	options.Unixfs.Pin(true),
 }
 
+var pinopts = []options.PinAddOption{
+	options.Pin.Recursive(true),
+}
+
 type Provider struct {
 	ipfs coreiface.CoreAPI
 }
 
 func NewProvider(ctx context.Context, repoPath string) (*Provider, error) {
-	local, err := httpapi.NewLocalApi()
-	if err == nil {
-		return &Provider{local}, nil
-	}
-
-	plugins, err := loader.NewPluginLoader("")
-	if err != nil {
-		return nil, err
-	}
-
-	if err := plugins.Initialize(); err != nil {
-		return nil, err
-	}
-
-	if err := plugins.Inject(); err != nil {
-		return nil, err
-	}
-
-	repo, err := fsrepo.Open(repoPath)
-	if err != nil {
-		return nil, err
-	}
-
-	cfg := &core.BuildCfg{
-		Online:  true,
-		Routing: libp2p.DHTOption,
-		Repo:    repo,
-	}
-
-	node, err := core.NewNode(ctx, cfg)
-	if err != nil {
-		return nil, err
-	}
-
-	ipfs, err := coreapi.NewCoreAPI(node)
+	ipfs, err := NewCoreAPI(ctx, repoPath)
 	if err != nil {
 		return nil, err
 	}
@@ -73,13 +37,13 @@ func NewProvider(ctx context.Context, repoPath string) (*Provider, error) {
 	return &Provider{ipfs}, nil
 }
 
-func (prov *Provider) Prefix() string {
-	return "ipfs"
+func (prov *Provider) Pin(ctx context.Context, fpath string) error {
+	return prov.ipfs.Pin().Add(ctx, path.New(fpath), pinopts...)
 }
 
 func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, error) {
 	node, err := prov.ipfs.Unixfs().Get(ctx, path.New(fpath))
-	if IsNotExist(err) {
+	if isNotExist(err) {
 		return nil, os.ErrNotExist
 	}
 
@@ -97,7 +61,7 @@ func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, err
 
 func (prov *Provider) ReadDir(ctx context.Context, fpath string) ([]fs.FileInfo, error) {
 	node, err := prov.ipfs.Unixfs().Get(ctx, path.New(fpath))
-	if IsNotExist(err) {
+	if isNotExist(err) {
 		return nil, os.ErrNotExist
 	}
 
@@ -160,8 +124,8 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 	return p.String(), nil
 }
 
-// IsNotExist returns true if the error is not exists.
-func IsNotExist(err error) bool {
+// isNotExist returns true if the error is not exists.
+func isNotExist(err error) bool {
 	if err == nil {
 		return false
 	}
