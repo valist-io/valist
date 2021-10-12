@@ -9,6 +9,7 @@ import (
 	"path/filepath"
 	"strings"
 
+	"github.com/pkg/errors"
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/build"
@@ -45,28 +46,59 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			orgID, err := client.GetOrganizationID(c.Context, valistFile.Org)
-			if err == types.ErrOrganizationNotExist {
+			releaseName := fmt.Sprintf("%s/%s/%s",
+				strings.ToLower(valistFile.Org),
+				strings.ToLower(valistFile.Repo),
+				strings.ToLower(valistFile.Tag),
+			)
+
+			res, err := client.ResolvePath(c.Context, releaseName)
+
+			switch err {
+			case nil:
+			case types.ErrOrganizationNotExist:
 				answer, err := prompt.Confirm("This organization does not exist, would you like to create it?").Run()
 				if err != nil {
 					return err
 				}
 
-				if strings.ToLower(answer) == "y" {
-					orgID, err = org.CreateOrg(client, c.Context, valistFile.Org)
+				if strings.ToLower(answer)[0:1] == "y" {
+					orgID, err := org.CreateOrg(client, c.Context, valistFile.Org)
 					if err != nil {
-						return nil
+						return err
 					}
+					res.OrgID = orgID
 				} else {
 					return nil
 				}
 
-				err = repo.CreateRepo(client, c.Context, orgID, valistFile.Repo)
+				fmt.Println("Creating repository...")
+
+				err = repo.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
 				if err != nil {
 					return err
 				}
-			} else if err != nil && err != types.ErrOrganizationNotExist {
+
+			case types.ErrRepositoryNotExist:
+				answer, err := prompt.Confirm("This repository does not exist, would you like to create it?").Run()
+				if err != nil {
+					return err
+				}
+
+				if strings.ToLower(answer)[0:1] == "y" {
+					err = repo.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+					if err != nil {
+						return err
+					}
+				}
+
+			case types.ErrReleaseNotExist:
+			default:
 				return err
+			}
+
+			if res.Release != nil {
+				return errors.Errorf("Release %s already exists", res.ReleaseTag)
 			}
 
 			_, err = build.Run(cwd, valistFile)
@@ -82,12 +114,6 @@ func NewPublishCommand() *cli.Command {
 			} else {
 				readme = string(readmeBytes)
 			}
-
-			releaseName := fmt.Sprintf("%s/%s/%s",
-				strings.ToLower(valistFile.Org),
-				strings.ToLower(valistFile.Repo),
-				strings.ToLower(valistFile.Tag),
-			)
 
 			releaseMeta := &types.ReleaseMeta{
 				Name:      releaseName,
@@ -135,7 +161,7 @@ func NewPublishCommand() *cli.Command {
 				return nil
 			}
 
-			vote, err := client.VoteRelease(c.Context, orgID, valistFile.Repo, release)
+			vote, err := client.VoteRelease(c.Context, res.OrgID, valistFile.Repo, release)
 			if err != nil {
 				return err
 			}

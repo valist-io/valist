@@ -18,6 +18,7 @@ require (
 	github.com/mattn/go-runewidth v0.0.10 // indirect
 	github.com/multiformats/go-multiaddr v0.3.3
 	github.com/otiai10/copy v1.6.0
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0

@@ -63,7 +63,7 @@ func AccountPassphrase() Prompt {
 
 func OrganizationName(value string) Prompt {
 	return Prompt{promptui.Prompt{
-		Label:    "Organization name or username",
+		Label:    "Organization full name",
 		Default:  value,
 		Validate: ValidateMinLength(1),
 	}}
@@ -86,7 +86,7 @@ func OrganizationHomepage(value string) Prompt {
 
 func RepositoryName(value string) Prompt {
 	return Prompt{promptui.Prompt{
-		Label:    "Repository name",
+		Label:    "Repository full name",
 		Default:  value,
 		Validate: ValidateMinLength(1),
 	}}
