@@ -5,10 +5,10 @@ import (
 	"errors"
 	"math/big"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
@@ -56,7 +56,7 @@ type CoreAPI interface {
 	// Storage returns the storage interface.
 	Storage() storage.Storage
 	// Database returns the local database.
-	Database() *badger.DB
+	Database() db.Database
 }
 
 type OrganizationAPI interface {
