@@ -1,7 +1,6 @@
 package command
 
 import (
-	"encoding/json"
 	"errors"
 	"fmt"
 	"os"
@@ -14,7 +13,6 @@ import (
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/core/types"
 )
 
 func NewInstallCommand() *cli.Command {
@@ -48,13 +46,8 @@ func NewInstallCommand() *cli.Command {
 				return errors.New("For NPM packages please run valist daemon and install using the NPM registry.")
 			}
 
-			releaseData, err := client.Storage().ReadFile(c.Context, res.Release.ReleaseCID)
+			releaseMeta, err := client.GetReleaseMeta(c.Context, res.Release.ReleaseCID)
 			if err != nil {
-				return err
-			}
-
-			var releaseMeta types.ReleaseMeta
-			if err := json.Unmarshal(releaseData, &releaseMeta); err != nil {
 				return err
 			}
 
