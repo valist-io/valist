@@ -13,9 +13,9 @@ import (
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/build"
+	"github.com/valist-io/valist/internal/command/organization"
+	"github.com/valist-io/valist/internal/command/repository"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
-	"github.com/valist-io/valist/internal/command/utils/org"
-	"github.com/valist-io/valist/internal/command/utils/repo"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
@@ -63,7 +63,7 @@ func NewPublishCommand() *cli.Command {
 				}
 
 				if strings.ToLower(answer)[0:1] == "y" {
-					orgID, err := org.CreateOrg(client, c.Context, valistFile.Org)
+					orgID, err := organization.CreateOrg(client, c.Context, valistFile.Org)
 					if err != nil {
 						return err
 					}
@@ -74,7 +74,7 @@ func NewPublishCommand() *cli.Command {
 
 				fmt.Println("Creating repository...")
 
-				err = repo.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+				err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
 				if err != nil {
 					return err
 				}
@@ -86,7 +86,7 @@ func NewPublishCommand() *cli.Command {
 				}
 
 				if strings.ToLower(answer)[0:1] == "y" {
-					err = repo.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+					err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
 					if err != nil {
 						return err
 					}
