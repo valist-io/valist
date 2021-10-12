@@ -61,9 +61,9 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"required,acceptable_characters,project_type"`
-	Org       string            `yaml:"org" validate:"required,acceptable_characters,lowercase"`
-	Repo      string            `yaml:"repo" validate:"required,acceptable_characters,lowercase"`
+	Type      string            `yaml:"type" validate:"required,project_type"`
+	Org       string            `yaml:"org" validate:"required,shortname,lowercase"`
+	Repo      string            `yaml:"repo" validate:"required,shortname,lowercase"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
 	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
 	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`
@@ -78,11 +78,17 @@ var validate *validator.Validate
 func (c Config) Validate() error {
 	if validate == nil {
 		validate = validator.New()
+		_ = validate.RegisterValidation("shortname", ValidateShortname)
 		_ = validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters)
 		_ = validate.RegisterValidation("project_type", ValidateProjectType)
 		_ = validate.RegisterValidation("platforms", ValidatePlatforms)
 	}
 	return validate.Struct(c)
+}
+
+func ValidateShortname(fl validator.FieldLevel) bool {
+	valid, _ := regexp.MatchString(types.RegexShortname, fl.Field().String())
+	return valid
 }
 
 func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {

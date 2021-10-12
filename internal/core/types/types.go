@@ -14,15 +14,19 @@ import (
 )
 
 const (
-	ProjectTypeBinary         = "binary"
-	ProjectTypeNode           = "node"
-	ProjectTypeNPM            = "npm"
-	ProjectTypeGo             = "go"
-	ProjectTypeRust           = "rust"
-	ProjectTypePython         = "python"
-	ProjectTypeDocker         = "docker"
-	ProjectTypeCPP            = "c++"
-	ProjectTypeStatic         = "static"
+	ProjectTypeBinary = "binary"
+	ProjectTypeNode   = "node"
+	ProjectTypeNPM    = "npm"
+	ProjectTypeGo     = "go"
+	ProjectTypeRust   = "rust"
+	ProjectTypePython = "python"
+	ProjectTypeDocker = "docker"
+	ProjectTypeCPP    = "c++"
+	ProjectTypeStatic = "static"
+)
+
+const (
+	RegexShortname            = "^[0-9A-z-_]+$"
 	RegexPath                 = "^[0-9A-z\\-_\\/\\.]+$"
 	RegexAcceptableCharacters = "^[0-9A-z-_\\\\/\\. ]*$"
 	RegexPlatformArchitecture = "^[0-9A-z\\-_]+\\/[0-9A-z\\-_]+$"
