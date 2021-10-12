@@ -128,6 +128,18 @@ type Release struct {
 	Signers    []common.Address
 }
 
+type Artifact struct {
+	SHA256    string   `json:"sha256"`
+	Providers []string `json:"providers"`
+}
+
+type ReleaseMeta struct {
+	Name      string              `json:"name"`
+	Readme    string              `json:"readme"`
+	License   string              `json:"license"`
+	Artifacts map[string]Artifact `json:"artifacts"`
+}
+
 type Repository struct {
 	Name          string
 	OrgID         common.Hash
@@ -147,6 +159,7 @@ type RepositoryMeta struct {
 type ResolvedPath struct {
 	Organization *Organization
 	OrgID        common.Hash
+	OrgName      string
 
 	Repository *Repository
 	RepoName   string
