@@ -1,10 +1,12 @@
 package build
 
 import (
+	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
 
+	"github.com/go-playground/validator/v10"
 	"github.com/valist-io/valist/internal/core/types"
 )
 
@@ -58,21 +60,74 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type"`
-	Org       string            `yaml:"org"`
-	Repo      string            `yaml:"repo"`
-	Tag       string            `yaml:"tag"`
-	Meta      string            `yaml:"meta,omitempty"`
-	Image     string            `yaml:"image,omitempty"`
-	Build     string            `yaml:"build,omitempty"`
-	Install   string            `yaml:"install,omitempty"`
-	Out       string            `yaml:"out,omitempty"`
-	Platforms map[string]string `yaml:"platforms,omitempty"`
+	Type      string            `yaml:"type" validate:"required,project_type"`
+	Org       string            `yaml:"org" validate:"required,lowercase,shortname"`
+	Repo      string            `yaml:"repo" validate:"required,lowercase,shortname"`
+	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
+	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
+	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`
+	Build     string            `yaml:"build,omitempty" validate:"acceptable_characters"`
+	Install   string            `yaml:"install,omitempty" validate:"acceptable_characters"`
+	Out       string            `yaml:"out,omitempty" validate:"required_with=Platforms,required_unless=Type npm,acceptable_characters"`
+	Platforms map[string]string `yaml:"platforms,omitempty" validate:"platforms"`
+}
+
+var validate *validator.Validate
+
+func init() {
+	validate = validator.New()
+	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
+	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
+	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
+	validate.RegisterValidation("platforms", ValidatePlatforms)                        //nolint:errcheck
+}
+
+func (c Config) Validate() error {
+	return validate.Struct(c)
+}
+
+func ValidateShortname(fl validator.FieldLevel) bool {
+	return types.RegexShortname.MatchString(fl.Field().String())
+}
+
+func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
+	return types.RegexAcceptableCharacters.MatchString(fl.Field().String())
+}
+
+func ValidateProjectType(fl validator.FieldLevel) bool {
+	for _, projectType := range types.ProjectTypes {
+		if projectType == fl.Field().String() {
+			return true
+		}
+	}
+	return false
+}
+
+func ValidatePlatforms(fl validator.FieldLevel) bool {
+	valid := true
+	for iter := fl.Field().MapRange(); iter.Next(); {
+		valid = types.RegexPlatformArchitecture.MatchString(iter.Key().String()) // linux/amd64
+		if !valid {
+			fmt.Println("Invalid os/arch in platforms")
+			break
+		}
+
+		valid = types.RegexPath.MatchString(iter.Value().String()) // bin/linux/amd64/valist
+		if !valid {
+			fmt.Println("Invalid path to artifact")
+			break
+		}
+	}
+	return valid
 }
 
 func (c Config) Save(path string) error {
 	yamlData, err := yaml.Marshal(c)
 	if err != nil {
+		return err
+	}
+
+	if err = c.Validate(); err != nil {
 		return err
 	}
 
@@ -85,5 +140,10 @@ func (c *Config) Load(path string) error {
 		return err
 	}
 
-	return yaml.Unmarshal(yamlFile, c)
+	err = yaml.Unmarshal(yamlFile, c)
+	if err != nil {
+		return err
+	}
+
+	return c.Validate()
 }

@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 	"math/big"
+	"regexp"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/common"
@@ -23,6 +24,13 @@ const (
 	ProjectTypeDocker = "docker"
 	ProjectTypeCPP    = "c++"
 	ProjectTypeStatic = "static"
+)
+
+var (
+	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
+	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
+	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
+	RegexPlatformArchitecture = regexp.MustCompile(`^[0-9A-z\-_]+\/[0-9A-z\-_]+$`)
 )
 
 var ProjectTypes = []string{
