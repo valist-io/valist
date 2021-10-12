@@ -61,8 +61,8 @@ var DefaultTemplates = map[string]string{
 // Config contains valist build settings.
 type Config struct {
 	Type      string            `yaml:"type" validate:"required,project_type"`
-	Org       string            `yaml:"org" validate:"required,shortname,lowercase"`
-	Repo      string            `yaml:"repo" validate:"required,shortname,lowercase"`
+	Org       string            `yaml:"org" validate:"required,lowercase,shortname"`
+	Repo      string            `yaml:"repo" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
 	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
 	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`

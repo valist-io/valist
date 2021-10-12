@@ -27,7 +27,7 @@ const (
 )
 
 var (
-	RegexShortname            = regexp.MustCompile(`^[0-9A-z-_]+$`)
+	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
 	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
 	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
 	RegexPlatformArchitecture = regexp.MustCompile(`^[0-9A-z\-_]+\/[0-9A-z\-_]+$`)
