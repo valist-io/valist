@@ -37,27 +37,29 @@ export default function Dashboard() {
 
   const fetchReadme = async () => {
     const release = repoReleases[0];
-    let markdown = '';
-    if (release && release.metaCID !== '') {
+    let metaJson;
+    if (release && release.releaseCID !== '') {
+      let requestURL = `https://gateway.valist.io/ipfs/${release.releaseCID.replace('/ipfs/', '')}`;
+      if (repo.meta.projectType === 'npm') {
+        requestURL = `https://gateway.valist.io/ipfs/${release.metaCID.replace('/ipfs/', '')}`;
+      }
       try {
-        const req = await fetch(`https://gateway.valist.io/ipfs/${release.metaCID.replace('/ipfs/', '')}`);
-        markdown = await req.text();
+        const req = await fetch(requestURL);
+        metaJson = await req.json();
+        setRepoReadme(metaJson.readme);
       } catch (e) {
         // noop
       }
     }
-    setRepoReadme(markdown);
   };
 
   const parseReadmeFromPackageJSON = () => {
-    if (repo.meta.projectType === 'npm') {
-      try {
-        const packageJSON = JSON.parse(repoReadme);
-        setRepoReadme(packageJSON.readme);
-        setReleaseMeta(packageJSON);
-      } catch (e) {
-        // noop
-      }
+    try {
+      const packageJSON = JSON.parse(repoReadme);
+      setRepoReadme(packageJSON.readme);
+      setReleaseMeta(packageJSON);
+    } catch (e) {
+      // noop
     }
   };
 
@@ -84,7 +86,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetchReadme();
-  }, [repoReleases]);
+  }, [repo, repoReleases]);
 
   useEffect(() => {
     parseReadmeFromPackageJSON();
