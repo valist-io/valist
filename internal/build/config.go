@@ -78,9 +78,9 @@ var validate *validator.Validate
 func (c Config) Validate() error {
 	if validate == nil {
 		validate = validator.New()
-		validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters)
-		validate.RegisterValidation("project_type", ValidateProjectType)
-		validate.RegisterValidation("platforms", ValidatePlatforms)
+		_ = validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters)
+		_ = validate.RegisterValidation("project_type", ValidateProjectType)
+		_ = validate.RegisterValidation("platforms", ValidatePlatforms)
 	}
 	return validate.Struct(c)
 }
@@ -102,17 +102,30 @@ func ValidateProjectType(fl validator.FieldLevel) bool {
 func ValidatePlatforms(fl validator.FieldLevel) bool {
 	iter := fl.Field().MapRange()
 	valid := true
+
+	regexKey, err := regexp.Compile(types.RegexPlatformArchitecture)
+	if err != nil {
+		fmt.Println("Could not compile regex")
+		valid = false
+	}
+
+	regexValue, err := regexp.Compile(types.RegexPath)
+	if err != nil {
+		fmt.Println("Could not compile regex")
+		valid = false
+	}
+
 	for iter.Next() {
 		key := iter.Key()
 		value := iter.Value()
 
-		valid, _ = regexp.MatchString(types.RegexPlatformArchitecture, key.String()) // linux/amd64
+		valid = regexKey.Match([]byte(key.String())) // linux/amd64
 		if !valid {
 			fmt.Println("Invalid os/arch in platforms")
 			break
 		}
 
-		valid, _ = regexp.MatchString(types.RegexPath, value.String()) // bin/linux/amd64/valist
+		valid = regexValue.Match([]byte(value.String())) // bin/linux/amd64/valist
 		if !valid {
 			fmt.Println("Invalid path to artifact")
 			break
@@ -140,7 +153,7 @@ func (c *Config) Load(path string) error {
 		return err
 	}
 
-	yaml.Unmarshal(yamlFile, c)
+	err = yaml.Unmarshal(yamlFile, c)
 	if err != nil {
 		return err
 	}
