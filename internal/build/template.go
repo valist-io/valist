@@ -18,9 +18,9 @@ func ConfigTemplate(projectType string, path string) error {
 	}
 
 	cfg := Config{
-		Org:     "test",
-		Repo:    "test",
-		Tag:     "test",
+		Org:     "acme-co",
+		Repo:    projectType + "-example",
+		Tag:     "1.0.0",
 		Type:    projectType,
 		Out:     "path_to_artifact_or_build_directory",
 		Install: DefaultInstalls[projectType],

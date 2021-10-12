@@ -61,16 +61,16 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"required,alphanum,lowercase"`
-	Org       string            `yaml:"org" validate:"required,alphanum,lowercase"`
-	Repo      string            `yaml:"repo" validate:"required,alphanum,lowercase"`
-	Tag       string            `yaml:"tag" validate:"required,printascii"`
-	Meta      string            `yaml:"meta,omitempty" validate:"url_encoded"`
-	Image     string            `yaml:"image,omitempty" validate:"url_encoded"`
-	Build     string            `yaml:"build,omitempty" validate:"printascii"`
-	Install   string            `yaml:"install,omitempty" validate:"printascii"`
-	Out       string            `yaml:"out,omitempty" validate:"required_unless=Type npm,url_encoded"`
-	Platforms map[string]string `yaml:"platforms,omitempty" validate:"required_with=Out,platforms"`
+	Type      string            `yaml:"type" validate:"required,acceptable_characters,project_type"`
+	Org       string            `yaml:"org" validate:"required,acceptable_characters,lowercase"`
+	Repo      string            `yaml:"repo" validate:"required,acceptable_characters,lowercase"`
+	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
+	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
+	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`
+	Build     string            `yaml:"build,omitempty" validate:"acceptable_characters"`
+	Install   string            `yaml:"install,omitempty" validate:"acceptable_characters"`
+	Out       string            `yaml:"out,omitempty" validate:"required_with=Platforms,required_unless=Type npm,acceptable_characters"`
+	Platforms map[string]string `yaml:"platforms,omitempty" validate:"platforms"`
 }
 
 var validate *validator.Validate
@@ -78,9 +78,25 @@ var validate *validator.Validate
 func (c Config) Validate() error {
 	if validate == nil {
 		validate = validator.New()
+		validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters)
+		validate.RegisterValidation("project_type", ValidateProjectType)
 		validate.RegisterValidation("platforms", ValidatePlatforms)
 	}
 	return validate.Struct(c)
+}
+
+func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
+	valid, _ := regexp.MatchString(types.RegexAcceptableCharacters, fl.Field().String())
+	return valid
+}
+
+func ValidateProjectType(fl validator.FieldLevel) bool {
+	for _, projectType := range types.ProjectTypes {
+		if projectType == fl.Field().String() {
+			return true
+		}
+	}
+	return false
 }
 
 func ValidatePlatforms(fl validator.FieldLevel) bool {
@@ -90,13 +106,13 @@ func ValidatePlatforms(fl validator.FieldLevel) bool {
 		key := iter.Key()
 		value := iter.Value()
 
-		valid, _ = regexp.MatchString("[0-z\\-]+\\/[0-z\\-]+", key.String()) // linux/amd64
+		valid, _ = regexp.MatchString(types.RegexPlatformArchitecture, key.String()) // linux/amd64
 		if !valid {
 			fmt.Println("Invalid os/arch in platforms")
 			break
 		}
 
-		valid, _ = regexp.MatchString("[0-z\\-\\/\\.]+", value.String()) // bin/linux/amd64/valist
+		valid, _ = regexp.MatchString(types.RegexPath, value.String()) // bin/linux/amd64/valist
 		if !valid {
 			fmt.Println("Invalid path to artifact")
 			break
