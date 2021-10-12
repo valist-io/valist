@@ -11,6 +11,7 @@ import (
 
 	"github.com/valist-io/valist/internal/build"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
+	"github.com/valist-io/valist/internal/command/utils/org"
 	"github.com/valist-io/valist/internal/command/utils/repo"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
@@ -50,37 +51,10 @@ func NewPublishCommand() *cli.Command {
 				}
 
 				if strings.ToLower(answer) == "y" {
-					name, err := prompt.OrganizationName("").Run()
+					orgID, err = org.CreateOrg(client, c.Context, valistFile.Org)
 					if err != nil {
-						return err
+						return nil
 					}
-
-					desc, err := prompt.OrganizationDescription("").Run()
-					if err != nil {
-						return err
-					}
-
-					orgMeta := types.OrganizationMeta{
-						Name:        name,
-						Description: desc,
-					}
-
-					fmt.Println("Creating organization...")
-
-					create, err := client.CreateOrganization(c.Context, &orgMeta)
-					if err != nil {
-						return err
-					}
-
-					fmt.Printf("Linking name '%v' to orgID '0x%x'...\n", valistFile.Org, create.OrgID)
-					orgID = create.OrgID
-					_, err = client.LinkOrganizationName(c.Context, orgID, valistFile.Org)
-					if err != nil {
-						return err
-					}
-
-					fmt.Printf("Successfully created %v!\n", valistFile.Org)
-					fmt.Printf("Your Valist ID: 0x%x\n", create.OrgID)
 				} else {
 					return nil
 				}
