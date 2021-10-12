@@ -105,14 +105,12 @@ func ValidatePlatforms(fl validator.FieldLevel) bool {
 
 	regexKey, err := regexp.Compile(types.RegexPlatformArchitecture)
 	if err != nil {
-		fmt.Println("Could not compile regex")
-		valid = false
+		panic("Could not compile regex")
 	}
 
 	regexValue, err := regexp.Compile(types.RegexPath)
 	if err != nil {
-		fmt.Println("Could not compile regex")
-		valid = false
+		panic("Could not compile regex")
 	}
 
 	for iter.Next() {
