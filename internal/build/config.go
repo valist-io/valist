@@ -3,7 +3,6 @@ package build
 import (
 	"fmt"
 	"os"
-	"regexp"
 
 	"gopkg.in/yaml.v3"
 
@@ -75,25 +74,24 @@ type Config struct {
 
 var validate *validator.Validate
 
+func init() {
+	validate = validator.New()
+	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
+	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
+	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
+	validate.RegisterValidation("platforms", ValidatePlatforms)                        //nolint:errcheck
+}
+
 func (c Config) Validate() error {
-	if validate == nil {
-		validate = validator.New()
-		_ = validate.RegisterValidation("shortname", ValidateShortname)
-		_ = validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters)
-		_ = validate.RegisterValidation("project_type", ValidateProjectType)
-		_ = validate.RegisterValidation("platforms", ValidatePlatforms)
-	}
 	return validate.Struct(c)
 }
 
 func ValidateShortname(fl validator.FieldLevel) bool {
-	valid, _ := regexp.MatchString(types.RegexShortname, fl.Field().String())
-	return valid
+	return types.RegexShortname.MatchString(fl.Field().String())
 }
 
 func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
-	valid, _ := regexp.MatchString(types.RegexAcceptableCharacters, fl.Field().String())
-	return valid
+	return types.RegexAcceptableCharacters.MatchString(fl.Field().String())
 }
 
 func ValidateProjectType(fl validator.FieldLevel) bool {
@@ -106,30 +104,15 @@ func ValidateProjectType(fl validator.FieldLevel) bool {
 }
 
 func ValidatePlatforms(fl validator.FieldLevel) bool {
-	iter := fl.Field().MapRange()
 	valid := true
-
-	regexKey, err := regexp.Compile(types.RegexPlatformArchitecture)
-	if err != nil {
-		panic("Could not compile regex")
-	}
-
-	regexValue, err := regexp.Compile(types.RegexPath)
-	if err != nil {
-		panic("Could not compile regex")
-	}
-
-	for iter.Next() {
-		key := iter.Key()
-		value := iter.Value()
-
-		valid = regexKey.Match([]byte(key.String())) // linux/amd64
+	for iter := fl.Field().MapRange(); iter.Next(); {
+		valid = types.RegexPlatformArchitecture.MatchString(iter.Key().String()) // linux/amd64
 		if !valid {
 			fmt.Println("Invalid os/arch in platforms")
 			break
 		}
 
-		valid = regexValue.Match([]byte(value.String())) // bin/linux/amd64/valist
+		valid = types.RegexPath.MatchString(iter.Value().String()) // bin/linux/amd64/valist
 		if !valid {
 			fmt.Println("Invalid path to artifact")
 			break
