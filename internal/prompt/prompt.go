@@ -195,3 +195,10 @@ func BuildArtifactPath() Prompt {
 		Label: "Artifact file path",
 	}}
 }
+
+func Confirm(text string) Prompt {
+	return Prompt{promptui.Prompt{
+		Label:     text,
+		IsConfirm: true,
+	}}
+}

@@ -5,14 +5,17 @@ import (
 	"math/big"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/urfave/cli/v2"
 
 	"github.com/valist-io/valist/internal/build"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
+	"github.com/valist-io/valist/internal/command/utils/repo"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewPublishCommand() *cli.Command {
@@ -40,7 +43,53 @@ func NewPublishCommand() *cli.Command {
 			}
 
 			orgID, err := client.GetOrganizationID(c.Context, valistFile.Org)
-			if err != nil {
+			if err == types.ErrOrganizationNotExist {
+				answer, err := prompt.Confirm("This organization does not exist, would you like to create it?").Run()
+				if err != nil {
+					return err
+				}
+
+				if strings.ToLower(answer) == "y" {
+					name, err := prompt.OrganizationName("").Run()
+					if err != nil {
+						return err
+					}
+
+					desc, err := prompt.OrganizationDescription("").Run()
+					if err != nil {
+						return err
+					}
+
+					orgMeta := types.OrganizationMeta{
+						Name:        name,
+						Description: desc,
+					}
+
+					fmt.Println("Creating organization...")
+
+					create, err := client.CreateOrganization(c.Context, &orgMeta)
+					if err != nil {
+						return err
+					}
+
+					fmt.Printf("Linking name '%v' to orgID '0x%x'...\n", valistFile.Org, create.OrgID)
+					orgID = create.OrgID
+					_, err = client.LinkOrganizationName(c.Context, orgID, valistFile.Org)
+					if err != nil {
+						return err
+					}
+
+					fmt.Printf("Successfully created %v!\n", valistFile.Org)
+					fmt.Printf("Your Valist ID: 0x%x\n", create.OrgID)
+				} else {
+					return nil
+				}
+
+				err = repo.CreateRepo(client, c.Context, orgID, valistFile.Repo)
+				if err != nil {
+					return err
+				}
+			} else if err != nil && err != types.ErrOrganizationNotExist {
 				return err
 			}
 
