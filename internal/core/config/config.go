@@ -12,6 +12,7 @@ import (
 
 const (
 	rootDir     = ".valist"
+	installDir  = "bin"
 	configFile  = "config"
 	keystoreDir = "keystore"
 	databaseDir = "database"
@@ -134,4 +135,9 @@ func (c *Config) KeyStore() *keystore.KeyStore {
 
 func (c *Config) Database() (*badger.DB, error) {
 	return badger.Open(badger.DefaultOptions(filepath.Join(c.rootPath, databaseDir)))
+}
+
+// InstallPath returns the path to install binaries.
+func (c *Config) InstallPath() string {
+	return filepath.Join(c.rootPath, installDir)
 }

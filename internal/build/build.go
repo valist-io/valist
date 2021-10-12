@@ -56,7 +56,6 @@ func Run(projectPath string, valistFile Config) ([]string, error) {
 		return nil, err
 	}
 
-	// @ TODO Construct image name from (orgName, repoName, tag)
 	// Create the build image using the dockerfile
 	if err := Create(buildImageName, dockerFilePath); err != nil {
 		return nil, err
