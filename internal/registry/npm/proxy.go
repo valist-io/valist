@@ -15,18 +15,20 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/storage"
 )
 
 const DefaultRegistry = "https://registry.npmjs.org"
 
 type proxy struct {
-	client types.CoreAPI
-	host   string
+	client   types.CoreAPI
+	database db.Database
+	host     string
 }
 
-func NewProxy(client types.CoreAPI, host string) http.Handler {
-	proxy := &proxy{client, host}
+func NewProxy(client types.CoreAPI, database db.Database, host string) http.Handler {
+	proxy := &proxy{client, database, host}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{name}", proxy.getMetadata).Methods(http.MethodGet)
@@ -38,7 +40,7 @@ func NewProxy(client types.CoreAPI, host string) http.Handler {
 }
 
 func (p *proxy) cacheMetadata(ctx context.Context, id string) (*Metadata, error) {
-	val, err := p.client.Database().Get(id)
+	val, err := p.database.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -57,7 +59,7 @@ func (p *proxy) cacheMetadata(ctx context.Context, id string) (*Metadata, error)
 }
 
 func (p *proxy) cacheTarball(ctx context.Context, id string) (storage.File, error) {
-	val, err := p.client.Database().Get(id)
+	val, err := p.database.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -86,7 +88,7 @@ func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
 		return nil, err
 	}
 
-	if err := p.client.Database().Set(id, body); err != nil {
+	if err := p.database.Set(id, body); err != nil {
 		return nil, err
 	}
 
@@ -133,7 +135,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	if err := p.client.Database().Set(id, []byte(tarPath)); err != nil {
+	if err := p.database.Set(id, []byte(tarPath)); err != nil {
 		return nil, err
 	}
 

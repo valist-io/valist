@@ -9,7 +9,6 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
-	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
@@ -66,8 +65,6 @@ type CoreAPI interface {
 	Signer() *signer.Signer
 	// Storage returns the storage provider.
 	Storage() storage.Provider
-	// Database returns the local database.
-	Database() db.Database
 }
 
 type OrganizationAPI interface {

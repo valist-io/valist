@@ -13,7 +13,6 @@ import (
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
-	"github.com/valist-io/valist/internal/db/memory"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
@@ -99,7 +98,6 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 	}
 
 	return client.NewClient(client.Options{
-		Database:   memory.NewDatabase(),
 		Storage:    ipfs,
 		Ethereum:   backend,
 		Valist:     valist,

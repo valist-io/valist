@@ -12,7 +12,6 @@ import (
 	"github.com/valist-io/gasless"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
-	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
@@ -43,7 +42,6 @@ type TransactorAPI interface {
 // Options is used to set client options.
 type Options struct {
 	Storage  storage.Provider
-	Database db.Database
 	Ethereum bind.DeployBackend
 
 	Valist   *valist.Valist
@@ -55,9 +53,8 @@ type Options struct {
 
 // Client is a Valist SDK client.
 type Client struct {
-	eth      bind.DeployBackend
-	storage  storage.Provider
-	database db.Database
+	eth     bind.DeployBackend
+	storage storage.Provider
 
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
@@ -94,14 +91,9 @@ func NewClient(opts Options) (*Client, error) {
 		return nil, fmt.Errorf("signer is required")
 	}
 
-	if opts.Database == nil {
-		return nil, fmt.Errorf("database is required")
-	}
-
 	return &Client{
 		eth:        opts.Ethereum,
 		storage:    opts.Storage,
-		database:   opts.Database,
 		valist:     opts.Valist,
 		registry:   opts.Registry,
 		signer:     opts.Signer,
@@ -118,10 +110,6 @@ func (client *Client) Signer() *signer.Signer {
 	return client.signer
 }
 
-func (client *Client) Database() db.Database {
-	return client.database
-}
-
 func (client *Client) Close() error {
-	return client.database.Close()
+	return nil
 }

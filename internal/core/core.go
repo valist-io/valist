@@ -11,7 +11,6 @@ import (
 	"github.com/valist-io/valist/internal/core/client/basetx"
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/db/badger"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/estuary"
 	"github.com/valist-io/valist/internal/storage/ipfs"
@@ -27,11 +26,6 @@ const (
 func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
-
-	database, err := badger.NewDatabase(cfg.DatabasePath())
-	if err != nil {
-		return nil, err
-	}
 
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
@@ -79,7 +73,6 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 
 	return client.NewClient(client.Options{
 		Storage:    estuary,
-		Database:   database,
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,
