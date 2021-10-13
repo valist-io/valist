@@ -3,9 +3,7 @@ package mock
 import (
 	"fmt"
 	"math/big"
-	"os"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/core"
@@ -15,6 +13,7 @@ import (
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/db/memory"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
@@ -105,18 +104,8 @@ func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
 		return nil, err
 	}
 
-	tmp, err := os.MkdirTemp("", "")
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := badger.Open(badger.DefaultOptions(tmp))
-	if err != nil {
-		return nil, err
-	}
-
 	return client.NewClient(client.Options{
-		Database:   db,
+		Database:   memory.NewDatabase(),
 		Storage:    ipfs.NewStorage(ipfsapi),
 		Ethereum:   backend,
 		Valist:     valist,
