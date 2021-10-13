@@ -73,6 +73,15 @@ func NewSigner(chainID *big.Int, backends ...accounts.Backend) (*Signer, error) 
 	return signer, nil
 }
 
+// List returns a list of all signer accounts.
+func (s *Signer) List() []accounts.Account {
+	var list []accounts.Account
+	for _, wallet := range s.manager.Wallets() {
+		list = append(list, wallet.Accounts()...)
+	}
+	return list
+}
+
 // Account returns the default signer account.
 func (s *Signer) Account() accounts.Account {
 	return s.account

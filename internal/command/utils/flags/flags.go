@@ -24,10 +24,3 @@ func AccountPrivateKey() *cli.StringFlag {
 		Usage: "Hex-encoded ECDSA private key",
 	}
 }
-
-func Mock() *cli.BoolFlag {
-	return &cli.BoolFlag{
-		Name:  "mock",
-		Usage: "Run a mock relay node",
-	}
-}

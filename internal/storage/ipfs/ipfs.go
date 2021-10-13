@@ -20,26 +20,30 @@ var addopts = []options.UnixfsAddOption{
 	options.Unixfs.Pin(true),
 }
 
-type Storage struct {
+var pinopts = []options.PinAddOption{
+	options.Pin.Recursive(true),
+}
+
+type Provider struct {
 	ipfs coreiface.CoreAPI
 }
 
-func NewStorage(ipfs coreiface.CoreAPI) *Storage {
-	return &Storage{ipfs}
-}
-
-func (s *Storage) Mkdir(ctx context.Context) (storage.Directory, error) {
-	node, err := s.ipfs.Object().New(ctx, options.Object.Type("unixfs-dir"))
+func NewProvider(ctx context.Context, repoPath string) (*Provider, error) {
+	ipfs, err := NewCoreAPI(ctx, repoPath)
 	if err != nil {
 		return nil, err
 	}
 
-	return &dir{s.ipfs, path.IpfsPath(node.Cid())}, nil
+	return &Provider{ipfs}, nil
 }
 
-func (s *Storage) Open(ctx context.Context, p string) (storage.File, error) {
-	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
-	if IsNotExist(err) {
+func (prov *Provider) Pin(ctx context.Context, fpath string) error {
+	return prov.ipfs.Pin().Add(ctx, path.New(fpath), pinopts...)
+}
+
+func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, error) {
+	node, err := prov.ipfs.Unixfs().Get(ctx, path.New(fpath))
+	if isNotExist(err) {
 		return nil, os.ErrNotExist
 	}
 
@@ -49,15 +53,15 @@ func (s *Storage) Open(ctx context.Context, p string) (storage.File, error) {
 
 	f, ok := node.(files.File)
 	if !ok {
-		return nil, fmt.Errorf("cannot open directory: %s", p)
+		return nil, fmt.Errorf("cannot open directory: %s", fpath)
 	}
 
 	return &file{"", f}, nil
 }
 
-func (s *Storage) ReadDir(ctx context.Context, p string) ([]fs.FileInfo, error) {
-	node, err := s.ipfs.Unixfs().Get(ctx, path.New(p))
-	if IsNotExist(err) {
+func (prov *Provider) ReadDir(ctx context.Context, fpath string) ([]fs.FileInfo, error) {
+	node, err := prov.ipfs.Unixfs().Get(ctx, path.New(fpath))
+	if isNotExist(err) {
 		return nil, os.ErrNotExist
 	}
 
@@ -83,8 +87,8 @@ func (s *Storage) ReadDir(ctx context.Context, p string) ([]fs.FileInfo, error) 
 	return entries, nil
 }
 
-func (s *Storage) ReadFile(ctx context.Context, p string) ([]byte, error) {
-	file, err := s.Open(ctx, p)
+func (prov *Provider) ReadFile(ctx context.Context, fpath string) ([]byte, error) {
+	file, err := prov.Open(ctx, fpath)
 	if err != nil {
 		return nil, err
 	}
@@ -92,8 +96,18 @@ func (s *Storage) ReadFile(ctx context.Context, p string) ([]byte, error) {
 	return io.ReadAll(file)
 }
 
-func (s *Storage) Write(ctx context.Context, b []byte) (string, error) {
-	p, err := s.ipfs.Unixfs().Add(ctx, files.NewBytesFile(b), addopts...)
+func (prov *Provider) WriteFile(ctx context.Context, fpath string) (string, error) {
+	info, err := os.Stat(fpath)
+	if err != nil {
+		return "", err
+	}
+
+	node, err := files.NewSerialFile(fpath, false, info)
+	if err != nil {
+		return "", err
+	}
+
+	p, err := prov.ipfs.Unixfs().Add(ctx, node, addopts...)
 	if err != nil {
 		return "", err
 	}
@@ -101,18 +115,8 @@ func (s *Storage) Write(ctx context.Context, b []byte) (string, error) {
 	return p.String(), nil
 }
 
-func (s *Storage) WriteFile(ctx context.Context, f string) (string, error) {
-	info, err := os.Stat(f)
-	if err != nil {
-		return "", err
-	}
-
-	node, err := files.NewSerialFile(f, false, info)
-	if err != nil {
-		return "", err
-	}
-
-	p, err := s.ipfs.Unixfs().Add(ctx, node, addopts...)
+func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
+	p, err := prov.ipfs.Unixfs().Add(ctx, files.NewBytesFile(data), addopts...)
 	if err != nil {
 		return "", err
 	}
@@ -120,8 +124,8 @@ func (s *Storage) WriteFile(ctx context.Context, f string) (string, error) {
 	return p.String(), nil
 }
 
-// IsNotExist returns true if the error is not exists.
-func IsNotExist(err error) bool {
+// isNotExist returns true if the error is not exists.
+func isNotExist(err error) bool {
 	if err == nil {
 		return false
 	}

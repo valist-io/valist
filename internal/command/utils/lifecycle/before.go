@@ -10,8 +10,6 @@ import (
 
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/core/mock"
-	"github.com/valist-io/valist/internal/core/types"
 )
 
 func SetupClient(c *cli.Context) error {
@@ -29,13 +27,7 @@ func SetupClient(c *cli.Context) error {
 		return err
 	}
 
-	var client types.CoreAPI
-	if c.Bool("mock") {
-		client, err = mock.NewClient(cfg.KeyStore())
-	} else {
-		client, err = core.NewClient(c.Context, cfg)
-	}
-
+	client, err := core.NewClient(c.Context, cfg)
 	if err != nil {
 		return err
 	}

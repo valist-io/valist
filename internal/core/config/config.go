@@ -15,6 +15,7 @@ const (
 	installDir  = "bin"
 	configFile  = "config"
 	keystoreDir = "keystore"
+	storageDir  = "storage"
 	databaseDir = "database"
 	scryptN     = keystore.StandardScryptN
 	scryptP     = keystore.StandardScryptP
@@ -29,13 +30,6 @@ type Ethereum struct {
 	MetaTx bool `json:"meta_tx"`
 	// RPC is the ethereum rpc address.
 	RPC string `json:"rpc"`
-}
-
-type IPFS struct {
-	// API is the IPFS api address.
-	API string `json:"api"`
-	// Peers is a mapping of peer addresses to connect to.
-	Peers []string `json:"peers"`
 }
 
 type Accounts struct {
@@ -56,7 +50,6 @@ type Config struct {
 	rootPath string
 	Accounts Accounts `json:"accounts"`
 	Ethereum Ethereum `json:"ethereum"`
-	IPFS     IPFS     `json:"ipfs"`
 	HTTP     HTTP     `json:"http"`
 }
 
@@ -73,12 +66,6 @@ func NewConfig(rootPath string) *Config {
 			},
 			MetaTx: true,
 			RPC:    "https://rpc.valist.io",
-		},
-		IPFS{
-			API: "https://pin.valist.io",
-			Peers: []string{
-				"/dnsaddr/gateway.valist.io/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
-			},
 		},
 		HTTP{
 			ApiAddr: "localhost:9000",
@@ -135,6 +122,10 @@ func (c *Config) KeyStore() *keystore.KeyStore {
 
 func (c *Config) Database() (*badger.DB, error) {
 	return badger.Open(badger.DefaultOptions(filepath.Join(c.rootPath, databaseDir)))
+}
+
+func (c *Config) StoragePath() string {
+	return filepath.Join(c.rootPath, storageDir)
 }
 
 // InstallPath returns the path to install binaries.

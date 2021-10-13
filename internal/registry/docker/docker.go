@@ -143,14 +143,14 @@ func (h *handler) putBlob(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	p, err := h.client.Storage().WriteFile(ctx, path)
+	blob, err := h.client.Storage().WriteFile(ctx, path)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
 	defer os.RemoveAll(filepath.Dir(path))
 
-	h.blobs[digest] = p
+	h.blobs[digest] = blob
 	delete(h.uploads, uuid)
 
 	w.Header().Set("Docker-Content-Digest", digest)
@@ -179,7 +179,8 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 	}
 
 	// TODO use tee reader
-	digest := fmt.Sprintf("sha256:%x", sha256.Sum256(data))
+	shasum := fmt.Sprintf("%x", sha256.Sum256(data))
+	digest := fmt.Sprintf("sha256:%s", shasum)
 
 	var manifest Manifest
 	if err := json.Unmarshal(data, &manifest); err != nil {
@@ -187,44 +188,58 @@ func (h *handler) putManifest(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	manifestCID, err := h.client.Storage().Write(ctx, data)
+	manifestPath, err := h.client.Storage().Write(ctx, data)
 	if err != nil {
 		h.error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	dir, err := h.client.Storage().Mkdir(ctx)
-	if err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
+	releaseMeta := &types.ReleaseMeta{
+		Name:      fmt.Sprintf("%s/%s/%s", orgName, repoName, ref),
+		Artifacts: make(map[string]types.Artifact),
 	}
 
-	// add manifest to release directory
-	if err := dir.Add(ctx, digest, manifestCID); err != nil {
-		h.error(w, err.Error(), http.StatusBadRequest)
-		return
+	releaseArtifact := types.Artifact{
+		SHA256:   shasum,
+		Provider: manifestPath,
 	}
 
-	// add layers and config to release directory
+	// add manifest to artifacts with ref and digest
+	releaseMeta.Artifacts[ref] = releaseArtifact
+	releaseMeta.Artifacts[digest] = releaseArtifact
+
+	// add layers and config to release artifacts
 	for _, digest := range manifest.Digests() {
-		p, err := h.findBlob(ctx, orgName, repoName, digest)
+		blob, err := h.findBlob(ctx, orgName, repoName, digest)
 		if err != nil {
 			h.error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
 
-		if err := dir.Add(ctx, digest, p); err != nil {
-			h.error(w, err.Error(), http.StatusBadRequest)
-			return
+		releaseMeta.Artifacts[digest] = types.Artifact{
+			SHA256:   digest,
+			Provider: blob,
 		}
 
 		delete(h.blobs, digest)
 	}
 
+	releaseData, err := json.Marshal(releaseMeta)
+	if err != nil {
+		h.error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
+	releasePath, err := h.client.Storage().Write(ctx, releaseData)
+	if err != nil {
+		h.error(w, err.Error(), http.StatusBadRequest)
+		return
+	}
+
 	release := &types.Release{
 		Tag:        ref,
-		ReleaseCID: dir.Path(),
-		MetaCID:    manifestCID,
+		ReleaseCID: releasePath,
+		MetaCID:    types.DeprecationNotice,
 	}
 
 	vote, err := h.client.VoteRelease(ctx, res.Organization.ID, res.Repository.Name, release)

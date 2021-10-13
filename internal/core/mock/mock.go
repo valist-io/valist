@@ -1,16 +1,15 @@
 package mock
 
 import (
-	"fmt"
+	"context"
 	"math/big"
 	"os"
+	"path/filepath"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/core"
-	"github.com/ipfs/go-ipfs/core/coreapi"
-	coremock "github.com/ipfs/go-ipfs/core/mock"
 
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
@@ -23,6 +22,7 @@ const (
 	veryLightScryptN = 2
 	veryLightScryptP = 1
 	passphrase       = "secret"
+	numAccounts      = 5
 )
 
 var (
@@ -31,8 +31,18 @@ var (
 	balance  = big.NewInt(9223372036854775807)
 )
 
-func NewKeyStore(ksLocation string, numAccounts int) (*keystore.KeyStore, error) {
-	kstore := keystore.NewKeyStore(ksLocation, veryLightScryptN, veryLightScryptP)
+func NewClient(ctx context.Context) (*client.Client, error) {
+	tmp, err := os.MkdirTemp("", "")
+	if err != nil {
+		return nil, err
+	}
+
+	keystoreDir := filepath.Join(tmp, "keystore")
+	storageDir := filepath.Join(tmp, "storage")
+	databaseDir := filepath.Join(tmp, "database")
+
+	kstore := keystore.NewKeyStore(keystoreDir, veryLightScryptN, veryLightScryptP)
+	galloc := make(core.GenesisAlloc)
 
 	for i := 0; i < numAccounts; i++ {
 		account, err := kstore.NewAccount(passphrase)
@@ -43,20 +53,8 @@ func NewKeyStore(ksLocation string, numAccounts int) (*keystore.KeyStore, error)
 		if err := kstore.Unlock(account, passphrase); err != nil {
 			return nil, err
 		}
-	}
 
-	return kstore, nil
-}
-
-func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
-	accounts := kstore.Accounts()
-	if len(accounts) == 0 {
-		return nil, fmt.Errorf("cannot create mock client with empty keystore")
-	}
-
-	alloc := make(core.GenesisAlloc)
-	for _, account := range accounts {
-		alloc[account.Address] = core.GenesisAccount{
+		galloc[account.Address] = core.GenesisAccount{
 			Balance: balance,
 		}
 	}
@@ -67,12 +65,13 @@ func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
 	}
 
 	// always default to first account
-	signer.SetAccount(accounts[0])
+	account := kstore.Accounts()[0]
+	signer.SetAccount(account)
 
 	txopts := signer.NewTransactor()
-	backend := backends.NewSimulatedBackend(alloc, gasLimit)
+	backend := backends.NewSimulatedBackend(galloc, gasLimit)
 
-	forwarderAddress, _, _, err := contract.DeployForwarder(&txopts.TransactOpts, backend, accounts[0].Address)
+	forwarderAddress, _, _, err := contract.DeployForwarder(&txopts.TransactOpts, backend, account.Address)
 	if err != nil {
 		return nil, err
 	}
@@ -90,12 +89,7 @@ func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
 	// ensure contracts are deployed
 	backend.Commit()
 
-	node, err := coremock.NewMockNode()
-	if err != nil {
-		return nil, err
-	}
-
-	ipfsapi, err := coreapi.NewCoreAPI(node)
+	ipfs, err := ipfs.NewProvider(ctx, storageDir)
 	if err != nil {
 		return nil, err
 	}
@@ -105,19 +99,14 @@ func NewClient(kstore *keystore.KeyStore) (*client.Client, error) {
 		return nil, err
 	}
 
-	tmp, err := os.MkdirTemp("", "")
-	if err != nil {
-		return nil, err
-	}
-
-	db, err := badger.Open(badger.DefaultOptions(tmp))
+	db, err := badger.Open(badger.DefaultOptions(databaseDir))
 	if err != nil {
 		return nil, err
 	}
 
 	return client.NewClient(client.Options{
 		Database:   db,
-		Storage:    ipfs.NewStorage(ipfsapi),
+		Storage:    ipfs,
 		Ethereum:   backend,
 		Valist:     valist,
 		Registry:   registry,

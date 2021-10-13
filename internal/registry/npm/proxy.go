@@ -159,7 +159,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, fmt.Errorf("failed to get npm package: status=%d body=%s", res.StatusCode, body)
 	}
 
-	tar, err := p.client.Storage().Write(ctx, body)
+	tarPath, err := p.client.Storage().Write(ctx, body)
 	if err != nil {
 		return nil, err
 	}
@@ -167,7 +167,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 	txn := p.client.Database().NewTransaction(true)
 	defer txn.Discard()
 
-	if err := txn.Set([]byte(id), []byte(tar)); err != nil {
+	if err := txn.Set([]byte(id), []byte(tarPath)); err != nil {
 		return nil, err
 	}
 
@@ -175,7 +175,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	return p.client.Storage().Open(ctx, tar)
+	return p.client.Storage().Open(ctx, tarPath)
 }
 
 func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
