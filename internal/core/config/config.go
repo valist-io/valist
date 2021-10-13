@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
@@ -120,8 +119,9 @@ func (c *Config) KeyStore() *keystore.KeyStore {
 	return keystore.NewKeyStore(filepath.Join(c.rootPath, keystoreDir), scryptN, scryptP)
 }
 
-func (c *Config) Database() (*badger.DB, error) {
-	return badger.Open(badger.DefaultOptions(filepath.Join(c.rootPath, databaseDir)))
+// DatabasePath returns the database directory path.
+func (c *Config) DatabasePath() string {
+	return filepath.Join(c.rootPath, databaseDir)
 }
 
 func (c *Config) StoragePath() string {

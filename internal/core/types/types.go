@@ -4,11 +4,12 @@ import (
 	"context"
 	"errors"
 	"math/big"
+	"regexp"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
+	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage"
 )
@@ -26,6 +27,13 @@ const (
 	ProjectTypeDocker = "docker"
 	ProjectTypeCPP    = "c++"
 	ProjectTypeStatic = "static"
+)
+
+var (
+	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
+	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
+	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
+	RegexPlatformArchitecture = regexp.MustCompile(`^[0-9A-z\-_]+\/[0-9A-z\-_]+$`)
 )
 
 var ProjectTypes = []string{
@@ -59,7 +67,7 @@ type CoreAPI interface {
 	// Storage returns the storage provider.
 	Storage() storage.Provider
 	// Database returns the local database.
-	Database() *badger.DB
+	Database() db.Database
 }
 
 type OrganizationAPI interface {

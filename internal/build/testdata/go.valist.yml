@@ -2,13 +2,13 @@
 type: go
 
 # The valist organization
-org: 
+org: acme-co
 
 # The valist repository
-repo: 
+repo: go-example
 
 # The latest release tag
-tag: 
+tag: 1.0.0
 
 # The command used for building the project
 build: go build

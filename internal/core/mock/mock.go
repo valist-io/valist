@@ -6,7 +6,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind/backends"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/core"
@@ -14,6 +13,7 @@ import (
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
+	"github.com/valist-io/valist/internal/db/memory"
 	"github.com/valist-io/valist/internal/signer"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
@@ -39,7 +39,6 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 
 	keystoreDir := filepath.Join(tmp, "keystore")
 	storageDir := filepath.Join(tmp, "storage")
-	databaseDir := filepath.Join(tmp, "database")
 
 	kstore := keystore.NewKeyStore(keystoreDir, veryLightScryptN, veryLightScryptP)
 	galloc := make(core.GenesisAlloc)
@@ -99,13 +98,8 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 		return nil, err
 	}
 
-	db, err := badger.Open(badger.DefaultOptions(databaseDir))
-	if err != nil {
-		return nil, err
-	}
-
 	return client.NewClient(client.Options{
-		Database:   db,
+		Database:   memory.NewDatabase(),
 		Storage:    ipfs,
 		Ethereum:   backend,
 		Valist:     valist,
