@@ -49,9 +49,9 @@ export default function ProjectProfileCard(props: ProjectProfileCardProps): JSX.
           </div>
           <div onClick={() => { props.setRepoView('members'); }}
             className="text-gray-600 text-center py-4 px-6 block hover:text-blue-500 focus:outline-none">
-            Members
+            Maintainers
           </div>
-          {(repoMeta.projectType === 'npm')
+          {(repoMeta.projectType === 'npm' || repoMeta.projectType === 'go')
             && <div onClick={() => { props.setRepoView('dependencies'); }}
                 className="text-gray-600 text-center py-4 px-6 block hover:text-blue-500 focus:outline-none">
                 Dependencies

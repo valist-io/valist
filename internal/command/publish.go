@@ -10,6 +10,7 @@ import (
 	"strings"
 
 	"github.com/urfave/cli/v2"
+	"golang.org/x/mod/modfile"
 
 	"github.com/valist-io/valist/internal/build"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
@@ -31,6 +32,7 @@ func NewPublishCommand() *cli.Command {
 		Before: lifecycle.SetupClient,
 		Action: func(c *cli.Context) error {
 			client := c.Context.Value(core.ClientKey).(*client.Client)
+			var dependencies []string
 
 			cwd, err := os.Getwd()
 			if err != nil {
@@ -47,9 +49,29 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			_, err = build.Run(cwd, valistFile)
-			if err != nil {
-				return err
+			if valistFile.Type == "npm" {
+				fmt.Println("Please publish npm packages using the `npm publish --registry=` command.")
+			} else {
+				_, err = build.Run(cwd, valistFile)
+				if err != nil {
+					return err
+				}
+			}
+
+			if valistFile.Type == "go" {
+				goModData, err := os.ReadFile(filepath.Join(cwd, "go.mod"))
+				if err != nil {
+					return err
+				}
+
+				modFile, err := modfile.Parse("go.mod", goModData, nil)
+				if err != nil {
+					return err
+				}
+
+				for _, url := range modFile.Require {
+					dependencies = append(dependencies, url.Mod.String())
+				}
 			}
 
 			var readme string
@@ -68,9 +90,10 @@ func NewPublishCommand() *cli.Command {
 			)
 
 			releaseMeta := &types.ReleaseMeta{
-				Name:      releaseName,
-				Readme:    readme,
-				Artifacts: make(map[string]types.Artifact),
+				Name:         releaseName,
+				Readme:       readme,
+				Dependencies: dependencies,
+				Artifacts:    make(map[string]types.Artifact),
 			}
 
 			for platform, artifact := range valistFile.Platforms {

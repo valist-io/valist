@@ -8,38 +8,31 @@ interface RepoDependenciesProps {
 }
 
 export default function RepoDependencies(props: RepoDependenciesProps): JSX.Element {
-  const { repoMeta, releaseMeta } = props;
-  let currentVersion;
-  let dependencies;
-  let devDependencies;
-
-  if (repoMeta.projectType === 'npm' && releaseMeta) {
-    currentVersion = releaseMeta.versions[Object.keys(releaseMeta.versions)[0]];
-    dependencies = currentVersion.dependencies;
-    devDependencies = currentVersion.devDependencies;
-  }
+  const { releaseMeta } = props;
 
   return (
       <div className="p-8">
         <h2 className="text-xl">Dependencies</h2>
         <hr/>
         <div className="flex flex-wrap mt-2 mb-4">
-          {Object.keys(dependencies).map((dependency) => (
+          {releaseMeta.dependencies && releaseMeta.dependencies.map((dependency: string) => (
             <div className="text-indigo-500 py-4 pr-4" key={dependency}>
               {dependency}
             </div>
           ))}
         </div>
 
-        <h2 className="text-xl">Dev Dependencies</h2>
-        <hr/>
-        <div className="flex flex-wrap mt-2">
-          {Object.keys(devDependencies).map((dependency) => (
-            <div className="text-indigo-500 py-4 pr-4" key={dependency}>
-              {dependency}
-            </div>
-          ))}
-        </div>
+        {releaseMeta.devDependencies && <div>
+          <h2 className="text-xl">Dev Dependencies</h2>
+          <hr/>
+          <div className="flex flex-wrap mt-2">
+            {releaseMeta.devDependencies.map((dependency: string) => (
+              <div className="text-indigo-500 py-4 pr-4" key={dependency}>
+                {dependency}
+              </div>
+            ))}
+          </div>
+        </div>}
       </div>
   );
 }

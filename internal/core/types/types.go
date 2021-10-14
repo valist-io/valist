@@ -140,10 +140,11 @@ type Artifact struct {
 }
 
 type ReleaseMeta struct {
-	Name      string              `json:"name"`
-	Readme    string              `json:"readme"`
-	License   string              `json:"license"`
-	Artifacts map[string]Artifact `json:"artifacts"`
+	Name         string              `json:"name"`
+	Readme       string              `json:"readme"`
+	License      string              `json:"license"`
+	Dependencies []string            `json:"dependencies"`
+	Artifacts    map[string]Artifact `json:"artifacts"`
 }
 
 type Repository struct {
