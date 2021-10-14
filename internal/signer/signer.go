@@ -19,6 +19,8 @@ import (
 	"github.com/valist-io/valist/internal/prompt"
 )
 
+const EnvKey = "VALIST_SIGNER"
+
 // Signer signs transactions.
 type Signer struct {
 	account accounts.Account
@@ -36,7 +38,7 @@ func NewSigner(chainID *big.Int, backends ...accounts.Backend) (*Signer, error) 
 		cache:   make(map[common.Address]string),
 	}
 
-	privatekey := os.Getenv("VALIST_SIGNER")
+	privatekey := os.Getenv(EnvKey)
 	if privatekey == "" {
 		return signer, nil
 	}
