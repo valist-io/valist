@@ -61,6 +61,19 @@ export type Release = {
   signers?: string[],
 };
 
+export type ReleaseArtifact = {
+    sha256:   string,
+    provider: string,
+}
+
+export type ReleaseMeta = {
+    name:         string,             
+    readme:       string,             
+    license?:      string,           
+    dependencies?: string[],          
+    artifacts:   Record<string, ReleaseArtifact> 
+}
+
 export type PendingVote = {
   // expiration date of vote
   expiration: string,

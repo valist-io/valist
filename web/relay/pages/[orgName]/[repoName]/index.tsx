@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useContext } from 'react';
 import { useRouter } from 'next/router';
 import Head from 'next/head';
-import { Repository, Release } from 'valist/dist/types';
+import { Repository, Release, ReleaseMeta } from 'valist/dist/types';
 import Layout from '../../../components/Layouts/DashboardLayout';
 import RepoContent from '../../../components/Repositories/RepoContent';
 import ProjectProfileCard from '../../../components/Repositories/ProjectProfileCard';
@@ -32,8 +32,16 @@ export default function Dashboard() {
   const [orgAdmins, setOrgAdmins] = useState<string[]>([]);
   const [repoReleases, setRepoReleases] = useState<Release[]>([]);
   const [repoView, setRepoView] = useState<string>('meta');
-  const [repoReadme, setRepoReadme] = useState<string>('');
-  const [releaseMeta, setReleaseMeta] = useState<any>({});
+  const [releaseMeta, setReleaseMeta] = useState<ReleaseMeta>({
+    name: 'loading',
+    readme: '# Readme Not Found',
+    artifacts: {
+      loading: {
+        sha256: 'loading',
+        provider: 'loading',
+      },
+    },
+  });
 
   const fetchReadme = async () => {
     const release = repoReleases[0];
@@ -47,7 +55,6 @@ export default function Dashboard() {
         const req = await fetch(requestURL);
         metaJson = await req.json();
         setReleaseMeta(metaJson);
-        setRepoReadme(metaJson.readme);
       } catch (e) {
         // noop
       }
@@ -111,7 +118,6 @@ export default function Dashboard() {
               {repo && <RepoContent
                 repoReleases={repoReleases}
                 releaseMeta={releaseMeta}
-                repoReadme={repoReadme}
                 view={repoView}
                 orgName={orgName}
                 repoName={repoName}
