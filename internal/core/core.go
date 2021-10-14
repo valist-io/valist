@@ -3,20 +3,16 @@ package core
 import (
 	"context"
 	"fmt"
-	"net/http"
 
 	"github.com/ethereum/go-ethereum/ethclient"
-	httpapi "github.com/ipfs/go-ipfs-http-client"
-	"github.com/libp2p/go-libp2p-core/peer"
-	ma "github.com/multiformats/go-multiaddr"
 
 	"github.com/valist-io/valist/internal/contract"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/client/basetx"
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/db/badger"
 	"github.com/valist-io/valist/internal/signer"
+	"github.com/valist-io/valist/internal/storage/estuary"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
@@ -30,11 +26,6 @@ const (
 func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
-
-	database, err := badger.NewDatabase(cfg.DatabasePath())
-	if err != nil {
-		return nil, err
-	}
 
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
@@ -61,24 +52,13 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	ipfsapi, err := httpapi.NewURLApiWithClient(cfg.IPFS.API, &http.Client{})
+	ipfs, err := ipfs.NewProvider(ctx, cfg.StoragePath())
 	if err != nil {
 		return nil, err
 	}
 
-	for _, peerString := range cfg.IPFS.Peers {
-		peerAddr, err := ma.NewMultiaddr(peerString)
-		if err != nil {
-			continue
-		}
-
-		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
-		if err != nil {
-			continue
-		}
-
-		go ipfsapi.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
-	}
+	// TODO move to config once URL is proxied
+	estuary := estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "", ipfs)
 
 	var transactor client.TransactorAPI
 	if cfg.Ethereum.MetaTx {
@@ -92,8 +72,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	return client.NewClient(client.Options{
-		Database:   database,
-		Storage:    ipfs.NewStorage(ipfsapi),
+		Storage:    estuary,
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,

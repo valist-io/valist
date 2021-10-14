@@ -39,7 +39,17 @@ func (h *handler) findBlob(ctx context.Context, orgName, repoName, digest string
 		return "", err
 	}
 
-	return fmt.Sprintf("%s/%s", res.Release.ReleaseCID, digest), nil
+	meta, err := h.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
+	if err != nil {
+		return "", err
+	}
+
+	artifact, ok := meta.Artifacts[digest]
+	if !ok {
+		return "", fmt.Errorf("artifact not found")
+	}
+
+	return artifact.Provider, nil
 }
 
 func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string) (storage.File, error) {
@@ -52,16 +62,21 @@ func (h *handler) loadBlob(ctx context.Context, orgName, repoName, digest string
 }
 
 func (h *handler) loadManifest(ctx context.Context, orgName, repoName, ref string) (storage.File, error) {
-	raw := fmt.Sprintf("%s/%s/latest", orgName, repoName)
+	raw := fmt.Sprintf("%s/%s/%s", orgName, repoName, ref)
 	res, err := h.client.ResolvePath(ctx, raw)
 	if err != nil {
 		return nil, err
 	}
 
-	release, err := h.client.GetRelease(ctx, res.Organization.ID, res.Repository.Name, ref)
-	if err == nil {
-		return h.client.Storage().Open(ctx, release.MetaCID)
+	meta, err := h.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
+	if err != nil {
+		return nil, err
 	}
 
-	return h.client.Storage().Open(ctx, fmt.Sprintf("%s/%s", res.Release.ReleaseCID, ref))
+	artifact, ok := meta.Artifacts[ref]
+	if !ok {
+		return nil, fmt.Errorf("artifact not found")
+	}
+
+	return h.client.Storage().Open(ctx, artifact.Provider)
 }

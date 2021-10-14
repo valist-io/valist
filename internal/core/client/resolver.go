@@ -3,7 +3,6 @@ package client
 import (
 	"context"
 	"fmt"
-	"path"
 	"strings"
 
 	"github.com/valist-io/valist/internal/core/types"
@@ -11,9 +10,9 @@ import (
 
 func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.ResolvedPath, error) {
 	clean := strings.TrimLeft(raw, "/@")
-	parts := strings.SplitN(clean, "/", 4)
+	parts := strings.Split(clean, "/")
 
-	if len(parts) == 0 {
+	if len(parts) == 0 || len(parts) > 3 {
 		return nil, fmt.Errorf("invalid path")
 	}
 
@@ -49,16 +48,6 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 
 	res.ReleaseTag = parts[2]
 	res.Release, err = client.GetRelease(ctx, orgID, res.RepoName, res.ReleaseTag)
-	if err != nil {
-		return &res, err
-	}
-
-	if len(parts) < 4 {
-		return &res, nil
-	}
-
-	res.FilePath = path.Join(res.Release.ReleaseCID, parts[3])
-	res.File, err = client.storage.Open(ctx, res.FilePath)
 	if err != nil {
 		return &res, err
 	}

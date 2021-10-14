@@ -3,7 +3,6 @@ package docker
 import (
 	"context"
 	"net/http"
-	"os"
 	"os/exec"
 	"testing"
 
@@ -16,14 +15,7 @@ import (
 func TestDockerPush(t *testing.T) {
 	ctx := context.Background()
 
-	tmp, err := os.MkdirTemp("", "test")
-	require.NoError(t, err, "Failed to create temp dir")
-	defer os.RemoveAll(tmp)
-
-	kstore, err := mock.NewKeyStore(tmp, 1)
-	require.NoError(t, err, "Failed to create keystore")
-
-	client, err := mock.NewClient(kstore)
+	client, err := mock.NewClient(ctx)
 	require.NoError(t, err, "Failed to create mock client")
 
 	orgName := "valist"

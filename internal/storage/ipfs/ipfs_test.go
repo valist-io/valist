@@ -1,30 +1,30 @@
 package ipfs
 
 import (
+	"context"
 	"testing"
 
 	"github.com/ipfs/go-ipfs/core/coreapi"
 	coremock "github.com/ipfs/go-ipfs/core/mock"
-	"github.com/stretchr/testify/suite"
-
-	"github.com/valist-io/valist/internal/storage/test"
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-type StorageSuite struct {
-	test.StorageSuite
-}
-
-func (s *StorageSuite) SetupTest() {
+func TestReadWrite(t *testing.T) {
 	node, err := coremock.NewMockNode()
-	s.Require().NoError(err, "Failed to create ipfs mock node")
+	require.NoError(t, err, "Failed to create ipfs mock node")
 
 	ipfsapi, err := coreapi.NewCoreAPI(node)
-	s.Require().NoError(err, "Failed to create ipfs core api")
+	require.NoError(t, err, "Failed to create ipfs core api")
 
-	storage := NewStorage(ipfsapi)
-	s.StorageSuite.SetStorage(storage)
-}
+	provider := &Provider{ipfsapi}
+	ctx := context.Background()
+	data := []byte("hello")
 
-func TestStorageSuite(t *testing.T) {
-	suite.Run(t, &StorageSuite{})
+	p, err := provider.Write(ctx, data)
+	require.NoError(t, err, "Failed to write file")
+
+	expect, err := provider.ReadFile(ctx, p)
+	require.NoError(t, err, "Failed to get file")
+	assert.Equal(t, data, expect)
 }

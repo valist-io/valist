@@ -62,8 +62,18 @@ func (l *storageLoader) Load(ep *transport.Endpoint) (storer.Storer, error) {
 		return nil, err
 	}
 
+	meta, err := l.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
+	if err != nil {
+		return nil, err
+	}
+
+	artifact, ok := meta.Artifacts[GitDirName]
+	if !ok {
+		return nil, fmt.Errorf("artifact not found")
+	}
+
 	storage := l.client.Storage()
-	root := res.Release.ReleaseCID
+	root := artifact.Provider
 
 	fs := &storageFS{storage, root}
 	cache := cache.NewObjectLRUDefault()

@@ -1,21 +1,37 @@
 package registry
 
 import (
+	"fmt"
 	"net/http"
+	"os"
 
 	"github.com/gorilla/mux"
 
+	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/db/badger"
 	"github.com/valist-io/valist/internal/registry/docker"
 	"github.com/valist-io/valist/internal/registry/git"
 	"github.com/valist-io/valist/internal/registry/npm"
 )
 
-func NewServer(client types.CoreAPI, addr string) *http.Server {
+func NewServer(client types.CoreAPI, config *config.Config) (*http.Server, error) {
+	addr := os.Getenv("VALIST_API_ADDR")
+	if addr == "" {
+		addr = config.HTTP.ApiAddr
+	}
+	fmt.Println("API server running on", addr)
+
+	// TODO move to client once RPC is implemented
+	database, err := badger.NewDatabase(config.DatabasePath())
+	if err != nil {
+		return nil, err
+	}
+	npmProxy := npm.NewProxy(client, database, addr+"/proxy/npm")
+
 	dockerHandler := docker.NewHandler(client)
 	gitHandler := git.NewHandler(client)
 	npmHandler := npm.NewHandler(client)
-	npmProxy := npm.NewProxy(client, addr+"/proxy/npm")
 
 	router := mux.NewRouter()
 	router.PathPrefix("/v2/").Handler(dockerHandler)
@@ -31,5 +47,5 @@ func NewServer(client types.CoreAPI, addr string) *http.Server {
 	return &http.Server{
 		Addr:    addr,
 		Handler: router,
-	}
+	}, nil
 }

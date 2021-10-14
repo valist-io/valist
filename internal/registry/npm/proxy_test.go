@@ -1,6 +1,7 @@
 package npm
 
 import (
+	"context"
 	"net/http"
 	"os"
 	"os/exec"
@@ -9,24 +10,25 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/db/memory"
 )
 
 func TestNpmProxy(t *testing.T) {
+	ctx := context.Background()
+	database := memory.NewDatabase()
+
 	tmp, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create temp dir")
 	defer os.RemoveAll(tmp)
 
-	kstore, err := mock.NewKeyStore(tmp, 1)
-	require.NoError(t, err, "Failed to create keystore")
-
-	client, err := mock.NewClient(kstore)
+	client, err := mock.NewClient(ctx)
 	require.NoError(t, err, "Failed to create mock client")
 
 	registryAddr := "localhost:10006"
 	registryPath := "http://localhost:10006"
 
 	go func() {
-		err := http.ListenAndServe(registryAddr, NewProxy(client, registryAddr))
+		err := http.ListenAndServe(registryAddr, NewProxy(client, database, registryAddr))
 		require.NoError(t, err, "Failed to start http server")
 	}()
 

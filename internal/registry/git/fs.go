@@ -49,7 +49,7 @@ func (f *storageFile) Write(p []byte) (n int, err error) {
 }
 
 type storageFS struct {
-	storage storage.Storage
+	storage storage.Provider
 	root    string
 }
 
