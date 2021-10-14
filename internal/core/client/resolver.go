@@ -16,14 +16,15 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.Resol
 		return nil, fmt.Errorf("invalid path")
 	}
 
-	orgID, err := client.GetOrganizationID(ctx, parts[0])
-	if err != nil {
-		return nil, err
+	res := types.ResolvedPath{
+		OrgID:   emptyHash,
+		OrgName: parts[0],
 	}
 
-	res := types.ResolvedPath{
-		OrgID:   orgID,
-		OrgName: parts[0],
+	orgID, err := client.GetOrganizationID(ctx, parts[0])
+	res.OrgID = orgID
+	if err != nil {
+		return &res, err
 	}
 
 	res.Organization, err = client.GetOrganization(ctx, res.OrgID)

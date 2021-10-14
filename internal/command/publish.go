@@ -13,10 +13,13 @@ import (
 	"golang.org/x/mod/modfile"
 
 	"github.com/valist-io/valist/internal/build"
+	"github.com/valist-io/valist/internal/command/organization"
+	"github.com/valist-io/valist/internal/command/repository"
 	"github.com/valist-io/valist/internal/command/utils/lifecycle"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/prompt"
 )
 
 func NewPublishCommand() *cli.Command {
@@ -44,8 +47,54 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			orgID, err := client.GetOrganizationID(c.Context, valistFile.Org)
-			if err != nil {
+			releaseName := fmt.Sprintf("%s/%s/%s",
+				strings.ToLower(valistFile.Org),
+				strings.ToLower(valistFile.Repo),
+				strings.ToLower(valistFile.Tag),
+			)
+
+			res, err := client.ResolvePath(c.Context, releaseName)
+
+			switch err {
+			case nil:
+			case types.ErrOrganizationNotExist:
+				answer, err := prompt.Confirm("This organization does not exist, would you like to create it?").Run()
+				if err != nil {
+					return err
+				}
+
+				if strings.ToLower(answer)[0:1] == "y" {
+					orgID, err := organization.CreateOrg(client, c.Context, valistFile.Org)
+					if err != nil {
+						return err
+					}
+					res.OrgID = orgID
+				} else {
+					return nil
+				}
+
+				fmt.Println("Creating repository...")
+
+				err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+				if err != nil {
+					return err
+				}
+
+			case types.ErrRepositoryNotExist:
+				answer, err := prompt.Confirm("This repository does not exist, would you like to create it?").Run()
+				if err != nil {
+					return err
+				}
+
+				if strings.ToLower(answer)[0:1] == "y" {
+					err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+					if err != nil {
+						return err
+					}
+				}
+
+			case types.ErrReleaseNotExist:
+			default:
 				return err
 			}
 
@@ -82,12 +131,6 @@ func NewPublishCommand() *cli.Command {
 			} else {
 				readme = string(readmeBytes)
 			}
-
-			releaseName := fmt.Sprintf("%s/%s/%s",
-				strings.ToLower(valistFile.Org),
-				strings.ToLower(valistFile.Repo),
-				strings.ToLower(valistFile.Tag),
-			)
 
 			releaseMeta := &types.ReleaseMeta{
 				Name:         releaseName,
@@ -136,7 +179,7 @@ func NewPublishCommand() *cli.Command {
 				return nil
 			}
 
-			vote, err := client.VoteRelease(c.Context, orgID, valistFile.Repo, release)
+			vote, err := client.VoteRelease(c.Context, res.OrgID, valistFile.Repo, release)
 			if err != nil {
 				return err
 			}
