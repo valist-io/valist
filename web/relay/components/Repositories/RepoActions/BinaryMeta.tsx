@@ -18,7 +18,7 @@ const BinaryMeta = (orgName = 'organization', repoName = 'repo') => {
   return (
         <div>
                 <div className="pb-2 mb-2">
-                    <h2 className="flex-1 text-xl">Download (GET) from Url</h2>
+                    <h2 className="flex-1 text-xl">Installation</h2>
                 </div>
                 <div ref={curlRef}
                   className="border-2 border-solid border-indigo-50 rounded-lg

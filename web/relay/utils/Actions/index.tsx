@@ -20,21 +20,19 @@ npm i @${orgName}/${repoName}`,
     },
     curlBinary: {
       description: 'Download (GET) from Url',
-      command: `curl -L -o ${repoName} ${location}/api/${orgName}/${repoName}/latest
-
-      `,
+      command: `curl -L -o ${repoName} ${location}/api/${orgName}/${repoName}/latest`,
+    },
+    installBinary: {
+      description: 'Installation',
+      command: `valist install ${orgName}/${repoName}`,
     },
     pipInstall: {
       description: 'Pip Install From Url',
-      command: `pip install ${location}/api/${orgName}/${repoName}/latest
-
-      `,
+      command: `pip install ${location}/api/${orgName}/${repoName}/latest`,
     },
     dockerLoad: {
       description: 'Load Container from Url',
-      command: `curl -L ${location}/api/${orgName}/${repoName}/latest | docker load
-
-      `,
+      command: `curl -L ${location}/api/${orgName}/${repoName}/latest | docker load`,
     },
   };
   return actions;
@@ -55,7 +53,7 @@ export const projectTypes: Record<string, ProjectType> = {
   },
   go: {
     actions: ['curlBinary'],
-    default: 'curlBinary',
+    default: 'installBinary',
   },
   python: {
     actions: ['pipInstall'],
