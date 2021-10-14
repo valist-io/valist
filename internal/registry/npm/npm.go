@@ -90,9 +90,17 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
+	latestVersion := meta.Versions[meta.DistTags["latest"]]
+	var dependencies []string
+	for key, _ := range latestVersion.Dependencies {
+		dependencies = append(dependencies, key)
+	}
+
 	releaseMeta := &types.ReleaseMeta{
-		Name:      fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, tag),
-		Artifacts: make(map[string]types.Artifact),
+		Name:         fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, tag),
+		Readme:       meta.Readme,
+		Dependencies: dependencies,
+		Artifacts:    make(map[string]types.Artifact),
 	}
 
 	// add all new versions to the existing versions
