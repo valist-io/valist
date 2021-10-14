@@ -3,9 +3,7 @@ package client
 import (
 	"fmt"
 	"math/big"
-	"time"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
@@ -44,7 +42,6 @@ type TransactorAPI interface {
 // Options is used to set client options.
 type Options struct {
 	Storage  storage.Provider
-	Database *badger.DB
 	Ethereum bind.DeployBackend
 
 	Valist   *valist.Valist
@@ -56,7 +53,6 @@ type Options struct {
 
 // Client is a Valist SDK client.
 type Client struct {
-	db      *badger.DB
 	eth     bind.DeployBackend
 	storage storage.Provider
 
@@ -67,7 +63,6 @@ type Client struct {
 	transactor TransactorAPI
 
 	orgs map[string]common.Hash
-	done chan bool
 }
 
 // NewClient create a client from the given options.
@@ -96,31 +91,7 @@ func NewClient(opts Options) (*Client, error) {
 		return nil, fmt.Errorf("signer is required")
 	}
 
-	if opts.Database == nil {
-		return nil, fmt.Errorf("database is required")
-	}
-
-	runGC := func() {
-		for err := error(nil); err == nil; {
-			// If a GC is successful, immediately run it again.
-			err = opts.Database.RunValueLogGC(0.7)
-		}
-	}
-
-	tick := time.NewTicker(5 * time.Minute)
-	done := make(chan bool)
-
-	go func() {
-		select {
-		case <-done:
-			return
-		case <-tick.C:
-			runGC()
-		}
-	}()
-
 	return &Client{
-		db:         opts.Database,
 		eth:        opts.Ethereum,
 		storage:    opts.Storage,
 		valist:     opts.Valist,
@@ -128,7 +99,6 @@ func NewClient(opts Options) (*Client, error) {
 		signer:     opts.Signer,
 		transactor: opts.Transactor,
 		orgs:       make(map[string]common.Hash),
-		done:       done,
 	}, nil
 }
 
@@ -140,10 +110,6 @@ func (client *Client) Signer() *signer.Signer {
 	return client.signer
 }
 
-func (client *Client) Database() *badger.DB {
-	return client.db
-}
-
-func (client *Client) Close() {
-	client.done <- true
+func (client *Client) Close() error {
+	return nil
 }

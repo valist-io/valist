@@ -6,7 +6,6 @@ import (
 	"math/big"
 	"regexp"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
@@ -66,8 +65,6 @@ type CoreAPI interface {
 	Signer() *signer.Signer
 	// Storage returns the storage provider.
 	Storage() storage.Provider
-	// Database returns the local database.
-	Database() *badger.DB
 }
 
 type OrganizationAPI interface {

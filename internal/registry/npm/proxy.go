@@ -9,25 +9,26 @@ import (
 	"os"
 	"path"
 	"strings"
-	"time"
 
 	"github.com/dgraph-io/badger/v3"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist/internal/core/types"
+	"github.com/valist-io/valist/internal/db"
 	"github.com/valist-io/valist/internal/storage"
 )
 
 const DefaultRegistry = "https://registry.npmjs.org"
 
 type proxy struct {
-	client types.CoreAPI
-	host   string
+	client   types.CoreAPI
+	database db.Database
+	host     string
 }
 
-func NewProxy(client types.CoreAPI, host string) http.Handler {
-	proxy := &proxy{client, host}
+func NewProxy(client types.CoreAPI, database db.Database, host string) http.Handler {
+	proxy := &proxy{client, database, host}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{name}", proxy.getMetadata).Methods(http.MethodGet)
@@ -38,16 +39,13 @@ func NewProxy(client types.CoreAPI, host string) http.Handler {
 	return handlers.LoggingHandler(os.Stdout, router)
 }
 
-func (p *proxy) cacheMetadata(id string) (*Metadata, error) {
-	txn := p.client.Database().NewTransaction(false)
-	defer txn.Discard()
-
-	item, err := txn.Get([]byte(id))
+func (p *proxy) cacheMetadata(ctx context.Context, id string) (*Metadata, error) {
+	val, err := p.database.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := item.ValueCopy(nil)
+	data, err := p.client.Storage().ReadFile(ctx, string(val))
 	if err != nil {
 		return nil, err
 	}
@@ -61,32 +59,15 @@ func (p *proxy) cacheMetadata(id string) (*Metadata, error) {
 }
 
 func (p *proxy) cacheTarball(ctx context.Context, id string) (storage.File, error) {
-	txn := p.client.Database().NewTransaction(false)
-	defer txn.Discard()
-
-	item, err := txn.Get([]byte(id))
+	val, err := p.database.Get(id)
 	if err != nil {
 		return nil, err
 	}
 
-	data, err := item.ValueCopy(nil)
-	if err != nil {
-		return nil, err
-	}
-
-	return p.client.Storage().Open(ctx, string(data))
+	return p.client.Storage().Open(ctx, string(val))
 }
 
 func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
-	cached, err := p.cacheMetadata(id)
-	if err == nil {
-		return cached, nil
-	}
-
-	if err != badger.ErrKeyNotFound {
-		return nil, err
-	}
-
 	res, err := http.Get(DefaultRegistry + id)
 	if err != nil {
 		return nil, err
@@ -107,17 +88,7 @@ func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
 		return nil, err
 	}
 
-	txn := p.client.Database().NewTransaction(true)
-	defer txn.Discard()
-
-	entry := badger.NewEntry([]byte(id), body)
-	entry = entry.WithTTL(5 * time.Minute)
-
-	if err := txn.SetEntry(entry); err != nil {
-		return nil, err
-	}
-
-	if err := txn.Commit(); err != nil {
+	if err := p.database.Set(id, body); err != nil {
 		return nil, err
 	}
 
@@ -125,17 +96,17 @@ func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
 }
 
 func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, error) {
-	meta, err := p.cacheMetadata(path.Dir(id))
-	if err != nil {
-		return nil, err
-	}
-
 	cached, err := p.cacheTarball(ctx, id)
 	if err == nil {
 		return cached, nil
 	}
 
 	if err != badger.ErrKeyNotFound {
+		return nil, err
+	}
+
+	meta, err := p.cacheMetadata(ctx, path.Dir(id))
+	if err != nil {
 		return nil, err
 	}
 
@@ -164,14 +135,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	txn := p.client.Database().NewTransaction(true)
-	defer txn.Discard()
-
-	if err := txn.Set([]byte(id), []byte(tarPath)); err != nil {
-		return nil, err
-	}
-
-	if err := txn.Commit(); err != nil {
+	if err := p.database.Set(id, []byte(tarPath)); err != nil {
 		return nil, err
 	}
 

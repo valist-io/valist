@@ -10,10 +10,12 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/valist-io/valist/internal/core/mock"
+	"github.com/valist-io/valist/internal/db/memory"
 )
 
 func TestNpmProxy(t *testing.T) {
 	ctx := context.Background()
+	database := memory.NewDatabase()
 
 	tmp, err := os.MkdirTemp("", "test")
 	require.NoError(t, err, "Failed to create temp dir")
@@ -26,7 +28,7 @@ func TestNpmProxy(t *testing.T) {
 	registryPath := "http://localhost:10006"
 
 	go func() {
-		err := http.ListenAndServe(registryAddr, NewProxy(client, registryAddr))
+		err := http.ListenAndServe(registryAddr, NewProxy(client, database, registryAddr))
 		require.NoError(t, err, "Failed to start http server")
 	}()
 
