@@ -135,6 +135,7 @@ func NewPublishCommand() *cli.Command {
 			releaseMeta := &types.ReleaseMeta{
 				Name:         releaseName,
 				Readme:       readme,
+				Version:      valistFile.Tag,
 				Dependencies: dependencies,
 				Artifacts:    make(map[string]types.Artifact),
 			}

@@ -99,6 +99,8 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 	releaseMeta := &types.ReleaseMeta{
 		Name:         fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, tag),
 		Readme:       meta.Readme,
+		Version:      latestVersion.Version,
+		License:      latestVersion.License,
 		Dependencies: dependencies,
 		Artifacts:    make(map[string]types.Artifact),
 	}
