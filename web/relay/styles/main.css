@@ -7,30 +7,32 @@
 @import "tailwindcss/components";
 @import "tailwindcss/utilities";
 
-.markdown>*:first-child {
+.markdown > *:first-child {
   margin-top: 0 !important;
 }
 
-.markdown h1, 
-.markdown h2, 
-.markdown h3, 
-.markdown h4, 
-.markdown h5, 
+.markdown h1,
+.markdown h2,
+.markdown h3,
+.markdown h4,
+.markdown h5,
 .markdown h6 {
-    padding: 0;
-    font-weight: 600;
-    -webkit-font-smoothing: antialiased;
-    cursor: text;
-    position: relative;
-    margin-bottom: 16px;
-    margin-top: 24px;
-    margin-bottom: 16px;
-    font-weight: 600;
-    line-height: 1.25;
+  padding: 0;
+  font-weight: 600;
+  -webkit-font-smoothing: antialiased;
+  cursor: text;
+  position: relative;
+  margin-bottom: 16px;
+  margin-top: 24px;
+  margin-bottom: 16px;
+  font-weight: 600;
+  line-height: 1.25;
 }
 
-.markdown h1, .markdown h2, .markdown h3 {
-  border-bottom: 1px solid rgba(0, 0, 0, .1);
+.markdown h1,
+.markdown h2,
+.markdown h3 {
+  border-bottom: 1px solid rgba(0, 0, 0, 0.1);
 }
 
 .markdown h1 {
@@ -55,8 +57,8 @@
   margin-bottom: 16px;
 }
 
-.markdown li+li {
-  margin-top: .25em;
+.markdown li + li {
+  margin-top: 0.25em;
 }
 
 .markdown p {
@@ -77,7 +79,7 @@
 
 .markdown code,
 .markdown pre {
-  font-family: SFMono-Regular,Consolas,Liberation Mono,Menlo,monospace;
+  font-family: SFMono-Regular, Consolas, Liberation Mono, Menlo, monospace;
   font-size: 14px;
 }
 
@@ -88,7 +90,7 @@
 .markdown blockquote {
   padding: 0 1em;
   color: #6a737d;
-  border-left: .25em solid #dfe2e5;
+  border-left: 0.25em solid #dfe2e5;
 }
 
 .markdown table {
@@ -120,4 +122,13 @@
   width: 200px;
   color: rgba(0, 0, 0, 0) !important;
   background: rgba(190, 190, 190, 0.2) !important;
+}
+
+.hide-scroll::-webkit-scrollbar {
+  display: none;
+}
+
+.hide-scroll {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
 }
