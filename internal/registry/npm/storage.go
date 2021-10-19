@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"os"
 
 	"github.com/valist-io/valist/internal/core/types"
 	"github.com/valist-io/valist/internal/storage"
@@ -35,7 +36,7 @@ func (h *handler) fetchPackage(ctx context.Context, org, repo, tag string) (stri
 
 func (h *handler) latestVersions(ctx context.Context, org, repo string) (map[string]Package, error) {
 	path, err := h.fetchPackage(ctx, org, repo, "latest")
-	if err == types.ErrReleaseNotExist {
+	if err == types.ErrReleaseNotExist || err == os.ErrNotExist {
 		return make(map[string]Package), nil
 	}
 
