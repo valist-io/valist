@@ -10,42 +10,6 @@ import (
 	"github.com/valist-io/valist/internal/core/types"
 )
 
-var DefaultImages = map[string]string{
-	types.ProjectTypeBinary: "gcc:bullseye",
-	types.ProjectTypeNode:   "node:buster",
-	types.ProjectTypeNPM:    "node:buster",
-	types.ProjectTypeGo:     "golang:buster",
-	types.ProjectTypeRust:   "rust:buster",
-	types.ProjectTypePython: "python:buster",
-	types.ProjectTypeDocker: "scratch",
-	types.ProjectTypeCPP:    "gcc:bullseye",
-	types.ProjectTypeStatic: "",
-}
-
-var DefaultInstalls = map[string]string{
-	types.ProjectTypeBinary: "make install",
-	types.ProjectTypeNode:   "npm install",
-	types.ProjectTypeNPM:    "npm install",
-	types.ProjectTypeGo:     "go get ./...",
-	types.ProjectTypeRust:   "cargo install",
-	types.ProjectTypePython: "pip install -r requirements.txt",
-	types.ProjectTypeDocker: "",
-	types.ProjectTypeCPP:    "make install",
-	types.ProjectTypeStatic: "",
-}
-
-var DefaultBuilds = map[string]string{
-	types.ProjectTypeBinary: "make build",
-	types.ProjectTypeNode:   "npm run build",
-	types.ProjectTypeNPM:    "npm run build",
-	types.ProjectTypeGo:     "go build",
-	types.ProjectTypeRust:   "cargo build",
-	types.ProjectTypePython: "python3 -m build",
-	types.ProjectTypeDocker: "",
-	types.ProjectTypeCPP:    "make build",
-	types.ProjectTypeStatic: "",
-}
-
 var DefaultTemplates = map[string]string{
 	types.ProjectTypeBinary: "default.tmpl",
 	types.ProjectTypeNode:   "node.tmpl",
@@ -60,16 +24,10 @@ var DefaultTemplates = map[string]string{
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"required,project_type"`
-	Org       string            `yaml:"org" validate:"required,lowercase,shortname"`
-	Repo      string            `yaml:"repo" validate:"required,lowercase,shortname"`
+	Type      string            `yaml:"type"`
+	Name      string            `yaml:"org" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
-	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
-	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`
-	Build     string            `yaml:"build,omitempty" validate:"acceptable_characters"`
-	Install   string            `yaml:"install,omitempty" validate:"acceptable_characters"`
-	Out       string            `yaml:"out,omitempty" validate:"required_with=Platforms,required_unless=Type npm,acceptable_characters"`
-	Platforms map[string]string `yaml:"platforms,omitempty" validate:"platforms"`
+	Artifacts map[string]string `yaml:"platforms" validate:"required,platforms"`
 }
 
 var validate *validator.Validate

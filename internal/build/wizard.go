@@ -2,6 +2,7 @@ package build
 
 import (
 	"fmt"
+	"strings"
 
 	"github.com/valist-io/valist/internal/prompt"
 )
@@ -17,54 +18,30 @@ func ConfigWizard() error {
 		return err
 	}
 
-	cfg.Org, err = prompt.OrganizationName("").Run()
+	org, err := prompt.OrganizationName("").Run()
 	if err != nil {
 		return err
 	}
 
-	cfg.Repo, err = prompt.RepositoryName("").Run()
+	repo, err := prompt.RepositoryName("").Run()
 	if err != nil {
 		return err
 	}
+
+	projectName := fmt.Sprintf("%s/%s/%s",
+		strings.ToLower(org),
+		strings.ToLower(repo),
+	)
+
+	cfg.Name = projectName
 
 	cfg.Tag, err = prompt.ReleaseTag("0.0.1").Run()
 	if err != nil {
 		return err
 	}
 
-	cfg.Meta, err = prompt.ReleaseMetaPath().Run()
-	if err != nil {
-		return err
-	}
-
-	defaultInstall := DefaultInstalls[cfg.Type]
-	cfg.Install, err = prompt.InstallCommand(defaultInstall).Run()
-	if err != nil {
-		return err
-	}
-
-	defaultBuild := DefaultBuilds[cfg.Type]
-	cfg.Build, err = prompt.BuildCommand(defaultBuild).Run()
-	if err != nil {
-		return err
-	}
-
-	defaultImage := DefaultImages[cfg.Type]
-	cfg.Image, err = prompt.DockerImage(defaultImage).Run()
-	if err != nil {
-		return err
-	}
-
-	// If the project type is not node prompt for out path
-	if cfg.Type != "node" {
-		cfg.Out, err = prompt.BuildOutPath().Run()
-		if err != nil {
-			return err
-		}
-	}
-
-	cfg.Platforms = make(map[string]string)
-	// If there is artifacts set isArtifacts to y
+	cfg.Artifacts = make(map[string]string)
+	// If there are artifacts set isArtifacts to y
 	isArtifacts, err := prompt.BuildPlatforms().Run()
 	if err != nil {
 		return err
@@ -93,7 +70,7 @@ func ConfigWizard() error {
 
 		// Set artifact key to os/arch and value to src
 		platform := fmt.Sprintf("%s/%s", osName, arch)
-		cfg.Platforms[platform] = src
+		cfg.Artifacts[platform] = src
 	}
 
 	return cfg.Save("valist.yml")
