@@ -46,13 +46,7 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			releaseName := fmt.Sprintf("%s/%s/%s",
-				strings.ToLower(valistFile.Org),
-				strings.ToLower(valistFile.Repo),
-				strings.ToLower(valistFile.Tag),
-			)
-
-			res, err := client.ResolvePath(c.Context, releaseName)
+			res, err := client.ResolvePath(c.Context, valistFile.Name)
 
 			switch err {
 			case nil:
@@ -63,7 +57,7 @@ func NewPublishCommand() *cli.Command {
 				}
 
 				if strings.ToLower(answer)[0:1] == "y" {
-					orgID, err := organization.CreateOrg(client, c.Context, valistFile.Org)
+					orgID, err := organization.CreateOrg(client, c.Context, res.OrgName)
 					if err != nil {
 						return err
 					}
@@ -74,7 +68,7 @@ func NewPublishCommand() *cli.Command {
 
 				fmt.Println("Creating repository...")
 
-				err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+				err = repository.CreateRepo(client, c.Context, res.OrgID, res.RepoName)
 				if err != nil {
 					return err
 				}
@@ -86,7 +80,7 @@ func NewPublishCommand() *cli.Command {
 				}
 
 				if strings.ToLower(answer)[0:1] == "y" {
-					err = repository.CreateRepo(client, c.Context, res.OrgID, valistFile.Repo)
+					err = repository.CreateRepo(client, c.Context, res.OrgID, res.RepoName)
 					if err != nil {
 						return err
 					}
@@ -101,11 +95,6 @@ func NewPublishCommand() *cli.Command {
 				return errors.Errorf("Release %s already exists", res.ReleaseTag)
 			}
 
-			_, err = build.Run(cwd, valistFile)
-			if err != nil {
-				return err
-			}
-
 			var readme string
 			readmeBytes, err := os.ReadFile("README.md")
 
@@ -116,14 +105,18 @@ func NewPublishCommand() *cli.Command {
 			}
 
 			releaseMeta := &types.ReleaseMeta{
-				Name:      releaseName,
+				Name:      fmt.Sprintf("%s@%s", valistFile.Name, valistFile.Tag),
 				Readme:    readme,
 				Artifacts: make(map[string]types.Artifact),
 			}
 
-			for platform, artifact := range valistFile.Platforms {
-				fileData, err := os.ReadFile(filepath.Join(cwd, valistFile.Out, artifact))
-				if err != nil {
+			for platform, artifact := range valistFile.Artifacts {
+				fileData, err := os.ReadFile(filepath.Join(cwd, artifact))
+
+				if err == os.ErrNotExist {
+					errMsg := fmt.Sprintf("Unable to find artifact %s for platform %s", artifact, platform)
+					return errors.New(errMsg)
+				} else if err != nil {
 					return err
 				}
 
@@ -161,7 +154,7 @@ func NewPublishCommand() *cli.Command {
 				return nil
 			}
 
-			vote, err := client.VoteRelease(c.Context, res.OrgID, valistFile.Repo, release)
+			vote, err := client.VoteRelease(c.Context, res.OrgID, res.RepoName, release)
 			if err != nil {
 				return err
 			}
