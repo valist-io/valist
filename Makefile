@@ -87,4 +87,7 @@ clean:
 	rm -rf ./web/lib/dist
 	rm -rf dist site
 
+publish:
+	clean install web bin-multi
+
 .PHONY: web docs
