@@ -23,10 +23,6 @@ var addopts = []options.UnixfsAddOption{
 	options.Unixfs.Pin(true),
 }
 
-var pinopts = []options.PinAddOption{
-	options.Pin.Recursive(true),
-}
-
 type Provider struct {
 	ipfs coreiface.CoreAPI
 }
@@ -51,7 +47,7 @@ func (prov *Provider) Export(ctx context.Context, fpath string) (io.Reader, erro
 	go func() {
 		ses := merkledag.NewSession(ctx, prov.ipfs.Dag())
 		err := car.WriteCar(ctx, ses, []cid.Cid{res.Cid()}, pw)
-		pw.CloseWithError(err)
+		pw.CloseWithError(err) //nolint:errcheck
 	}()
 
 	return pr, nil
