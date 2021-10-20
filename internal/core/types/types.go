@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/ethereum/go-ethereum/common"
+
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
 	"github.com/valist-io/valist/internal/signer"
@@ -60,7 +61,7 @@ type CoreAPI interface {
 	ReleaseAPI
 	RepositoryAPI
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
-	ResolvePath(context.Context, string) (*ResolvedPath, error)
+	ResolvePath(context.Context, string) (ResolvedPath, error)
 	// Signer returns the transaction signer.
 	Signer() *signer.Signer
 	// Storage returns the storage provider.

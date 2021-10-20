@@ -16,13 +16,6 @@ import (
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
 
-type contextKey string
-
-const (
-	ClientKey = contextKey("client")
-	ConfigKey = contextKey("config")
-)
-
 func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) {
 	valistAddress := cfg.Ethereum.Contracts["valist"]
 	registryAddress := cfg.Ethereum.Contracts["registry"]
@@ -37,7 +30,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 		return nil, err
 	}
 
-	signer, err := signer.NewSigner(chainID, cfg.KeyStore())
+	signer, err := signer.NewSigner(chainID, cfg.OpenKeyStore())
 	if err != nil {
 		return nil, err
 	}

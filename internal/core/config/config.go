@@ -16,8 +16,6 @@ const (
 	keystoreDir = "keystore"
 	storageDir  = "storage"
 	databaseDir = "database"
-	scryptN     = keystore.StandardScryptN
-	scryptP     = keystore.StandardScryptP
 )
 
 type Ethereum struct {
@@ -50,12 +48,22 @@ type Config struct {
 	Accounts Accounts `json:"accounts"`
 	Ethereum Ethereum `json:"ethereum"`
 	HTTP     HTTP     `json:"http"`
+	KeyStore KeyStore `json:"keystore"`
+}
+
+type KeyStore struct {
+	Path    string `json:"path"`
+	ScryptN int    `json:"scrypt_n"`
+	ScryptP int    `json:"scrypt_p"`
 }
 
 // NewConfig returns a config with default settings.
-func NewConfig(rootPath string) *Config {
+func NewConfig(path string) *Config {
+	rootPath := filepath.Join(path, rootDir)
+	keystorePath := filepath.Join(rootPath, keystoreDir)
+
 	return &Config{
-		filepath.Join(rootPath, rootDir),
+		rootPath,
 		Accounts{},
 		Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
@@ -69,6 +77,11 @@ func NewConfig(rootPath string) *Config {
 		HTTP{
 			ApiAddr: "localhost:9000",
 			WebAddr: "localhost:9001",
+		},
+		KeyStore{
+			Path:    keystorePath,
+			ScryptN: keystore.StandardScryptN,
+			ScryptP: keystore.StandardScryptP,
 		},
 	}
 }
@@ -114,9 +127,9 @@ func (c *Config) Save() error {
 	return os.WriteFile(path, data, 0666)
 }
 
-// KeyStore returns the config keystore.
-func (c *Config) KeyStore() *keystore.KeyStore {
-	return keystore.NewKeyStore(filepath.Join(c.rootPath, keystoreDir), scryptN, scryptP)
+// OpenKeyStore opens and returns a keystore instance.
+func (c *Config) OpenKeyStore() *keystore.KeyStore {
+	return keystore.NewKeyStore(c.KeyStore.Path, c.KeyStore.ScryptN, c.KeyStore.ScryptP)
 }
 
 // DatabasePath returns the database directory path.
