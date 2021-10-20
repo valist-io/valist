@@ -8,20 +8,19 @@ import (
 	"os"
 	"strings"
 
+	cid "github.com/ipfs/go-cid"
 	files "github.com/ipfs/go-ipfs-files"
+	merkledag "github.com/ipfs/go-merkledag"
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/ipfs/interface-go-ipfs-core/options"
 	"github.com/ipfs/interface-go-ipfs-core/path"
+	car "github.com/ipld/go-car"
 
 	"github.com/valist-io/valist/internal/storage"
 )
 
 var addopts = []options.UnixfsAddOption{
 	options.Unixfs.Pin(true),
-}
-
-var pinopts = []options.PinAddOption{
-	options.Pin.Recursive(true),
 }
 
 type Provider struct {
@@ -37,8 +36,21 @@ func NewProvider(ctx context.Context, repoPath string) (*Provider, error) {
 	return &Provider{ipfs}, nil
 }
 
-func (prov *Provider) Pin(ctx context.Context, fpath string) error {
-	return prov.ipfs.Pin().Add(ctx, path.New(fpath), pinopts...)
+// Export returns a reader for exporting CAR data.
+func (prov *Provider) Export(ctx context.Context, fpath string) (io.Reader, error) {
+	res, err := prov.ipfs.ResolvePath(ctx, path.New(fpath))
+	if err != nil {
+		return nil, err
+	}
+
+	pr, pw := io.Pipe()
+	go func() {
+		ses := merkledag.NewSession(ctx, prov.ipfs.Dag())
+		err := car.WriteCar(ctx, ses, []cid.Cid{res.Cid()}, pw)
+		pw.CloseWithError(err) //nolint:errcheck
+	}()
+
+	return pr, nil
 }
 
 func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, error) {
