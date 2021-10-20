@@ -12,7 +12,7 @@ import (
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"project_type"`
+	Type      string            `yaml:"type,omitempty" validate:"project_type"`
 	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
 	Artifacts map[string]string `yaml:"artifacts" validate:"platforms"`
@@ -42,7 +42,7 @@ func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
 
 func ValidateProjectType(fl validator.FieldLevel) bool {
 	for _, projectType := range types.ProjectTypes {
-		if projectType == fl.Field().String() {
+		if projectType == fl.Field().String() || fl.Field().String() == "" {
 			return true
 		}
 	}
