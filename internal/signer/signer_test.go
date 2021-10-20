@@ -25,7 +25,7 @@ func TestEnvironmentOverride(t *testing.T) {
 
 	signer, err := NewSigner(big.NewInt(1337))
 	require.NoError(t, err, "failed to create signer")
-	
+
 	assert.Equal(t, address, signer.account.Address)
 	assert.Len(t, signer.manager.Accounts(), 1)
 
