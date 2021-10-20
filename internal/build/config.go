@@ -12,10 +12,9 @@ import (
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type,omitempty" validate:"project_type"`
 	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
-	Artifacts map[string]string `yaml:"artifacts" validate:"platforms"`
+	Artifacts map[string]string `yaml:"artifacts" validate:"artifacts"`
 }
 
 var validate *validator.Validate
@@ -25,7 +24,7 @@ func init() {
 	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
 	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
 	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
-	validate.RegisterValidation("platforms", ValidateArtifacts)                        //nolint:errcheck
+	validate.RegisterValidation("artifacts", ValidateArtifacts)                        //nolint:errcheck
 }
 
 func (c Config) Validate() error {

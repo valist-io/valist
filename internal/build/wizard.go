@@ -12,12 +12,6 @@ func ConfigWizard() error {
 	var cfg Config
 	var err error
 
-	// If project type is not set ask for projectType
-	_, cfg.Type, err = prompt.RepositoryProjectType().Run()
-	if err != nil {
-		return err
-	}
-
 	org, err := prompt.OrganizationName("").Run()
 	if err != nil {
 		return err

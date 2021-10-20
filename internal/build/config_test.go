@@ -14,8 +14,7 @@ func TestInvalidConfig(t *testing.T) {
 	require.NoError(t, err, "Failed to create tmp dir")
 	defer os.RemoveAll(tmp)
 
-	var fullConfigObjectCorrect = Config{
-		Type: "binary",
+	var fullConfigObject = Config{
 		Name: "acme-co/go-example",
 		Tag:  "0.0.2",
 		Artifacts: map[string]string{
@@ -24,22 +23,14 @@ func TestInvalidConfig(t *testing.T) {
 		},
 	}
 
-	err = fullConfigObjectCorrect.Validate()
+	err = fullConfigObject.Validate()
 	require.NoError(t, err, "Should create correct config")
 
-	fullConfigObject := fullConfigObjectCorrect
-	fullConfigObject.Type = "; myshellcommand"
-
-	err = fullConfigObject.Validate()
-	require.Error(t, err, "Should fail with invalid project type")
-
-	fullConfigObject = fullConfigObjectCorrect
 	fullConfigObject.Name = "; myshellcommand"
 
 	err = fullConfigObject.Validate()
-	require.Error(t, err, "Should fail with invalid org")
+	require.Error(t, err, "Should fail with invalid name")
 
-	fullConfigObject = fullConfigObjectCorrect
 	fullConfigObject.Artifacts = make(map[string]string)
 
 	fullConfigObject.Artifacts["inValiD@@@333"] = "/bin/linux/hello-world"
@@ -47,7 +38,6 @@ func TestInvalidConfig(t *testing.T) {
 	err = fullConfigObject.Validate()
 	require.Error(t, err, "Should fail with invalid platform key")
 
-	fullConfigObject = fullConfigObjectCorrect
 	fullConfigObject.Artifacts = make(map[string]string)
 
 	fullConfigObject.Artifacts["linux/amd64"] = "; myshellcommand"
@@ -62,7 +52,6 @@ func TestLoadSaveValistConfig(t *testing.T) {
 	defer os.RemoveAll(tmp)
 
 	var fullConfigObject = Config{
-		Type: "binary",
 		Name: "test/test",
 		Tag:  "0.0.2",
 		Artifacts: map[string]string{
