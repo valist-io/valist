@@ -10,24 +10,12 @@ import (
 	"github.com/valist-io/valist/internal/core/types"
 )
 
-var DefaultTemplates = map[string]string{
-	types.ProjectTypeBinary: "default.tmpl",
-	types.ProjectTypeNode:   "node.tmpl",
-	types.ProjectTypeNPM:    "npm.tmpl",
-	types.ProjectTypeGo:     "go.tmpl",
-	types.ProjectTypeRust:   "rust.tmpl",
-	types.ProjectTypePython: "python.tmpl",
-	types.ProjectTypeDocker: "docker.tmpl",
-	types.ProjectTypeCPP:    "cpp.tmpl",
-	types.ProjectTypeStatic: "static.tmpl",
-}
-
 // Config contains valist build settings.
 type Config struct {
 	Type      string            `yaml:"type"`
 	Name      string            `yaml:"org" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
-	Artifacts map[string]string `yaml:"platforms" validate:"required,platforms"`
+	Artifacts map[string]string `yaml:"artifacts" validate:"platforms"`
 }
 
 var validate *validator.Validate
@@ -37,7 +25,7 @@ func init() {
 	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
 	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
 	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
-	validate.RegisterValidation("platforms", ValidatePlatforms)                        //nolint:errcheck
+	validate.RegisterValidation("platforms", ValidateArtifacts)                        //nolint:errcheck
 }
 
 func (c Config) Validate() error {
@@ -61,7 +49,7 @@ func ValidateProjectType(fl validator.FieldLevel) bool {
 	return false
 }
 
-func ValidatePlatforms(fl validator.FieldLevel) bool {
+func ValidateArtifacts(fl validator.FieldLevel) bool {
 	valid := true
 	for iter := fl.Field().MapRange(); iter.Next(); {
 		valid = types.RegexPlatformArchitecture.MatchString(iter.Key().String()) // linux/amd64
