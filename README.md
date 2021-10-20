@@ -29,9 +29,6 @@ Documentation for how to get started with Valist can be found at [https://docs.v
 #### System Requirements:
 
 * Go >= 1.16
-* node >= 14.17
-* npm >= 6.14
-
 
 ```bash
 git clone https://github.com/valist-io/valist
