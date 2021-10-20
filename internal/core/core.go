@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/valist-io/valist/internal/contract"
@@ -30,7 +31,8 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 		return nil, err
 	}
 
-	signer, err := signer.NewSigner(chainID, cfg.OpenKeyStore())
+	kstore := keystore.NewKeyStore(cfg.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
+	signer, err := signer.NewSigner(chainID, kstore)
 	if err != nil {
 		return nil, err
 	}

@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -48,22 +47,12 @@ type Config struct {
 	Accounts Accounts `json:"accounts"`
 	Ethereum Ethereum `json:"ethereum"`
 	HTTP     HTTP     `json:"http"`
-	KeyStore KeyStore `json:"keystore"`
-}
-
-type KeyStore struct {
-	Path    string `json:"path"`
-	ScryptN int    `json:"scrypt_n"`
-	ScryptP int    `json:"scrypt_p"`
 }
 
 // NewConfig returns a config with default settings.
 func NewConfig(path string) *Config {
-	rootPath := filepath.Join(path, rootDir)
-	keystorePath := filepath.Join(rootPath, keystoreDir)
-
 	return &Config{
-		rootPath,
+		filepath.Join(path, rootDir),
 		Accounts{},
 		Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
@@ -77,11 +66,6 @@ func NewConfig(path string) *Config {
 		HTTP{
 			ApiAddr: "localhost:9000",
 			WebAddr: "localhost:9001",
-		},
-		KeyStore{
-			Path:    keystorePath,
-			ScryptN: keystore.StandardScryptN,
-			ScryptP: keystore.StandardScryptP,
 		},
 	}
 }
@@ -127,9 +111,9 @@ func (c *Config) Save() error {
 	return os.WriteFile(path, data, 0666)
 }
 
-// OpenKeyStore opens and returns a keystore instance.
-func (c *Config) OpenKeyStore() *keystore.KeyStore {
-	return keystore.NewKeyStore(c.KeyStore.Path, c.KeyStore.ScryptN, c.KeyStore.ScryptP)
+// KeyStorePath returns the keystore directory path.
+func (c *Config) KeyStorePath() string {
+	return filepath.Join(c.rootPath, keystoreDir)
 }
 
 // DatabasePath returns the database directory path.

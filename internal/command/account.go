@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/ethereum/go-ethereum/accounts"
+	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/crypto"
 
@@ -15,7 +16,7 @@ import (
 // CreateAccount creates a new account.
 func CreateAccount(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := config.OpenKeyStore()
+	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	passphrase, err := prompt.NewAccountPassphrase().Run()
 	if err != nil {
@@ -38,7 +39,7 @@ func CreateAccount(ctx context.Context) error {
 // DefaultAccount sets the default account in the config.
 func DefaultAccount(ctx context.Context, addr string) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := config.OpenKeyStore()
+	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	if !common.IsHexAddress(addr) {
 		return fmt.Errorf("Invalid account address")
@@ -56,7 +57,7 @@ func DefaultAccount(ctx context.Context, addr string) error {
 // ExportAccount exports an account in web3 secret json format.
 func ExportAccount(ctx context.Context, addr string) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := config.OpenKeyStore()
+	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	address := common.HexToAddress(addr)
 	account := accounts.Account{Address: address}
@@ -83,7 +84,7 @@ func ExportAccount(ctx context.Context, addr string) error {
 // ImportAccount imports an account private key.
 func ImportAccount(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := config.OpenKeyStore()
+	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	privkey, err := prompt.AccountPrivateKey().Run()
 	if err != nil {
@@ -116,7 +117,7 @@ func ImportAccount(ctx context.Context) error {
 // ListAccounts prints all account addresses.
 func ListAccounts(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := config.OpenKeyStore()
+	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
 	for _, account := range kstore.Accounts() {
 		if config.Accounts.Default == account.Address {
