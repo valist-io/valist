@@ -42,7 +42,6 @@ var ProjectTypes = []string{
 	ProjectTypeRust,
 	ProjectTypePython,
 	ProjectTypeDocker,
-	ProjectTypeRust,
 	ProjectTypeStatic,
 }
 
