@@ -28,7 +28,7 @@ func ConfigWizard() error {
 		return err
 	}
 
-	projectName := fmt.Sprintf("%s/%s/%s",
+	projectName := fmt.Sprintf("%s/%s",
 		strings.ToLower(org),
 		strings.ToLower(repo),
 	)

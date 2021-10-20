@@ -12,8 +12,8 @@ import (
 
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type"`
-	Name      string            `yaml:"org" validate:"required,lowercase,shortname"`
+	Type      string            `yaml:"type" validate:"project_type"`
+	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
 	Artifacts map[string]string `yaml:"artifacts" validate:"platforms"`
 }
@@ -33,7 +33,7 @@ func (c Config) Validate() error {
 }
 
 func ValidateShortname(fl validator.FieldLevel) bool {
-	return types.RegexShortname.MatchString(fl.Field().String())
+	return types.RegexPath.MatchString(fl.Field().String())
 }
 
 func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {

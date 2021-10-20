@@ -20,11 +20,10 @@ const (
 	ProjectTypeBinary = "binary"
 	ProjectTypeNode   = "node"
 	ProjectTypeNPM    = "npm"
-	ProjectTypeGo     = "go"
-	ProjectTypeRust   = "rust"
+	ProjectTypeGit    = "git"
+	ProjectTypeRust   = "crate"
 	ProjectTypePython = "python"
 	ProjectTypeDocker = "docker"
-	ProjectTypeCPP    = "c++"
 	ProjectTypeStatic = "static"
 )
 
@@ -39,11 +38,11 @@ var ProjectTypes = []string{
 	ProjectTypeBinary,
 	ProjectTypeNode,
 	ProjectTypeNPM,
-	ProjectTypeGo,
+	ProjectTypeGit,
 	ProjectTypeRust,
 	ProjectTypePython,
 	ProjectTypeDocker,
-	ProjectTypeCPP,
+	ProjectTypeRust,
 	ProjectTypeStatic,
 }
 

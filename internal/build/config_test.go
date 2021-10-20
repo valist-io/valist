@@ -15,6 +15,7 @@ func TestInvalidConfig(t *testing.T) {
 	defer os.RemoveAll(tmp)
 
 	var fullConfigObjectCorrect = Config{
+		Type: "binary",
 		Name: "acme-co/go-example",
 		Tag:  "0.0.2",
 		Artifacts: map[string]string{
@@ -61,8 +62,8 @@ func TestLoadSaveValistConfig(t *testing.T) {
 	defer os.RemoveAll(tmp)
 
 	var fullConfigObject = Config{
-		Type: "go",
-		Name: "test",
+		Type: "binary",
+		Name: "test/test",
 		Tag:  "0.0.2",
 		Artifacts: map[string]string{
 			"linux/amd64":  "bin/linux/hello-world",
