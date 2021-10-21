@@ -43,9 +43,9 @@ docs:
 	mkdocs build
 
 clean:
-	rm -rf dist site
+	rm -Rf dist site
 
-publish:
-	clean install web bin-multi
+publish: clean bin-multi
+	go run cmd/valist/main.go publish
 
 .PHONY: docs
