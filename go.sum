@@ -673,6 +673,7 @@ github.com/ipfs/iptb v1.4.0/go.mod h1:1rzHpCYtNp87/+hTxG5TfCVn/yMY3dKnLn8tBiMfdm
 github.com/ipfs/iptb-plugins v0.3.0 h1:C1rpq1o5lUZtaAOkLIox5akh6ba4uk/3RwWc6ttVxw0=
 github.com/ipfs/iptb-plugins v0.3.0/go.mod h1:5QtOvckeIw4bY86gSH4fgh3p3gCSMn3FmIKr4gaBncA=
 github.com/ipfs/tar-utils v0.0.1/go.mod h1:ACflm9wXvV9w0eMJt6yYXxS2zuIV+yXGNwbuq1bhLeE=
+github.com/ipld/go-car v0.3.1 h1:WT+3cdmXlvmWOlGxk9webhj4auGO5QvgqC2vCCkFRXs=
 github.com/ipld/go-car v0.3.1/go.mod h1:dPkEWeAK8KaVvH5TahaCs6Mncpd4lDMpkbs0/SPzuVs=
 github.com/ipld/go-codec-dagpb v1.2.0 h1:2umV7ud8HBMkRuJgd8gXw95cLhwmcYrihS3cQEy9zpI=
 github.com/ipld/go-codec-dagpb v1.2.0/go.mod h1:6nBN7X7h8EOsEejZGqC7tej5drsdBAXbMHyBT+Fne5s=
