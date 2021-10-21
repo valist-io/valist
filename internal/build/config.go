@@ -22,8 +22,7 @@ var validate *validator.Validate
 func init() {
 	validate = validator.New()
 	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
-	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
-	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
+	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck                 //nolint:errcheck
 	validate.RegisterValidation("artifacts", ValidateArtifacts)                        //nolint:errcheck
 }
 
@@ -39,25 +38,10 @@ func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
 	return types.RegexAcceptableCharacters.MatchString(fl.Field().String())
 }
 
-func ValidateProjectType(fl validator.FieldLevel) bool {
-	for _, projectType := range types.ProjectTypes {
-		if projectType == fl.Field().String() || fl.Field().String() == "" {
-			return true
-		}
-	}
-	return false
-}
-
 func ValidateArtifacts(fl validator.FieldLevel) bool {
 	valid := true
 	for iter := fl.Field().MapRange(); iter.Next(); {
-		valid = types.RegexPlatformArchitecture.MatchString(iter.Key().String()) // linux/amd64
-		if !valid {
-			fmt.Println("Invalid os/arch in platforms")
-			break
-		}
-
-		valid = types.RegexPath.MatchString(iter.Value().String()) // bin/linux/amd64/valist
+		valid = types.RegexPath.MatchString(iter.Value().String())
 		if !valid {
 			fmt.Println("Invalid path to artifact")
 			break
