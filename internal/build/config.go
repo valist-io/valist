@@ -14,7 +14,7 @@ import (
 type Config struct {
 	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
-	Artifacts map[string]string `yaml:"artifacts" validate:"artifacts"`
+	Artifacts map[string]string `yaml:"artifacts" validate:"required,artifacts"`
 }
 
 var validate *validator.Validate
