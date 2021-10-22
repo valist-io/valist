@@ -1,9 +1,6 @@
 package command
 
 import (
-	"os"
-	"path/filepath"
-
 	"github.com/urfave/cli/v2"
 	"github.com/valist-io/valist/internal/build"
 )
@@ -20,22 +17,19 @@ func NewInitCommand() *cli.Command {
 			},
 		},
 		Action: func(c *cli.Context) error {
-			wd, err := os.Getwd()
-			if err != nil {
-				return err
-			}
-
-			if c.Bool("wizard") {
-				return build.ConfigWizard()
-			}
-
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			projectType := c.Args().Get(0)
-			valistFilePath := filepath.Join(wd, "valist.yml")
-			return build.ConfigTemplate(projectType, valistFilePath)
+			projectName := c.Args().Get(0)
+
+			cfg := build.Config{
+				Name:      projectName,
+				Tag:       "0.0.1",
+				Artifacts: map[string]string{"linux/amd64": "path_to_bin"},
+			}
+
+			return cfg.Save("valist.yml")
 		},
 	}
 }

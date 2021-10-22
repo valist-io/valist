@@ -1,6 +1,8 @@
 SHELL=/bin/bash
 
-all: install valist
+all: valist
+
+valist: bin
 
 bin:
 	go build -ldflags "-s -w" ./cmd/valist
@@ -22,69 +24,28 @@ bin-windows-amd64:
 
 bin-multi: bin-linux-amd64 bin-linux-arm64 bin-darwin-amd64 bin-darwin-arm64 bin-windows-amd64
 
-valist: web bin
-
-install: install-lib install-relay
-
-install-lib:
-	npm install --prefix ./web/lib
-
-install-relay:
-	npm install --prefix ./web/relay
-
 install-docs:
 	pip install mkdocs mkdocs-material
-
-dev-lib:
-	npm run dev --prefix ./web/lib
-
-dev-relay:
-	npm run dev --prefix ./web/relay
 
 dev-docs:
 	mkdocs serve
 
-dev:
-	@make -j 2 dev-lib dev-relay
+start:
+	go run cmd/valist/main.go daemon
 
-web-lib:
-	npm run build --prefix ./web/lib
-
-web-relay:
-	rm -rf ./web/relay/out
-	npm run build --prefix ./web/relay
-	npm run export --prefix ./web/relay
-
-web: web-lib web-relay
-
-lint-valist:
+lint:
 	golangci-lint run
 
-lint-web-lib:
-	npm run lint --prefix ./web/lib
-
-lint-web-relay:
-	npm run lint --prefix ./web/relay
-
-lint: lint-valist lint-web-lib lint-web-relay
-
-test-valist:
+test:
 	go test ./...
-
-test-web-lib:
-	npm run test --prefix ./web/lib
-
-test: test-valist test-web-lib
 
 docs:
 	mkdocs build
 
 clean:
-	rm -rf ./web/relay/.next
-	rm -rf ./web/relay/out
-	rm -rf ./web/relay/node_modules
-	rm -rf ./web/lib/node_modules
-	rm -rf ./web/lib/dist
-	rm -rf dist site
+	rm -Rf dist site
 
-.PHONY: web docs
+publish: clean bin-multi
+	go run cmd/valist/main.go publish
+
+.PHONY: docs

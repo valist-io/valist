@@ -20,11 +20,10 @@ const (
 	ProjectTypeBinary = "binary"
 	ProjectTypeNode   = "node"
 	ProjectTypeNPM    = "npm"
-	ProjectTypeGo     = "go"
-	ProjectTypeRust   = "rust"
+	ProjectTypeGit    = "git"
+	ProjectTypeRust   = "crate"
 	ProjectTypePython = "python"
 	ProjectTypeDocker = "docker"
-	ProjectTypeCPP    = "c++"
 	ProjectTypeStatic = "static"
 )
 
@@ -32,18 +31,16 @@ var (
 	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
 	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
 	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
-	RegexPlatformArchitecture = regexp.MustCompile(`^[0-9A-z\-_]+\/[0-9A-z\-_]+$`)
 )
 
 var ProjectTypes = []string{
 	ProjectTypeBinary,
 	ProjectTypeNode,
 	ProjectTypeNPM,
-	ProjectTypeGo,
+	ProjectTypeGit,
 	ProjectTypeRust,
 	ProjectTypePython,
 	ProjectTypeDocker,
-	ProjectTypeCPP,
 	ProjectTypeStatic,
 }
 

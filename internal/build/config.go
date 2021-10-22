@@ -10,66 +10,11 @@ import (
 	"github.com/valist-io/valist/internal/core/types"
 )
 
-var DefaultImages = map[string]string{
-	types.ProjectTypeBinary: "gcc:bullseye",
-	types.ProjectTypeNode:   "node:buster",
-	types.ProjectTypeNPM:    "node:buster",
-	types.ProjectTypeGo:     "golang:buster",
-	types.ProjectTypeRust:   "rust:buster",
-	types.ProjectTypePython: "python:buster",
-	types.ProjectTypeDocker: "scratch",
-	types.ProjectTypeCPP:    "gcc:bullseye",
-	types.ProjectTypeStatic: "",
-}
-
-var DefaultInstalls = map[string]string{
-	types.ProjectTypeBinary: "make install",
-	types.ProjectTypeNode:   "npm install",
-	types.ProjectTypeNPM:    "npm install",
-	types.ProjectTypeGo:     "go get ./...",
-	types.ProjectTypeRust:   "cargo install",
-	types.ProjectTypePython: "pip install -r requirements.txt",
-	types.ProjectTypeDocker: "",
-	types.ProjectTypeCPP:    "make install",
-	types.ProjectTypeStatic: "",
-}
-
-var DefaultBuilds = map[string]string{
-	types.ProjectTypeBinary: "make build",
-	types.ProjectTypeNode:   "npm run build",
-	types.ProjectTypeNPM:    "npm run build",
-	types.ProjectTypeGo:     "go build",
-	types.ProjectTypeRust:   "cargo build",
-	types.ProjectTypePython: "python3 -m build",
-	types.ProjectTypeDocker: "",
-	types.ProjectTypeCPP:    "make build",
-	types.ProjectTypeStatic: "",
-}
-
-var DefaultTemplates = map[string]string{
-	types.ProjectTypeBinary: "default.tmpl",
-	types.ProjectTypeNode:   "node.tmpl",
-	types.ProjectTypeNPM:    "npm.tmpl",
-	types.ProjectTypeGo:     "go.tmpl",
-	types.ProjectTypeRust:   "rust.tmpl",
-	types.ProjectTypePython: "python.tmpl",
-	types.ProjectTypeDocker: "docker.tmpl",
-	types.ProjectTypeCPP:    "cpp.tmpl",
-	types.ProjectTypeStatic: "static.tmpl",
-}
-
 // Config contains valist build settings.
 type Config struct {
-	Type      string            `yaml:"type" validate:"required,project_type"`
-	Org       string            `yaml:"org" validate:"required,lowercase,shortname"`
-	Repo      string            `yaml:"repo" validate:"required,lowercase,shortname"`
+	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
 	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
-	Meta      string            `yaml:"meta,omitempty" validate:"acceptable_characters"`
-	Image     string            `yaml:"image,omitempty" validate:"acceptable_characters"`
-	Build     string            `yaml:"build,omitempty" validate:"acceptable_characters"`
-	Install   string            `yaml:"install,omitempty" validate:"acceptable_characters"`
-	Out       string            `yaml:"out,omitempty" validate:"required_with=Platforms,required_unless=Type npm,acceptable_characters"`
-	Platforms map[string]string `yaml:"platforms,omitempty" validate:"platforms"`
+	Artifacts map[string]string `yaml:"artifacts" validate:"required,artifacts"`
 }
 
 var validate *validator.Validate
@@ -77,9 +22,8 @@ var validate *validator.Validate
 func init() {
 	validate = validator.New()
 	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
-	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
-	validate.RegisterValidation("project_type", ValidateProjectType)                   //nolint:errcheck
-	validate.RegisterValidation("platforms", ValidatePlatforms)                        //nolint:errcheck
+	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck                 //nolint:errcheck
+	validate.RegisterValidation("artifacts", ValidateArtifacts)                        //nolint:errcheck
 }
 
 func (c Config) Validate() error {
@@ -87,32 +31,17 @@ func (c Config) Validate() error {
 }
 
 func ValidateShortname(fl validator.FieldLevel) bool {
-	return types.RegexShortname.MatchString(fl.Field().String())
+	return types.RegexPath.MatchString(fl.Field().String())
 }
 
 func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
 	return types.RegexAcceptableCharacters.MatchString(fl.Field().String())
 }
 
-func ValidateProjectType(fl validator.FieldLevel) bool {
-	for _, projectType := range types.ProjectTypes {
-		if projectType == fl.Field().String() {
-			return true
-		}
-	}
-	return false
-}
-
-func ValidatePlatforms(fl validator.FieldLevel) bool {
+func ValidateArtifacts(fl validator.FieldLevel) bool {
 	valid := true
 	for iter := fl.Field().MapRange(); iter.Next(); {
-		valid = types.RegexPlatformArchitecture.MatchString(iter.Key().String()) // linux/amd64
-		if !valid {
-			fmt.Println("Invalid os/arch in platforms")
-			break
-		}
-
-		valid = types.RegexPath.MatchString(iter.Value().String()) // bin/linux/amd64/valist
+		valid = types.RegexPath.MatchString(iter.Value().String())
 		if !valid {
 			fmt.Println("Invalid path to artifact")
 			break
