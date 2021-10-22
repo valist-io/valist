@@ -1,7 +1,6 @@
 package build
 
 import (
-	"fmt"
 	"os"
 
 	"gopkg.in/yaml.v3"
@@ -12,8 +11,8 @@ import (
 
 // Config contains valist build settings.
 type Config struct {
-	Name      string            `yaml:"name" validate:"required,lowercase,shortname"`
-	Tag       string            `yaml:"tag" validate:"required,acceptable_characters"`
+	Name      string            `yaml:"name"      validate:"required,lowercase,shortname"`
+	Tag       string            `yaml:"tag"       validate:"required,acceptable_characters"`
 	Artifacts map[string]string `yaml:"artifacts" validate:"required,artifacts"`
 }
 
@@ -22,7 +21,7 @@ var validate *validator.Validate
 func init() {
 	validate = validator.New()
 	validate.RegisterValidation("shortname", ValidateShortname)                        //nolint:errcheck
-	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck                 //nolint:errcheck
+	validate.RegisterValidation("acceptable_characters", ValidateAcceptableCharacters) //nolint:errcheck
 	validate.RegisterValidation("artifacts", ValidateArtifacts)                        //nolint:errcheck
 }
 
@@ -39,15 +38,12 @@ func ValidateAcceptableCharacters(fl validator.FieldLevel) bool {
 }
 
 func ValidateArtifacts(fl validator.FieldLevel) bool {
-	valid := true
 	for iter := fl.Field().MapRange(); iter.Next(); {
-		valid = types.RegexPath.MatchString(iter.Value().String())
-		if !valid {
-			fmt.Println("Invalid path to artifact")
-			break
+		if !types.RegexPath.MatchString(iter.Value().String()) {
+			return false
 		}
 	}
-	return valid
+	return true
 }
 
 func (c Config) Save(path string) error {

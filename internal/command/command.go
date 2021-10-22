@@ -6,4 +6,3 @@ const (
 	ClientKey = contextKey("client")
 	ConfigKey = contextKey("config")
 )
-

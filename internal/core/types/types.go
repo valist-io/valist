@@ -46,9 +46,9 @@ var ProjectTypes = []string{
 }
 
 var (
-	ErrOrganizationNotExist = errors.New("Organization does not exist")
-	ErrRepositoryNotExist   = errors.New("Repository does not exist")
-	ErrReleaseNotExist      = errors.New("Release does not exist")
+	ErrOrgNotExist     = errors.New("Organization does not exist")
+	ErrRepoNotExist    = errors.New("Repository does not exist")
+	ErrReleaseNotExist = errors.New("Release does not exist")
 )
 
 // CoreAPI defines the high-level interface for Valist.

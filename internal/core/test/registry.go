@@ -12,7 +12,7 @@ func (s *CoreSuite) TestGetOrganizationID() {
 	ctx := context.Background()
 
 	_, err := s.client.GetOrganizationID(ctx, "empty")
-	s.Assert().Equal(types.ErrOrganizationNotExist, err)
+	s.Assert().Equal(types.ErrOrgNotExist, err)
 
 	orgName := "valist"
 	orgID := common.HexToHash("0xDEADBEEF")

@@ -135,7 +135,11 @@ var (
 		Name:  "init",
 		Usage: "Initialize a new valist project",
 		Action: func(c *cli.Context) error {
-			return fmt.Errorf("not implemented") // TODO
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
+			return command.Init(c.Context, c.Args().Get(0))
 		},
 	}
 	// installCommand installs a binary artifact
@@ -223,7 +227,7 @@ var (
 			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
-			return fmt.Errorf("not implemented") // TODO
+			return command.Publish(c.Context, c.Bool("dryrun"))
 		},
 	}
 	// thresholdCommand votes to change signature threshold
