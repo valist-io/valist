@@ -26,6 +26,11 @@ func Publish(ctx context.Context, dryrun bool) error {
 		return err
 	}
 
+	// create will do nothing if org and repo already exist
+	if err := Create(ctx, valist.Name); err != nil {
+		return err
+	}
+
 	res, err := client.ResolvePath(ctx, valist.Name+"/"+valist.Tag)
 	if err == nil {
 		return fmt.Errorf("release %s already exists", res.ReleaseTag)
@@ -36,7 +41,10 @@ func Publish(ctx context.Context, dryrun bool) error {
 	}
 
 	// TODO replace with regex or path matcher
-	readme, _ := os.ReadFile("README1.md") //nolint:errcheck
+	readme, err := os.ReadFile("README.md")
+	if err != nil {
+		fmt.Println("warning: readme not found")
+	}
 
 	releaseMeta := &types.ReleaseMeta{
 		Name:      fmt.Sprintf("%s@%s", valist.Name, valist.Tag),
@@ -44,15 +52,18 @@ func Publish(ctx context.Context, dryrun bool) error {
 		Artifacts: make(map[string]types.Artifact),
 	}
 
+	// TODO run file uploads in parallel and print progress
 	for key, val := range valist.Artifacts {
+		fmt.Printf("Adding: %s...\n", key)
+
 		fdata, err := os.ReadFile(filepath.Join(cwd, val))
 		if err != nil {
-			return fmt.Errorf("failed to add %s %s: %v", key, val, err)
+			return fmt.Errorf("failed to add %s: %v", key, err)
 		}
 
 		fpath, err := client.Storage().Write(ctx, fdata)
 		if err != nil {
-			return err
+			return fmt.Errorf("failed to add %s: %v", key, err)
 		}
 
 		releaseMeta.Artifacts[key] = types.Artifact{

@@ -16,17 +16,20 @@ func Create(ctx context.Context, rpath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
 	res, err := client.ResolvePath(ctx, rpath)
-	if err != nil {
-		return err
-	}
-
-	switch {
-	case res.Repository == nil:
+	switch err {
+	case types.ErrOrgNotExist:
+		if err := createOrganization(ctx, res.OrgName); err != nil {
+			return err
+		}
+		res, err = client.ResolvePath(ctx, rpath)
+		if err != types.ErrRepoNotExist {
+			return err
+		}
 		return createRepository(ctx, res.OrgID, res.RepoName)
-	case res.Organization == nil:
-		return createOrganization(ctx, res.OrgName)
+	case types.ErrRepoNotExist:
+		return createRepository(ctx, res.OrgID, res.RepoName)
 	default:
-		return fmt.Errorf("invalid path")
+		return err
 	}
 }
 
