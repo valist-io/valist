@@ -1,22 +1,5 @@
-# The project type
-type: npm
-
-# The valist organization
-org: acme-co
-
-# The valist repository
-repo: npm-example
+# The valist organization/project
+name: acme-co/npm-example
 
 # The latest release tag
 tag: 1.0.0
-
-# The command used for building the project
-build: npm run build
-
-# The command used for installing the project's dependencies
-# install: npm install
-
-# The docker image used for building the project. Will default to node:buster for npm.
-# image: node:buster
-
-

@@ -11,7 +11,6 @@ import (
 	"github.com/valist-io/valist/internal/core/client"
 	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/registry"
-	"github.com/valist-io/valist/web"
 )
 
 // Daemon runs the valist node daemon indefinitely.

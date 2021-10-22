@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -13,6 +14,7 @@ import (
 	"github.com/valist-io/valist/internal/core/client/metatx"
 	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/signer"
+	"github.com/valist-io/valist/internal/storage"
 	"github.com/valist-io/valist/internal/storage/estuary"
 	"github.com/valist-io/valist/internal/storage/ipfs"
 )
@@ -53,7 +55,9 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	// TODO move to config once URL is proxied
-	estuary := estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "", ipfs)
+	var provider storage.Provider
+	provider = estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "", ipfs)
+	provider = storage.WithTimeout(provider, 5*time.Minute, 5*time.Minute)
 
 	var transactor client.TransactorAPI
 	if cfg.Ethereum.MetaTx {
@@ -67,7 +71,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	return client.NewClient(client.Options{
-		Storage:    estuary,
+		Storage:    provider,
 		Ethereum:   eth,
 		Valist:     valist,
 		Registry:   registry,

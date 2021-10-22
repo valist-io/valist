@@ -1,17 +1,8 @@
-type: go
-org: valist
-repo: cli
-tag: 0.5.0
-meta: README.md
-install:
-  curl -fsSL https://deb.nodesource.com/setup_14.x | bash -
-
-  RUN apt install -yy nodejs
-build: make clean install web bin-multi
-out: dist
-platforms:
-  linux/amd64: linux-amd64/valist
-  linux/arm64: linux-arm64/valist
-  darwin/amd64: darwin-amd64/valist
-  darwin/arm64: darwin-arm64/valist
-  windows/amd64: windows-amd64/valist
+name: valist/cli
+tag: 0.6.0-rc.0
+artifacts:
+  linux/amd64: dist/linux-amd64/valist
+  linux/arm64: dist/linux-arm64/valist
+  darwin/amd64: dist/darwin-amd64/valist
+  darwin/arm64: dist/darwin-arm64/valist
+  windows/amd64: dist/windows-amd64/valist.exe
