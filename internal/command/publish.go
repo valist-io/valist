@@ -93,7 +93,8 @@ func NewPublishCommand() *cli.Command {
 				return err
 			}
 
-			if _, err := os.Stat(filepath.Join(cwd, "go.mod")); os.IsNotExist(err) {
+			_, err = os.Stat(filepath.Join(cwd, "go.mod"))
+			if err != nil {
 				goModData, err := os.ReadFile(filepath.Join(cwd, "go.mod"))
 				if err != nil {
 					return err
