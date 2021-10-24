@@ -8,7 +8,7 @@ You can download the latest version of the Valist CLI from app.valist.io/valist/
 
 Or, you can use the following script to install the binary globally:
 
-```bash
+```sh
 mkdir -p ~/.local/bin
 curl https://gateway.valist.io/ipfs/QmZ9T6H7WTb6VrNaqFEwo7Mqj6jGxMe4vpR6srxsjy3otz/linux-amd64/valist -o ~/.local/bin/valist
 ```
@@ -23,12 +23,13 @@ Please note, you'll need to replace `linux-amd64` with your os and architecture.
 
 Finally, ensure your PATH includes the ~/.local/bin folder:
 
-```
+```sh
 export PATH="$PATH:$HOME/.local/bin"
 echo PATH=\"\$PATH:$HOME/.local/bin\" >> ~/.zshrc # or .bashrc
 ```
 
-> Installing from package managers coming soon!
+!!! note
+    Installing from package managers coming soon!
 
 #### Running the daemon
 
