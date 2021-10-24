@@ -31,4 +31,17 @@ markdown_extensions:
   - pymdownx.highlight
   - admonition
   - pymdownx.details
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/valist-io/valist
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/valist
+    - icon: fontawesome/brands/twitter
+      link: https://twitter.com/valist_io
+    - icon: fontawesome/brands/medium
+      link: https://medium.com/valist
+    - icon: fontawesome/brands/discord
+      link: https://valist.io/discord
+
 
