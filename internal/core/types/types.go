@@ -7,6 +7,7 @@ import (
 	"regexp"
 
 	"github.com/ethereum/go-ethereum/common"
+
 	"github.com/valist-io/valist/internal/contract/registry"
 	"github.com/valist-io/valist/internal/contract/valist"
 	"github.com/valist-io/valist/internal/signer"
@@ -45,9 +46,9 @@ var ProjectTypes = []string{
 }
 
 var (
-	ErrOrganizationNotExist = errors.New("Organization does not exist")
-	ErrRepositoryNotExist   = errors.New("Repository does not exist")
-	ErrReleaseNotExist      = errors.New("Release does not exist")
+	ErrOrgNotExist     = errors.New("Organization does not exist")
+	ErrRepoNotExist    = errors.New("Repository does not exist")
+	ErrReleaseNotExist = errors.New("Release does not exist")
 )
 
 // CoreAPI defines the high-level interface for Valist.
@@ -57,7 +58,7 @@ type CoreAPI interface {
 	ReleaseAPI
 	RepositoryAPI
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
-	ResolvePath(context.Context, string) (*ResolvedPath, error)
+	ResolvePath(context.Context, string) (ResolvedPath, error)
 	// Signer returns the transaction signer.
 	Signer() *signer.Signer
 	// Storage returns the storage provider.
