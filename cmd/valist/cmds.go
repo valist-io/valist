@@ -134,12 +134,15 @@ var (
 	initCommand = cli.Command{
 		Name:  "init",
 		Usage: "Initialize a new valist project",
+		Flags: []cli.Flag{
+			&initWizardFlag,
+		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			return command.Init(c.Context, c.Args().Get(0))
+			return command.Init(c.Context, c.Args().Get(0), c.Bool("wizard"))
 		},
 	}
 	// installCommand installs a binary artifact
