@@ -42,8 +42,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 	}
 
 	var dependencies []string
-	_, err = os.Stat(filepath.Join(cwd, "go.mod"))
-	if err != nil {
+	if _, err := os.Stat(filepath.Join(cwd, "go.mod")); err == nil {
 		goModData, err := os.ReadFile(filepath.Join(cwd, "go.mod"))
 		if err != nil {
 			return err
