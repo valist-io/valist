@@ -92,7 +92,7 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 
 	latestVersion := meta.Versions[meta.DistTags["latest"]]
 	var dependencies []string
-	for key, _ := range latestVersion.Dependencies {
+	for key := range latestVersion.Dependencies {
 		dependencies = append(dependencies, key)
 	}
 
