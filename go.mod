@@ -19,7 +19,6 @@ require (
 	github.com/ipld/go-car v0.3.1
 	github.com/manifoldco/promptui v0.8.0
 	github.com/mattn/go-runewidth v0.0.10 // indirect
-	github.com/otiai10/copy v1.6.0
 	github.com/pkg/errors v0.9.1
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
