@@ -7,13 +7,11 @@
 To publish a binary from the Valist CLI create a new `valist.yml` within your project folder containing one of the supported binary project types `binary` or `go`. Or, run `valist init` to generate a new `valist.yaml`.
 
 ```yaml
-type: go
-org: acme-co
-repo: go-example
+name: acme-co/go-example
 tag: 0.1.6-rc.0
-meta: README.md
 build: go build -o ./dist/hello src/main.go 
-out: dist/hello
+artifacts:
+  hello: dist/hello
 ```
 
 ```bash
