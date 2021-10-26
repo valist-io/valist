@@ -4,7 +4,7 @@
 
 To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and click `versions`, then choose your desired release from the release list.
 
-![valist-release-page](img/valist-release-page.png){width="600px"}
+![valist-release-page](./img/valist-release-page.png){width="600px"}
 
 ## SDK
 

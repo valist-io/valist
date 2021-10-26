@@ -12,7 +12,7 @@ To create an organization from the CLI it's as simple as running `valist org cre
 
 You will then be prompted to enter some additional metadata about the organization.
 
-![cli-create-org-metadata](img/cli-org-create-metadata.png)
+![cli-create-org-metadata](./img/cli-org-create-metadata.png)
 
 ## SDK
 
