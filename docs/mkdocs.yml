@@ -1,7 +1,7 @@
 site_name: Valist Documentation
 site_url: https://docs.valist.io
 repo_url: https://github.com/valist-io/valist
-docs_dir: docs
+docs_dir: src
 theme:
   palette:
     - scheme: default
@@ -19,12 +19,12 @@ theme:
     - toc.integrate
 nav:
     - index.md
-    - content/creating-an-organization.md
-    - content/creating-a-repository.md
-    - content/access-control.md
-    - content/multi-factor-everything.md
-    - content/publishing-software.md
-    - content/fetching-and-installing-software.md
+    - creating-an-organization.md
+    - creating-a-repository.md
+    - access-control.md
+    - multi-factor-everything.md
+    - publishing-software.md
+    - fetching-and-installing-software.md
 markdown_extensions:
   - attr_list
   - pymdownx.superfences

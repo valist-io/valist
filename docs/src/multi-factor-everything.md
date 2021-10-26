@@ -6,7 +6,7 @@ One of the coolest features of Valist is that there is a multi-factor system for
 
 You may have heard of the [two man rule](https://en.wikipedia.org/wiki/Two-man_rule) -- an authentication mechanism designed to prevent accidental or malicious launch of nuclear weapons by a single individual. This mechanism requires the presence of two authorized individuals, **with special keys**, to perform a nuclear strike. Valist applies this same concept to software distribution. When enabled multi-party verification requires operations be verified and digitally signed by multiple members within your organization before being finalized.
 
-![two-man-rule](../img/two-man-rule.jpeg)
+![two-man-rule](./img/two-man-rule.jpeg)
 
 ## Organization vs Repo Level
 

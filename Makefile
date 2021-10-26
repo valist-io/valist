@@ -28,7 +28,7 @@ install-docs:
 	pip install mkdocs mkdocs-material
 
 dev-docs:
-	cd documentation && mkdocs serve
+	cd docs && mkdocs serve
 
 start:
 	go run cmd/valist/main.go daemon
@@ -40,7 +40,7 @@ test:
 	go test ./...
 
 docs:
-	cd documentation && mkdocs build
+	cd docs && mkdocs build
 
 clean:
 	rm -Rf dist site
