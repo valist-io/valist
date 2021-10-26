@@ -1,0 +1,22 @@
+name: Valist Deployment
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+jobs:
+  test:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make test
+  publish:
+    name: Multi-platform build and publish
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - run: make bin-multi
+      - run: ./dist/linux-amd64/valist publish --dryrun
