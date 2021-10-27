@@ -8,49 +8,47 @@ import (
 	"github.com/valist-io/valist/internal/core/types"
 )
 
-func (client *Client) ResolvePath(ctx context.Context, raw string) (*types.ResolvedPath, error) {
+func (client *Client) ResolvePath(ctx context.Context, raw string) (types.ResolvedPath, error) {
+	var res types.ResolvedPath
+	var err error
+
 	clean := strings.TrimLeft(raw, "/@")
 	parts := strings.Split(clean, "/")
 
 	if len(parts) == 0 || len(parts) > 3 {
-		return nil, fmt.Errorf("invalid path")
+		return res, fmt.Errorf("invalid path")
 	}
 
-	res := types.ResolvedPath{
-		OrgID:   emptyHash,
-		OrgName: parts[0],
-	}
-
-	orgID, err := client.GetOrganizationID(ctx, parts[0])
-	res.OrgID = orgID
+	res.OrgName = parts[0]
+	res.OrgID, err = client.GetOrganizationID(ctx, res.OrgName)
 	if err != nil {
-		return &res, err
+		return res, err
 	}
 
 	res.Organization, err = client.GetOrganization(ctx, res.OrgID)
 	if err != nil {
-		return &res, err
+		return res, err
 	}
 
 	if len(parts) < 2 {
-		return &res, nil
+		return res, nil
 	}
 
 	res.RepoName = parts[1]
-	res.Repository, err = client.GetRepository(ctx, orgID, res.RepoName)
+	res.Repository, err = client.GetRepository(ctx, res.OrgID, res.RepoName)
 	if err != nil {
-		return &res, err
+		return res, err
 	}
 
 	if len(parts) < 3 {
-		return &res, nil
+		return res, nil
 	}
 
 	res.ReleaseTag = parts[2]
-	res.Release, err = client.GetRelease(ctx, orgID, res.RepoName, res.ReleaseTag)
+	res.Release, err = client.GetRelease(ctx, res.OrgID, res.RepoName, res.ReleaseTag)
 	if err != nil {
-		return &res, err
+		return res, err
 	}
 
-	return &res, nil
+	return res, nil
 }

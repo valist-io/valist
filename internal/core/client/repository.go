@@ -27,7 +27,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 	}
 
 	if !repo.Exists {
-		return nil, types.ErrRepositoryNotExist
+		return nil, types.ErrRepoNotExist
 	}
 
 	return &types.Repository{

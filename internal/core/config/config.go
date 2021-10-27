@@ -5,7 +5,6 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 )
 
@@ -16,8 +15,6 @@ const (
 	keystoreDir = "keystore"
 	storageDir  = "storage"
 	databaseDir = "database"
-	scryptN     = keystore.StandardScryptN
-	scryptP     = keystore.StandardScryptP
 )
 
 type Ethereum struct {
@@ -53,9 +50,9 @@ type Config struct {
 }
 
 // NewConfig returns a config with default settings.
-func NewConfig(rootPath string) *Config {
+func NewConfig(path string) *Config {
 	return &Config{
-		filepath.Join(rootPath, rootDir),
+		filepath.Join(path, rootDir),
 		Accounts{},
 		Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
@@ -114,9 +111,9 @@ func (c *Config) Save() error {
 	return os.WriteFile(path, data, 0666)
 }
 
-// KeyStore returns the config keystore.
-func (c *Config) KeyStore() *keystore.KeyStore {
-	return keystore.NewKeyStore(filepath.Join(c.rootPath, keystoreDir), scryptN, scryptP)
+// KeyStorePath returns the keystore directory path.
+func (c *Config) KeyStorePath() string {
+	return filepath.Join(c.rootPath, keystoreDir)
 }
 
 // DatabasePath returns the database directory path.

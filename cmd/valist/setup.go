@@ -1,4 +1,4 @@
-package lifecycle
+package main
 
 import (
 	"context"
@@ -8,11 +8,13 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
+	"github.com/valist-io/valist/internal/command"
 	"github.com/valist-io/valist/internal/core"
 	"github.com/valist-io/valist/internal/core/config"
 )
 
-func SetupClient(c *cli.Context) error {
+// setup initializes the client before commands are executed
+func setup(c *cli.Context) error {
 	home, err := os.UserHomeDir()
 	if err != nil {
 		return err
@@ -45,7 +47,7 @@ func SetupClient(c *cli.Context) error {
 		client.Signer().SetAccount(account)
 	}
 
-	c.Context = context.WithValue(c.Context, core.ClientKey, client)
-	c.Context = context.WithValue(c.Context, core.ConfigKey, cfg)
+	c.Context = context.WithValue(c.Context, command.ClientKey, client)
+	c.Context = context.WithValue(c.Context, command.ConfigKey, cfg)
 	return nil
 }

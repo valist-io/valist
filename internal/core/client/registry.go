@@ -29,7 +29,7 @@ func (client *Client) GetOrganizationID(ctx context.Context, name string) (commo
 	}
 
 	if bytes.Equal(orgID[:], emptyHash.Bytes()) {
-		return emptyHash, types.ErrOrganizationNotExist
+		return emptyHash, types.ErrOrgNotExist
 	}
 
 	client.orgs[name] = orgID

@@ -1,32 +1,8 @@
 package command
 
-import (
-	"github.com/urfave/cli/v2"
+type contextKey string
 
-	"github.com/valist-io/valist/internal/command/account"
-	"github.com/valist-io/valist/internal/command/organization"
-	"github.com/valist-io/valist/internal/command/repository"
-	"github.com/valist-io/valist/internal/command/utils/flags"
+const (
+	ClientKey = contextKey("client")
+	ConfigKey = contextKey("config")
 )
-
-func NewApp() *cli.App {
-	return &cli.App{
-		Name:        "valist",
-		HelpName:    "valist",
-		Usage:       "Valist command line interface",
-		Description: `Universal package repository.`,
-		Flags: []cli.Flag{
-			flags.Account(),
-			flags.AccountPassphrase(),
-		},
-		Commands: []*cli.Command{
-			account.NewCommand(),
-			organization.NewCommand(),
-			repository.NewCommand(),
-			NewDaemonCommand(),
-			NewInitCommand(),
-			NewPublishCommand(),
-			NewInstallCommand(),
-		},
-	}
-}

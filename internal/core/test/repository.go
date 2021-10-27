@@ -12,7 +12,7 @@ func (s *CoreSuite) TestGetRepository() {
 	ctx := context.Background()
 
 	_, err := s.client.GetRepository(ctx, emptyHash, "empty")
-	s.Assert().Equal(types.ErrRepositoryNotExist, err)
+	s.Assert().Equal(types.ErrRepoNotExist, err)
 }
 
 func (s *CoreSuite) TestCreateRepository() {
