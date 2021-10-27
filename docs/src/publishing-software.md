@@ -59,146 +59,56 @@ npm publish --registry=http://localhost:9000/api/npm
 
 [Example NPM Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-npm-package)
 
-<!-- ### SDK
+## Websites
 
-To publish a binary from the Valist SDK, create and run the following javascript:
+Any static websites can be published and hosted through Valist.
 
-```javascript
-  import Valist from '@valist/sdk';
-  const HDWalletProvider = require('@truffle/hdwallet-provider');
+Start by creating a repository for your web project.
 
-  const key = "<key>";
-  const orgName = "<orgName";
-  const repoName = "<repoName>";
-  const metaData = "<orgMeta>";
+```bash
+valist create acme-co/website-example
+```
 
-  const web3Provider = new HDWalletProvider({
-    privateKeys: [key],
-    providerOrUrl: 'https://rpc.valist.io',
-  });
-
-  const valist = new Valist({web3Provider});
-
-  (async () => {
-    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
-
-    console.log(transactionHash);
-  })();
-``` -->
-
-<!-- ### SDK
-
-To publish a binary from the Valist SDK create and run the following javascript:
-
-```javascript
-  import Valist from '@valist/sdk';
-  const HDWalletProvider = require('@truffle/hdwallet-provider');
-
-  const key = "<key>";
-  const orgName = "<orgName";
-  const repoName = "<repoName>";
-  const metaData = "<orgMeta>";
-
-  const web3Provider = new HDWalletProvider({
-    privateKeys: [key],
-    providerOrUrl: 'https://rpc.valist.io',
-  });
-
-  const valist = new Valist({web3Provider});
-
-  (async () => {
-    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
-
-    console.log(transactionHash);
-  })();
-``` -->
-<!--
-## Python Packages
-
-### CLI
-
-To publish a python package from the Valist-CLI create a new `valist.yml` within your project with a project type of `python`. Or run a `valist init` to generate a new `valist.yaml`.
+Next, add your website files to the `valist.yml`.
 
 ```yaml
-type: python
-org: test
-repo: testProject
+name: acme-co/website-example
 tag: 0.0.1
-out: dist
+artifacts:
+  web/index: index.html
+  logo: logo.png
 ```
+
+To publish a new release, update the `tag` in your `valist.yml`, and run the following from your project root.
 
 ```bash
 valist publish
 ```
 
-### SDK
+## NFTs
 
-To publish a binary from the Valist-SDK create and run the following javascript:
+Valist can be used to publish and pin metadata, images or any other web3 assets required for minting an nft.
 
-```javascript
-  import Valist from '@valist/sdk';
-  const HDWalletProvider = require('@truffle/hdwallet-provider');
+Start by creating a repository for your NFT project.
 
-  const key = "<key>";
-  const orgName = "<orgName";
-  const repoName = "<repoName>";
-  const metaData = "<orgMeta>";
-
-  const web3Provider = new HDWalletProvider({
-    privateKeys: [key],
-    providerOrUrl: 'https://rpc.valist.io',
-  });
-
-  const valist = new Valist({web3Provider});
-
-  (async () => {
-    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
-
-    console.log(transactionHash);
-  })();
+```bash
+valist create acme-co/nft-example
 ```
 
-## Docker Images
-
-### CLI
-
-To publish a docker image from the Valist-CLI create a new `valist.yml` within your project with a project type of `docker`. Or run a `valist init` to generate a new `valist.yaml`.
+Next, add your nft assets to the `valist.yml`.
 
 ```yaml
-type: docker
-org: test
-repo: testProject
+name: acme-co/nft-example
 tag: 0.0.1
-out: dist
+artifacts:
+  meta: data/meta.json
+  image: data/ape.png
 ```
+
+To publish a new release, update the `tag` in your `valist.yml`, and run the following from your project root.
 
 ```bash
 valist publish
 ```
 
-### SDK
-
-To publish a binary from the Valist-SDK create and run the following javascript:
-
-```javascript
-  import Valist from '@valist/sdk';
-  const HDWalletProvider = require('@truffle/hdwallet-provider');
-
-  const key = "<key>";
-  const orgName = "<orgName";
-  const repoName = "<repoName>";
-  const metaData = "<orgMeta>";
-
-  const web3Provider = new HDWalletProvider({
-    privateKeys: [key],
-    providerOrUrl: 'https://rpc.valist.io',
-  });
-
-  const valist = new Valist({web3Provider});
-
-  (async () => {
-    const { transactionHash } = await valist.publishRelease(orgName, repoName, releaseObject);
-
-    console.log(transactionHash);
-  })();
-``` -->
+> **Note:** In a future upgrade to the valist system, all Valist repos will implement the `ERC-721` interface to allow repositories to be managed, owned, and traded. If you are interested in contributing or following the status of these features, checkout the current implementation and planning doc on [hackmd](https://hackmd.io/YF5CsRv_QZWk7o7ZzgRxDg?both)
