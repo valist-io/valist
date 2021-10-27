@@ -4,16 +4,43 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/valist-io/valist/internal/command"
+	"github.com/urfave/cli/v2"
 )
 
-// version is set by goreleaser
-var version = "dev"
+var (
+	app = cli.NewApp()
+	// version set by linker flags
+	version = "dev"
+	// global flags
+	globalFlags = []cli.Flag{
+		&accountFlag,
+		&passphraseFlag,
+	}
+)
+
+func init() {
+	app.Name = "valist"
+	app.HelpName = "valist"
+	app.Usage = "Valist command line interface"
+	app.Description = `Universal package repository.`
+	app.Copyright = "2020-2021 Valist, Inc."
+	app.Version = version
+	app.Flags = append(app.Flags, globalFlags...)
+	app.Commands = []*cli.Command{
+		&accountCommand,
+		&createCommand,
+		&daemonCommand,
+		&getCommand,
+		&initCommand,
+		&installCommand,
+		&keyCommand,
+		&publishCommand,
+		&thresholdCommand,
+		&updateCommand,
+	}
+}
 
 func main() {
-	app := command.NewApp()
-	app.Version = version
-
 	if err := app.Run(os.Args); err != nil {
 		fmt.Fprintln(os.Stderr, err)
 	}

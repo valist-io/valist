@@ -2,7 +2,6 @@ package prompt
 
 import (
 	"errors"
-	"fmt"
 	"os"
 	"strconv"
 
@@ -138,67 +137,10 @@ func ReleaseTag(value string) Prompt {
 	}}
 }
 
-func ReleaseMetaPath() Prompt {
-	return Prompt{promptui.Prompt{
-		Label: "Path to metadata file (README.md)",
-	}}
-}
-
-func InstallCommand(value string) Prompt {
-	return Prompt{promptui.Prompt{
-		Label:   "Command used to install dependencies",
-		Default: value,
-	}}
-}
-
-func BuildCommand(value string) Prompt {
-	return Prompt{promptui.Prompt{
-		Label:   "Command used to build your project",
-		Default: value,
-	}}
-}
-
-func DockerImage(value string) Prompt {
-	return Prompt{promptui.Prompt{
-		Label: fmt.Sprintf("Docker image (if not set, will default to %v)", value),
-	}}
-}
-
-func BuildOutPath() Prompt {
-	return Prompt{promptui.Prompt{
-		Label: "Build output file/directory",
-	}}
-}
-
-func BuildPlatforms() Prompt {
+func ReleaseMultiArch() Prompt {
 	return Prompt{promptui.Prompt{
 		Label:     "Are you building for multiple architecures? (y,N)",
 		IsConfirm: true,
 		Validate:  ValidateYesNo(),
-	}}
-}
-
-func BuildOS() Prompt {
-	return Prompt{promptui.Prompt{
-		Label: "Platform operating system, e.g. linux, darwin, freebsd, windows (leave blank to quit)",
-	}}
-}
-
-func BuildArch() Prompt {
-	return Prompt{promptui.Prompt{
-		Label: "Platform architecture, e.g. amd64, arm64",
-	}}
-}
-
-func BuildArtifactPath() Prompt {
-	return Prompt{promptui.Prompt{
-		Label: "Artifact file path",
-	}}
-}
-
-func Confirm(text string) Prompt {
-	return Prompt{promptui.Prompt{
-		Label:     text,
-		IsConfirm: true,
 	}}
 }
