@@ -8,15 +8,15 @@ on:
   pull_request:
 jobs:
 
-  unit-tests:
-    name: Unit Tests
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.16'
-      - uses: actions/checkout@v2
-      - run: make test
+  # unit-tests:
+  #   name: Unit Tests
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/setup-go@v2
+  #       with:
+  #         go-version: '^1.16'
+  #     - uses: actions/checkout@v2
+  #     - run: make test
 
   example-tests:
     name: Example Project Tests
@@ -35,15 +35,16 @@ jobs:
       - run: cd valist && make bin
       - run: mv valist/valist $GITHUB_WORKSPACE/bin/valist
       - run: git clone https://github.com/valist-io/example-projects
-      - run: cd example-projects && make publish-all
+      - run: make publish-all
+        working-directory: ./example-projects
 
-  publish:
-    name: Multi-platform build and publish
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.16'
-      - run: make bin-multi
-      - run: ./dist/linux-amd64/valist publish --dryrun
+  # publish:
+  #   name: Multi-platform build and publish
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - uses: actions/checkout@v2
+  #     - uses: actions/setup-go@v2
+  #       with:
+  #         go-version: '^1.16'
+  #     - run: make bin-multi
+  #     - run: ./dist/linux-amd64/valist publish --dryrun
