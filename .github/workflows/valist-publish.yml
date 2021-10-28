@@ -49,7 +49,6 @@ jobs:
     name: Multi-platform build and publish
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
       - name: Publish multi-platform release
         uses: docker://golang:1.16
       - run: |
