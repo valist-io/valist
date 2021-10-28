@@ -1,31 +1,54 @@
 # Publishing Software
 
-## Binary Executables
+## Binary
 
-### CLI
+> [Example Binary Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-go-project)
 
-To publish a binary from the Valist CLI create a new `valist.yml` within your project folder containing one of the supported binary project types `binary` or `go`. Or, run `valist init` to generate a new `valist.yaml`.
+Start by creating a `valist.yml` in your project root. The organization and repository will be created if they do not exist.
+
+```bash
+valist init acme-co/go-example
+```
+
+Add your release artifacts to the `valist.yml`. Any README or LICENSE files will be included automatically.
 
 ```yaml
 name: acme-co/go-example
 tag: 0.1.6-rc.0
-build: go build -o ./dist/hello src/main.go 
 artifacts:
-  hello: dist/hello
+  main: out/main
 ```
+
+To publish a new release, update the `tag` in your `valist.yml`, and run the following from your project root.
 
 ```bash
 valist publish
 ```
 
-[Example Go Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-go-project)
+### Platforms
 
-## NPM Packages
+If your project has artifacts for multiple platforms, add an entry for each supported platform to your `valist.yml`. 
 
-### CLI
+```yaml
+artifacts:
+  linux/amd64: path_to_bin
+  linux/arm64: path_to_bin
+  darwin/amd64: path_to_bin
+  darwin/arm64: path_to_bin
+  windows/amd64: path_to_bin
+```
 
-To publish an NPM package from the Valist CLI, create a new `package.json` with the name structured as `@orgName/repoName` and the `version` as the current version to be published.
+## NPM
 
+> [Example NPM Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-npm-package)
+
+Start by creating a repository for your NPM project.
+
+```bash
+valist create acme-co/npm-example
+```
+
+Make sure the `name` in your `package.json` matches your repository name.
 
 ```json
 {
@@ -45,19 +68,67 @@ To publish an NPM package from the Valist CLI, create a new `package.json` with 
 }
 ```
 
-In a new terminal window start the valist daemon
+To publish a new release, update the `version` in your `package.json`, and run the following from your project root.
 
 ```bash
+# In a new terminal window run the valist daemon
 valist daemon
-```
 
-Now just publish to the registry using the npm publish command and the registry flag!
-
-```bash
+# A prompt will appear in the daemon terminal window
 npm publish --registry=http://localhost:9000/api/npm
 ```
 
-[Example NPM Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-npm-package)
+## Git
+
+> Git support is experimental.
+
+Start by creating a repository for your Git project.
+
+```bash
+valist create acme-co/git-example
+```
+
+To publish a new release, create a Git tag, and run the following from your project root.
+
+```bash
+# In a new terminal window run the valist daemon
+valist daemon
+
+# The git tag will be your release tag
+git tag -a v0.0.1 -m "release v0.0.1"
+
+# A prompt will appear in the daemon terminal window
+git push http://localhost:9000/api/git/acme-co/git-example tags/v0.0.1
+```
+
+## Docker
+
+> Docker support is experimental.
+
+Start by creating a repository for your Docker project.
+
+```bash
+valist create acme-co/docker-example
+```
+
+Add an entry to `/etc/hosts` for your local valist node.
+
+```text
+127.0.0.1 valist.local
+```
+
+To publish a new release, create a Docker tag, and run the following from your project root.
+
+```bash
+# In a new terminal window run the valist daemon
+valist daemon
+
+# The docker tag must match your valist host entry
+docker build --tag valist.local:9000/acme-co/docker-example .
+
+# A prompt will appear in the daemon terminal window
+docker push valist.local:9000/acme-co/docker-example
+```
 
 <!-- ### SDK
 

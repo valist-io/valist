@@ -1,5 +1,15 @@
 # Fetching & Installing Software
 
+## CLI
+
+To install a binary artifact run the following.
+
+```bash
+valist install acme-co/go-example/0.1.6-rc.0
+```
+
+The CLI will detect your current platform and install the correct artifact into your `~/.valist/bin` directory.
+
 ## Web
 
 To download a release artifact from the Web UI, navigate to the target repository's profile page (https://app.valist.io/`<orgName>`/`<repoName>`), and click `versions`, then choose your desired release from the release list.
