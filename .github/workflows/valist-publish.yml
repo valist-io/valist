@@ -45,9 +45,8 @@ jobs:
     name: Multi-platform build and publish
     runs-on: ubuntu-latest
     steps:
-      - name: Publish multi-platform release
-        uses: docker://golang:1.16
-      - run: |
+      - uses: docker://golang:1.16
+        run: |
           git clone https://github.com/valist-io/valist
           cd valist
           make publish
