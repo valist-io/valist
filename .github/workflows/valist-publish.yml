@@ -6,6 +6,8 @@ on:
     branches:
       - main
   pull_request:
+env:
+  DOCKER_TAG: valist/valist:latest
 jobs:
 
   unit-tests:
@@ -29,13 +31,18 @@ jobs:
         with:
           repository: valist-io/valist
           path: valist
-      - run: | # add valist to PATH
+      - name: Setup PATH
+      - run: |
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
-      - run: cd valist && make bin
-      - run: mv valist/valist $GITHUB_WORKSPACE/bin/valist
+      - name: Build and install Valist
+      - run: |
+          cd valist && make bin
+          mv valist/valist $GITHUB_WORKSPACE/bin/valist
+      - name: Clone example-projects
       - run: git clone https://github.com/valist-io/example-projects
-      - run: make publish-all
+      - name: Build and publish --dryrun examples
+      - run: make publish
         working-directory: ./example-projects
 
   publish:
@@ -43,8 +50,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
-      - uses: actions/setup-go@v2
-        with:
-          go-version: '^1.16'
-      - run: make bin-multi
-      - run: ./dist/linux-amd64/valist publish --dryrun
+      - name: Publish multi-platform release
+      - uses: docker://golang:1.16
+      - uses: actions/checkout@v2
+      - run: make publish
