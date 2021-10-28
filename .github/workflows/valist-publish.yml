@@ -31,15 +31,12 @@ jobs:
         with:
           repository: valist-io/valist
           path: valist
-      - name: Setup PATH
       - run: |
           mkdir -p $GITHUB_WORKSPACE/bin
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
-      - name: Build and install Valist
       - run: |
           cd valist && make bin
           mv valist/valist $GITHUB_WORKSPACE/bin/valist
-      - name: Clone example-projects
       - run: git clone https://github.com/valist-io/example-projects
       - name: Build and publish --dryrun examples
       - run: make publish
