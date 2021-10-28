@@ -38,7 +38,6 @@ jobs:
           cd valist && make bin
           mv valist/valist $GITHUB_WORKSPACE/bin/valist
       - run: git clone https://github.com/valist-io/example-projects
-      - name: Build and publish --dryrun examples
       - run: make publish
         working-directory: ./example-projects
 
