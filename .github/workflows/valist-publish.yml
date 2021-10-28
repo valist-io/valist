@@ -51,6 +51,6 @@ jobs:
     steps:
       - uses: actions/checkout@v2
       - name: Publish multi-platform release
-      - uses: docker://golang:1.16
+        uses: docker://golang:1.16
       - uses: actions/checkout@v2
       - run: make publish
