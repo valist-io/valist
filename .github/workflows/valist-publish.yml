@@ -36,7 +36,7 @@ jobs:
           echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
       - run: |
           cd valist && make bin
-          mv valist/valist $GITHUB_WORKSPACE/bin/valist
+          mv valist $GITHUB_WORKSPACE/bin/valist
       - run: git clone https://github.com/valist-io/example-projects
       - run: make publish
         working-directory: ./example-projects
