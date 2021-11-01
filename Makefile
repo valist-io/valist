@@ -31,7 +31,7 @@ dev-docs:
 	cd docs && mkdocs serve
 
 start:
-	go run cmd/valist daemon
+	go run ./cmd/valist daemon
 
 lint:
 	golangci-lint run
@@ -46,6 +46,6 @@ clean:
 	rm -Rf dist site
 
 publish: clean bin-multi
-	go run cmd/valist publish
+	go run ./cmd/valist publish
 
 .PHONY: docs
