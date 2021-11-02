@@ -47,4 +47,7 @@ jobs:
     container: golang:1.16
     steps:
       - uses: actions/checkout@v2
+      - shell: bash
+        env:
+          VALIST_SIGNER: ${{ secrets.VALIST_SIGNER }}
       - run: make publish
