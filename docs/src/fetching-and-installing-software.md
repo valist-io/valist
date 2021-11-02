@@ -2,13 +2,26 @@
 
 ## CLI
 
-To install a binary artifact run the following.
+To install a binary artifact, run the following:
 
 ```bash
-valist install acme-co/go-example/0.1.6-rc.0
+valist install [org-name]/[repo-name]
 ```
 
 The CLI will detect your current platform and install the correct artifact into your `~/.valist/bin` directory.
+
+You can also install packages at specific versions using:
+
+```sh
+valist install [org-name]/[repo-name]/[version-tag]
+```
+
+Finally, ensure your PATH includes the ~/.valist/bin folder:
+
+```sh
+export PATH="$PATH:$HOME/.valist/bin"
+echo PATH=\"\$PATH:$HOME/.valist/bin\" >> ~/.zshrc # or .bashrc
+```
 
 ## Web
 
@@ -36,15 +49,3 @@ const Valist = require('@valist/sdk');
 ```
 
 [Example Node SDK Project](https://github.com/valist-io/example-projects/tree/main/sdk-node)
-
-## NPM Registry
-
-Every **npm** repo type published on Valist is accessible via the relay API at [https://valist.io/api/npm](https://valist.io/api/npm).
-
-To install an npm package, you'll need to link your organization to the Valist registry, then install!
-
-```bash
-echo @acme-co:registry=https://valist.io/api/npm >> .npmrc
-
-npm i @acme-co/npm-example
-```
