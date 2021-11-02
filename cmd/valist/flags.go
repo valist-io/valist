@@ -20,4 +20,10 @@ var (
 		Name:  "dryrun",
 		Usage: "Skip publish",
 	}
+	// initWizardFlag runs the interactive init wizard
+	initWizardFlag = cli.BoolFlag{
+		Name:    "wizard",
+		Aliases: []string{"i"},
+		Usage:   "Run interactive wizard",
+	}
 )
