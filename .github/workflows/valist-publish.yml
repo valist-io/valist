@@ -50,4 +50,4 @@ jobs:
       - shell: bash
         env:
           VALIST_SIGNER: ${{ secrets.VALIST_SIGNER }}
-      - run: make publish
+        run: make publish
