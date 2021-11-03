@@ -10,7 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/valist-io/valist/internal/core/mock"
-	"github.com/valist-io/valist/internal/db/memory"
+	"github.com/valist-io/valist/internal/database/memory"
 )
 
 func TestNpmProxy(t *testing.T) {

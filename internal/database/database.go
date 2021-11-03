@@ -1,4 +1,10 @@
-package db
+package database
+
+import (
+	"errors"
+)
+
+var ErrKeyNotFound = errors.New("Key not found")
 
 // Database is a key value database.
 type Database interface {

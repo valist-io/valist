@@ -4,9 +4,10 @@ import (
 	"os"
 	"testing"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/require"
+
+	"github.com/valist-io/valist/internal/database"
 )
 
 func TestBadgerDatabase(t *testing.T) {
@@ -31,5 +32,5 @@ func TestBadgerDatabase(t *testing.T) {
 	require.NoError(t, err, "Failed to delete entry")
 
 	_, err = db.Get(key)
-	assert.Equal(t, badger.ErrKeyNotFound, err)
+	assert.Equal(t, database.ErrKeyNotFound, err)
 }
