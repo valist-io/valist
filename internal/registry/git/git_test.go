@@ -1,3 +1,4 @@
+//go:build experimental
 package git
 
 import (
