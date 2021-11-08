@@ -52,7 +52,7 @@ type Package struct {
 	// object with name, email, and or url of author as listed in package.json
 	Author interface{} `json:"author"`
 	// as listed in package.json
-	License interface{} `json:"license"`
+	License string `json:"license"`
 	// full text of README file as pointed to in package.json
 	Readme string `json:"readme"`
 	// name of README file
