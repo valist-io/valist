@@ -1,3 +1,32 @@
+---
+title: Security
+---
+
+# Access Control
+
+## Roles
+
+### Organization Admin
+
+An organization admin is the default role for managing an organization on Valist. They are responsible for adding new developers to a repository as well as keeping the repository metadata up to date.
+
+### Repository Developer
+
+A repository developer is the default role for managing the releases under a repository. Together repository developers are able to vote on the next release of a piece of software.
+
+## Key Management
+
+### CLI
+
+The Valist CLI leverages the [Web3 Storage Definition](https://github.com/ethereum/wiki/wiki/Web3-Secret-Storage-Definition) to store encrypted keystore files in `~/.valist/keystore`.
+
+These keystore files are compatible with common Ethereum wallets like MetaMask, Geth/Clef, and MyCrypto.
+
+### Web
+
+In browser, the Valist relay frontend interacts with `MetaMask` or `WalletConnect` for key management. Please note that when using these options, you will need to configure your wallet to point to the Polygon Mumbai network.
+
+
 # Multi-Factor Everything
 
 One of the coolest features of Valist is that there is a multi-factor system for everything. With multi-factor everything you can eliminate single points of failure within your software supply chain and have all actions audited and approved by members across your organization.
@@ -33,7 +62,7 @@ By default each organization's and repository's threshold is set to **0**.
 Using the CLI an `Org Admin`  is able to propose a new `Organization` threshold by running:
 
 ```bash
-valist org threshold [org_name] [threshold_number]
+valist threshold [org-name] [threshold-number]
 ```
 
 #### Repository Level Threshold
@@ -41,7 +70,7 @@ valist org threshold [org_name] [threshold_number]
 Using the CLI a `Repo Developer` is able to propose a new `Repository` threshold by running:
 
 ```bash
-valist repo threshold [org_name] [repo_name] [threshold_number]
+valist threshold [org-name]/[repo-name] [threshold-number]
 ```
 
 ## Voting on Access Control & Releases
