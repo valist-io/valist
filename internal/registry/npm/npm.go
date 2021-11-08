@@ -90,7 +90,12 @@ func (h *handler) putPackage(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	latestVersion := meta.Versions[meta.DistTags["latest"]]
+	latestVersion, ok := meta.Versions[tag]
+	if !ok {
+		h.error(w, "latest version tag not found", http.StatusBadRequest)
+		return
+	}
+
 	var dependencies []string
 	for key := range latestVersion.Dependencies {
 		dependencies = append(dependencies, key)
