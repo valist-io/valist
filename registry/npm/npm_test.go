@@ -49,19 +49,24 @@ func TestNpmPublish(t *testing.T) {
 	require.NoError(t, err, "Failed to create repository")
 
 	registryAddr := "localhost:10001"
-	registryPath := "http://localhost:10001"
+	registryPath := "http://localhost:10001/"
 
 	go func() {
 		err := http.ListenAndServe(registryAddr, NewHandler(client))
 		require.NoError(t, err, "Failed to start http server")
 	}()
 
-	err = exec.Command("npm", "publish", "./testdata/v0", "--registry", registryPath).Run()
-	require.NoError(t, err, "Failed to publish npm package")
+	cmd := exec.Command("npm", "publish", "--registry", registryPath)
+	cmd.Dir = "./testdata/v0"
+	out, err := cmd.CombinedOutput()
+	require.NoError(t, err, "Failed to publish npm package: %s", string(out))
 
-	err = exec.Command("npm", "view", "@valist/sdk", "--registry", registryPath).Run()
-	require.NoError(t, err, "Failed to view npm package")
+	cmd = exec.Command("npm", "view", "@valist/sdk", "--registry", registryPath)
+	out, err = cmd.CombinedOutput()
+	require.NoError(t, err, "Failed to view npm package: %s", string(out))
 
-	err = exec.Command("npm", "publish", "./testdata/v1", "--registry", registryPath).Run()
-	require.NoError(t, err, "Failed to publish npm package")
+	cmd = exec.Command("npm", "publish", "--registry", registryPath)
+	cmd.Dir = "./testdata/v1"
+	out, err = cmd.CombinedOutput()
+	require.NoError(t, err, "Failed to publish npm package: %s", string(out))
 }
