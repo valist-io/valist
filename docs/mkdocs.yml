@@ -19,12 +19,14 @@ theme:
     - toc.integrate
 nav:
     - index.md
+    - about.md
     - creating-an-organization.md
     - creating-a-repository.md
-    - access-control.md
-    - multi-factor-everything.md
     - publishing-software.md
+    - npm-registry.md
     - fetching-and-installing-software.md
+    - security.md
+    
 markdown_extensions:
   - attr_list
   - pymdownx.superfences
@@ -43,5 +45,3 @@ extra:
       link: https://medium.com/valist
     - icon: fontawesome/brands/discord
       link: https://valist.io/discord
-
-
