@@ -6,7 +6,7 @@ import (
 
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/command"
+	"github.com/valist-io/valist/command"
 )
 
 var (
