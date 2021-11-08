@@ -11,6 +11,7 @@ import (
 
 	"github.com/valist-io/valist/core/client"
 	"github.com/valist-io/valist/core/types"
+	"golang.org/x/mod/modfile"
 )
 
 func Publish(ctx context.Context, dryrun bool) error {
@@ -40,6 +41,23 @@ func Publish(ctx context.Context, dryrun bool) error {
 		return err
 	}
 
+	var dependencies []string
+	if _, err := os.Stat(filepath.Join(cwd, "go.mod")); err == nil {
+		goModData, err := os.ReadFile(filepath.Join(cwd, "go.mod"))
+		if err != nil {
+			return err
+		}
+
+		modFile, err := modfile.Parse("go.mod", goModData, nil)
+		if err != nil {
+			return err
+		}
+
+		for _, url := range modFile.Require {
+			dependencies = append(dependencies, url.Mod.String())
+		}
+	}
+
 	// TODO replace with regex or path matcher
 	readme, err := os.ReadFile("README.md")
 	if err != nil {
@@ -47,9 +65,11 @@ func Publish(ctx context.Context, dryrun bool) error {
 	}
 
 	releaseMeta := &types.ReleaseMeta{
-		Name:      fmt.Sprintf("%s@%s", valist.Name, valist.Tag),
-		Readme:    string(readme),
-		Artifacts: make(map[string]types.Artifact),
+		Name:         fmt.Sprintf("%s@%s", valist.Name, valist.Tag),
+		Readme:       string(readme),
+		Version:      valist.Tag,
+		Dependencies: dependencies,
+		Artifacts:    make(map[string]types.Artifact),
 	}
 
 	// TODO run file uploads in parallel and print progress

@@ -92,10 +92,14 @@ type Artifact struct {
 type ReleaseMeta struct {
 	// Name is the full release path.
 	Name string `json:"name"`
+	// Version is the release version.
+	Version string `json:"version"`
 	// Readme contains the readme contents.
 	Readme string `json:"readme"`
 	// License contains the license type.
 	License string `json:"license"`
+	// Dependencies contains a list of all dependencies.
+	Dependencies []string `json:"dependencies"`
 	// Artifacts is a mapping of names to artifacts.
 	Artifacts map[string]Artifact `json:"artifacts"`
 }

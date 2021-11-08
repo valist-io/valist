@@ -65,7 +65,7 @@ func (prov *Provider) Open(ctx context.Context, fpath string) (storage.File, err
 
 	f, ok := node.(files.File)
 	if !ok {
-		return nil, fmt.Errorf("cannot open directory: %s", fpath)
+		return nil, os.ErrNotExist
 	}
 
 	return &file{"", f}, nil

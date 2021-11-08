@@ -8,8 +8,8 @@ import (
 
 	"github.com/gorilla/mux"
 
-	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist"
+	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/database/badger"
 	"github.com/valist-io/valist/registry/docker"
 	"github.com/valist-io/valist/registry/git"
