@@ -10,25 +10,24 @@ import (
 	"path"
 	"strings"
 
-	"github.com/dgraph-io/badger/v3"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist/internal/core/types"
-	"github.com/valist-io/valist/internal/db"
+	"github.com/valist-io/valist/internal/database"
 	"github.com/valist-io/valist/internal/storage"
 )
 
 const DefaultRegistry = "https://registry.npmjs.org"
 
 type proxy struct {
-	client   types.CoreAPI
-	database db.Database
-	host     string
+	client types.CoreAPI
+	db     database.Database
+	host   string
 }
 
-func NewProxy(client types.CoreAPI, database db.Database, host string) http.Handler {
-	proxy := &proxy{client, database, host}
+func NewProxy(client types.CoreAPI, db database.Database, host string) http.Handler {
+	proxy := &proxy{client, db, host}
 
 	router := mux.NewRouter()
 	router.HandleFunc("/{name}", proxy.getMetadata).Methods(http.MethodGet)
@@ -40,7 +39,7 @@ func NewProxy(client types.CoreAPI, database db.Database, host string) http.Hand
 }
 
 func (p *proxy) cacheMetadata(ctx context.Context, id string) (*Metadata, error) {
-	val, err := p.database.Get(id)
+	val, err := p.db.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -59,7 +58,7 @@ func (p *proxy) cacheMetadata(ctx context.Context, id string) (*Metadata, error)
 }
 
 func (p *proxy) cacheTarball(ctx context.Context, id string) (storage.File, error) {
-	val, err := p.database.Get(id)
+	val, err := p.db.Get(id)
 	if err != nil {
 		return nil, err
 	}
@@ -67,7 +66,7 @@ func (p *proxy) cacheTarball(ctx context.Context, id string) (storage.File, erro
 	return p.client.Storage().Open(ctx, string(val))
 }
 
-func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
+func (p *proxy) fetchMetadata(ctx context.Context, id string) (*Metadata, error) {
 	res, err := http.Get(DefaultRegistry + id)
 	if err != nil {
 		return nil, err
@@ -88,7 +87,12 @@ func (p *proxy) fetchMetadata(id string) (*Metadata, error) {
 		return nil, err
 	}
 
-	if err := p.database.Set(id, body); err != nil {
+	metaPath, err := p.client.Storage().Write(ctx, body)
+	if err != nil {
+		return nil, err
+	}
+
+	if err := p.db.Set(id, []byte(metaPath)); err != nil {
 		return nil, err
 	}
 
@@ -101,7 +105,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return cached, nil
 	}
 
-	if err != badger.ErrKeyNotFound {
+	if err != database.ErrKeyNotFound {
 		return nil, err
 	}
 
@@ -135,7 +139,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 		return nil, err
 	}
 
-	if err := p.database.Set(id, []byte(tarPath)); err != nil {
+	if err := p.db.Set(id, []byte(tarPath)); err != nil {
 		return nil, err
 	}
 
@@ -143,7 +147,7 @@ func (p *proxy) fetchTarball(ctx context.Context, id string) (storage.File, erro
 }
 
 func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
-	meta, err := p.fetchMetadata(req.URL.Path)
+	meta, err := p.fetchMetadata(req.Context(), req.URL.Path)
 	if err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
@@ -163,6 +167,7 @@ func (p *proxy) getMetadata(w http.ResponseWriter, req *http.Request) {
 func (p *proxy) getTarball(w http.ResponseWriter, req *http.Request) {
 	file, err := p.fetchTarball(req.Context(), strings.TrimPrefix(req.URL.Path, "/-"))
 	if err != nil {
+		fmt.Println(err)
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}

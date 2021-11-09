@@ -10,7 +10,7 @@ import (
 
 	"github.com/valist-io/valist/internal/core/config"
 	"github.com/valist-io/valist/internal/core/types"
-	"github.com/valist-io/valist/internal/db/badger"
+	"github.com/valist-io/valist/internal/database/badger"
 	"github.com/valist-io/valist/internal/registry/docker"
 	"github.com/valist-io/valist/internal/registry/git"
 	"github.com/valist-io/valist/internal/registry/npm"

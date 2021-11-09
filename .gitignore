@@ -9,3 +9,5 @@ site
 *.test
 *.out
 dist
+
+dist/

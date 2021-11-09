@@ -4,6 +4,8 @@ import (
 	"time"
 
 	"github.com/dgraph-io/badger/v3"
+
+	"github.com/valist-io/valist/internal/database"
 )
 
 type Database struct {
@@ -47,6 +49,10 @@ func (db *Database) Get(key string) ([]byte, error) {
 	defer txn.Discard()
 
 	item, err := txn.Get([]byte(key))
+	if err == badger.ErrKeyNotFound {
+		return nil, database.ErrKeyNotFound
+	}
+
 	if err != nil {
 		return nil, err
 	}

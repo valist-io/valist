@@ -1,0 +1,43 @@
+before:
+  hooks:
+    - go mod tidy
+builds:
+  - id: valist
+    main: ./cmd/valist
+    env:
+      - CGO_ENABLED=0
+    goos:
+      - linux
+      - windows
+      - darwin
+    goarch:
+      - amd64
+      - arm64
+    ignore:
+      - goos: windows
+        goarch: arm64
+nfpms:
+  - id: default
+    builds:
+      - valist
+    formats:
+      - apk
+      - deb
+      - rpm
+    homepage: https://valist.io
+    description: Universal package repositories, code signing, and access control.
+    license: MPL-2.0
+brews:
+  - name: valist
+    tap:
+      owner: valist-io
+      name: homebrew-valist
+    homepage: https://valist.io
+    description: Universal package repositories, code signing, and access control.
+    license: MPL-2.0
+checksum:
+  name_template: 'checksums.txt'
+snapshot:
+  name_template: "{{ incpatch .Version }}-next"
+changelog:
+  skip: true

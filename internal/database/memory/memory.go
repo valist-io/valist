@@ -1,7 +1,7 @@
 package memory
 
 import (
-	"fmt"
+	"github.com/valist-io/valist/internal/database"
 )
 
 type Database struct {
@@ -20,7 +20,7 @@ func (db *Database) Set(key string, val []byte) error {
 func (db *Database) Get(key string) ([]byte, error) {
 	val, ok := db.values[key]
 	if !ok {
-		return nil, fmt.Errorf("key not found")
+		return nil, database.ErrKeyNotFound
 	}
 
 	return val, nil
