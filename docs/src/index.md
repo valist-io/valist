@@ -17,7 +17,7 @@ brew install valist-io/valist/valist
 
 This will add the [homebrew-valist](github.com/valist-io/homebrew-valist) tap and install the CLI automatically.
 
-#### Go Install
+##### Go Install
 
 You can install the CLI by running the following:
 
