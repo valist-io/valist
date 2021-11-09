@@ -8,10 +8,10 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/urfave/cli/v2"
 
-	"github.com/valist-io/valist/internal/command"
-	"github.com/valist-io/valist/internal/core"
-	"github.com/valist-io/valist/internal/core/config"
-	"github.com/valist-io/valist/internal/signer"
+	"github.com/valist-io/valist/command"
+	"github.com/valist-io/valist/core"
+	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/signer"
 )
 
 // setup initializes the client before commands are executed
