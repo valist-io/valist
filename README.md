@@ -1,5 +1,6 @@
 [![Logo](./docs/src/img/logo-large-with-text.png)](https://valist.io)
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/valist-io/valist.svg)](https://pkg.go.dev/github.com/valist-io/valist)
 [![Discord](https://img.shields.io/discord/785535462311591976)](https://discord.com/channels/785535462311591976)
 [![Valist](https://img.shields.io/badge/valist-published-blue)](https://app.valist.io/valist)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist?ref=badge_shield)
