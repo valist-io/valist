@@ -11,6 +11,7 @@ import (
 	"github.com/valist-io/valist/command"
 	"github.com/valist-io/valist/core"
 	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/signer"
 )
 
 // setup initializes the client before commands are executed
@@ -35,16 +36,18 @@ func setup(c *cli.Context) error {
 	}
 
 	var account accounts.Account
-	if c.IsSet("account") {
-		account.Address = common.HexToAddress(c.String("account"))
-	} else {
-		account.Address = cfg.Accounts.Default
-	}
+	if os.Getenv(signer.EnvKey) == "" {
+		if c.IsSet("account") {
+			account.Address = common.HexToAddress(c.String("account"))
+		} else {
+			account.Address = cfg.Accounts.Default
+		}
 
-	if c.IsSet("passphrase") {
-		client.Signer().SetAccountWithPassphrase(account, c.String("passphrase"))
-	} else {
-		client.Signer().SetAccount(account)
+		if c.IsSet("passphrase") {
+			client.Signer().SetAccountWithPassphrase(account, c.String("passphrase"))
+		} else {
+			client.Signer().SetAccount(account)
+		}
 	}
 
 	c.Context = context.WithValue(c.Context, command.ClientKey, client)
