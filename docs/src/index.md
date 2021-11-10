@@ -5,10 +5,19 @@
 ### CLI
 
 #### Package managers
-!!! note
-    Installing from package managers coming soon!
 
-#### Go Install
+!!! note
+    Installing from more package managers coming soon!
+
+##### Homebrew
+
+```sh
+brew install valist-io/valist/valist
+```
+
+This will add the [homebrew-valist](github.com/valist-io/homebrew-valist) tap and install the CLI automatically.
+
+##### Go Install
 
 You can install the CLI by running the following:
 
@@ -51,13 +60,13 @@ echo PATH=\"\$PATH:$HOME/.local/bin\" >> ~/.zshrc # or .bashrc
 
 After you have valist installed, simply run the following:
 
-```
+```sh
 valist daemon
 ```
 
 This will start the universal package registry API and web server:
 
-```
+```sh
 
 @@@  @@@   @@@@@@   @@@       @@@   @@@@@@   @@@@@@@
 @@@  @@@  @@@@@@@@  @@@       @@@  @@@@@@@   @@@@@@@
@@ -76,10 +85,18 @@ API server running on localhost:9000
 
 ### SDK
 
-The Valist JS-SDK can be installed by running the following command:
+You can install the JS-SDK by running the following:
 
-```bash
+```sh
+npm install @valist/sdk
+```
+
+If you're using the Valist NPM Registry, you can install the JS-SDK by running the following:
+
+```sh
 echo "@valist:registry=http://localhost:9000/api/npm" >> .npmrc
 
 npm install @valist/sdk
 ```
+
+This will fetch and install the package by querying the registry smart contract and pulling the files from IPFS.
