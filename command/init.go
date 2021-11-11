@@ -23,7 +23,7 @@ func Init(ctx context.Context, rpath string, wizard bool) error {
 	}
 
 	vpath := filepath.Join(cwd, "valist.yml")
-	if err := valist.Load(vpath); err != os.ErrNotExist {
+	if err := valist.Load(vpath); err != nil && err != os.ErrNotExist {
 		return fmt.Errorf("project already exists: %s", vpath)
 	}
 

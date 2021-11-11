@@ -137,6 +137,9 @@ var (
 		Flags: []cli.Flag{
 			&initWizardFlag,
 		},
+		Before: func(c *cli.Context) error {
+			return setup(c)
+		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
