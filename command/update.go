@@ -88,6 +88,15 @@ func updateRepository(ctx context.Context, repo *types.Repository) error {
 		return err
 	}
 
+	changeType, err := prompt.ChangeRepositoryProjectType().Run()
+	if err != nil {
+		return err
+	}
+
+	if changeType[0] == 'y' || changeType[0] == 'Y' {
+		_, meta.ProjectType, err = prompt.RepositoryProjectType().Run()
+	}
+
 	_, err = client.SetRepositoryMeta(ctx, repo.OrgID, repo.Name, meta)
 	if err != nil {
 		return err
