@@ -17,11 +17,14 @@ func ValidateMinLength(min int) promptui.ValidateFunc {
 
 func ValidateYesNo() promptui.ValidateFunc {
 	return func(value string) error {
-		switch value[0] {
-		case 'Y', 'y', 'N', 'n':
-			return nil
-		default:
-			return fmt.Errorf("Must be y or n")
+		if len(value) != 0 {
+			switch value[0] {
+			case 'Y', 'y', 'N', 'n':
+				return nil
+			default:
+				return fmt.Errorf("Must be y or n")
+			}
 		}
+		return fmt.Errorf("Must be y or n")
 	}
 }
