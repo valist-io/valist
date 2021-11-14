@@ -99,6 +99,14 @@ func RepositoryDescription(value string) Prompt {
 	}}
 }
 
+func ChangeRepositoryProjectType() Prompt {
+	return Prompt{promptui.Prompt{
+		Label:     "Would you like to change the repo's project type? (y,N)",
+		IsConfirm: true,
+		Validate:  ValidateYesNo(),
+	}}
+}
+
 func RepositoryProjectType() *promptui.Select {
 	return &promptui.Select{
 		Label: "Repository project type",
