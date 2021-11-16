@@ -42,10 +42,6 @@ func (client *Client) ResolvePath(ctx context.Context, raw string) (types.Resolv
 	}
 
 	if len(parts) < 3 {
-		res.Release, err = client.GetLatestRelease(ctx, res.OrgID, res.RepoName)
-		if err != nil && err != types.ErrReleaseNotExist {
-			return res, err
-		}
 		return res, nil
 	}
 
