@@ -18,6 +18,11 @@ func Install(ctx context.Context, rpath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 	config := ctx.Value(ConfigKey).(*config.Config)
 
+	parts := strings.Split(rpath, "/")
+	if len(parts) < 3 {
+		rpath += "/latest"
+	}
+
 	res, err := client.ResolvePath(ctx, rpath)
 	if err != nil {
 		return err
