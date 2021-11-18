@@ -96,7 +96,7 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 	}
 
 	if res.StatusCode > 299 {
-		return "", fmt.Errorf("failed to add to valist: status=%s body=%s", res.Status, body)
+		return "", fmt.Errorf("failed to add to pin.valist.io: status=%s body=%s", res.Status, body)
 	}
 
 	return fpath, nil
