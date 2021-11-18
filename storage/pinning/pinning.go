@@ -1,10 +1,12 @@
-package estuary
+package pinning
 
 import (
+	"bytes"
 	"context"
 	"fmt"
 	"io"
 	"io/fs"
+	"mime/multipart"
 	"net/http"
 	"os"
 
@@ -13,18 +15,16 @@ import (
 )
 
 type Provider struct {
-	host  string
-	token string
-	ipfs  *ipfs.Provider
-	http  *http.Client
+	host string
+	ipfs *ipfs.Provider
+	http *http.Client
 }
 
-func NewProvider(host, token string, ipfs *ipfs.Provider) *Provider {
+func NewProvider(host string, ipfs *ipfs.Provider) *Provider {
 	return &Provider{
-		host:  host,
-		token: token,
-		ipfs:  ipfs,
-		http:  &http.Client{},
+		host: host,
+		ipfs: ipfs,
+		http: &http.Client{},
 	}
 }
 
@@ -60,12 +60,30 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 		return "", err
 	}
 
-	req, err := http.NewRequest(http.MethodPost, prov.host+"/content/add-car", car)
+	buf := &bytes.Buffer{}
+	writer := multipart.NewWriter(buf)
+	part, err := writer.CreateFormFile("path", "file")
 	if err != nil {
 		return "", err
 	}
 
-	req.Header.Set("Authorization", "Bearer "+prov.token)
+	_, err = io.Copy(part, car)
+	if err != nil {
+		fmt.Println("Error when copying file parts")
+		return "", err
+	}
+
+	err = writer.Close()
+	if err != nil {
+		return "", err
+	}
+
+	req, err := http.NewRequest(http.MethodPost, prov.host+"/api/v0/dag/import", buf)
+	req.Header.Set("Content-Type", writer.FormDataContentType())
+	if err != nil {
+		return "", err
+	}
+
 	res, err := prov.http.Do(req)
 	if err != nil {
 		return "", err
@@ -78,7 +96,7 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 	}
 
 	if res.StatusCode > 299 {
-		return "", fmt.Errorf("failed to add to estuary: status=%s body=%s", res.Status, body)
+		return "", fmt.Errorf("failed to add to valist: status=%s body=%s", res.Status, body)
 	}
 
 	return fpath, nil
