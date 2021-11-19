@@ -48,4 +48,7 @@ clean:
 publish: clean bin-multi
 	go run ./cmd/valist publish
 
+publish-dryrun: clean bin-multi
+	go run ./cmd/valist publish --dryrun
+
 .PHONY: docs
