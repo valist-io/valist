@@ -22,11 +22,12 @@ var once sync.Once
 // NewCoreAPI returns an IPFS CoreAPI. If a local IPFS istance is running
 // a local connection will be attempted, otherwise a new instance is started.
 func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
-	local, err := httpapi.NewLocalApi()
+	local, err := connectToLocalIPFS(ctx)
 	if err == nil {
 		return local, nil
 	}
 
+	fmt.Println("WARNING: failed to connect to local IPFS")
 	// make sure this only happens once
 	once.Do(setupPlugins)
 
@@ -53,6 +54,23 @@ func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error)
 
 	return coreapi.NewCoreAPI(node)
 }
+
+// connectToLocalIPFS attempts to connect to the local IPFS API and
+// makes a request to ensure the API is running.
+func connectToLocalIPFS(ctx context.Context) (coreiface.CoreAPI, error) {
+	local, err := httpapi.NewLocalApi()
+	if err != nil {
+		return nil, err
+	}
+
+	// make a request to ensure the api is actually running
+	_, err = local.Swarm().ListenAddrs(ctx)
+	if err != nil {
+		return nil, err
+	}
+	
+	return local, nil
+} 
 
 // setupPlugins initializes the IPFS plugins once.
 func setupPlugins() {
