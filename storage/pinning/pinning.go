@@ -71,13 +71,13 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 		// create a form file for the multipart data
 		ff, err := mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
 		if err != nil {
-			pw.CloseWithError(err)
+			pw.CloseWithError(err) //nolint:errcheck
 			return
 		}
 		// copy the input data to the form file
 		_, err = io.Copy(ff, car)
 		if err != nil {
-			pw.CloseWithError(err)
+			pw.CloseWithError(err) //nolint:errcheck
 			return
 		}
 	}()
