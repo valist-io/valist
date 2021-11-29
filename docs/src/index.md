@@ -6,6 +6,16 @@
 
 #### Package managers
 
+##### NPM
+
+To install the CLI on any system, run the following:
+
+```sh
+npm install -g @valist/cli
+```
+
+This will use the Valist JS-SDK to download CLI from IPFS. This is simply a wrapper for the Go binary.
+
 !!! note
     Installing from more package managers coming soon!
 
