@@ -1,7 +1,6 @@
 package pinning
 
 import (
-	"bytes"
 	"context"
 	"fmt"
 	"io"
@@ -9,6 +8,7 @@ import (
 	"mime/multipart"
 	"net/http"
 	"os"
+	"strings"
 
 	"github.com/valist-io/valist/storage"
 	"github.com/valist-io/valist/storage/ipfs"
@@ -60,26 +60,32 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 		return "", err
 	}
 
-	buf := &bytes.Buffer{}
-	writer := multipart.NewWriter(buf)
-	part, err := writer.CreateFormFile("path", "file")
-	if err != nil {
-		return "", err
-	}
+	// use a pipe to stream request data
+	pr, pw := io.Pipe()
+	// write form data to the pipe writer
+	mw := multipart.NewWriter(pw)
+	// pipe reader will block until content is written to pipe writer
+	// this is how the data is able to be streamed in a routine
+	go func() {
+		defer mw.Close()
+		// create a form file for the multipart data
+		ff, err := mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+		// copy the input data to the form file
+		_, err = io.Copy(ff, car)
+		if err != nil {
+			pw.CloseWithError(err)
+			return
+		}
+	}()
 
-	_, err = io.Copy(part, car)
-	if err != nil {
-		fmt.Println("Error when copying file parts")
-		return "", err
-	}
+	defer pr.Close()
 
-	err = writer.Close()
-	if err != nil {
-		return "", err
-	}
-
-	req, err := http.NewRequest(http.MethodPost, prov.host+"/api/v0/dag/import", buf)
-	req.Header.Set("Content-Type", writer.FormDataContentType())
+	req, err := http.NewRequest(http.MethodPost, prov.host+"/api/v0/dag/import", pr)
+	req.Header.Set("Content-Type", mw.FormDataContentType())
 	if err != nil {
 		return "", err
 	}
