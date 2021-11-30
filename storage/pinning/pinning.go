@@ -67,7 +67,7 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 	// pipe reader will block until content is written to pipe writer
 	// this is how the data is able to be streamed in a routine
 	go func() {
-                 // create a form file for the multipart data
+		// create a form file for the multipart data
 		ff, err := mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
 		if err != nil {
 			pw.CloseWithError(err) //nolint:errcheck
@@ -79,11 +79,11 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 			pw.CloseWithError(err) //nolint:errcheck
 			return
 		}
-		
+
 		err = mw.Close()
 		pw.CloseWithError(err) //nolint:errcheck
 		// create a form file for the multipart data
-		ff, err := mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
+		ff, err = mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
 		if err != nil {
 			pw.CloseWithError(err) //nolint:errcheck
 			return
