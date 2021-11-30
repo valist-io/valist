@@ -1,4 +1,4 @@
-package estuary
+package pinning
 
 import (
 	"context"
@@ -11,8 +11,7 @@ import (
 )
 
 const (
-	host  = "https://pin-proxy-rkl5i.ondigitalocean.app"
-	token = "test"
+	host = "https://pin.valist.io"
 )
 
 func TestWrite(t *testing.T) {
@@ -25,7 +24,7 @@ func TestWrite(t *testing.T) {
 	ipfs, err := ipfs.NewProvider(ctx, tmp)
 	require.NoError(t, err, "Failed to write file")
 
-	provider := NewProvider(host, token, ipfs)
+	provider := NewProvider(host, ipfs)
 	_, err = provider.Write(ctx, data)
 	require.NoError(t, err, "Failed to write file")
 }

@@ -15,8 +15,8 @@ import (
 	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/signer"
 	"github.com/valist-io/valist/storage"
-	"github.com/valist-io/valist/storage/estuary"
 	"github.com/valist-io/valist/storage/ipfs"
+	pinning "github.com/valist-io/valist/storage/pinning"
 )
 
 // NewClient creates a new valist client using the given config.
@@ -57,7 +57,7 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 
 	// TODO move to config once URL is proxied
 	var provider storage.Provider
-	provider = estuary.NewProvider("https://pin-proxy-rkl5i.ondigitalocean.app", "", ipfs)
+	provider = pinning.NewProvider("https://pin.valist.io", ipfs)
 	provider = storage.WithTimeout(provider, 5*time.Minute, 5*time.Minute)
 
 	var transactor client.TransactorAPI
