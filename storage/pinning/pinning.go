@@ -82,13 +82,11 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 		}
 	}()
 
-	defer pr.Close()
-
 	req, err := http.NewRequest(http.MethodPost, prov.host+"/api/v0/dag/import", pr)
-	req.Header.Set("Content-Type", mw.FormDataContentType())
 	if err != nil {
 		return "", err
 	}
+	req.Header.Set("Content-Type", mw.FormDataContentType())
 
 	res, err := prov.http.Do(req)
 	if err != nil {
