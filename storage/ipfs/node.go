@@ -68,9 +68,9 @@ func connectToLocalIPFS(ctx context.Context) (coreiface.CoreAPI, error) {
 	if err != nil {
 		return nil, err
 	}
-	
+
 	return local, nil
-} 
+}
 
 // setupPlugins initializes the IPFS plugins once.
 func setupPlugins() {

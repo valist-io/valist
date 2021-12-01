@@ -27,7 +27,6 @@ func (s *CoreSuite) TestCreateRepository() {
 	repoMeta := &types.RepositoryMeta{
 		Name:        "sdk",
 		Description: "Valist core sdk.",
-		ProjectType: "npm",
 		Homepage:    "https://valist.io",
 		Repository:  "https://github.com/valist-io/valist",
 	}
@@ -46,7 +45,6 @@ func (s *CoreSuite) TestCreateRepository() {
 	s.Require().NoError(err, "Failed to get repository meta")
 	s.Assert().Equal(repoMeta.Name, meta.Name)
 	s.Assert().Equal(repoMeta.Description, meta.Description)
-	s.Assert().Equal(repoMeta.ProjectType, meta.ProjectType)
 	s.Assert().Equal(repoMeta.Homepage, meta.Homepage)
 
 	_, err = s.client.VoteRepoDev(ctx, orgCreatedEvent.OrgID, "sdk", client.ADD_KEY, s.accounts[1].Address)

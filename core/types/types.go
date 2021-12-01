@@ -12,33 +12,11 @@ import (
 // DeprecationNotice contains a deprecation notice in plain text
 const DeprecationNotice = "QmRBwMae3Skqzc1GmAKBdcnFFPnHeD585MwYtVZzfh9Tkh"
 
-const (
-	ProjectTypeBinary = "binary"
-	ProjectTypeNode   = "node"
-	ProjectTypeNPM    = "npm"
-	ProjectTypeGit    = "git"
-	ProjectTypeRust   = "crate"
-	ProjectTypePython = "python"
-	ProjectTypeDocker = "docker"
-	ProjectTypeStatic = "static"
-)
-
 var (
 	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
 	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
 	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
 )
-
-var ProjectTypes = []string{
-	ProjectTypeBinary,
-	ProjectTypeNode,
-	ProjectTypeNPM,
-	ProjectTypeGit,
-	ProjectTypeRust,
-	ProjectTypePython,
-	ProjectTypeDocker,
-	ProjectTypeStatic,
-}
 
 var (
 	ErrOrgNotExist     = errors.New("Organization does not exist")
@@ -124,8 +102,6 @@ type RepositoryMeta struct {
 	Name string `json:"name"`
 	// Description is a short description of the repository.
 	Description string `json:"description"`
-	// ProjectType is used to change how the repository is displayed.
-	ProjectType string `json:"projectType"`
 	// Homepage is the website for the repository.
 	Homepage string `json:"homepage"`
 	// Repository is the source code url for the repository.
