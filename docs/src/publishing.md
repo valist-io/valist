@@ -1,4 +1,4 @@
-# Publishing Software
+# Publishing
 
 ## Binary
 
@@ -25,8 +25,6 @@ To publish a new release, update the `tag` in your `valist.yml`, and run the fol
 valist publish
 ```
 
-### Platforms
-
 If your project has artifacts for multiple platforms, add an entry for each supported platform to your `valist.yml`. 
 
 ```yaml
@@ -36,98 +34,6 @@ artifacts:
   darwin/amd64: path_to_bin
   darwin/arm64: path_to_bin
   windows/amd64: path_to_bin
-```
-
-## NPM
-
-> [Example NPM Project](https://github.com/valist-io/example-projects/tree/main/cli-publish-npm-package)
-
-Start by creating a repository for your NPM project.
-
-```bash
-valist create acme-co/npm-example
-```
-
-Make sure the `name` in your `package.json` matches your repository name.
-
-```json
-{
-  "name": "@acme-co/npm-example",
-  "version": "0.0.1-rc.0",
-  "description": "",
-  "main": "dist/index.js",
-  "scripts": {
-    "build": "tsc",
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "author": "ACME",
-  "license": "MIT",
-  "dependencies": {
-    "typescript": "^4.3.4"
-  }
-}
-```
-
-To publish a new release, update the `version` in your `package.json`, and run the following from your project root.
-
-```bash
-# In a new terminal window run the valist daemon
-valist daemon
-
-# A prompt will appear in the daemon terminal window
-npm publish --registry=http://localhost:9000/api/npm
-```
-
-## Git
-
-> Git support is experimental.
-
-Start by creating a repository for your Git project.
-
-```bash
-valist create acme-co/git-example
-```
-
-To publish a new release, create a Git tag, and run the following from your project root.
-
-```bash
-# In a new terminal window run the valist daemon
-valist daemon
-
-# The git tag will be your release tag
-git tag -a v0.0.1 -m "release v0.0.1"
-
-# A prompt will appear in the daemon terminal window
-git push http://localhost:9000/api/git/acme-co/git-example tags/v0.0.1
-```
-
-## Docker
-
-> Docker support is experimental.
-
-Start by creating a repository for your Docker project.
-
-```bash
-valist create acme-co/docker-example
-```
-
-Add an entry to `/etc/hosts` for your local valist node.
-
-```text
-127.0.0.1 valist.local
-```
-
-To publish a new release, create a Docker tag, and run the following from your project root.
-
-```bash
-# In a new terminal window run the valist daemon
-valist daemon
-
-# The docker tag must match your valist host entry
-docker build --tag valist.local:9000/acme-co/docker-example .
-
-# A prompt will appear in the daemon terminal window
-docker push valist.local:9000/acme-co/docker-example
 ```
 
 ## Websites

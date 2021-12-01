@@ -1,5 +1,7 @@
 # Getting Started
 
+Valist can be used as a command line interface (CLI) or imported as a TypeScript library.
+
 ## Installation
 
 ### CLI

@@ -19,12 +19,10 @@ theme:
     - toc.integrate
 nav:
     - index.md
-    - about.md
-    - creating-an-organization.md
-    - creating-a-repository.md
-    - publishing-software.md
-    - npm-registry.md
-    - fetching-and-installing-software.md
+    - organizations.md
+    - repositories.md
+    - publishing.md
+    - installing.md
     - security.md
     
 markdown_extensions:

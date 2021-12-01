@@ -1,4 +1,4 @@
-# Creating an Organization
+# Organizations
 
 Creating an organization is the first step to publishing software on Valist! Organizations are how users are able to manage their various software repositories and admin credentials on Valist. Each organization receives a unique `valist-ID` which is then linked to a namespace that is governed by the members (keys) of the organization.
 
