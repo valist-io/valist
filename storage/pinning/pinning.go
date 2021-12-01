@@ -65,7 +65,6 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 	// write form data to the pipe writer
 	mw := multipart.NewWriter(pw)
 	// pipe reader will block until content is written to pipe writer
-	// this is how the data is able to be streamed in a routine
 	go func() {
 		// create a form file for the multipart data
 		ff, err := mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
@@ -79,21 +78,8 @@ func (prov *Provider) Write(ctx context.Context, data []byte) (string, error) {
 			pw.CloseWithError(err) //nolint:errcheck
 			return
 		}
-
 		err = mw.Close()
 		pw.CloseWithError(err) //nolint:errcheck
-		// create a form file for the multipart data
-		ff, err = mw.CreateFormFile("path", strings.TrimPrefix(fpath, "/ipfs/"))
-		if err != nil {
-			pw.CloseWithError(err) //nolint:errcheck
-			return
-		}
-		// copy the input data to the form file
-		_, err = io.Copy(ff, car)
-		if err != nil {
-			pw.CloseWithError(err) //nolint:errcheck
-			return
-		}
 	}()
 
 	req, err := http.NewRequest(http.MethodPost, prov.host+"/api/v0/dag/import", pr)
