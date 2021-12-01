@@ -1,12 +1,10 @@
-package bin
+package http
 
 import (
 	"encoding/json"
 	"fmt"
 	"net/http"
-	"os"
 
-	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist"
@@ -16,16 +14,6 @@ const DefaultGateway = "https://ipfs.io"
 
 type handler struct {
 	client valist.API
-}
-
-func NewHandler(client valist.API) http.Handler {
-	handler := &handler{client}
-
-	router := mux.NewRouter()
-	router.HandleFunc("/{org}/{repo}", handler.getRelease).Methods(http.MethodGet)
-	router.HandleFunc("/{org}/{repo}/{tag}", handler.getRelease).Methods(http.MethodGet)
-
-	return handlers.LoggingHandler(os.Stdout, router)
 }
 
 func (h *handler) getRelease(w http.ResponseWriter, req *http.Request) {
