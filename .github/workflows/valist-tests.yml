@@ -1,0 +1,51 @@
+name: Valist Tests
+on:
+  push:
+    tags:
+      - v*
+    branches:
+      - main
+  pull_request:
+env:
+  DOCKER_TAG: valist/valist:latest
+jobs:
+
+  unit-tests:
+    name: Unit Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+      - uses: actions/checkout@v2
+      - run: make test
+
+  example-tests:
+    name: Example Project Tests
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+      - uses: actions/checkout@v2
+        with:
+          repository: valist-io/valist
+          path: valist
+      - run: |
+          mkdir -p $GITHUB_WORKSPACE/bin
+          echo "$GITHUB_WORKSPACE/bin" >> $GITHUB_PATH
+      - run: |
+          cd valist && make bin
+          mv valist $GITHUB_WORKSPACE/bin/valist
+      - run: git clone https://github.com/valist-io/example-projects
+      - run: make publish
+        working-directory: ./example-projects
+
+  publish:
+    name: Multi-platform build and publish
+    runs-on: ubuntu-latest
+    container: golang:1.16
+    steps:
+      - uses: actions/checkout@v2
+      - shell: bash
+        run: make publish-dryrun
