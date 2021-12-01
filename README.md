@@ -5,21 +5,13 @@
 [![Valist](https://img.shields.io/badge/valist-published-blue)](https://app.valist.io/valist)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist?ref=badge_shield)
 
-A trustless universal package repository enabling you to digitally sign and distribute software via IPFS in just a few steps.
+Web3 native digital distribution.
 
 ## Features
 
-Valist supports building and distributing software from source code to the end user.
-
-Key Features:
-
-* Publish Binaries (software, firmware, you name it)
-* Easy Reproducible Builds
-* NPM Registry
-* Docker Registry
-* Multi-Factor Releases (multi-sig for publishing software)
-* Native IPFS Support
-* Multi-Chain Support (Ethereum-based only for now)
+* Publish Assets (EXEs, NFTs, WASM, etc.)
+* Multi-Factor Releases (multi-sig for publishing assets)
+* Multi-Chain Support (EVM based only for now)
 
 ## Documentation
 
