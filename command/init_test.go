@@ -15,7 +15,7 @@ func TestInitCommand(t *testing.T) {
 
 	err = os.Chdir(t.TempDir())
 	require.NoError(t, err, "failed to change dir")
-	t.Cleanup(func() { os.Chdir(cwd) })
+	t.Cleanup(func() { os.Chdir(cwd) }) //nolint:errcheck
 
 	err = Init(context.Background(), "valist/sdk", false)
 	require.NoError(t, err, "failed to init valist project")
