@@ -2,12 +2,14 @@ package command
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 
 	"github.com/valist-io/valist/prompt"
 )
+
+var ErrProjectExist = errors.New("valist.yml already exists")
 
 // Init creates a new valist config.
 func Init(ctx context.Context, rpath string, wizard bool) error {
@@ -23,8 +25,10 @@ func Init(ctx context.Context, rpath string, wizard bool) error {
 	}
 
 	vpath := filepath.Join(cwd, "valist.yml")
-	if err := valist.Load(vpath); err != nil && err != os.ErrNotExist {
-		return fmt.Errorf("project already exists: %s", vpath)
+	if err := valist.Load(vpath); err == nil {
+		return ErrProjectExist
+	} else if !errors.Is(err, os.ErrNotExist) {
+		return err
 	}
 
 	if wizard {
@@ -51,11 +55,6 @@ func Init(ctx context.Context, rpath string, wizard bool) error {
 			valist.Artifacts["www"] = "path_to_web"
 			valist.Artifacts["img"] = "path_to_img"
 		}
-	}
-
-	// create will do nothing if org and repo already exist
-	if err := Create(ctx, rpath); err != nil {
-		return err
 	}
 
 	return valist.Save(vpath)
