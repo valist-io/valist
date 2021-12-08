@@ -57,7 +57,7 @@ func newIPFS(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
 		return local, nil
 	}
 
-	fmt.Println("Local IPFS node not found, using embedded node instead.")
+	fmt.Println("Local IPFS node not found, starting embedded node instead. Use a persistent node for a better experience.")
 	once.Do(setupPlugins)
 
 	if err := initRepo(repoPath); err != nil {
