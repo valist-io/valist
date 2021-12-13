@@ -25,7 +25,6 @@ func (s *CoreSuite) TestVoteRelease() {
 	repoMeta := &types.RepositoryMeta{
 		Name:        "sdk",
 		Description: "Valist core sdk.",
-		ProjectType: "npm",
 		Homepage:    "https://valist.io",
 		Repository:  "https://github.com/valist-io/valist",
 	}

@@ -80,11 +80,6 @@ func createRepository(ctx context.Context, orgID common.Hash, repoName string) e
 		return err
 	}
 
-	_, projectType, err := prompt.RepositoryProjectType().Run()
-	if err != nil {
-		return err
-	}
-
 	homepage, err := prompt.RepositoryHomepage("").Run()
 	if err != nil {
 		return err
@@ -98,7 +93,6 @@ func createRepository(ctx context.Context, orgID common.Hash, repoName string) e
 	meta := types.RepositoryMeta{
 		Name:        name,
 		Description: desc,
-		ProjectType: projectType,
 		Homepage:    homepage,
 		Repository:  url,
 	}

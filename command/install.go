@@ -10,7 +10,6 @@ import (
 
 	"github.com/valist-io/valist/core/client"
 	"github.com/valist-io/valist/core/config"
-	"github.com/valist-io/valist/core/types"
 )
 
 // Install downloads a binary artifact to the valist bin path.
@@ -30,15 +29,6 @@ func Install(ctx context.Context, rpath string) error {
 
 	if res.Release == nil {
 		return fmt.Errorf("invalid release path: %s", rpath)
-	}
-
-	meta, err := client.GetRepositoryMeta(ctx, res.Repository.MetaCID)
-	if err != nil {
-		return err
-	}
-
-	if meta.ProjectType != types.ProjectTypeBinary {
-		return fmt.Errorf("only binary type projects can be installed")
 	}
 
 	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)

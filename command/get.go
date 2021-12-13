@@ -55,7 +55,6 @@ func getRepository(ctx context.Context, repo *types.Repository) error {
 	}
 
 	fmt.Printf("Name:        %s\n", meta.Name)
-	fmt.Printf("Type:        %s\n", meta.ProjectType)
 	fmt.Printf("Description: %s\n", meta.Description)
 	fmt.Printf("Homepage:    %s\n", meta.Homepage)
 	fmt.Printf("Repository:  %s\n", meta.Repository)

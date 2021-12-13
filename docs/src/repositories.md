@@ -1,4 +1,4 @@
-# Creating a Repository
+# Repositories
 
 After you have created an organization, you are ready to create a repository. Creating a repository allows you to mange, publish, and retrieve your software releases on Valist.
 
@@ -28,7 +28,6 @@ To create a new repository using the Valist SDK, create a new javascript file co
       description: 'The coolest project in the world',
       homepage: 'https://cool.project',
       repository: 'https://github.com/',
-      projectType: 'binary',
     };
 
   const web3Provider = new HDWalletProvider({

@@ -1,4 +1,4 @@
-# Fetching & Installing Software
+# Installing
 
 ## CLI
 

@@ -1,5 +1,7 @@
 # Getting Started
 
+Valist can be used as a command line interface (CLI) or imported as a TypeScript library.
+
 ## Installation
 
 ### CLI
@@ -14,7 +16,7 @@ To install the CLI on any system, run the following:
 npm install -g @valist/cli
 ```
 
-This will use the Valist JS-SDK to download CLI from IPFS. This is simply a wrapper for the Go binary.
+This will download the appropriate Go binary from IPFS. This package is simply a cross-platform wrapper for the Go CLI.
 
 !!! note
     Installing from more package managers coming soon!
@@ -93,20 +95,10 @@ This will start the universal package registry API and web server:
 API server running on localhost:9000
 ```
 
-### SDK
+### TypeScript/JavaScript SDK
 
 You can install the JS-SDK by running the following:
 
 ```sh
 npm install @valist/sdk
 ```
-
-If you're using the Valist NPM Registry, you can install the JS-SDK by running the following:
-
-```sh
-echo "@valist:registry=http://localhost:9000/api/npm" >> .npmrc
-
-npm install @valist/sdk
-```
-
-This will fetch and install the package by querying the registry smart contract and pulling the files from IPFS.
