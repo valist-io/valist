@@ -34,7 +34,7 @@ func CreateAccount(ctx context.Context) error {
 
 	config.Accounts.Pinned = append(config.Accounts.Pinned, account.Address)
 
-	fmt.Println(fmt.Sprintf("Created account %s", account.Address.Hex()))
+	fmt.Printf("Created account %s", account.Address.Hex())
 	return config.Save()
 }
 
