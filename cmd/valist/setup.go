@@ -54,3 +54,23 @@ func setup(c *cli.Context) error {
 	c.Context = context.WithValue(c.Context, command.ConfigKey, cfg)
 	return nil
 }
+
+// setup initializes the config only (no client) before commands are executed
+func setupConfig(c *cli.Context) error {
+	home, err := os.UserHomeDir()
+	if err != nil {
+		return err
+	}
+
+	if err := config.Initialize(home); err != nil {
+		return err
+	}
+
+	cfg := config.NewConfig(home)
+	if err := cfg.Load(); err != nil {
+		return err
+	}
+
+	c.Context = context.WithValue(c.Context, command.ConfigKey, cfg)
+	return nil
+}

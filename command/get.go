@@ -32,6 +32,7 @@ func Get(ctx context.Context, rpath string) error {
 func getRelease(ctx context.Context, release *types.Release) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
+	fmt.Println("Fetching from distributed storage...")
 	meta, err := client.GetReleaseMeta(ctx, release.ReleaseCID)
 	if err != nil {
 		return err
@@ -49,6 +50,7 @@ func getRelease(ctx context.Context, release *types.Release) error {
 func getRepository(ctx context.Context, repo *types.Repository) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
+	fmt.Println("Fetching from distributed storage...")
 	meta, err := client.GetRepositoryMeta(ctx, repo.MetaCID)
 	if err != nil {
 		return err
@@ -57,8 +59,7 @@ func getRepository(ctx context.Context, repo *types.Repository) error {
 	fmt.Printf("Name:        %s\n", meta.Name)
 	fmt.Printf("Description: %s\n", meta.Description)
 	fmt.Printf("Homepage:    %s\n", meta.Homepage)
-	fmt.Printf("Repository:  %s\n", meta.Repository)
-	fmt.Printf("Threshold:   %d\n", repo.Threshold)
+	fmt.Printf("Source code repo:  %s\n", meta.Repository)
 
 	return nil
 }
@@ -66,6 +67,7 @@ func getRepository(ctx context.Context, repo *types.Repository) error {
 func getOrganization(ctx context.Context, org *types.Organization) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
+	fmt.Println("Fetching from distributed storage...")
 	meta, err := client.GetOrganizationMeta(ctx, org.MetaCID)
 	if err != nil {
 		return err
@@ -74,7 +76,6 @@ func getOrganization(ctx context.Context, org *types.Organization) error {
 	fmt.Printf("Name:        %s\n", meta.Name)
 	fmt.Printf("Description: %s\n", meta.Description)
 	fmt.Printf("Homepage:    %s\n", meta.Homepage)
-	fmt.Printf("Threshold:   %d\n", org.Threshold)
 
 	return nil
 }
