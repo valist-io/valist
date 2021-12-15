@@ -42,7 +42,7 @@ func Install(ctx context.Context, rpath string) error {
 		return fmt.Errorf("target platform %s not found in release", platform)
 	}
 
-	data, err := client.Storage().ReadFile(ctx, artifact.Provider)
+	data, err := client.ReadFile(ctx, artifact.Provider)
 	if err != nil {
 		return err
 	}

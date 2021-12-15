@@ -41,7 +41,7 @@ func (client *Client) GetRepository(ctx context.Context, orgID common.Hash, repo
 
 // GetRepositoryMeta returns the repository meta from the given path.
 func (client *Client) GetRepositoryMeta(ctx context.Context, p string) (*types.RepositoryMeta, error) {
-	data, err := client.storage.ReadFile(ctx, p)
+	data, err := client.ReadFile(ctx, p)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +61,7 @@ func (client *Client) CreateRepository(ctx context.Context, orgID common.Hash, n
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -107,7 +107,7 @@ func (client *Client) SetRepositoryMeta(ctx context.Context, orgID common.Hash, 
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}

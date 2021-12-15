@@ -3,7 +3,6 @@ package core
 import (
 	"context"
 	"fmt"
-	"time"
 
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/ethclient"
@@ -13,21 +12,19 @@ import (
 	"github.com/valist-io/valist/core/client/basetx"
 	"github.com/valist-io/valist/core/client/metatx"
 	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/ipfs"
 	"github.com/valist-io/valist/signer"
-	"github.com/valist-io/valist/storage"
-	"github.com/valist-io/valist/storage/ipfs"
-	pinning "github.com/valist-io/valist/storage/pinning"
 )
 
 // NewClient creates a new valist client using the given config.
 func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) {
-	valistAddress := cfg.Ethereum.Contracts["valist"]
-	registryAddress := cfg.Ethereum.Contracts["registry"]
+	var opt client.Options
 
 	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
 	if err != nil {
 		return nil, err
 	}
+	opt.Ethereum = eth
 
 	chainID, err := eth.ChainID(ctx)
 	if err != nil {
@@ -35,48 +32,38 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 	}
 
 	kstore := keystore.NewKeyStore(cfg.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
-	signer, err := signer.NewSigner(chainID, kstore)
+	opt.Signer, err = signer.NewSigner(chainID, kstore)
 	if err != nil {
 		return nil, err
 	}
 
-	valist, err := contract.NewValist(valistAddress, eth)
+	valistAddress := cfg.Ethereum.Contracts["valist"]
+	opt.Valist, err = contract.NewValist(valistAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize valist contract: %v", err)
 	}
 
-	registry, err := contract.NewRegistry(registryAddress, eth)
+	registryAddress := cfg.Ethereum.Contracts["registry"]
+	opt.Registry, err = contract.NewRegistry(registryAddress, eth)
 	if err != nil {
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	ipfs, err := ipfs.NewProvider(ctx, cfg.StoragePath())
+	opt.IPFS, err = ipfs.NewCoreAPI(ctx, cfg.StoragePath())
 	if err != nil {
 		return nil, err
 	}
+	ipfs.Bootstrap(ctx, opt.IPFS)
 
-	// TODO move to config once URL is proxied
-	var provider storage.Provider
-	provider = pinning.NewProvider("https://pin.valist.io", ipfs)
-	provider = storage.WithTimeout(provider, 5*time.Minute, 5*time.Minute)
-
-	var transactor client.TransactorAPI
 	if cfg.Ethereum.MetaTx {
-		transactor, err = metatx.NewTransactor(eth, valistAddress, registryAddress, cfg.Ethereum.BiconomyApiKey)
+		opt.Transactor, err = metatx.NewTransactor(eth, valistAddress, registryAddress, cfg.Ethereum.BiconomyApiKey)
 	} else {
-		transactor, err = basetx.NewTransactor(eth, valistAddress, registryAddress)
+		opt.Transactor, err = basetx.NewTransactor(eth, valistAddress, registryAddress)
 	}
 
 	if err != nil {
 		return nil, err
 	}
 
-	return client.NewClient(client.Options{
-		Storage:    provider,
-		Ethereum:   eth,
-		Valist:     valist,
-		Registry:   registry,
-		Signer:     signer,
-		Transactor: transactor,
-	})
+	return client.NewClient(opt)
 }

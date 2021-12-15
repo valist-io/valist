@@ -81,7 +81,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 			return fmt.Errorf("failed to add %s: %v", key, err)
 		}
 
-		fpath, err := client.Storage().Write(ctx, fdata)
+		fpath, err := client.WriteFile(ctx, fdata)
 		if err != nil {
 			return fmt.Errorf("failed to add %s: %v", key, err)
 		}
@@ -97,7 +97,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 		return err
 	}
 
-	releasePath, err := client.Storage().Write(ctx, releaseData)
+	releasePath, err := client.WriteFile(ctx, releaseData)
 	if err != nil {
 		return err
 	}
