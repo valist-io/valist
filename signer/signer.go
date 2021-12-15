@@ -105,30 +105,30 @@ func (s *Signer) SignTx(address common.Address, tx *types.Transaction) (*types.T
 	if address != s.account.Address {
 		return nil, bind.ErrNotAuthorized
 	}
-
 	wallet, err := s.wallet(s.account)
 	if err != nil {
 		return nil, err
 	}
-
 	out, err := wallet.SignTx(s.account, tx, s.chainID)
 	if _, ok := err.(*accounts.AuthNeededError); !ok {
 		return out, err
 	}
 
-	passphrase, err := s.passphrase(s.account)
-	if err != nil {
-		return nil, err
+	// attempt password unlock up to 3 times
+	for i := 0; i < 3; i++ {
+		passphrase, err := s.passphrase(s.account)
+		if err != nil {
+			return nil, err
+		}
+		out, err = wallet.SignTxWithPassphrase(s.account, passphrase, tx, s.chainID)
+		if err != nil {
+			continue
+		}
+		s.cache[s.account.Address] = passphrase
+		return out, nil
 	}
 
-	out, err = wallet.SignTxWithPassphrase(s.account, passphrase, tx, s.chainID)
-	if err != nil {
-		return nil, err
-	}
-
-	// remember the passphrase only after successful transaction
-	s.cache[s.account.Address] = passphrase
-	return out, nil
+	return nil, fmt.Errorf("failed to sign transaction")
 }
 
 // SignTypedData signs the given typedData using the given account's wallet.
@@ -136,30 +136,30 @@ func (s *Signer) SignTypedData(address common.Address, typedData core.TypedData)
 	if address != s.account.Address {
 		return nil, bind.ErrNotAuthorized
 	}
-
 	wallet, err := s.wallet(s.account)
 	if err != nil {
 		return nil, err
 	}
-
 	out, err := wallet.SignTypedData(s.account, typedData)
 	if _, ok := err.(*accounts.AuthNeededError); !ok {
 		return out, err
 	}
 
-	passphrase, err := s.passphrase(s.account)
-	if err != nil {
-		return nil, err
+	// attempt password unlock up to 3 times
+	for i := 0; i < 3; i++ {
+		passphrase, err := s.passphrase(s.account)
+		if err != nil {
+			return nil, err
+		}
+		out, err = wallet.SignTypedDataWithPassphrase(s.account, passphrase, typedData)
+		if err != nil {
+			continue
+		}
+		s.cache[s.account.Address] = passphrase
+		return out, nil
 	}
 
-	out, err = wallet.SignTypedDataWithPassphrase(s.account, passphrase, typedData)
-	if err != nil {
-		return nil, err
-	}
-
-	// remember the passphrase only after successful transaction
-	s.cache[s.account.Address] = passphrase
-	return out, nil
+	return nil, fmt.Errorf("failed to sign typed data")
 }
 
 // NewTransactor returns TransactOpts for meta or regular transactions.
