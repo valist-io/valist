@@ -25,43 +25,20 @@ var bootstrapPeers = []string{
 // once is used to ensure plugins are only initialized once.
 var once sync.Once
 
-// NewCoreAPI returns a new IPFS instance bootstrapped with the default peers.
-func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
-	ipfs, err := newIPFS(ctx, repoPath)
-	if err != nil {
-		return nil, err
-	}
-
-	for _, peerString := range bootstrapPeers {
-		peerAddr, err := multiaddr.NewMultiaddr(peerString)
-		if err != nil {
-			continue
-		}
-
-		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
-		if err != nil {
-			continue
-		}
-
-		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
-	}
-
-	return ipfs, nil
-}
-
-// newIPFS returns an IPFS CoreAPI. If a local IPFS istance is running
+// NewCoreAPI returns an IPFS CoreAPI. If a local IPFS istance is running
 // a local connection will be attempted, otherwise a new instance is started.
-func newIPFS(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
+func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
 	local, err := connectToIPFS(ctx)
 	if err == nil {
 		return local, nil
 	}
 
-	fmt.Println("Local IPFS node not found, starting embedded node instead. Use a persistent node for a better experience.")
-	once.Do(setupPlugins)
+	fmt.Println("Local IPFS node not found, starting embedded node.")
+	fmt.Println("Use a persistent node for a better experience.")
 
+	once.Do(setupPlugins)
 	if err := initRepo(repoPath); err != nil {
-		return nil, fmt.Errorf("failed to init fsrepo: %s", err)
+		return nil, err
 	}
 
 	repo, err := fsrepo.Open(repoPath)
@@ -83,6 +60,23 @@ func newIPFS(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
 	return coreapi.NewCoreAPI(node)
 }
 
+// Bootstrap attempts to connect to bootstrap peers.
+func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
+	for _, peerString := range bootstrapPeers {
+		peerAddr, err := multiaddr.NewMultiaddr(peerString)
+		if err != nil {
+			continue
+		}
+
+		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
+		if err != nil {
+			continue
+		}
+
+		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+	}
+}
+
 // connectToIPFS attempts to connect to the local IPFS API and
 // makes a request to ensure the API is running.
 func connectToIPFS(ctx context.Context) (coreiface.CoreAPI, error) {
@@ -91,7 +85,6 @@ func connectToIPFS(ctx context.Context) (coreiface.CoreAPI, error) {
 		return nil, err
 	}
 
-	// make a request to ensure the api is actually running
 	_, err = local.Swarm().ListenAddrs(ctx)
 	if err != nil {
 		return nil, err

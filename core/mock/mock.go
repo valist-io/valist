@@ -13,8 +13,8 @@ import (
 	"github.com/valist-io/valist/contract"
 	"github.com/valist-io/valist/core/client"
 	"github.com/valist-io/valist/core/client/basetx"
+	"github.com/valist-io/valist/ipfs"
 	"github.com/valist-io/valist/signer"
-	"github.com/valist-io/valist/storage/ipfs"
 )
 
 const (
@@ -87,7 +87,7 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 	// ensure contracts are deployed
 	backend.Commit()
 
-	ipfs, err := ipfs.NewProvider(ctx, storageDir)
+	ipfs, err := ipfs.NewCoreAPI(ctx, storageDir)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +98,7 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 	}
 
 	return client.NewClient(client.Options{
-		Storage:    ipfs,
+		IPFS:       ipfs,
 		Ethereum:   backend,
 		Valist:     valist,
 		Registry:   registry,

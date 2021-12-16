@@ -37,7 +37,7 @@ func (client *Client) GetOrganization(ctx context.Context, id common.Hash) (*typ
 
 // GetOrganizationMeta returns the organization metadata from the given path.
 func (client *Client) GetOrganizationMeta(ctx context.Context, p string) (*types.OrganizationMeta, error) {
-	data, err := client.storage.ReadFile(ctx, p)
+	data, err := client.ReadFile(ctx, p)
 	if err != nil {
 		return nil, fmt.Errorf("Failed to get organization meta: %v", err)
 	}
@@ -57,7 +57,7 @@ func (client *Client) CreateOrganization(ctx context.Context, meta *types.Organi
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}
@@ -85,7 +85,7 @@ func (client *Client) SetOrganizationMeta(ctx context.Context, orgID common.Hash
 		return nil, err
 	}
 
-	metaCID, err := client.storage.Write(ctx, data)
+	metaCID, err := client.WriteFile(ctx, data)
 	if err != nil {
 		return nil, err
 	}

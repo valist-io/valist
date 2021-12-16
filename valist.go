@@ -10,7 +10,6 @@ import (
 	"github.com/valist-io/valist/contract/valist"
 	"github.com/valist-io/valist/core/types"
 	"github.com/valist-io/valist/signer"
-	"github.com/valist-io/valist/storage"
 )
 
 // API defines the valist api.
@@ -57,8 +56,10 @@ type API interface {
 	VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, repoName string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(ctx context.Context, path string) (types.ResolvedPath, error)
+	// ReadFile returns the contents of the file at the given path.
+	ReadFile(ctx context.Context, path string) ([]byte, error)
+	// WriteFile writes the given contents to a file and returns its unique path.
+	WriteFile(ctx context.Context, data []byte) (string, error)
 	// Signer returns the transaction signer.
 	Signer() *signer.Signer
-	// Storage returns the storage provider.
-	Storage() storage.Provider
 }

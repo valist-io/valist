@@ -48,7 +48,7 @@ func (client *Client) GetRelease(ctx context.Context, orgID common.Hash, repoNam
 
 // GetReleaseMeta returns the release meta from the given path.
 func (client *Client) GetReleaseMeta(ctx context.Context, p string) (*types.ReleaseMeta, error) {
-	releaseData, err := client.Storage().ReadFile(ctx, p)
+	releaseData, err := client.ReadFile(ctx, p)
 	if err != nil {
 		return nil, err
 	}

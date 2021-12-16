@@ -8,12 +8,12 @@ import (
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
 	"github.com/ethereum/go-ethereum/crypto"
+	coreiface "github.com/ipfs/interface-go-ipfs-core"
 
 	"github.com/valist-io/gasless"
 	"github.com/valist-io/valist/contract/registry"
 	"github.com/valist-io/valist/contract/valist"
 	"github.com/valist-io/valist/signer"
-	"github.com/valist-io/valist/storage"
 )
 
 var (
@@ -41,8 +41,8 @@ type TransactorAPI interface {
 
 // Options is used to set client options.
 type Options struct {
-	Storage  storage.Provider
 	Ethereum bind.DeployBackend
+	IPFS     coreiface.CoreAPI
 
 	Valist   *valist.Valist
 	Registry *registry.ValistRegistry
@@ -53,8 +53,8 @@ type Options struct {
 
 // Client is a Valist SDK client.
 type Client struct {
-	eth     bind.DeployBackend
-	storage storage.Provider
+	eth  bind.DeployBackend
+	ipfs coreiface.CoreAPI
 
 	valist   *valist.Valist
 	registry *registry.ValistRegistry
@@ -71,8 +71,8 @@ func NewClient(opts Options) (*Client, error) {
 		return nil, fmt.Errorf("ethereum client is required")
 	}
 
-	if opts.Storage == nil {
-		return nil, fmt.Errorf("storage is required")
+	if opts.IPFS == nil {
+		return nil, fmt.Errorf("ipfs coreapi is required")
 	}
 
 	if opts.Valist == nil {
@@ -93,17 +93,13 @@ func NewClient(opts Options) (*Client, error) {
 
 	return &Client{
 		eth:        opts.Ethereum,
-		storage:    opts.Storage,
+		ipfs:       opts.IPFS,
 		valist:     opts.Valist,
 		registry:   opts.Registry,
 		signer:     opts.Signer,
 		transactor: opts.Transactor,
 		orgs:       make(map[string]common.Hash),
 	}, nil
-}
-
-func (client *Client) Storage() storage.Provider {
-	return client.storage
 }
 
 func (client *Client) Signer() *signer.Signer {
