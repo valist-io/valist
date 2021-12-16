@@ -5,7 +5,6 @@ import (
 	"crypto/sha256"
 	"encoding/json"
 	"fmt"
-	"math/big"
 	"os"
 	"path/filepath"
 
@@ -118,16 +117,12 @@ func Publish(ctx context.Context, dryrun bool) error {
 		return nil
 	}
 
-	vote, err := client.VoteRelease(ctx, res.OrgID, res.RepoName, release)
+	_, err = client.VoteRelease(ctx, res.OrgID, res.RepoName, release)
 	if err != nil {
 		return err
 	}
 
-	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
-		fmt.Printf("Voted to publish release %s %d/%d\n", release.Tag, vote.SigCount, vote.Threshold)
-	} else {
-		fmt.Printf("Approved release %s\n", release.Tag)
-	}
+	fmt.Printf("Approved release %s\n", release.Tag)
 
 	return nil
 }
