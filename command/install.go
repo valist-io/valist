@@ -31,6 +31,7 @@ func Install(ctx context.Context, rpath string) error {
 		return fmt.Errorf("invalid release path: %s", rpath)
 	}
 
+	fmt.Println("Fetching from distributed storage...")
 	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return err

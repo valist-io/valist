@@ -33,6 +33,8 @@ func CreateAccount(ctx context.Context) error {
 	}
 
 	config.Accounts.Pinned = append(config.Accounts.Pinned, account.Address)
+
+	fmt.Printf("Created account %s", account.Address.Hex())
 	return config.Save()
 }
 
@@ -118,6 +120,12 @@ func ImportAccount(ctx context.Context) error {
 func ListAccounts(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
 	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
+
+	if len(kstore.Accounts()) == 0 {
+		fmt.Println("No keys found. Please generate one using the following command:")
+		fmt.Println("valist account create")
+		return nil
+	}
 
 	for _, account := range kstore.Accounts() {
 		if config.Accounts.Default == account.Address {

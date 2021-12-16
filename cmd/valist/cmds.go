@@ -27,7 +27,7 @@ var (
 		Name:  "create",
 		Usage: "Create an account",
 		Before: func(c *cli.Context) error {
-			return setup(c)
+			return setupConfig(c)
 		},
 		Action: func(c *cli.Context) error {
 			return command.CreateAccount(c.Context)
@@ -39,7 +39,7 @@ var (
 		Usage:     "Set the default account",
 		ArgsUsage: "[address]",
 		Before: func(c *cli.Context) error {
-			return setup(c)
+			return setupConfig(c)
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
@@ -55,7 +55,7 @@ var (
 		Usage:     "Export an account",
 		ArgsUsage: "[address]",
 		Before: func(c *cli.Context) error {
-			return setup(c)
+			return setupConfig(c)
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
@@ -70,7 +70,7 @@ var (
 		Name:  "import",
 		Usage: "Import an account",
 		Before: func(c *cli.Context) error {
-			return setup(c)
+			return setupConfig(c)
 		},
 		Action: func(c *cli.Context) error {
 			return command.ImportAccount(c.Context)
@@ -81,7 +81,7 @@ var (
 		Name:  "list",
 		Usage: "List all accounts",
 		Before: func(c *cli.Context) error {
-			return setup(c)
+			return setupConfig(c)
 		},
 		Action: func(c *cli.Context) error {
 			return command.ListAccounts(c.Context)
