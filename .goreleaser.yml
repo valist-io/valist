@@ -25,15 +25,15 @@ nfpms:
       - deb
       - rpm
     homepage: https://valist.io
-    description: Universal package repositories, code signing, and access control.
+    description: Web3-native software distribution.
     license: MPL-2.0
 brews:
-  - name: valist
+  - name: cli
     tap:
       owner: valist-io
       name: homebrew-valist
     homepage: https://valist.io
-    description: Universal package repositories, code signing, and access control.
+    description: Web3-native software distribution.
     license: MPL-2.0
 checksum:
   name_template: 'checksums.txt'
