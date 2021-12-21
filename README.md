@@ -11,7 +11,7 @@ Web3 native digital distribution.
 
 * Publish Assets (EXEs, NFTs, WASM, etc.)
 * Multi-Factor Releases (multi-sig for publishing assets)
-* Multi-Chain Support (EVM based only for now)
+* Multi-Chain Support (EVM based only for now, NEAR coming soon)
 
 ## Documentation
 
