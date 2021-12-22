@@ -1,6 +1,6 @@
 SHELL=/bin/bash
 
-LDFLAGS=-ldflags "-s -w -X 'main.Version=v0.6.2'"
+LDFLAGS=-ldflags "-s -w -X 'main.Version=v0.6.3'"
 
 all: valist
 
