@@ -1,5 +1,5 @@
 name: valist/cli
-tag: 0.6.2
+tag: 0.6.3
 artifacts:
   linux/amd64: dist/valist_linux_amd64/valist
   linux/arm64: dist/valist_linux_arm64/valist
