@@ -47,7 +47,8 @@ docs:
 clean:
 	rm -Rf dist site
 
-publish: clean bin-multi
+publish: clean
+	goreleaser build
 	go run ./cmd/valist publish
 
 publish-dryrun: clean bin-multi
