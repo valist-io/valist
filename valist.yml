@@ -1,8 +1,8 @@
 name: valist/cli
 tag: 0.6.2
 artifacts:
-  linux/amd64: dist/linux-amd64/valist
-  linux/arm64: dist/linux-arm64/valist
-  darwin/amd64: dist/darwin-amd64/valist
-  darwin/arm64: dist/darwin-arm64/valist
-  windows/amd64: dist/windows-amd64/valist.exe
+  linux/amd64: dist/valist_linux_amd64/valist
+  linux/arm64: dist/valist_linux_arm64/valist
+  darwin/amd64: dist/valist_darwin_amd64/valist
+  darwin/arm64: dist/valist_darwin_arm64/valist
+  windows/amd64: dist/valist_windows_amd64/valist.exe

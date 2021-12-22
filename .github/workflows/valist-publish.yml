@@ -2,19 +2,28 @@ name: Valist Publish
 on:
   push:
     tags:
-      - v*
-    branches:
-      - main
-env:
-  DOCKER_TAG: valist/valist:latest
+      - 'v*'
+permissions:
+  contents: write
 jobs:
-  publish:
-    name: Multi-platform build and publish
+  goreleaser:
     runs-on: ubuntu-latest
-    container: golang:1.16
     steps:
-      - uses: actions/checkout@v2
-      - shell: bash
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+      - name: Set up Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: '^1.16'
+      - name: Install GoReleaser
+        uses: goreleaser/goreleaser-action@v2
+        with:
+          install-only: true
+      - name: Run GoReleaser
         env:
-          VALIST_SIGNER: ${{ secrets.VALIST_SIGNER }}
-        run: make publish
+          GITHUB_TOKEN: ${{ secrets.GH_PAT }}
+        run: goreleaser release --rm-dist
+      - name: Valist Publish
+        uses: valist-io/valist-github-action@main
