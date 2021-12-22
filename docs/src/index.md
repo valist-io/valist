@@ -24,7 +24,7 @@ This will download the appropriate Go binary from IPFS. This package is simply a
 ##### Homebrew
 
 ```sh
-brew install valist-io/valist/valist
+brew install valist-io/valist/cli
 ```
 
 This will add the [homebrew-valist](github.com/valist-io/homebrew-valist) tap and install the CLI automatically.
@@ -42,7 +42,7 @@ go install github.com/valist-io/valist
 
 #### Download from valist.io
 
-You can download the latest version of the Valist CLI from app.valist.io/valist/cli -- You'll be able to select your OS and architecture from the `Install` tab or from the sidebar. Place this binary in your PATH or use it directly.
+You can download the latest version of the Valist CLI from [app.valist.io/valist/cli](app.valist.io/valist/cli) -- You'll be able to select your OS and architecture from the `Install` tab or from the sidebar. Place this binary in your PATH or use it directly.
 
 #### Manual installation
 
@@ -50,7 +50,7 @@ Or, you can use the following script to install the binary globally:
 
 ```sh
 mkdir -p ~/.local/bin
-curl https://gateway.valist.io/ipfs/QmZ9T6H7WTb6VrNaqFEwo7Mqj6jGxMe4vpR6srxsjy3otz/linux-amd64/valist -o ~/.local/bin/valist
+curl https://valist.io/api/valist/cli?artifact=linux/amd64 -o ~/.local/bin/valist
 ```
 
 Please note, you'll need to replace `linux-amd64` with your os and architecture. The following options are available:
