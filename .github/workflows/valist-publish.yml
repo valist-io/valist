@@ -27,3 +27,5 @@ jobs:
         run: goreleaser release --rm-dist
       - name: Valist Publish
         uses: valist-io/valist-github-action@main
+        env:
+          VALIST_SIGNER: ${{ secrets.VALIST_SIGNER }}
