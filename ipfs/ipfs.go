@@ -18,12 +18,13 @@ import (
 	multiaddr "github.com/multiformats/go-multiaddr"
 )
 
-var bootstrapPeers = []string{
-	"/dnsaddr/gateway.valist.io/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
-}
-
 // once is used to ensure plugins are only initialized once.
 var once sync.Once
+
+var bootstrapPeers = []string{
+	"/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
+	"/ip4/107.191.98.233/udp/4001/quic/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
+}
 
 // NewCoreAPI returns an IPFS CoreAPI. If a local IPFS istance is running
 // a local connection will be attempted, otherwise a new instance is started.
@@ -62,19 +63,29 @@ func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error)
 
 // Bootstrap attempts to connect to bootstrap peers.
 func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
+	var wg sync.WaitGroup
 	for _, peerString := range bootstrapPeers {
 		peerAddr, err := multiaddr.NewMultiaddr(peerString)
 		if err != nil {
+			fmt.Printf("Failed to parse bootstrap peer addr %s\n", peerString)
 			continue
 		}
 
 		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
 		if err != nil {
+			fmt.Printf("Failed to parse bootstrap peer info %s\n", peerString)
 			continue
 		}
 
-		go ipfs.Swarm().Connect(ctx, *peerInfo) //nolint:errcheck
+		wg.Add(1)
+		go func(info peer.AddrInfo) {
+			defer wg.Done()
+			if err := ipfs.Swarm().Connect(ctx, info); err != nil {
+				fmt.Printf("Failed to bootstrap %s %v\n", peerInfo.ID, err)
+			}
+		}(*peerInfo)
 	}
+	wg.Wait()
 }
 
 // connectToIPFS attempts to connect to the local IPFS API and
