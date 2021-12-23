@@ -4,12 +4,13 @@
 [![Discord](https://img.shields.io/discord/785535462311591976)](https://discord.com/channels/785535462311591976)
 [![Valist](https://img.shields.io/badge/valist-published-blue)](https://app.valist.io/valist)
 [![FOSSA Status](https://app.fossa.com/api/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist.svg?type=shield)](https://app.fossa.com/projects/git%2Bgithub.com%2Fvalist-io%2Fvalist?ref=badge_shield)
+[![Gitcoin](https://img.shields.io/badge/gitcoin-grant-brightgreen)](https://gitcoin.co/grants/1776/valist)
 
-Web3 native digital distribution.
+Web3-native software distribution.
 
 ## Features
 
-* Publish Assets (EXEs, NFTs, WASM, etc.)
+* Publish Applications and Assets (EXEs, WASM, Docker images, NFTs, etc.)
 * Multi-Factor Releases (multi-sig for publishing assets)
 * Multi-Chain Support (EVM based only for now, NEAR coming soon)
 
