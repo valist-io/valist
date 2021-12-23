@@ -4,6 +4,8 @@ import (
 	"context"
 	"fmt"
 	"io/ioutil"
+	"net/http"
+	"os"
 	"sync"
 
 	config "github.com/ipfs/go-ipfs-config"
@@ -21,15 +23,10 @@ import (
 // once is used to ensure plugins are only initialized once.
 var once sync.Once
 
-var bootstrapPeers = []string{
-	"/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
-	"/ip4/107.191.98.233/udp/4001/quic/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
-}
-
 // NewCoreAPI returns an IPFS CoreAPI. If a local IPFS istance is running
 // a local connection will be attempted, otherwise a new instance is started.
-func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error) {
-	local, err := connectToIPFS(ctx)
+func NewCoreAPI(ctx context.Context, repoPath, apiAddr string) (coreiface.CoreAPI, error) {
+	local, err := connectToIPFS(ctx, apiAddr)
 	if err == nil {
 		return local, nil
 	}
@@ -62,9 +59,9 @@ func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error)
 }
 
 // Bootstrap attempts to connect to bootstrap peers.
-func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
+func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI, peers []string) {
 	var wg sync.WaitGroup
-	for _, peerString := range bootstrapPeers {
+	for _, peerString := range peers {
 		peerAddr, err := multiaddr.NewMultiaddr(peerString)
 		if err != nil {
 			fmt.Printf("Failed to parse bootstrap peer addr %s\n", peerString)
@@ -90,18 +87,33 @@ func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
 
 // connectToIPFS attempts to connect to the local IPFS API and
 // makes a request to ensure the API is running.
-func connectToIPFS(ctx context.Context) (coreiface.CoreAPI, error) {
-	local, err := httpapi.NewLocalApi()
+func connectToIPFS(ctx context.Context, apiAddr string) (coreiface.CoreAPI, error) {
+	var api coreiface.CoreAPI
+	var err error
+
+	// choose a host in this order
+	// 1. address from environment
+	// 2. address from config
+	// 3. attempt local node
+	if envAddr := os.Getenv("VALIST_IPFS_ADDR"); envAddr != "" {
+		api, err = httpapi.NewURLApiWithClient(envAddr, &http.Client{})
+	} else if apiAddr != "" {
+		api, err = httpapi.NewURLApiWithClient(apiAddr, &http.Client{})
+	} else {
+		api, err = httpapi.NewLocalApi()
+	}
+
 	if err != nil {
 		return nil, err
 	}
 
-	_, err = local.Swarm().ListenAddrs(ctx)
+	// sanity check that the api is active
+	_, err = api.Swarm().ListenAddrs(ctx)
 	if err != nil {
 		return nil, err
 	}
 
-	return local, nil
+	return api, nil
 }
 
 // setupPlugins initializes the IPFS plugins once.
