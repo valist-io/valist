@@ -13,8 +13,11 @@ import (
 	"github.com/valist-io/gasless"
 	"github.com/valist-io/valist/contract/registry"
 	"github.com/valist-io/valist/contract/valist"
+	"github.com/valist-io/valist/log"
 	"github.com/valist-io/valist/signer"
 )
+
+var logger = log.New()
 
 var (
 	emptyHash  = common.HexToHash("0x0")

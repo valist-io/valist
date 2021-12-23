@@ -32,16 +32,15 @@ func Get(ctx context.Context, rpath string) error {
 func getRelease(ctx context.Context, release *types.Release) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	meta, err := client.GetReleaseMeta(ctx, release.ReleaseCID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("%s@%s\n", meta.Name, release.Tag)
-
+	logger.Info("%s@%s", meta.Name, release.Tag)
 	for name, artifact := range meta.Artifacts {
-		fmt.Printf("- %s: %s\n", name, artifact.Provider)
+		logger.Info("- %s: %s", name, artifact.Provider)
 	}
 
 	return nil
@@ -50,16 +49,16 @@ func getRelease(ctx context.Context, release *types.Release) error {
 func getRepository(ctx context.Context, repo *types.Repository) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	meta, err := client.GetRepositoryMeta(ctx, repo.MetaCID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Name:        %s\n", meta.Name)
-	fmt.Printf("Description: %s\n", meta.Description)
-	fmt.Printf("Homepage:    %s\n", meta.Homepage)
-	fmt.Printf("Source code repo:  %s\n", meta.Repository)
+	logger.Info("Name:        %s", meta.Name)
+	logger.Info("Description: %s", meta.Description)
+	logger.Info("Homepage:    %s", meta.Homepage)
+	logger.Info("Source code repo:  %s", meta.Repository)
 
 	return nil
 }
@@ -67,15 +66,15 @@ func getRepository(ctx context.Context, repo *types.Repository) error {
 func getOrganization(ctx context.Context, org *types.Organization) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	meta, err := client.GetOrganizationMeta(ctx, org.MetaCID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Name:        %s\n", meta.Name)
-	fmt.Printf("Description: %s\n", meta.Description)
-	fmt.Printf("Homepage:    %s\n", meta.Homepage)
+	logger.Info("Name:        %s", meta.Name)
+	logger.Info("Description: %s", meta.Description)
+	logger.Info("Homepage:    %s", meta.Homepage)
 
 	return nil
 }

@@ -1,11 +1,14 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/urfave/cli/v2"
+
+	"github.com/valist-io/valist/log"
 )
+
+var logger = log.New()
 
 var (
 	app = cli.NewApp()
@@ -43,6 +46,6 @@ func init() {
 
 func main() {
 	if err := app.Run(os.Args); err != nil {
-		fmt.Fprintln(os.Stderr, err)
+		logger.Error("%v", err)
 	}
 }

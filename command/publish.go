@@ -60,7 +60,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 	// TODO replace with regex or path matcher
 	readme, err := os.ReadFile("README.md")
 	if err != nil {
-		fmt.Println("warning: readme not found")
+		logger.Warn("readme not found")
 	}
 
 	releaseMeta := &types.ReleaseMeta{
@@ -73,7 +73,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 
 	// TODO run file uploads in parallel and print progress
 	for key, val := range valist.Artifacts {
-		fmt.Printf("Adding: %s...\n", key)
+		logger.Info("Adding: %s...", key)
 
 		fdata, err := os.ReadFile(filepath.Join(cwd, val))
 		if err != nil {
@@ -107,10 +107,9 @@ func Publish(ctx context.Context, dryrun bool) error {
 		MetaCID:    types.DeprecationNotice,
 	}
 
-	fmt.Printf("%s@%s\n", releaseMeta.Name, release.Tag)
-
+	logger.Info("%s@%s", releaseMeta.Name, release.Tag)
 	for name, artifact := range releaseMeta.Artifacts {
-		fmt.Printf("- %s: %s\n", name, artifact.Provider)
+		logger.Info("- %s: %s", name, artifact.Provider)
 	}
 
 	if dryrun {
@@ -122,7 +121,6 @@ func Publish(ctx context.Context, dryrun bool) error {
 		return err
 	}
 
-	fmt.Printf("Approved release %s\n", release.Tag)
-
+	logger.Info("Approved release %s", release.Tag)
 	return nil
 }

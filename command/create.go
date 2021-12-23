@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 
 	"github.com/ethereum/go-ethereum/common"
 
@@ -51,19 +50,19 @@ func createOrganization(ctx context.Context, orgName string) error {
 		Description: desc,
 	}
 
-	fmt.Println("Creating organization...")
+	logger.Info("Creating organization...")
 	create, err := client.CreateOrganization(ctx, &orgMeta)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Linking name '%s' to organization ID '0x%x'...\n", orgName, create.OrgID)
+	logger.Info("Linking name '%s' to organization ID '0x%x'...", orgName, create.OrgID)
 	_, err = client.LinkOrganizationName(ctx, create.OrgID, orgName)
 	if err != nil {
 		return err
 	}
 
-	fmt.Println("Organization created!")
+	logger.Info("Organization created!")
 	return nil
 }
 
@@ -102,6 +101,6 @@ func createRepository(ctx context.Context, orgID common.Hash, repoName string) e
 		return err
 	}
 
-	fmt.Println("Repository created!")
+	logger.Info("Repository created!")
 	return nil
 }

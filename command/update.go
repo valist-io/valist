@@ -31,7 +31,7 @@ func Update(ctx context.Context, rpath string) error {
 func updateOrganization(ctx context.Context, org *types.Organization) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	meta, err := client.GetOrganizationMeta(ctx, org.MetaCID)
 	if err != nil {
 		return err
@@ -57,14 +57,14 @@ func updateOrganization(ctx context.Context, org *types.Organization) error {
 		return err
 	}
 
-	fmt.Println("Organization updated!")
+	logger.Info("Organization updated!")
 	return nil
 }
 
 func updateRepository(ctx context.Context, repo *types.Repository) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	meta, err := client.GetRepositoryMeta(ctx, repo.MetaCID)
 	if err != nil {
 		return err
@@ -95,6 +95,6 @@ func updateRepository(ctx context.Context, repo *types.Repository) error {
 		return err
 	}
 
-	fmt.Println("Repository updated!")
+	logger.Info("Repository updated!")
 	return nil
 }
