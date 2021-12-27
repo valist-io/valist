@@ -8,6 +8,7 @@ import (
 
 	"github.com/ethereum/go-ethereum/accounts/abi/bind"
 	"github.com/ethereum/go-ethereum/common"
+	"github.com/ethereum/go-ethereum/crypto"
 
 	"github.com/valist-io/valist/contract/valist"
 	"github.com/valist-io/valist/core/types"
@@ -140,4 +141,20 @@ func (client *Client) VoteOrganizationThreshold(ctx context.Context, orgID commo
 	}
 
 	return client.valist.ParseVoteThresholdEvent(*logs[0])
+}
+
+// GetOrganizationMembers returns a list of all keys currently active in the organization.
+func (client *Client) GetOrganizationMembers(ctx context.Context, orgID common.Hash) ([]common.Address, error) {
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.signer.Account().Address,
+	}
+
+	packed, err := packedEncoding(orgID, ORG_ADMIN)
+	if err != nil {
+		return nil, err
+	}
+	selector := crypto.Keccak256Hash(packed)
+
+	return client.valist.GetRoleMembers(&callopts, selector)
 }

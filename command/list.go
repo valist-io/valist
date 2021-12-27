@@ -60,14 +60,23 @@ func listRepository(ctx context.Context, repo *types.Repository) error {
 		return err
 	}
 
+	members, err := client.GetRepositoryMembers(ctx, repo.OrgID, repo.Name)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Name:        %s\n", meta.Name)
 	fmt.Printf("Description: %s\n", meta.Description)
 	fmt.Printf("Homepage:    %s\n", meta.Homepage)
 	fmt.Printf("Source:      %s\n", meta.Repository)
-	fmt.Printf("Releases:      \n")
 
-	iter := client.ListReleaseTags(repo.OrgID, repo.Name)
-	return iter.ForEach(ctx, func(tag string) {
+	fmt.Printf("Members:       \n")
+	for _, address := range members {
+		fmt.Printf("- %s\n", address)
+	}
+
+	fmt.Printf("Releases:      \n")
+	return client.ListReleaseTags(repo.OrgID, repo.Name).ForEach(ctx, func(tag string) {
 		fmt.Printf("- %s\n", tag)
 	})
 }
@@ -81,9 +90,19 @@ func listOrganization(ctx context.Context, org *types.Organization) error {
 		return err
 	}
 
+	members, err := client.GetOrganizationMembers(ctx, org.ID)
+	if err != nil {
+		return err
+	}
+
 	fmt.Printf("Name:        %s\n", meta.Name)
 	fmt.Printf("Description: %s\n", meta.Description)
 	fmt.Printf("Homepage:    %s\n", meta.Homepage)
+
+	fmt.Printf("Members:       \n")
+	for _, address := range members {
+		fmt.Printf("- %s\n", address)
+	}
 
 	return nil
 }
