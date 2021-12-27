@@ -10,6 +10,7 @@ import (
 
 const (
 	rootDir     = ".valist"
+	installDir  = "bin"
 	configFile  = "config"
 	keystoreDir = "keystore"
 	storageDir  = "storage"
@@ -122,4 +123,9 @@ func (c *Config) DatabasePath() string {
 
 func (c *Config) StoragePath() string {
 	return filepath.Join(c.rootPath, storageDir)
+}
+
+// InstallPath returns the path to install binaries.
+func (c *Config) InstallPath() string {
+	return filepath.Join(c.rootPath, installDir)
 }
