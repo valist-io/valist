@@ -114,11 +114,14 @@ var (
 			return command.Daemon(c.Context)
 		},
 	}
-	// getCommand prints org, repo, or release metadata
+	// getCommand downloads a release file
 	getCommand = cli.Command{
 		Name:      "get",
-		Usage:     "Print organization, repository, or release metadata",
-		ArgsUsage: "[name]",
+		Usage:     "Download a release file",
+		ArgsUsage: "[name] [file]",
+		Flags: []cli.Flag{
+			&outputFlag,
+		},
 		Before: func(c *cli.Context) error {
 			return setup(c)
 		},
@@ -127,7 +130,7 @@ var (
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
-			return command.Get(c.Context, c.Args().Get(0))
+			return command.Get(c.Context, c.Args().Get(0), c.Args().Get(1), c.String("output"))
 		},
 	}
 	// initCommand initializes a valist.yml
@@ -146,22 +149,6 @@ var (
 			}
 
 			return command.Init(c.Context, c.Args().Get(0), c.Bool("wizard"))
-		},
-	}
-	// installCommand installs a binary artifact
-	installCommand = cli.Command{
-		Name:      "install",
-		Usage:     "Installs a binary artifact",
-		ArgsUsage: "[name]",
-		Before: func(c *cli.Context) error {
-			return setup(c)
-		},
-		Action: func(c *cli.Context) error {
-			if c.NArg() != 1 {
-				cli.ShowSubcommandHelpAndExit(c, 1)
-			}
-
-			return command.Install(c.Context, c.Args().Get(0))
 		},
 	}
 	// keyCommand manages organization and repository keys
@@ -220,6 +207,23 @@ var (
 			}
 
 			return command.KeyRotate(c.Context, c.Args().Get(0), c.Args().Get(1))
+		},
+	}
+	// listCommand prints org, repo, or release contents
+	listCommand = cli.Command{
+		Name:      "list",
+		Usage:     "List organization, repository, or release contents",
+		ArgsUsage: "[name]",
+		Aliases:   []string{"ls"},
+		Before: func(c *cli.Context) error {
+			return setup(c)
+		},
+		Action: func(c *cli.Context) error {
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
+			return command.List(c.Context, c.Args().Get(0))
 		},
 	}
 	// publishCommand creates a new release
