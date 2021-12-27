@@ -33,6 +33,7 @@ func init() {
 		&daemonCommand,
 		&getCommand,
 		&initCommand,
+		&installCommand,
 		&keyCommand,
 		&listCommand,
 		&publishCommand,

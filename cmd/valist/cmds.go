@@ -151,6 +151,22 @@ var (
 			return command.Init(c.Context, c.Args().Get(0), c.Bool("wizard"))
 		},
 	}
+	// installCommand installs a binary artifact
+	installCommand = cli.Command{
+		Name:      "install",
+		Usage:     "Installs a binary artifact",
+		ArgsUsage: "[name]",
+		Before: func(c *cli.Context) error {
+			return setup(c)
+		},
+		Action: func(c *cli.Context) error {
+			if c.NArg() != 1 {
+				cli.ShowSubcommandHelpAndExit(c, 1)
+			}
+
+			return command.Install(c.Context, c.Args().Get(0))
+		},
+	}
 	// keyCommand manages organization and repository keys
 	keyCommand = cli.Command{
 		Name:  "key",
