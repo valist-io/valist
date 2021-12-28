@@ -2,7 +2,6 @@ package command
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +17,7 @@ func Daemon(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Printf(`
+	logger.Info(`
 
 @@@  @@@   @@@@@@   @@@       @@@   @@@@@@   @@@@@@@
 @@@  @@@  @@@@@@@@  @@@       @@@  @@@@@@@   @@@@@@@
@@ -39,13 +38,13 @@ func Daemon(ctx context.Context) error {
 	}
 
 	go server.ListenAndServe() //nolint:errcheck
-	fmt.Println("server running on", server.Addr)
+	logger.Info("server running on %s", server.Addr)
 
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, os.Interrupt, syscall.SIGINT, syscall.SIGTERM)
 
 	<-quit
-	fmt.Println("shutting down")
+	logger.Info("shutting down")
 
 	ctx, cancel := context.WithTimeout(ctx, 30*time.Second)
 	defer cancel()

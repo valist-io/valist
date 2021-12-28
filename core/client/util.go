@@ -35,8 +35,8 @@ func waitMined(ctx context.Context, eth bind.DeployBackend, tx *types.Transactio
 		sim.Commit()
 	}
 
-	fmt.Printf("Waiting for transaction: %s\n", tx.Hash().Hex())
-	fmt.Printf("View status: https://mumbai.polygonscan.com/tx/%s\n", tx.Hash().Hex())
+	logger.Info("Waiting for transaction: %s", tx.Hash().Hex())
+	logger.Info("View status: https://mumbai.polygonscan.com/tx/%s", tx.Hash().Hex())
 
 	receipt, err := bind.WaitMined(ctx, eth, tx)
 	if err != nil {

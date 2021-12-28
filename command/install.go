@@ -31,7 +31,7 @@ func Install(ctx context.Context, rpath string) error {
 		return fmt.Errorf("invalid release path: %s", rpath)
 	}
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Info("Fetching from distributed storage...")
 	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return err
@@ -51,8 +51,7 @@ func Install(ctx context.Context, rpath string) error {
 	binPath := config.InstallPath()
 	exePath := filepath.Join(binPath, res.RepoName)
 
-	fmt.Printf("Installing for target platform %s\n", platform)
-
+	logger.Info("Installing for target platform %s", platform)
 	if err := os.MkdirAll(binPath, 0744); err != nil {
 		return err
 	}
@@ -61,11 +60,10 @@ func Install(ctx context.Context, rpath string) error {
 		return err
 	}
 
-	fmt.Printf("Successfully installed: %s\n", exePath)
-
+	logger.Info("Successfully installed: %s\n", exePath)
 	if !strings.Contains(os.Getenv("PATH"), binPath) {
-		fmt.Printf("\n%s not detected in $PATH. Add to path or run:\n", binPath)
-		fmt.Printf(`    export PATH="$PATH:%s"`, binPath)
+		logger.Info("%s not detected in $PATH. Add to path or run:", binPath)
+		logger.Info(`export PATH="$PATH:%s"`, binPath)
 	}
 
 	return nil

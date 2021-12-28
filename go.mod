@@ -5,6 +5,7 @@ go 1.16
 require (
 	github.com/dgraph-io/ristretto v0.1.0 // indirect
 	github.com/ethereum/go-ethereum v1.10.9
+	github.com/fatih/color v1.9.0
 	github.com/go-playground/validator/v10 v10.9.0
 	github.com/gorilla/mux v1.8.0
 	github.com/ipfs/go-cid v0.0.7

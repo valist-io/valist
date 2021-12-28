@@ -33,9 +33,9 @@ func Threshold(ctx context.Context, rpath string, threshold int64) error {
 	}
 
 	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
-		fmt.Printf("Voted to set threshold %d/%d\n", vote.SigCount, threshold)
+		logger.Info("Voted to set threshold %d/%d", vote.SigCount, threshold)
 	} else {
-		fmt.Printf("Approved threshold %d\n", threshold)
+		logger.Info("Approved threshold %d", threshold)
 	}
 
 	return nil

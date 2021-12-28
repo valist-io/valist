@@ -2,7 +2,6 @@ package ipfs
 
 import (
 	"context"
-	"fmt"
 	"io/ioutil"
 	"sync"
 
@@ -16,7 +15,11 @@ import (
 	coreiface "github.com/ipfs/interface-go-ipfs-core"
 	"github.com/libp2p/go-libp2p-core/peer"
 	multiaddr "github.com/multiformats/go-multiaddr"
+
+	"github.com/valist-io/valist/log"
 )
+
+var logger = log.New()
 
 // once is used to ensure plugins are only initialized once.
 var once sync.Once
@@ -34,8 +37,8 @@ func NewCoreAPI(ctx context.Context, repoPath string) (coreiface.CoreAPI, error)
 		return local, nil
 	}
 
-	fmt.Println("Local IPFS node not found, starting embedded node.")
-	fmt.Println("Use a persistent node for a better experience.")
+	logger.Warn("Local IPFS node not found, starting embedded node.")
+	logger.Warn("Use a persistent node for a better experience.")
 
 	once.Do(setupPlugins)
 	if err := initRepo(repoPath); err != nil {
@@ -67,13 +70,13 @@ func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
 	for _, peerString := range bootstrapPeers {
 		peerAddr, err := multiaddr.NewMultiaddr(peerString)
 		if err != nil {
-			fmt.Printf("Failed to parse bootstrap peer addr %s\n", peerString)
+			logger.Warn("Failed to parse bootstrap peer addr %s", peerString)
 			continue
 		}
 
 		peerInfo, err := peer.AddrInfoFromP2pAddr(peerAddr)
 		if err != nil {
-			fmt.Printf("Failed to parse bootstrap peer info %s\n", peerString)
+			logger.Warn("Failed to parse bootstrap peer info %s", peerString)
 			continue
 		}
 
@@ -81,7 +84,7 @@ func Bootstrap(ctx context.Context, ipfs coreiface.CoreAPI) {
 		go func(info peer.AddrInfo) {
 			defer wg.Done()
 			if err := ipfs.Swarm().Connect(ctx, info); err != nil {
-				fmt.Printf("Failed to bootstrap %s %v\n", peerInfo.ID, err)
+				logger.Warn("Failed to bootstrap %s %v", peerInfo.ID, err)
 			}
 		}(*peerInfo)
 	}
