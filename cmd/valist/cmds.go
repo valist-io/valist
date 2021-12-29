@@ -126,7 +126,7 @@ var (
 			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
-			if c.NArg() != 1 {
+			if c.NArg() != 1 && c.NArg() != 2 {
 				cli.ShowSubcommandHelpAndExit(c, 1)
 			}
 
