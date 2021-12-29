@@ -87,7 +87,7 @@ func NewClient(ctx context.Context) (*client.Client, error) {
 	// ensure contracts are deployed
 	backend.Commit()
 
-	ipfs, err := ipfs.NewCoreAPI(ctx, storageDir)
+	ipfs, err := ipfs.NewCoreAPI(ctx, storageDir, "")
 	if err != nil {
 		return nil, err
 	}

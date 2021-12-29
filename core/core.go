@@ -46,11 +46,11 @@ func NewClient(ctx context.Context, cfg *config.Config) (*client.Client, error) 
 		return nil, fmt.Errorf("failed to initialize registry contract: %v", err)
 	}
 
-	coreAPI, err := ipfs.NewCoreAPI(ctx, cfg.StoragePath())
+	coreAPI, err := ipfs.NewCoreAPI(ctx, cfg.StoragePath(), cfg.IPFS.ApiAddr)
 	if err != nil {
 		return nil, err
 	}
-	ipfs.Bootstrap(ctx, coreAPI)
+	ipfs.Bootstrap(ctx, coreAPI, cfg.IPFS.BootstrapPeers)
 
 	var transactor client.TransactorAPI
 	if cfg.Ethereum.MetaTx {

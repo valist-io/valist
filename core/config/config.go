@@ -14,8 +14,14 @@ const (
 	configFile  = "config"
 	keystoreDir = "keystore"
 	storageDir  = "storage"
-	databaseDir = "database"
 )
+
+type IPFS struct {
+	// ApiAddr is the address of the IPFS node
+	ApiAddr string `json:"api_address"`
+	// BootstrapPeers is a list of peers to connect to
+	BootstrapPeers []string `json:"bootstrap_peers"`
+}
 
 type Ethereum struct {
 	// BiconomyApiKey is the mexa public api key.
@@ -46,15 +52,22 @@ type Config struct {
 	rootPath string
 	Accounts Accounts `json:"accounts"`
 	Ethereum Ethereum `json:"ethereum"`
+	IPFS     IPFS     `json:"ipfs"`
 	HTTP     HTTP     `json:"http"`
 }
 
 // NewConfig returns a config with default settings.
 func NewConfig(path string) *Config {
 	return &Config{
-		filepath.Join(path, rootDir),
-		Accounts{},
-		Ethereum{
+		rootPath: filepath.Join(path, rootDir),
+		Accounts: Accounts{},
+		IPFS: IPFS{
+			BootstrapPeers: []string{
+				"/ip4/107.191.98.233/tcp/4001/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
+				"/ip4/107.191.98.233/udp/4001/quic/p2p/QmasbWJE9C7PVFVj1CVQLX617CrDQijCxMv6ajkRfaTi98",
+			},
+		},
+		Ethereum: Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
 			Contracts: map[string]common.Address{
 				"valist":   common.HexToAddress("0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6"),
@@ -63,9 +76,8 @@ func NewConfig(path string) *Config {
 			MetaTx: true,
 			RPC:    "https://rpc.valist.io",
 		},
-		HTTP{
+		HTTP: HTTP{
 			ApiAddr: "localhost:9000",
-			WebAddr: "localhost:9001",
 		},
 	}
 }
@@ -116,16 +128,12 @@ func (c *Config) KeyStorePath() string {
 	return filepath.Join(c.rootPath, keystoreDir)
 }
 
-// DatabasePath returns the database directory path.
-func (c *Config) DatabasePath() string {
-	return filepath.Join(c.rootPath, databaseDir)
-}
-
-func (c *Config) StoragePath() string {
-	return filepath.Join(c.rootPath, storageDir)
-}
-
 // InstallPath returns the path to install binaries.
 func (c *Config) InstallPath() string {
 	return filepath.Join(c.rootPath, installDir)
+}
+
+// StoragePath is the path to the IPFS repo storage.
+func (c *Config) StoragePath() string {
+	return filepath.Join(c.rootPath, storageDir)
 }
