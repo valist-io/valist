@@ -32,20 +32,20 @@ func List(ctx context.Context, rpath string) error {
 func listRelease(ctx context.Context, release *types.Release) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Notice("Fetching from distributed storage...")
 	meta, err := client.GetReleaseMeta(ctx, release.ReleaseCID)
 	if err != nil {
 		return err
 	}
 
-	fmt.Printf("Name:     %s\n", meta.Name)
-	fmt.Printf("Tag:      %s\n", release.Tag)
-	fmt.Printf("Artifacts:  \n")
+	logger.Info("Name:      %s", meta.Name)
+	logger.Info("Tag:       %s", release.Tag)
+	logger.Info("Artifacts:")
 
 	for name, artifact := range meta.Artifacts {
-		fmt.Printf("- %s\n", name)
-		fmt.Printf("  %s\n", artifact.Provider)
-		fmt.Printf("  %s\n", artifact.SHA256)
+		logger.Info("- %s", name)
+		logger.Info("  %s", artifact.Provider)
+		logger.Info("  %s", artifact.SHA256)
 	}
 
 	return nil
@@ -54,7 +54,7 @@ func listRelease(ctx context.Context, release *types.Release) error {
 func listRepository(ctx context.Context, repo *types.Repository) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Notice("Fetching from distributed storage...")
 	meta, err := client.GetRepositoryMeta(ctx, repo.MetaCID)
 	if err != nil {
 		return err
@@ -65,26 +65,26 @@ func listRepository(ctx context.Context, repo *types.Repository) error {
 		return err
 	}
 
-	fmt.Printf("Name:        %s\n", meta.Name)
-	fmt.Printf("Description: %s\n", meta.Description)
-	fmt.Printf("Homepage:    %s\n", meta.Homepage)
-	fmt.Printf("Source:      %s\n", meta.Repository)
+	logger.Info("Name:        %s", meta.Name)
+	logger.Info("Description: %s", meta.Description)
+	logger.Info("Homepage:    %s", meta.Homepage)
+	logger.Info("Source:      %s", meta.Repository)
 
-	fmt.Printf("Members:       \n")
+	logger.Info("Members:")
 	for _, address := range members {
-		fmt.Printf("- %s\n", address)
+		logger.Info("- %s", address)
 	}
 
-	fmt.Printf("Releases:      \n")
+	logger.Info("Releases:")
 	return client.ListReleaseTags(repo.OrgID, repo.Name).ForEach(ctx, func(tag string) {
-		fmt.Printf("- %s\n", tag)
+		logger.Info("- %s", tag)
 	})
 }
 
 func listOrganization(ctx context.Context, org *types.Organization) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Notice("Fetching from distributed storage...")
 	meta, err := client.GetOrganizationMeta(ctx, org.MetaCID)
 	if err != nil {
 		return err
@@ -95,13 +95,13 @@ func listOrganization(ctx context.Context, org *types.Organization) error {
 		return err
 	}
 
-	fmt.Printf("Name:        %s\n", meta.Name)
-	fmt.Printf("Description: %s\n", meta.Description)
-	fmt.Printf("Homepage:    %s\n", meta.Homepage)
+	logger.Info("Name:        %s", meta.Name)
+	logger.Info("Description: %s", meta.Description)
+	logger.Info("Homepage:    %s", meta.Homepage)
 
-	fmt.Printf("Members:       \n")
+	logger.Info("Members:")
 	for _, address := range members {
-		fmt.Printf("- %s\n", address)
+		logger.Info("- %s", address)
 	}
 
 	return nil

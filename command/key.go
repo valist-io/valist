@@ -53,9 +53,9 @@ func keyOperation(ctx context.Context, rpath string, addr string, op common.Hash
 	}
 
 	if big.NewInt(1).Cmp(vote.Threshold) == -1 && vote.SigCount.Cmp(vote.Threshold) == -1 {
-		fmt.Printf("Pending %d/%d votes\n", vote.SigCount, vote.Threshold)
+		logger.Info("Pending %d/%d votes", vote.SigCount, vote.Threshold)
 	} else {
-		fmt.Println("Approved!")
+		logger.Info("Approved!")
 	}
 
 	return nil

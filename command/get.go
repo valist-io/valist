@@ -28,7 +28,7 @@ func Get(ctx context.Context, rpath, apath, opath string) error {
 		return fmt.Errorf("invalid release path: %s", rpath)
 	}
 
-	fmt.Println("Fetching from distributed storage...")
+	logger.Notice("Fetching from distributed storage...")
 	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return err
