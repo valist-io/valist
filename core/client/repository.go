@@ -145,3 +145,19 @@ func (client *Client) VoteRepositoryThreshold(ctx context.Context, orgID common.
 
 	return client.valist.ParseVoteThresholdEvent(*logs[0])
 }
+
+// GetRepositoryMembers returns a list of all keys currently active in the organization.
+func (client *Client) GetRepositoryMembers(ctx context.Context, orgID common.Hash, repoName string) ([]common.Address, error) {
+	callopts := bind.CallOpts{
+		Context: ctx,
+		From:    client.signer.Account().Address,
+	}
+
+	packed, err := packedEncoding(orgID, repoName, REPO_DEV)
+	if err != nil {
+		return nil, err
+	}
+	selector := crypto.Keccak256Hash(packed)
+
+	return client.valist.GetRoleMembers(&callopts, selector)
+}

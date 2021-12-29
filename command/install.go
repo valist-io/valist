@@ -17,8 +17,7 @@ func Install(ctx context.Context, rpath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
 	config := ctx.Value(ConfigKey).(*config.Config)
 
-	parts := strings.Split(rpath, "/")
-	if len(parts) < 3 {
+	if strings.Count(rpath, "/") < 2 {
 		rpath += "/latest"
 	}
 
@@ -31,7 +30,7 @@ func Install(ctx context.Context, rpath string) error {
 		return fmt.Errorf("invalid release path: %s", rpath)
 	}
 
-	logger.Info("Fetching from distributed storage...")
+	logger.Notice("Fetching from distributed storage...")
 	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return err

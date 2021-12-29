@@ -3,78 +3,61 @@ package command
 import (
 	"context"
 	"fmt"
+	"os"
+	"path/filepath"
+	"runtime"
+	"strings"
 
 	"github.com/valist-io/valist/core/client"
-	"github.com/valist-io/valist/core/types"
 )
 
-// Get prints organization, repository, or release metadata.
-func Get(ctx context.Context, rpath string) error {
+// Get downloads a binary artifact.
+func Get(ctx context.Context, rpath, apath, opath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
+
+	if strings.Count(rpath, "/") < 2 {
+		rpath += "/latest"
+	}
 
 	res, err := client.ResolvePath(ctx, rpath)
 	if err != nil {
 		return err
 	}
 
-	switch {
-	case res.Release != nil:
-		return getRelease(ctx, res.Release)
-	case res.Repository != nil:
-		return getRepository(ctx, res.Repository)
-	case res.Organization != nil:
-		return getOrganization(ctx, res.Organization)
-	default:
-		return fmt.Errorf("invalid path")
+	if res.Release == nil {
+		return fmt.Errorf("invalid release path: %s", rpath)
 	}
-}
 
-func getRelease(ctx context.Context, release *types.Release) error {
-	client := ctx.Value(ClientKey).(*client.Client)
-
-	logger.Info("Fetching from distributed storage...")
-	meta, err := client.GetReleaseMeta(ctx, release.ReleaseCID)
+	logger.Notice("Fetching from distributed storage...")
+	releaseMeta, err := client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
 	if err != nil {
 		return err
 	}
 
-	logger.Info("%s@%s", meta.Name, release.Tag)
-	for name, artifact := range meta.Artifacts {
-		logger.Info("- %s: %s", name, artifact.Provider)
+	// default to system platform if no artifact specified
+	if apath == "" {
+		apath = runtime.GOOS + "/" + runtime.GOARCH
 	}
 
-	return nil
-}
+	artifact, ok := releaseMeta.Artifacts[apath]
+	if !ok {
+		return fmt.Errorf("%s not found in release", apath)
+	}
 
-func getRepository(ctx context.Context, repo *types.Repository) error {
-	client := ctx.Value(ClientKey).(*client.Client)
-
-	logger.Info("Fetching from distributed storage...")
-	meta, err := client.GetRepositoryMeta(ctx, repo.MetaCID)
+	data, err := client.ReadFile(ctx, artifact.Provider)
 	if err != nil {
 		return err
 	}
 
-	logger.Info("Name:        %s", meta.Name)
-	logger.Info("Description: %s", meta.Description)
-	logger.Info("Homepage:    %s", meta.Homepage)
-	logger.Info("Source code repo:  %s", meta.Repository)
-
-	return nil
-}
-
-func getOrganization(ctx context.Context, org *types.Organization) error {
-	client := ctx.Value(ClientKey).(*client.Client)
-
-	logger.Info("Fetching from distributed storage...")
-	meta, err := client.GetOrganizationMeta(ctx, org.MetaCID)
+	cwd, err := os.Getwd()
 	if err != nil {
 		return err
 	}
 
-	logger.Info("Name:        %s", meta.Name)
-	logger.Info("Description: %s", meta.Description)
-	logger.Info("Homepage:    %s", meta.Homepage)
+	// default to current directory if no output specified
+	if opath == "" {
+		opath = filepath.Join(cwd, strings.ReplaceAll(apath, string(filepath.Separator), "-"))
+	}
 
-	return nil
+	return os.WriteFile(opath, data, 0744)
 }

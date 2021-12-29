@@ -26,4 +26,10 @@ var (
 		Aliases: []string{"i"},
 		Usage:   "Run interactive wizard",
 	}
+	// outputFlag sets the download file path
+	outputFlag = cli.StringFlag{
+		Name:    "output",
+		Aliases: []string{"o"},
+		Usage:   "Output file path",
+	}
 )

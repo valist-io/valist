@@ -38,6 +38,7 @@ func init() {
 		&initCommand,
 		&installCommand,
 		&keyCommand,
+		&listCommand,
 		&publishCommand,
 		&thresholdCommand,
 		&updateCommand,

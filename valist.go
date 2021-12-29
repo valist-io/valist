@@ -26,6 +26,8 @@ type API interface {
 	VoteOrganizationAdmin(ctx context.Context, orgID common.Hash, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error)
 	// VoteOrganizationThreshold votes to set a multifactor voting threshold for the organization.
 	VoteOrganizationThreshold(ctx context.Context, orgID common.Hash, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error)
+	// GetOrganizationMembers returns a list of all keys currently active in the organization.
+	GetOrganizationMembers(ctx context.Context, orgID common.Hash) ([]common.Address, error)
 	// GetOrganizationID returns the orgID for the given orgName.
 	GetOrganizationID(ctx context.Context, orgName string) (common.Hash, error)
 	// LinkOrganizationName links the given orgID to the orgName.
@@ -54,6 +56,8 @@ type API interface {
 	VoteRepoDev(ctx context.Context, orgID common.Hash, repoName string, operation common.Hash, address common.Address) (*valist.ValistVoteKeyEvent, error)
 	// VoteRepositoryThreshold votes to set a multifactor voting threshold for the repository.
 	VoteRepositoryThreshold(ctx context.Context, orgID common.Hash, repoName string, threshold *big.Int) (*valist.ValistVoteThresholdEvent, error)
+	// GetRepositoryMembers returns a list of all keys currently active in the repository.
+	GetRepositoryMembers(ctx context.Context, orgID common.Hash, repoName string) ([]common.Address, error)
 	// ResolvePath resolves the organization, repository, release, and node from the given path.
 	ResolvePath(ctx context.Context, path string) (types.ResolvedPath, error)
 	// ReadFile returns the contents of the file at the given path.
