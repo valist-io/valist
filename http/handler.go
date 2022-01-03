@@ -10,7 +10,7 @@ import (
 	"github.com/valist-io/valist"
 )
 
-const DefaultGateway = "https://ipfs.io"
+const DefaultGateway = "https://gateway.valist.io"
 
 type handler struct {
 	client valist.API
