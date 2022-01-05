@@ -12,7 +12,7 @@ Web3-native software distribution.
 
 * Publish Applications and Assets (EXEs, WASM, Docker images, NFTs, etc.)
 * Multi-Factor Releases (multi-sig for publishing assets)
-* Multi-Chain Support (EVM based only for now, NEAR coming soon)
+* Multi-Chain Support (EVM based only for now, NEAR [coming soon](https://github.com/filecoin-project/devgrants/pull/368))
 
 ## Documentation
 
