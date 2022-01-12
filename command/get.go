@@ -62,7 +62,7 @@ func Get(ctx context.Context, rpath, apath, opath string) error {
 		opath = filepath.Join(cwd, strings.ReplaceAll(apath, string(filepath.Separator), "-"))
 	}
 
-	if cfg.Stats == config.StatsAllow {
+	if cfg.Telemetry == config.TelemetryAllow {
 		defer telemetry.RecordDownload(fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, res.ReleaseTag))
 	}
 
