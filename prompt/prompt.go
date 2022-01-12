@@ -127,3 +127,11 @@ func ReleaseMultiArch() Prompt {
 		Validate:  ValidateYesNo(),
 	}}
 }
+
+func StatsOptIn() Prompt {
+	return Prompt{promptui.Prompt{
+		Label:     "Would you like to participate in the Valist package popularity contest? (Y,n)",
+		IsConfirm: true,
+		Validate:  ValidateYesNo(),
+	}}
+}

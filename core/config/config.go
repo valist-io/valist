@@ -14,6 +14,9 @@ const (
 	configFile  = "config"
 	keystoreDir = "keystore"
 	storageDir  = "storage"
+	StatsAllow  = "allow"
+	StatsDeny   = "deny"
+	StatsNone   = "none"
 )
 
 type IPFS struct {
@@ -54,6 +57,7 @@ type Config struct {
 	Ethereum Ethereum `json:"ethereum"`
 	IPFS     IPFS     `json:"ipfs"`
 	HTTP     HTTP     `json:"http"`
+	Stats    string   `json:"stats"`
 }
 
 // NewConfig returns a config with default settings.
@@ -79,6 +83,7 @@ func NewConfig(path string) *Config {
 		HTTP: HTTP{
 			ApiAddr: "localhost:9000",
 		},
+		Stats: StatsNone,
 	}
 }
 

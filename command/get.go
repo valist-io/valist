@@ -9,11 +9,14 @@ import (
 	"strings"
 
 	"github.com/valist-io/valist/core/client"
+	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/telemetry"
 )
 
 // Get downloads a binary artifact.
 func Get(ctx context.Context, rpath, apath, opath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
+	cfg := ctx.Value(ConfigKey).(*config.Config)
 
 	if strings.Count(rpath, "/") < 2 {
 		rpath += "/latest"
@@ -57,6 +60,10 @@ func Get(ctx context.Context, rpath, apath, opath string) error {
 	// default to current directory if no output specified
 	if opath == "" {
 		opath = filepath.Join(cwd, strings.ReplaceAll(apath, string(filepath.Separator), "-"))
+	}
+
+	if cfg.Stats == config.StatsAllow {
+		defer telemetry.RecordDownload(fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, res.ReleaseTag))
 	}
 
 	return os.WriteFile(opath, data, 0744)

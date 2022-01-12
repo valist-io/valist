@@ -11,6 +11,7 @@ import (
 	"github.com/valist-io/valist/command"
 	"github.com/valist-io/valist/core"
 	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/prompt"
 	"github.com/valist-io/valist/signer"
 )
 
@@ -31,6 +32,11 @@ func setup(c *cli.Context) error {
 	}
 
 	client, err := core.NewClient(c.Context, cfg)
+	if err != nil {
+		return err
+	}
+
+	err = setupTelemetry(cfg)
 	if err != nil {
 		return err
 	}
@@ -73,4 +79,28 @@ func setupConfig(c *cli.Context) error {
 
 	c.Context = context.WithValue(c.Context, command.ConfigKey, cfg)
 	return nil
+}
+
+func setupTelemetry(cfg *config.Config) error {
+	if cfg.Stats != config.StatsNone {
+		return nil
+	}
+
+	option, err := prompt.StatsOptIn().Run()
+	if err == prompt.ErrNonInteractive {
+		return nil
+	}
+
+	if err != nil {
+		return err
+	}
+
+	switch option[0] {
+	case 'n', 'N':
+		cfg.Stats = config.StatsDeny
+	default:
+		cfg.Stats = config.StatsAllow
+	}
+
+	return cfg.Save()
 }

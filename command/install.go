@@ -10,12 +10,13 @@ import (
 
 	"github.com/valist-io/valist/core/client"
 	"github.com/valist-io/valist/core/config"
+	"github.com/valist-io/valist/telemetry"
 )
 
 // Install downloads a binary artifact to the valist bin path.
 func Install(ctx context.Context, rpath string) error {
 	client := ctx.Value(ClientKey).(*client.Client)
-	config := ctx.Value(ConfigKey).(*config.Config)
+	cfg := ctx.Value(ConfigKey).(*config.Config)
 
 	if strings.Count(rpath, "/") < 2 {
 		rpath += "/latest"
@@ -47,7 +48,7 @@ func Install(ctx context.Context, rpath string) error {
 		return err
 	}
 
-	binPath := config.InstallPath()
+	binPath := cfg.InstallPath()
 	exePath := filepath.Join(binPath, res.RepoName)
 
 	logger.Info("Installing for target platform %s", platform)
@@ -63,6 +64,10 @@ func Install(ctx context.Context, rpath string) error {
 	if !strings.Contains(os.Getenv("PATH"), binPath) {
 		logger.Info("%s not detected in $PATH. Add to path or run:", binPath)
 		logger.Info(`export PATH="$PATH:%s"`, binPath)
+	}
+
+	if cfg.Stats == config.StatsAllow {
+		defer telemetry.RecordDownload(fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, res.ReleaseTag))
 	}
 
 	return nil
