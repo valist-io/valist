@@ -12,7 +12,7 @@ import (
 var logger = log.New()
 
 func RecordDownload(project string) {
-	stats_path := fmt.Sprintf("http://app.valist.io/api/download/%s", project)
+	stats_path := fmt.Sprintf("https://stats.valist.io/api/download/%s", project)
 	req, err := http.NewRequest(http.MethodPut, stats_path, &bytes.Buffer{})
 
 	if err != nil {
