@@ -9,14 +9,14 @@ import (
 )
 
 const (
-	rootDir     = ".valist"
-	installDir  = "bin"
-	configFile  = "config"
-	keystoreDir = "keystore"
-	storageDir  = "storage"
-	StatsAllow  = "allow"
-	StatsDeny   = "deny"
-	StatsNone   = "none"
+	rootDir        = ".valist"
+	installDir     = "bin"
+	configFile     = "config"
+	keystoreDir    = "keystore"
+	storageDir     = "storage"
+	TelemetryAllow = "allow"
+	TelemetryDeny  = "deny"
+	TelemetryNone  = "none"
 )
 
 type IPFS struct {
@@ -52,12 +52,12 @@ type HTTP struct {
 }
 
 type Config struct {
-	rootPath string
-	Accounts Accounts `json:"accounts"`
-	Ethereum Ethereum `json:"ethereum"`
-	IPFS     IPFS     `json:"ipfs"`
-	HTTP     HTTP     `json:"http"`
-	Stats    string   `json:"stats"`
+	rootPath  string
+	Accounts  Accounts `json:"accounts"`
+	Ethereum  Ethereum `json:"ethereum"`
+	IPFS      IPFS     `json:"ipfs"`
+	HTTP      HTTP     `json:"http"`
+	Telemetry string   `json:"telemetry"`
 }
 
 // NewConfig returns a config with default settings.
@@ -83,7 +83,7 @@ func NewConfig(path string) *Config {
 		HTTP: HTTP{
 			ApiAddr: "localhost:9000",
 		},
-		Stats: StatsNone,
+		Telemetry: TelemetryNone,
 	}
 }
 

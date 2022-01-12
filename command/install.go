@@ -66,7 +66,7 @@ func Install(ctx context.Context, rpath string) error {
 		logger.Info(`export PATH="$PATH:%s"`, binPath)
 	}
 
-	if cfg.Stats == config.StatsAllow {
+	if cfg.Telemetry == config.TelemetryAllow {
 		defer telemetry.RecordDownload(fmt.Sprintf("%s/%s/%s", res.OrgName, res.RepoName, res.ReleaseTag))
 	}
 

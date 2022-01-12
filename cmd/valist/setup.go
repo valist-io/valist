@@ -82,7 +82,7 @@ func setupConfig(c *cli.Context) error {
 }
 
 func setupTelemetry(cfg *config.Config) error {
-	if cfg.Stats != config.StatsNone {
+	if cfg.Telemetry != config.TelemetryNone {
 		return nil
 	}
 
@@ -97,9 +97,9 @@ func setupTelemetry(cfg *config.Config) error {
 
 	switch option[0] {
 	case 'n', 'N':
-		cfg.Stats = config.StatsDeny
+		cfg.Telemetry = config.TelemetryDeny
 	default:
-		cfg.Stats = config.StatsAllow
+		cfg.Telemetry = config.TelemetryAllow
 	}
 
 	return cfg.Save()
