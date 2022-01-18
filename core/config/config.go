@@ -4,8 +4,6 @@ import (
 	"encoding/json"
 	"os"
 	"path/filepath"
-
-	"github.com/ethereum/go-ethereum/common"
 )
 
 const (
@@ -27,7 +25,7 @@ type Ethereum struct {
 	// BiconomyApiKey is the mexa public api key.
 	BiconomyApiKey string `json:"biconomy_api_key"`
 	// Contracts is a mapping of contract addresses.
-	Contracts map[string]common.Address `json:"contracts"`
+	Contracts map[string]string `json:"contracts"`
 	// MetaTx enables meta transactions.
 	MetaTx bool `json:"meta_tx"`
 	// RPC is the ethereum rpc address.
@@ -36,9 +34,9 @@ type Ethereum struct {
 
 type Accounts struct {
 	// Pinned is a list of all accounts.
-	Pinned []common.Address `json:"pinned,omitempty"`
+	Pinned []string `json:"pinned,omitempty"`
 	// Default is the default account.
-	Default common.Address `json:"default,omitempty"`
+	Default string `json:"default,omitempty"`
 }
 
 type HTTP struct {
@@ -69,9 +67,8 @@ func NewConfig(path string) *Config {
 		},
 		Ethereum: Ethereum{
 			BiconomyApiKey: "qLW9TRUjQ.f77d2f86-c76a-4b9c-b1ee-0453d0ead878",
-			Contracts: map[string]common.Address{
-				"valist":   common.HexToAddress("0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6"),
-				"registry": common.HexToAddress("0x2Be6D782dBA2C52Cd0a41c6052e914dCaBcCD78e"),
+			Contracts: map[string]string{
+				"valist": "0xA7E4124aDBBc50CF402e4Cad47de906a14daa0f6",
 			},
 			MetaTx: true,
 			RPC:    "https://rpc.valist.io",

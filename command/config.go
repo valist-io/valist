@@ -2,11 +2,17 @@ package command
 
 import (
 	"os"
+	"regexp"
 
 	"gopkg.in/yaml.v3"
 
 	"github.com/go-playground/validator/v10"
-	"github.com/valist-io/valist/core/types"
+)
+
+var (
+	RegexShortname            = regexp.MustCompile(`^[0-9a-z-_]+$`)
+	RegexPath                 = regexp.MustCompile(`^[0-9A-z\-_\/\.]+$`)
+	RegexAcceptableCharacters = regexp.MustCompile(`^[0-9A-z-_\\/\. ]*$`)
 )
 
 var validate *validator.Validate
@@ -15,10 +21,10 @@ var validate *validator.Validate
 func init() {
 	validate = validator.New()
 	validate.RegisterValidation("shortname", func(fl validator.FieldLevel) bool {
-		return types.RegexPath.MatchString(fl.Field().String())
+		return RegexPath.MatchString(fl.Field().String())
 	})
 	validate.RegisterValidation("acceptable_characters", func(fl validator.FieldLevel) bool {
-		return types.RegexAcceptableCharacters.MatchString(fl.Field().String())
+		return RegexAcceptableCharacters.MatchString(fl.Field().String())
 	})
 }
 

@@ -26,22 +26,18 @@ func init() {
 	app.HelpName = "valist"
 	app.Usage = "Valist command line interface"
 	app.Description = `Web3-native software distribution`
-	app.Copyright = "2020-2021 Valist, Inc."
+	app.Copyright = "2020-2022 Valist, Inc."
 	app.Version = Version
 	app.Flags = append(app.Flags, globalFlags...)
 	app.EnableBashCompletion = true
 	app.Commands = []*cli.Command{
 		&accountCommand,
-		&createCommand,
 		&daemonCommand,
 		&getCommand,
 		&initCommand,
 		&installCommand,
-		&keyCommand,
 		&listCommand,
 		&publishCommand,
-		&thresholdCommand,
-		&updateCommand,
 	}
 }
 

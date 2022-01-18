@@ -2,13 +2,10 @@ package command
 
 import (
 	"context"
+	"os"
 	"fmt"
 
-	"github.com/ethereum/go-ethereum/accounts"
-	"github.com/ethereum/go-ethereum/accounts/keystore"
-	"github.com/ethereum/go-ethereum/common"
-	"github.com/ethereum/go-ethereum/crypto"
-
+	"github.com/valist-io/valist/core"
 	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/prompt"
 )
@@ -16,124 +13,102 @@ import (
 // CreateAccount creates a new account.
 func CreateAccount(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
+	client := ctx.Value(ClientKey).(*core.Client)
 
 	passphrase, err := prompt.NewAccountPassphrase().Run()
 	if err != nil {
 		return err
 	}
-
-	account, err := kstore.NewAccount(passphrase)
+	addr, err := client.CreateAccount(passphrase)
 	if err != nil {
 		return err
 	}
-
-	if config.Accounts.Default == common.HexToAddress("0x0") {
-		config.Accounts.Default = account.Address
+	logger.Info("Created account %s", addr)
+	if config.Accounts.Default == "" {
+		config.Accounts.Default = addr
 	}
-
-	config.Accounts.Pinned = append(config.Accounts.Pinned, account.Address)
-
-	logger.Info("Created account %s", account.Address.Hex())
+	config.Accounts.Pinned = append(config.Accounts.Pinned, addr)
 	return config.Save()
 }
 
 // DefaultAccount sets the default account in the config.
 func DefaultAccount(ctx context.Context, addr string) error {
+	client := ctx.Value(ClientKey).(*core.Client)
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
-	if !common.IsHexAddress(addr) {
-		return fmt.Errorf("Invalid account address")
+	if !client.HasAccount(addr) {
+		return fmt.Errorf("account does not exist")
 	}
 
-	address := common.HexToAddress(addr)
-	if !kstore.HasAddress(address) {
-		return fmt.Errorf("Invalid account address")
-	}
-
-	config.Accounts.Default = address
+	config.Accounts.Default = addr
 	return config.Save()
 }
 
 // ExportAccount exports an account in web3 secret json format.
 func ExportAccount(ctx context.Context, addr string) error {
-	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
-
-	address := common.HexToAddress(addr)
-	account := accounts.Account{Address: address}
+	client := ctx.Value(ClientKey).(*core.Client)
 
 	passphrase, err := prompt.AccountPassphrase().Run()
 	if err != nil {
 		return err
 	}
-
 	newPassphrase, err := prompt.NewAccountPassphrase().Run()
 	if err != nil {
 		return err
 	}
-
-	json, err := kstore.Export(account, passphrase, newPassphrase)
+	json, err := client.ExportAccount(addr, passphrase, newPassphrase)
 	if err != nil {
 		return err
 	}
-
 	logger.Info(string(json))
 	return nil
 }
 
 // ImportAccount imports an account private key.
-func ImportAccount(ctx context.Context) error {
+func ImportAccount(ctx context.Context, fpath string) error {
+	client := ctx.Value(ClientKey).(*core.Client)
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
-	privkey, err := prompt.AccountPrivateKey().Run()
+	data, err := os.ReadFile(fpath)
 	if err != nil {
 		return err
 	}
-
 	passphrase, err := prompt.AccountPassphrase().Run()
 	if err != nil {
 		return err
 	}
-
-	private, err := crypto.HexToECDSA(privkey)
+	newPassphrase, err := prompt.NewAccountPassphrase().Run()
 	if err != nil {
 		return err
 	}
-
-	account, err := kstore.ImportECDSA(private, passphrase)
+	address, err := client.ImportAccount(data, passphrase, newPassphrase)
 	if err != nil {
 		return err
 	}
-
-	if config.Accounts.Default == common.HexToAddress("0x0") {
-		config.Accounts.Default = account.Address
+	if config.Accounts.Default == "" {
+		config.Accounts.Default = address
 	}
-
-	logger.Info("Successfully imported %s", account.Address)
+	logger.Info("Successfully imported %s", address)
 	return config.Save()
 }
 
 // ListAccounts prints all account addresses.
 func ListAccounts(ctx context.Context) error {
+	client := ctx.Value(ClientKey).(*core.Client)
 	config := ctx.Value(ConfigKey).(*config.Config)
-	kstore := keystore.NewKeyStore(config.KeyStorePath(), keystore.StandardScryptN, keystore.StandardScryptP)
 
-	if len(kstore.Accounts()) == 0 {
-		logger.Warn("No keys found. Please generate one using the following command:")
-		logger.Warn("valist account create")
-		return nil
-	}
-
-	for _, account := range kstore.Accounts() {
-		if config.Accounts.Default == account.Address {
-			logger.Info("%s (default)", account.Address)
+	accounts := client.ListAccounts()
+	for _, addr := range accounts {
+		if config.Accounts.Default == addr {
+			logger.Info("%s (default)", addr)
 		} else {
-			logger.Info("%s", account.Address)
+			logger.Info("%s", addr)
 		}
 	}
 
+	if len(accounts) == 0 {
+		logger.Warn("No keys found. Please generate one using the following command:")
+		logger.Warn("valist account create")
+	}
 	return nil
 }

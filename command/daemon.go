@@ -7,7 +7,7 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/valist-io/valist/core/client"
+	"github.com/valist-io/valist/core"
 	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/http"
 )
@@ -15,7 +15,7 @@ import (
 // Daemon runs the valist node daemon indefinitely.
 func Daemon(ctx context.Context) error {
 	config := ctx.Value(ConfigKey).(*config.Config)
-	client := ctx.Value(ClientKey).(*client.Client)
+	client := ctx.Value(ClientKey).(*core.Client)
 
 	logger.Info(`
 
@@ -32,7 +32,7 @@ func Daemon(ctx context.Context) error {
 
 `)
 
-	server, err := http.NewServer(client, config)
+	server, err := http.NewServer(client, config.HTTP.ApiAddr)
 	if err != nil {
 		return err
 	}

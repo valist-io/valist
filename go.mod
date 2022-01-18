@@ -25,7 +25,6 @@ require (
 	github.com/rivo/uniseg v0.2.0 // indirect
 	github.com/stretchr/testify v1.7.0
 	github.com/urfave/cli/v2 v2.3.0
-	github.com/valist-io/gasless v0.0.5
 	golang.org/x/mod v0.5.1
 	gopkg.in/yaml.v3 v3.0.0-20210107192922-496545a6307b
 )

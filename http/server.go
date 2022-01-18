@@ -8,13 +8,12 @@ import (
 	"github.com/gorilla/mux"
 
 	"github.com/valist-io/valist"
-	"github.com/valist-io/valist/core/config"
 )
 
-func NewServer(client valist.API, config *config.Config) (*http.Server, error) {
-	addr := os.Getenv("VALIST_API_ADDR")
-	if addr == "" {
-		addr = config.HTTP.ApiAddr
+func NewServer(client valist.API, addr string) (*http.Server, error) {
+	// override from environment variable
+	if env := os.Getenv("VALIST_API_ADDR"); env != "" {
+		addr = env
 	}
 
 	handler := &handler{client}

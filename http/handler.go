@@ -34,17 +34,11 @@ func (h *handler) getRelease(w http.ResponseWriter, req *http.Request) {
 		return
 	}
 
-	meta, err := h.client.GetReleaseMeta(ctx, res.Release.ReleaseCID)
-	if err != nil {
-		http.Error(w, err.Error(), http.StatusBadRequest)
-		return
-	}
-
 	artifactName := req.URL.Query().Get("artifact")
-	artifact, ok := meta.Artifacts[artifactName]
+	artifact, ok := res.Release.Artifacts[artifactName]
 	switch {
 	case ok && artifactName != "":
-		url := fmt.Sprintf("%s/%s?filename=%s", DefaultGateway, artifact.Provider, meta.Name)
+		url := fmt.Sprintf("%s/%s?filename=%s", DefaultGateway, artifact.Provider, res.Release.Name)
 		http.Redirect(w, req, url, http.StatusSeeOther)
 		return
 	case !ok && artifactName != "":
@@ -55,7 +49,7 @@ func (h *handler) getRelease(w http.ResponseWriter, req *http.Request) {
 	w.Header().Add("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 
-	if err := json.NewEncoder(w).Encode(meta); err != nil {
+	if err := json.NewEncoder(w).Encode(res.Release); err != nil {
 		http.Error(w, err.Error(), http.StatusBadRequest)
 		return
 	}
