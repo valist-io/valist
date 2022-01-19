@@ -10,7 +10,6 @@ import (
 	"github.com/ethereum/go-ethereum/ethclient"
 
 	"github.com/valist-io/valist"
-	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/core/contract/evm"
 	"github.com/valist-io/valist/core/storage/ipfs"
 )
@@ -22,12 +21,12 @@ type Client struct {
 }
 
 // NewClient creates a new Valist client using the given config.
-func NewClient(ctx context.Context, cfg *config.Config) (valist.API, error) {
-	eth, err := ethclient.Dial(cfg.Ethereum.RPC)
+func NewClient(ctx context.Context, config *Config) (valist.API, error) {
+	eth, err := ethclient.Dial(config.EthereumRPC)
 	if err != nil {
 		return nil, err
 	}
-	storage, err := ipfs.NewStorage(ctx, cfg.StoragePath(), cfg.IPFS.ApiAddr, cfg.IPFS.BootstrapPeers)
+	storage, err := ipfs.NewStorage(ctx, config.StoragePath(), config.IpfsApiAddress, config.IpfsBootstrapPeers...)
 	if err != nil {
 		return nil, err
 	}
@@ -35,9 +34,9 @@ func NewClient(ctx context.Context, cfg *config.Config) (valist.API, error) {
 	if err != nil {
 		return nil, err
 	}
-	
-	accounts := evm.NewAccountManager(cfg.KeyStorePath(), chainID)
-	address := common.HexToAddress(cfg.Ethereum.Contracts["valist"])
+
+	accounts := evm.NewAccountManager(config.KeyStorePath(), chainID)
+	address := common.HexToAddress(config.EthereumContracts["valist"])
 
 	contract, err := evm.NewContract(address, eth, accounts)
 	if err != nil {

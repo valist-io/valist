@@ -31,19 +31,20 @@ var once sync.Once
 // a local connection will be attempted, otherwise a new instance is started.
 func newCoreAPI(ctx context.Context, repoPath, apiAddr string) (coreiface.CoreAPI, error) {
 	var api coreiface.CoreAPI
+	var err error
 	envAddr := os.Getenv("VALIST_IPFS_ADDR")
-	
+
 	switch {
 	case envAddr != "":
-		api, _ = httpapi.NewURLApiWithClient(envAddr, &http.Client{})
+		api, err = httpapi.NewURLApiWithClient(envAddr, &http.Client{})
 	case apiAddr != "":
-		api, _ = httpapi.NewURLApiWithClient(apiAddr, &http.Client{})
+		api, err = httpapi.NewURLApiWithClient(apiAddr, &http.Client{})
 	default:
-		api, _ = httpapi.NewLocalApi()
+		api, err = httpapi.NewLocalApi()
 	}
 
 	// if we have a local or remote connection return
-	if api != nil {
+	if err == nil {
 		return api, nil
 	}
 

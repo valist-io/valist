@@ -24,7 +24,7 @@ var (
 		Name:  "create",
 		Usage: "Create an account",
 		Before: func(c *cli.Context) error {
-			return setupConfig(c)
+			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
 			return command.CreateAccount(c.Context)
@@ -36,7 +36,7 @@ var (
 		Usage:     "Set the default account",
 		ArgsUsage: "[address]",
 		Before: func(c *cli.Context) error {
-			return setupConfig(c)
+			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
@@ -52,7 +52,7 @@ var (
 		Usage:     "Export an account",
 		ArgsUsage: "[address]",
 		Before: func(c *cli.Context) error {
-			return setupConfig(c)
+			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
@@ -64,11 +64,11 @@ var (
 	}
 	// accountImportCommand imports an account private key
 	accountImportCommand = cli.Command{
-		Name:  "import",
-		Usage: "Import an account",
+		Name:      "import",
+		Usage:     "Import an account",
 		ArgsUsage: "[file]",
 		Before: func(c *cli.Context) error {
-			return setupConfig(c)
+			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
 			if c.NArg() != 1 {
@@ -82,7 +82,7 @@ var (
 		Name:  "list",
 		Usage: "List all accounts",
 		Before: func(c *cli.Context) error {
-			return setupConfig(c)
+			return setup(c)
 		},
 		Action: func(c *cli.Context) error {
 			return command.ListAccounts(c.Context)

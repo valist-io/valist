@@ -8,13 +8,12 @@ import (
 	"time"
 
 	"github.com/valist-io/valist/core"
-	"github.com/valist-io/valist/core/config"
 	"github.com/valist-io/valist/http"
 )
 
 // Daemon runs the valist node daemon indefinitely.
 func Daemon(ctx context.Context) error {
-	config := ctx.Value(ConfigKey).(*config.Config)
+	config := ctx.Value(ConfigKey).(*core.Config)
 	client := ctx.Value(ClientKey).(*core.Client)
 
 	logger.Info(`
@@ -32,7 +31,7 @@ func Daemon(ctx context.Context) error {
 
 `)
 
-	server, err := http.NewServer(client, config.HTTP.ApiAddr)
+	server, err := http.NewServer(client, config.ApiAddress)
 	if err != nil {
 		return err
 	}

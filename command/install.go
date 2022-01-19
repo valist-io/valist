@@ -9,13 +9,12 @@ import (
 	"strings"
 
 	"github.com/valist-io/valist/core"
-	"github.com/valist-io/valist/core/config"
 )
 
 // Install downloads a binary artifact to the valist bin path.
 func Install(ctx context.Context, rpath string) error {
 	client := ctx.Value(ClientKey).(*core.Client)
-	config := ctx.Value(ConfigKey).(*config.Config)
+	config := ctx.Value(ConfigKey).(*core.Config)
 
 	if strings.Count(rpath, "/") < 2 {
 		rpath += "/latest"

@@ -238,8 +238,8 @@ func (c *Contract) GetReleaseRejectors(ctx context.Context, teamName string, pro
 func (c *Contract) txopts(ctx context.Context) *bind.TransactOpts {
 	return &bind.TransactOpts{
 		Context: ctx,
-		From: c.accounts.account.Address,
-		Signer: c.accounts.signTx,
+		From:    c.accounts.account.Address,
+		Signer:  c.accounts.signTx,
 	}
 }
 
@@ -247,7 +247,7 @@ func (c *Contract) txopts(ctx context.Context) *bind.TransactOpts {
 func (c *Contract) callopts(ctx context.Context) *bind.CallOpts {
 	return &bind.CallOpts{
 		Context: ctx,
-		From: c.accounts.account.Address,
+		From:    c.accounts.account.Address,
 	}
 }
 

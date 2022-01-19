@@ -24,7 +24,7 @@ type AccountManager struct {
 	passwords map[common.Address]string
 }
 
-// NewAccountManager returns an account manager 
+// NewAccountManager returns an account manager
 // backed by the keystore at the given path.
 func NewAccountManager(path string, chainID *big.Int) *AccountManager {
 	return &AccountManager{
@@ -41,7 +41,7 @@ func (a *AccountManager) GetAccount() string {
 
 // HasAccount returns true if the account exists.
 func (a *AccountManager) HasAccount(address string) bool {
-	return a.keystore.HasAddress(common.HexToAddress(address))	
+	return a.keystore.HasAddress(common.HexToAddress(address))
 }
 
 // SetAccount sets the current account with an optional password.

@@ -25,7 +25,7 @@ type Storage struct {
 	ipfs coreiface.CoreAPI
 }
 
-func NewStorage(ctx context.Context, repoPath, apiAddr string, peers []string) (*Storage, error) {
+func NewStorage(ctx context.Context, repoPath, apiAddr string, peers ...string) (*Storage, error) {
 	ipfs, err := newCoreAPI(ctx, repoPath, apiAddr)
 	if err != nil {
 		return nil, err
@@ -118,7 +118,7 @@ func (s *Storage) exportCAR(ctx context.Context, id cid.Cid) error {
 			return pw.CloseWithError(err)
 		}
 		return pw.CloseWithError(mw.Close())
-	}()
+	}() //nolint:errcheck
 
 	req, err := http.NewRequest(http.MethodPost, importURL, pr)
 	if err != nil {
