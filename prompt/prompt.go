@@ -6,7 +6,6 @@ import (
 	"strconv"
 
 	"github.com/manifoldco/promptui"
-	"github.com/urfave/cli/v2"
 )
 
 var ErrNonInteractive = errors.New("prompt in non-interactive environment")
@@ -20,17 +19,7 @@ func (p Prompt) Run() (string, error) {
 	if ci, _ := strconv.ParseBool(os.Getenv("CI")); ci {
 		return "", ErrNonInteractive
 	}
-
 	return p.inner.Run()
-}
-
-// RunFlag returns the value of the flag if set, otherwise the prompt is run normally.
-func (p Prompt) RunFlag(c *cli.Context, flag string) (string, error) {
-	if c.IsSet(flag) {
-		return c.String(flag), nil
-	}
-
-	return p.Run()
 }
 
 func NewAccountPassphrase() Prompt {

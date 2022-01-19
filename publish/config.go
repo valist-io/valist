@@ -1,4 +1,4 @@
-package command
+package publish
 
 import (
 	"os"
@@ -41,28 +41,24 @@ func (c Config) Validate() error {
 }
 
 func (c Config) Save(path string) error {
-	yamlData, err := yaml.Marshal(c)
+	data, err := yaml.Marshal(c)
 	if err != nil {
 		return err
 	}
-
 	if err = c.Validate(); err != nil {
 		return err
 	}
-
-	return os.WriteFile(path, yamlData, 0644)
+	return os.WriteFile(path, data, 0644)
 }
 
 func (c *Config) Load(path string) error {
-	yamlFile, err := os.ReadFile(path)
+	data, err := os.ReadFile(path)
 	if err != nil {
 		return err
 	}
-
-	err = yaml.Unmarshal(yamlFile, c)
+	err = yaml.Unmarshal(data, c)
 	if err != nil {
 		return err
 	}
-
 	return c.Validate()
 }

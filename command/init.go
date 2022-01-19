@@ -7,13 +7,14 @@ import (
 	"path/filepath"
 
 	"github.com/valist-io/valist/prompt"
+	"github.com/valist-io/valist/publish"
 )
 
 var ErrProjectExist = errors.New("valist.yml already exists")
 
 // Init creates a new valist config.
 func Init(ctx context.Context, rpath string, wizard bool) error {
-	valist := Config{
+	pub := publish.Config{
 		Name:      rpath,
 		Tag:       "0.0.1",
 		Artifacts: make(map[string]string),
@@ -25,7 +26,7 @@ func Init(ctx context.Context, rpath string, wizard bool) error {
 	}
 
 	vpath := filepath.Join(cwd, "valist.yml")
-	if err := valist.Load(vpath); err == nil {
+	if err := pub.Load(vpath); err == nil {
 		return ErrProjectExist
 	} else if !errors.Is(err, os.ErrNotExist) {
 		return err
@@ -41,21 +42,21 @@ func Init(ctx context.Context, rpath string, wizard bool) error {
 			return err
 		}
 
-		switch multi[0] {
-		case 'y', 'Y':
+		switch multi {
+		case "y", "Y":
 			// add supported multi arch install platforms
-			valist.Artifacts["linux/amd64"] = "path_to_bin"
-			valist.Artifacts["linux/arm64"] = "path_to_bin"
-			valist.Artifacts["darwin/amd64"] = "path_to_bin"
-			valist.Artifacts["darwin/arm64"] = "path_to_bin"
-			valist.Artifacts["windows/amd64"] = "path_to_bin"
+			pub.Artifacts["linux/amd64"] = "path_to_bin"
+			pub.Artifacts["linux/arm64"] = "path_to_bin"
+			pub.Artifacts["darwin/amd64"] = "path_to_bin"
+			pub.Artifacts["darwin/arm64"] = "path_to_bin"
+			pub.Artifacts["windows/amd64"] = "path_to_bin"
 		default:
 			// add some example artifacts
-			valist.Artifacts["exe"] = "path_to_bin"
-			valist.Artifacts["www"] = "path_to_web"
-			valist.Artifacts["img"] = "path_to_img"
+			pub.Artifacts["exe"] = "path_to_bin"
+			pub.Artifacts["www"] = "path_to_web"
+			pub.Artifacts["img"] = "path_to_img"
 		}
 	}
 
-	return valist.Save(vpath)
+	return pub.Save(vpath)
 }

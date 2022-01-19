@@ -30,7 +30,7 @@ func setup(c *cli.Context) error {
 
 	c.Context = context.WithValue(c.Context, command.ClientKey, client)
 	c.Context = context.WithValue(c.Context, command.ConfigKey, config)
-	
+
 	var acct = config.GetDefaultAccount()
 	var pass = c.String("passphrase")
 	// setup default account from config or override from flags
