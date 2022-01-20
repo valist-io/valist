@@ -3,11 +3,14 @@ package evm
 import (
 	"fmt"
 	"math/big"
+	"time"
 
 	"github.com/ethereum/go-ethereum/accounts"
 	"github.com/ethereum/go-ethereum/accounts/keystore"
 	"github.com/ethereum/go-ethereum/common"
 	"github.com/ethereum/go-ethereum/core/types"
+
+	"github.com/valist-io/valist/prompt"
 )
 
 const (
@@ -19,18 +22,14 @@ type AccountManager struct {
 	account  accounts.Account
 	keystore *keystore.KeyStore
 	signer   types.Signer
-	// cache for passwords so we don't prompt twice
-	// this should only be in memory for one command
-	passwords map[common.Address]string
 }
 
 // NewAccountManager returns an account manager
 // backed by the keystore at the given path.
 func NewAccountManager(path string, chainID *big.Int) *AccountManager {
 	return &AccountManager{
-		signer:    types.LatestSignerForChainID(chainID),
-		keystore:  keystore.NewKeyStore(path, scryptN, scryptP),
-		passwords: make(map[common.Address]string),
+		signer:   types.LatestSignerForChainID(chainID),
+		keystore: keystore.NewKeyStore(path, scryptN, scryptP),
 	}
 }
 
@@ -44,16 +43,19 @@ func (a *AccountManager) HasAccount(address string) bool {
 	return a.keystore.HasAddress(common.HexToAddress(address))
 }
 
-// SetAccount sets the current account with an optional password.
-func (a *AccountManager) SetAccount(address, password string) error {
+// SetAccount sets the current account and optionally unlocks it with the passphrase.
+func (a *AccountManager) SetAccount(address, passphrase string) (err error) {
 	addr := common.HexToAddress(address)
-	acct, err := a.keystore.Find(accounts.Account{Address: addr})
+	acct := accounts.Account{Address: addr}
+
+	a.account, err = a.keystore.Find(acct)
 	if err != nil {
 		return err
 	}
-	a.account = acct
-	a.passwords[addr] = password
-	return nil
+	if passphrase == "" {
+		return nil
+	}
+	return a.keystore.TimedUnlock(a.account, passphrase, 0)
 }
 
 // CreateAccount creates a new account encrypted with the given password.
@@ -90,14 +92,29 @@ func (a *AccountManager) ExportAccount(address, password, newPassword string) ([
 	return a.keystore.Export(acct, password, newPassword)
 }
 
-func (a *AccountManager) signTx(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
+func (a *AccountManager) SignTx(address common.Address, tx *types.Transaction) (*types.Transaction, error) {
 	if address != a.account.Address {
 		return nil, fmt.Errorf("not authorized")
 	}
 	signature, err := a.keystore.SignHash(a.account, a.signer.Hash(tx).Bytes())
+	if err == nil {
+		return tx.WithSignature(a.signer, signature)
+	}
+	if err != keystore.ErrLocked {
+		return nil, err
+	}
+SIGN_TX:
+	passphrase, err := prompt.AccountPassphrase().Run()
 	if err != nil {
 		return nil, err
 	}
-	// TODO retry with password
+	err = a.keystore.TimedUnlock(a.account, passphrase, 1*time.Minute)
+	if err != nil {
+		goto SIGN_TX
+	}
+	signature, err = a.keystore.SignHashWithPassphrase(a.account, passphrase, a.signer.Hash(tx).Bytes())
+	if err != nil {
+		return nil, err
+	}
 	return tx.WithSignature(a.signer, signature)
 }

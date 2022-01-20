@@ -36,8 +36,8 @@ type AccountAPI interface {
 	GetAccount() string
 	// HasAccount returns true if the account exists.
 	HasAccount(address string) bool
-	// SetAccount sets the current account with an optional password.
-	SetAccount(address, password string) error
+	// SetAccount sets the current account and optionally unlocks it with the passphrase.
+	SetAccount(address, passphrase string) error
 	// CreateAccount creates a new account with the given passphrase.
 	CreateAccount(passphrase string) (string, error)
 	// ListAccounts returns a list of all accounts.

@@ -7,8 +7,8 @@ import (
 )
 
 const (
-	// ContractTypeEthereum enables Ethereum contracts.
-	ContractTypeEthereum = "ethereum"
+	// ContractTypeEVM enables EVM contracts and accounts.
+	ContractTypeEVM = "evm"
 	// StorageTypeIPFS enables IPFS storage.
 	StorageTypeIPFS = "ipfs"
 )
@@ -48,7 +48,7 @@ func NewConfig(path string) *Config {
 	return &Config{
 		rootPath:               filepath.Join(path, ".valist"),
 		ApiAddress:             "localhost:9000",
-		ContractType:           ContractTypeEthereum,
+		ContractType:           ContractTypeEVM,
 		StorageType:            StorageTypeIPFS,
 		DefaultAccounts:        make(map[string]string),
 		EthereumRPC:            "https://rpc.valist.io",

@@ -239,7 +239,7 @@ func (c *Contract) txopts(ctx context.Context) *bind.TransactOpts {
 	return &bind.TransactOpts{
 		Context: ctx,
 		From:    c.accounts.account.Address,
-		Signer:  c.accounts.signTx,
+		Signer:  c.accounts.SignTx,
 	}
 }
 

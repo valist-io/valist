@@ -32,14 +32,12 @@ var once sync.Once
 func newCoreAPI(ctx context.Context, repoPath, apiAddr string) (coreiface.CoreAPI, error) {
 	var api coreiface.CoreAPI
 	var err error
-	envAddr := os.Getenv("VALIST_IPFS_ADDR")
 
-	switch {
-	case envAddr != "":
-		api, err = httpapi.NewURLApiWithClient(envAddr, &http.Client{})
-	case apiAddr != "":
+	if env := os.Getenv("VALIST_IPFS_ADDR"); env != "" {
+		api, err = httpapi.NewURLApiWithClient(env, &http.Client{})
+	} else if apiAddr != "" {
 		api, err = httpapi.NewURLApiWithClient(apiAddr, &http.Client{})
-	default:
+	} else {
 		api, err = httpapi.NewLocalApi()
 	}
 

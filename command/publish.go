@@ -34,24 +34,26 @@ func Publish(ctx context.Context, dryrun bool) error {
 
 	var artifacts = make(map[string]valist.Artifact)
 	for key, val := range pub.Artifacts {
-		logger.Info("Adding: %s...", key)
+		logger.Info("Adding %s...", key)
+
 		fpath, err := client.WriteFile(ctx, filepath.Join(cwd, val))
 		if err != nil {
 			return fmt.Errorf("failed to add %s: %v", key, err)
 		}
-		// TODO find a way to sha256 directories
 		artifacts[key] = valist.Artifact{
 			Provider: fpath,
 		}
+
+		logger.Info("Added %s @ %s", key, fpath)
 	}
 
 	readme, err := publish.Readme(cwd)
 	if err != nil {
-		logger.Warn("readme not found")
+		logger.Warn("Readme not found")
 	}
 	dependencies, err := publish.Dependencies(cwd)
 	if err != nil {
-		logger.Warn("dependencies not found")
+		logger.Warn("Dependencies not found")
 	}
 
 	release := &valist.Release{
@@ -70,11 +72,7 @@ func Publish(ctx context.Context, dryrun bool) error {
 	if err != nil {
 		return err
 	}
-
-	logger.Info("%s@%s", release.Name, pub.Tag)
-	for name, artifact := range release.Artifacts {
-		logger.Info("- %s: %s", name, artifact.Provider)
-	}
+	logger.Notice("Release @ %s", releasePath)
 	if dryrun {
 		return nil
 	}
