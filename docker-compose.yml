@@ -8,8 +8,6 @@ services:
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     command: ["daemon", "--migrate=true", "--writable=true"]
-    volumes:
-      - "./.data/ipfs:/data/ipfs"
     ports:
       - '4001:4001/tcp'
       - '4001:4001/udp'

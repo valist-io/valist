@@ -18,14 +18,11 @@ build-js:
 dev-js:
 	cd valist-js && lerna bootstrap && lerna run dev --parallel
 
-up:
-	docker-compose up
-
-down:
-	docker-compose down
+docker-compose:
+	bash ./docker-compose.sh
 
 dev:
-	$(MAKE) -j 2 up dev-js
+	$(MAKE) -j 2 docker-compose dev-js
 
 build: build-subgraph build-contracts build-js
 
