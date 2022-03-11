@@ -1,12 +1,16 @@
 [submodule "valist-js"]
 	path = valist-js
 	url = git@github.com:valist-io/valist-js.git
+	branch = main
 [submodule "valist-subgraph"]
 	path = valist-subgraph
 	url = git@github.com:valist-io/valist-subgraph.git
+	branch = main
 [submodule "valist-contracts"]
 	path = valist-contracts
 	url = git@github.com:valist-io/valist-contracts.git
+	branch = main
 [submodule "valist-near"]
 	path = valist-near
 	url = git@github.com:valist-io/valist-near.git
+	branch = main
