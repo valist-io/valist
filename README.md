@@ -4,15 +4,19 @@ This repo contains all services required to run Valist on your machine.
 
 ## Development
 
-This repo uses submodules to manage dependencies.
+Start by cloning the repo and updating submodules.
+
+```bash
+git clone https://github.com/valist-io/valist-meta
+
+cd valist-meta
+
+bash update-submodules.sh
+```
 
 To start the docker-compose run the following.
 
 ```bash
-git clone --recurse-submodules https://github.com/valist-io/valist-meta
-
-cd valist-meta
-
 make dev
 ```
 
