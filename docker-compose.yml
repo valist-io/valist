@@ -34,6 +34,7 @@ services:
       ipfs: 'ipfs:5001'
       ethereum: 'ganache:http://ganache:8545'
       GRAPH_LOG: debug
+      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: true
   postgres:
     image: postgres
     ports:
