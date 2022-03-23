@@ -8,6 +8,8 @@ services:
   ipfs:
     image: ipfs/go-ipfs:v0.10.0
     command: ["daemon", "--migrate=true", "--writable=true"]
+    volumes:
+      - "./.data/ipfs:/data/ipfs"
     ports:
       - '4001:4001/tcp'
       - '4001:4001/udp'
@@ -34,7 +36,7 @@ services:
       ipfs: 'ipfs:5001'
       ethereum: 'ganache:http://ganache:8545'
       GRAPH_LOG: debug
-      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: true
+      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: 1
   postgres:
     image: postgres
     ports:
