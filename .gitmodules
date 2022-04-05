@@ -18,3 +18,6 @@
 	url = git@github.com:valist-io/valist-near.git
 	branch = main
 	update = merge
+[submodule "valist-go"]
+	path = valist-go
+	url = git@github.com:valist-io/valist-go.git
