@@ -1,10 +1,10 @@
 SHELL=/bin/bash
 
 build-subgraph:
-	cd valist-subgraph && lerna bootstrap && lerna run codegen && lerna run build
+	cd valist-subgraph && npm install && npm run codegen && npm run build
 
 deploy-subgraph: build-subgraph
-	cd valist-subgraph && lerna run deploy:ganache
+	cd valist-subgraph && npm run deploy:ganache
 
 build-contracts:
 	cd valist-contracts && npm install && npm run build
