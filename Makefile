@@ -3,13 +3,13 @@ SHELL=/bin/bash
 build-subgraph:
 	cd valist-subgraph && npm install && npm run codegen && npm run build
 
-deploy-subgraph: build-subgraph
+deploy-subgraph:
 	cd valist-subgraph && npm run deploy:ganache
 
 build-contracts:
 	cd valist-contracts && npm install && npm run build
 
-deploy-contracts: build-contracts
+deploy-contracts:
 	cd valist-contracts && npm run deploy:ganache
 
 build-js:
