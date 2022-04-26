@@ -12,6 +12,9 @@ build-contracts:
 deploy-contracts:
 	cd valist-contracts && npm run deploy:ganache
 
+migrate-contracts:
+	cd valist-contracts && npm run migrate:ganache
+
 build-js:
 	cd valist-js && lerna bootstrap && lerna run build
 
@@ -27,3 +30,5 @@ dev:
 build: build-subgraph build-contracts build-js
 
 deploy: deploy-contracts deploy-subgraph
+
+migrate: migrate-contracts
