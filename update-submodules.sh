@@ -2,4 +2,4 @@
 
 git submodule update --init --remote
 
-git submodule foreach git checkout $1
+git submodule foreach git pull origin $1
