@@ -1,16 +1,19 @@
 SHELL=/bin/bash
 
 build-subgraph:
-	cd valist-subgraph && lerna bootstrap && lerna run codegen && lerna run build
+	cd valist-subgraph && npm install && npm run codegen && npm run build
 
-deploy-subgraph: build-subgraph
-	cd valist-subgraph && lerna run deploy:ganache
+deploy-subgraph:
+	cd valist-subgraph && npm run deploy:ganache
 
 build-contracts:
 	cd valist-contracts && npm install && npm run build
 
-deploy-contracts: build-contracts
+deploy-contracts:
 	cd valist-contracts && npm run deploy:ganache
+
+migrate-contracts:
+	cd valist-contracts && npm run migrate:ganache
 
 build-js:
 	cd valist-js && lerna bootstrap && lerna run build
@@ -27,3 +30,5 @@ dev:
 build: build-subgraph build-contracts build-js
 
 deploy: deploy-contracts deploy-subgraph
+
+migrate: migrate-contracts

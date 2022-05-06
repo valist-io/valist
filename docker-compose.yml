@@ -37,6 +37,7 @@ services:
       ethereum: 'ganache:http://ganache:8545'
       GRAPH_LOG: debug
       GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: 1
+      GRAPH_ETHEREUM_CLEANUP_BLOCKS: 1
   postgres:
     image: postgres
     ports:
