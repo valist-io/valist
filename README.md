@@ -19,9 +19,9 @@ Documentation for how to get started with Valist can be found at [https://docs.v
 
 ## Examples
 
-[Create React App](https://github.com/valist-io/example-create-react-app)
-[NextJS App](https://github.com/valist-io/example-next-app)
-[Go Multi Platform](https://github.com/valist-io/example-go-multi-platform)
+- [Create React App](https://github.com/valist-io/example-create-react-app)
+- [NextJS App](https://github.com/valist-io/example-next-app)
+- [Go Multi Platform](https://github.com/valist-io/example-go-multi-platform)
 
 ## Building
 
