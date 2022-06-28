@@ -17,6 +17,12 @@ Web3-native software distribution.
 
 Documentation for how to get started with Valist can be found at [https://docs.valist.io](https://docs.valist.io).
 
+## Examples
+
+[Create React App](https://github.com/valist-io/example-create-react-app)
+[NextJS App](https://github.com/valist-io/example-next-app)
+[Go Multi Platform](https://github.com/valist-io/example-go-multi-platform)
+
 ## Building
 
 This repo contains all services required to run Valist on your machine. However, you can also clone each repo and build components separately.
