@@ -1,0 +1,23 @@
+[submodule "valist-js"]
+	path = valist-js
+	url = git@github.com:valist-io/valist-js.git
+	branch = main
+	update = merge
+[submodule "valist-subgraph"]
+	path = valist-subgraph
+	url = git@github.com:valist-io/valist-subgraph.git
+	branch = main
+	update = merge
+[submodule "valist-contracts"]
+	path = valist-contracts
+	url = git@github.com:valist-io/valist-contracts.git
+	branch = main
+	update = merge
+[submodule "valist-near"]
+	path = valist-near
+	url = git@github.com:valist-io/valist-near.git
+	branch = main
+	update = merge
+[submodule "valist-go"]
+	path = valist-go
+	url = git@github.com:valist-io/valist-go.git

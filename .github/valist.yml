@@ -1,0 +1,12 @@
+name: Valist Publish
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: valist-io/valist-github-action@v2.3.1
+        with:
+          private-key:
+          account: acme-co
+          project: example
+          release: 0.0.1
+          path: 'build'

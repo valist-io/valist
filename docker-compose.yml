@@ -1,0 +1,49 @@
+version: '3'
+services:
+  ganache:
+    image: trufflesuite/ganache
+    ports:
+      - '8545:8545'
+    command: ["--deterministic"]
+  ipfs:
+    image: ipfs/go-ipfs:v0.10.0
+    command: ["daemon", "--migrate=true", "--writable=true"]
+    volumes:
+      - "./.data/ipfs:/data/ipfs"
+    ports:
+      - '4001:4001/tcp'
+      - '4001:4001/udp'
+      - '5001:5001'
+      - '8080:8080'
+  graph-node:
+    image: graphprotocol/graph-node
+    ports:
+      - '8000:8000'
+      - '8001:8001'
+      - '8020:8020'
+      - '8030:8030'
+      - '8040:8040'
+    restart: always
+    depends_on:
+      - ganache
+      - postgres
+      - ipfs
+    environment:
+      postgres_host: postgres
+      postgres_user: graph-node
+      postgres_pass: let-me-in
+      postgres_db: graph-node
+      ipfs: 'ipfs:5001'
+      ethereum: 'ganache:http://ganache:8545'
+      GRAPH_LOG: debug
+      GRAPH_ALLOW_NON_DETERMINISTIC_IPFS: 1
+      GRAPH_ETHEREUM_CLEANUP_BLOCKS: 1
+  postgres:
+    image: postgres
+    ports:
+      - '5432:5432'
+    command: ["postgres", "-cshared_preload_libraries=pg_stat_statements"]
+    environment:
+      POSTGRES_USER: graph-node
+      POSTGRES_PASSWORD: let-me-in
+      POSTGRES_DB: graph-node
